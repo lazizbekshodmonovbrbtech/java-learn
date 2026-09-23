@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQL chuqur</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐘</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F8FB;--sunken:#E6ECF2;
+  --ink:#182430;--ink-soft:#4C5866;--ink-faint:#7C8896;--border:#D8E0E9;--border-strong:#C3CDD8;
+  --accent:#2E6FA8;--accent-ink:#1F5183;--accent-soft:#E1EDF7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+.rt{border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;background:var(--surface);margin-top:10px}
+.rt table{border-collapse:collapse;width:100%;font-family:var(--font-mono);font-size:12px}
+.rt th{background:var(--accent-soft);color:var(--accent-ink);text-align:left;padding:7px 10px;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+.rt td{padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;transition:.3s}
+.rt tr:last-child td{border-bottom:0}
+.rt tr.out td{opacity:.25;text-decoration:line-through}
+.rt tr.grp1 td{background:var(--teal-soft)}.rt tr.grp2 td{background:var(--purple-soft)}.rt tr.grp3 td{background:var(--amber-soft)}
+.rt td.nullv{color:var(--amber);font-style:italic}
+.rt td.win{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.rt tr.um td{background:var(--amber-soft)}
+.rt tr{animation:pop .25s both}
+/* order */
+.ord{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.oc{font-family:var(--font-mono);font-size:12.5px;padding:7px 11px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface-2);transition:.3s;position:relative}
+.oc .num{position:absolute;top:-8px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--ink-faint);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
+.oc.cur{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600;transform:translateY(-2px)}
+.oc.cur .num{background:var(--accent)}
+.oc.done{border-color:var(--teal)}.oc.done .num{background:var(--teal)}
+.rows-cnt{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+.rows-cnt b{color:var(--accent-ink);font-size:15px}
+/* join lab */
+.jsrc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.venn{display:flex;justify-content:center;margin-top:8px}
+.venn svg{width:200px;height:110px}
+.venn .L,.venn .R{fill:var(--sunken);stroke:var(--border-strong);stroke-width:1.5;transition:.3s}
+.venn .L.on,.venn .R.on{fill:var(--accent-soft);stroke:var(--accent)}
+.venn .M{fill:none;transition:.3s}.venn .M.on{fill:var(--accent)}
+.venn text{font-family:var(--font-mono);font-size:11px;fill:var(--ink-soft)}
+/* sub/exists */
+.eqv{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.eqc{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--surface-2);cursor:pointer;transition:.2s}
+.eqc.on{border-color:var(--accent);background:var(--accent-soft)}
+.eqc pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;white-space:pre-wrap}
+.eqc .lbl{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:4px}
+/* null */
+.nrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nq{font-family:var(--font-mono);font-size:12.5px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface-2);cursor:pointer;transition:.2s}
+.nq.on{border-color:var(--accent);background:var(--accent-soft)}
+.nres{margin-top:10px;font-family:var(--font-mono);font-size:15px;text-align:center;padding:12px;border-radius:12px;border:1.5px dashed var(--border)}
+.nres.t{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}.nres.f{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}.nres.n{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+@media (max-width:560px){.jsrc{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2E6FA8"></span> PostgreSQL · 2/4</span><span>· Kurs: 34/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>PostgreSQL · 34-modul · noldan</span>
+    <h1>SQL chuqur: <span class="steam">JOIN, CTE, window</span></h1>
+    <p class="lead">SQL "nima kerak"ni aytadi, baza "qanday olish"ni o'zi hal qiladi. Lekin so'rov qanday <b>bajarilishini</b> tushunmasangiz, natija kutilmagan bo'ladi. Bu modulda har bosqichda satrlar qanday kamayib-ko'payishini ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>So'rov yozilish tartibi ≠ bajarilish tartibi</h2></div>
+    <p class="sec-sub">Siz SELECT'dan boshlab yozasiz, baza FROM'dan boshlab bajaradi. Shuning uchun WHERE'da alias ishlamaydi, HAVING'da esa agregat ishlaydi. 10 ta tranzaksiya ustida qadamlab yuring.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">hisobot.sql</span></div>
+      <pre class="code"><span class="k">SELECT</span>   hisob_id, <span class="k">COUNT</span>(*) <span class="k">AS</span> soni, <span class="k">SUM</span>(summa) <span class="k">AS</span> jami
+<span class="k">FROM</span>     tranzaksiya
+<span class="k">WHERE</span>    holat = <span class="st">'OK'</span>
+<span class="k">GROUP BY</span> hisob_id
+<span class="k">HAVING</span>   <span class="k">SUM</span>(summa) &gt; <span class="nu">150000</span>
+<span class="k">ORDER BY</span> jami <span class="k">DESC</span>
+<span class="k">LIMIT</span>    <span class="nu">1</span>;</pre>
+    </div>
+    <div class="stage">
+      <div class="ord" id="ord"></div>
+      <div class="rt" id="ordT"></div>
+      <div class="rows-cnt" id="ordCnt"></div>
+      <div class="ctrls"><button class="btn" id="exPrev">‹</button><button class="btn primary" id="exPlay">▶ Avto</button><button class="btn" id="exNext">›</button><div class="bar"><div id="exBar"></div></div></div>
+      <div class="explain" id="exEx"></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Suhbatda</div>"WHERE va HAVING farqi?" — WHERE <b>guruhlashdan oldin</b> satrlarni filtrlaydi (agregat ishlatib bo'lmaydi). HAVING <b>guruhlashdan keyin</b> guruhlarni filtrlaydi (agregat bilan). WHERE'ni iloji boricha ko'proq ishlating — kamroq satr guruhlanadi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>JOIN laboratoriyasi — 5 tur, bitta ma'lumot</h2></div>
+    <p class="sec-sub">Chapda mijozlar (Sardor'ning hisobi yo'q), o'ngda hisoblar (#4 egasiz — mijoz_id NULL). JOIN turini almashtiring va natija jadvalini kuzating.</p>
+    <div class="stage">
+      <div class="seg" id="jseg"><button class="on" data-j="INNER">INNER</button><button data-j="LEFT">LEFT</button><button data-j="RIGHT">RIGHT</button><button data-j="FULL">FULL</button><button data-j="CROSS">CROSS</button></div>
+      <div class="venn"><svg viewBox="0 0 200 110"><circle class="L" id="vL" cx="75" cy="55" r="45"/><circle class="R" id="vR" cx="125" cy="55" r="45"/><path class="M" id="vM" d="M100 15.6 A45 45 0 0 1 100 94.4 A45 45 0 0 1 100 15.6 Z"/><text x="30" y="100">mijoz</text><text x="140" y="100">hisob</text></svg></div>
+      <div class="jsrc">
+        <div class="rt"><table><tr><th colspan="2">mijoz</th></tr><tr><td>1</td><td>Otabek</td></tr><tr><td>2</td><td>Dilnoza</td></tr><tr><td>3</td><td>Sardor</td></tr></table></div>
+        <div class="rt"><table><tr><th colspan="3">hisob</th></tr><tr><td>#1</td><td>UZS</td><td>mijoz_id 1</td></tr><tr><td>#2</td><td>USD</td><td>mijoz_id 1</td></tr><tr><td>#3</td><td>UZS</td><td>mijoz_id 2</td></tr><tr><td>#4</td><td>EUR</td><td class="nullv">mijoz_id NULL</td></tr></table></div>
+      </div>
+      <div class="sqlout" style="margin-top:12px;font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px 14px" id="jsql"></div>
+      <div class="rt" id="jres"></div>
+      <div class="explain" id="jex"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ LEFT JOIN + WHERE tuzog'i</div><code>LEFT JOIN hisob h ON … WHERE h.valyuta = 'UZS'</code> — WHERE NULL satrlarni o'chiradi, LEFT JOIN INNER'ga aylanadi! Shartni <b>ON</b> ichiga qo'ying: <code>ON h.mijoz_id = m.id AND h.valyuta = 'UZS'</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Bir savol — uch yo'l: JOIN, IN, EXISTS</h2></div>
+    <p class="sec-sub">"Kamida bitta hisobi bor mijozlar" — uchta ekvivalent so'rov. Bosing, farqini o'qing.</p>
+    <div class="eqv" id="eqv"></div>
+    <div class="explain" id="eqEx"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>CTE (WITH) — so'rovni bosqichlarga bo'lish</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">cte.sql</span></div>
+      <pre class="code"><span class="k">WITH</span> oylik <span class="k">AS</span> (                                   <span class="cm">-- 1-qadam: har hisobning oylik aylanmasi</span>
+    <span class="k">SELECT</span> hisob_id, date_trunc(<span class="st">'month'</span>, vaqt) <span class="k">AS</span> oy, <span class="k">SUM</span>(summa) <span class="k">AS</span> jami
+    <span class="k">FROM</span> tranzaksiya <span class="k">WHERE</span> holat = <span class="st">'OK'</span>
+    <span class="k">GROUP BY</span> hisob_id, date_trunc(<span class="st">'month'</span>, vaqt)
+),
+faol <span class="k">AS</span> (                                          <span class="cm">-- 2-qadam: 3 oydan ko'p faol bo'lganlar</span>
+    <span class="k">SELECT</span> hisob_id <span class="k">FROM</span> oylik <span class="k">GROUP BY</span> hisob_id <span class="k">HAVING</span> <span class="k">COUNT</span>(*) &gt;= <span class="nu">3</span>
+)
+<span class="k">SELECT</span> m.ism, o.oy, o.jami                            <span class="cm">-- 3-qadam: yakuniy hisobot</span>
+<span class="k">FROM</span> oylik o
+<span class="k">JOIN</span> faol f <span class="k">ON</span> f.hisob_id = o.hisob_id
+<span class="k">JOIN</span> hisob h <span class="k">ON</span> h.id = o.hisob_id
+<span class="k">JOIN</span> mijoz m <span class="k">ON</span> m.id = h.mijoz_id
+<span class="k">ORDER BY</span> m.ism, o.oy;
+
+<span class="cm">-- Rekursiv CTE: filial ierarxiyasi (bosh ofis → viloyat → tuman)</span>
+<span class="k">WITH RECURSIVE</span> daraxt <span class="k">AS</span> (
+    <span class="k">SELECT</span> id, nom, ota_id, <span class="nu">1</span> <span class="k">AS</span> daraja <span class="k">FROM</span> filial <span class="k">WHERE</span> ota_id <span class="k">IS NULL</span>
+    <span class="k">UNION ALL</span>
+    <span class="k">SELECT</span> f.id, f.nom, f.ota_id, d.daraja + <span class="nu">1</span> <span class="k">FROM</span> filial f <span class="k">JOIN</span> daraxt d <span class="k">ON</span> f.ota_id = d.id
+)
+<span class="k">SELECT</span> * <span class="k">FROM</span> daraxt <span class="k">ORDER BY</span> daraja;</pre>
+    </div>
+    <div class="grid2">
+      <div class="card good"><h4>CTE afzalligi</h4><p>O'qiladi — yuqoridan pastga qadamlar. Bir nomni bir necha marta ishlatish. Rekursiya (daraxt, graf). PostgreSQL 12+ CTE'ni inline qiladi (optimizatsiya to'sqinlik emas); <code>MATERIALIZED</code> bilan majburlash mumkin.</p></div>
+      <div class="card"><h4>Subquery vs CTE</h4><p>Ikkalasi bir xil natija. Subquery ichma-ich o'qish qiyin; CTE — nomlangan bosqich. 2+ marta ishlatilsa yoki ichma-ichlik 2 darajadan oshsa — CTE.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Window funksiyalar — guruhlab, lekin satrlarni yo'qotmasdan</h2></div>
+    <p class="sec-sub">GROUP BY satrlarni "yig'ib" 1 ta qiladi. <b>Window</b> — har satr o'z o'rnida qoladi, yoniga guruh bo'yicha hisob qo'shiladi. Funksiyani tanlang — yangi ustun paydo bo'ladi. Rang — PARTITION (hisob).</p>
+    <div class="stage">
+      <div class="seg" id="wseg"><button class="on" data-w="row">ROW_NUMBER()</button><button data-w="rank">RANK()</button><button data-w="sum">SUM() — yig'ilib boruvchi</button><button data-w="lag">LAG() — oldingi</button><button data-w="grp">GROUP BY (taqqoslash)</button></div>
+      <div class="sqlout" style="margin-top:12px;font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px 14px;white-space:pre-wrap" id="wsql"></div>
+      <div class="rt" id="wres"></div>
+      <div class="explain" id="wex"></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Bank klassikasi</div>"Har hisobning oxirgi tranzaksiyasi": <code>ROW_NUMBER() OVER (PARTITION BY hisob_id ORDER BY vaqt DESC)</code> → tashqi so'rovda <code>WHERE rn = 1</code>. Yoki PostgreSQL'ga xos: <code>SELECT DISTINCT ON (hisob_id) * FROM tranzaksiya ORDER BY hisob_id, vaqt DESC</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>NULL — uch qiymatli mantiq</h2></div>
+    <p class="sec-sub">NULL "noma'lum" degani, "bo'sh" emas. Har ifodani bosing — natijasi TRUE / FALSE / NULL.</p>
+    <div class="stage">
+      <div class="nrow" id="nrow"></div>
+      <div class="nres" id="nres">Ifodani tanlang</div>
+      <div class="explain" id="nex"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ NOT IN tuzog'i</div><code>WHERE id NOT IN (SELECT mijoz_id FROM hisob)</code> — subquery'da bitta NULL bo'lsa, butun natija <b>bo'sh</b>! (x ≠ NULL → NULL → satr chiqmaydi). Yechim: <code>NOT EXISTS</code> yoki <code>WHERE mijoz_id IS NOT NULL</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SQL so'rovi qanday tartibda bajariladi?<span class="chev">›</span></summary><div class="iv-a">FROM/JOIN → WHERE → GROUP BY → HAVING → SELECT (ifodalar, alias) → DISTINCT → ORDER BY → LIMIT/OFFSET. Shuning uchun WHERE'da SELECT alias'i ishlamaydi, ORDER BY'da ishlaydi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>INNER, LEFT, RIGHT, FULL, CROSS farqi?<span class="chev">›</span></summary><div class="iv-a">INNER — faqat mos juftliklar. LEFT — chapning hammasi + mos o'ng (yo'q bo'lsa NULL). RIGHT — teskarisi. FULL — ikkalasining hammasi. CROSS — dekart ko'paytma (n×m), ON yo'q. Amalda 95% INNER va LEFT.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>IN, EXISTS, JOIN — qaysi tez?<span class="chev">›</span></summary><div class="iv-a">Zamonaviy PostgreSQL planner ko'pincha bir xil rejaga keltiradi (semi-join). EXISTS — birinchi mos topilganda to'xtaydi, NULL'dan xavfsiz. IN — kichik ro'yxat uchun qulay. JOIN — o'ng jadvaldan ustun ham kerak bo'lsa; lekin takrorlanish (dublikat) chiqishi mumkin — DISTINCT kerak bo'ladi. Javob: EXPLAIN bilan tekshiring.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Window funksiya va GROUP BY farqi?<span class="chev">›</span></summary><div class="iv-a">GROUP BY guruhni bitta satrga yig'adi (satrlar yo'qoladi). Window (<code>OVER</code>) — har satr qoladi, yoniga guruh bo'yicha hisob qo'shiladi: running total, rank, oldingi/keyingi satr (LAG/LEAD), foiz ulushi. PARTITION BY — guruh, ORDER BY — frame tartibi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>RANK, DENSE_RANK, ROW_NUMBER farqi?<span class="chev">›</span></summary><div class="iv-a">Teng qiymatlarda: ROW_NUMBER — baribir 1,2,3 (tasodifiy tartib). RANK — 1,1,3 (bo'shliq qoldiradi). DENSE_RANK — 1,1,2 (bo'shliqsiz). "Top-3 mijoz" — DENSE_RANK; "har guruhdan bittasi" — ROW_NUMBER.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>UNION va UNION ALL?<span class="chev">›</span></summary><div class="iv-a">UNION dublikatlarni olib tashlaydi (sort/hash — qimmat). UNION ALL — shunchaki qo'shadi, tez. Dublikat bo'lishi mumkin emasligini bilsangiz — doim ALL.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>N+1 muammosini SQL darajasida qanday hal qilasiz?<span class="chev">›</span></summary><div class="iv-a">Bitta JOIN so'rov yoki <code>WHERE id IN (...)</code> batch. JPA'da <code>JOIN FETCH</code> / <code>@EntityGraph</code> (29-modul). Ro'yxat + har element uchun alohida so'rov — hech qachon.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">1.</span>Guruhlangan natijani agregat bo'yicha filtrlash?</div>
+        <button class="opt">WHERE SUM(summa) > 100</button><button class="opt">ORDER BY</button><button class="opt">HAVING SUM(summa) > 100</button>
+        <div class="q-fb" data-ok="To'g'ri. HAVING — guruhlashdan keyin." data-no="Yo'q. WHERE guruhlashdan oldin ishlaydi, agregat bilmaydi. HAVING kerak."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Hisobi yo'q mijozlarni ham ko'rish uchun?</div>
+        <button class="opt">INNER JOIN</button><button class="opt">LEFT JOIN</button><button class="opt">CROSS JOIN</button>
+        <div class="q-fb" data-ok="To'g'ri. LEFT — chapning hammasi, o'ng NULL." data-no="Yo'q. LEFT JOIN chap jadvalni to'liq saqlaydi."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span><code>NULL = NULL</code> natijasi?</div>
+        <button class="opt">NULL (noma'lum)</button><button class="opt">TRUE</button><button class="opt">FALSE</button>
+        <div class="q-fb" data-ok="To'g'ri. NULL bilan taqqoslash doim NULL. IS NULL ishlating." data-no="Yo'q. NULL noma'lum — taqqoslash natijasi ham noma'lum (NULL)."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Har satrni saqlab, guruh bo'yicha yig'indi qo'shish?</div>
+        <button class="opt">GROUP BY</button><button class="opt">SUM() OVER (PARTITION BY …)</button><button class="opt">DISTINCT</button>
+        <div class="q-fb" data-ok="To'g'ri. Window funksiya satrlarni yo'qotmaydi." data-no="Yo'q. GROUP BY satrlarni yig'adi; satrlar qolishi uchun window (OVER)."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · PostgreSQL</span>
+      <h3>Indeks va EXPLAIN</h3>
+      <p>B-tree qanday ishlaydi, Seq Scan vs Index Scan jonli taqqoslash, EXPLAIN ANALYZE o'qish, composite/partial indeks, qachon indeks ishlamaydi.</p>
+      <div class="topics"><span class="topic-pill">33 · PG asoslari</span><span class="topic-pill now">34 · SQL chuqur</span><span class="topic-pill">35 · Indeks & EXPLAIN</span><span class="topic-pill">36 · Tranzaksiya</span><span class="topic-pill">37 · Big-O</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="33-asoslar-va-constraintlar.html"><span class="cl">← Oldingi dars</span><span class="ct">33 · Asoslar va constraint&#x27;lar</span><span class="cs">🐘 PostgreSQL</span></a><a class="cn nx" href="35-indeks-va-explain.html"><span class="cl">Keyingi dars →</span><span class="ct">35 · Indeks va EXPLAIN</span><span class="cs">🐘 PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:38.6%"></i></div><span>34 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(34)<0)v.push(34);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','34');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(34)<0)D[t].push(34);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  function tbl(cols,rows,cls){return '<table><tr>'+cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>'+rows.map(function(r,i){return '<tr class="'+(cls?cls(r,i):'')+'">'+r.map(function(v){return v===null?'<td class="nullv">NULL</td>':(typeof v==='object'?'<td class="'+v.c+'">'+v.v+'</td>':'<td>'+v+'</td>');}).join('')+'</tr>';}).join('')+'</table>';}
+  /* execution order */
+  var tx=[[1,1,'OK',50000],[2,1,'OK',120000],[3,2,'OK',30000],[4,2,'XATO',80000],[5,3,'OK',200000],[6,1,'OK',15000],[7,3,'OK',40000],[8,2,'OK',25000],[9,3,'XATO',10000],[10,2,'OK',60000]];
+  var cols=['id','hisob_id','holat','summa'];
+  var ordT=document.getElementById('ordT'),ordC=document.getElementById('ordCnt'),ordEl=document.getElementById('ord'),exEx=document.getElementById('exEx');
+  var stages=['FROM tranzaksiya','WHERE holat=OK','GROUP BY hisob_id','HAVING SUM>150000','SELECT ustunlar','ORDER BY jami DESC','LIMIT 1'];
+  ordEl.innerHTML=stages.map(function(s,i){return '<span class="oc"><span class="num">'+(i+1)+'</span>'+s+'</span>';}).join('');
+  var gcls={1:'grp1',2:'grp2',3:'grp3'};
+  function groups(rows){var g={};rows.forEach(function(r){(g[r[1]]=g[r[1]]||[]).push(r);});return Object.keys(g).map(function(k){return [+k,g[k].length,g[k].reduce(function(a,r){return a+r[3];},0)];});}
+  var ok=tx.filter(function(r){return r[2]==='OK';});
+  var ex=[
+    function(){ordT.innerHTML=tbl(cols,tx);ordC.innerHTML='<b>10</b> satr — jadval to\'liq o\'qildi (yoki indeks orqali).';exEx.innerHTML='<b>1. FROM.</b> Baza avval qaysi jadval(lar)dan olishni hal qiladi, JOIN\'lar shu yerda. Hali hech narsa filtrlanmagan.';},
+    function(){ordT.innerHTML=tbl(cols,tx,function(r){return r[2]==='OK'?'':'out';});ordC.innerHTML='<b>8</b> satr — 2 ta XATO tushib qoldi.';exEx.innerHTML='<b>2. WHERE.</b> Har satr alohida tekshiriladi. Agregat (SUM, COUNT) bu yerda <b>mumkin emas</b> — guruhlar hali yo\'q. SELECT\'dagi alias (jami) ham hali yo\'q.';},
+    function(){var s=ok.slice().sort(function(a,b){return a[1]-b[1];});ordT.innerHTML=tbl(cols,s,function(r){return gcls[r[1]];});ordC.innerHTML='<b>3</b> guruh (hisob 1, 2, 3) — rang bilan.';exEx.innerHTML='<b>3. GROUP BY.</b> Satrlar hisob_id bo\'yicha to\'plamlarga yig\'iladi. Endi har guruh uchun COUNT/SUM hisoblanadi. Guruhlanmagan ustunni (masalan, holat) SELECT\'da ishlatib bo\'lmaydi.';},
+    function(){var g=groups(ok);ordT.innerHTML=tbl(['hisob_id','COUNT(*)','SUM(summa)'],g,function(r){return (r[2]>150000?gcls[r[0]]:'out');});ordC.innerHTML='<b>2</b> guruh qoldi — hisob 2 (115 000) tushib qoldi.';exEx.innerHTML='<b>4. HAVING.</b> Endi guruhlarni filtrlaymiz — agregat bilan. Hisob 1: 185 000 ✓, hisob 2: 115 000 ✗, hisob 3: 240 000 ✓. WHERE bu yerda ishlamasdi — u guruhlashdan oldin edi, SUM hali yo\'q edi.';},
+    function(){var g=groups(ok).filter(function(r){return r[2]>150000;});ordT.innerHTML=tbl(['hisob_id','soni','jami'],g,function(r){return gcls[r[0]];});ordC.innerHTML='<b>2</b> satr — endi ustunlar nomlandi (alias).';exEx.innerHTML='<b>5. SELECT.</b> Faqat endi ustunlar tanlanadi va alias (soni, jami) beriladi. Shuning uchun alias ORDER BY\'da ishlaydi (keyin keladi), WHERE\'da ishlamaydi (oldin edi).';},
+    function(){var g=groups(ok).filter(function(r){return r[2]>150000;}).sort(function(a,b){return b[2]-a[2];});ordT.innerHTML=tbl(['hisob_id','soni','jami'],g,function(r){return gcls[r[0]];});ordC.innerHTML='<b>2</b> satr — jami bo\'yicha kamayish tartibida.';exEx.innerHTML='<b>6. ORDER BY.</b> Natija saralanadi. Bu qimmat amal (sort) — LIMIT bilan birga bo\'lsa PostgreSQL top-N heapsort ishlatadi. Indeks tartibi mos kelsa sort umuman kerak bo\'lmaydi.';},
+    function(){var g=groups(ok).filter(function(r){return r[2]>150000;}).sort(function(a,b){return b[2]-a[2];});ordT.innerHTML=tbl(['hisob_id','soni','jami'],g,function(r,i){return i<1?gcls[r[0]]:'out';});ordC.innerHTML='<b>1</b> satr — yakuniy natija.';exEx.innerHTML='<b>7. LIMIT 1.</b> Eng oxirida — faqat birinchi 1 ta qaytariladi. OFFSET ham shu yerda (lekin katta OFFSET sekin — keyset pagination afzal: <code>WHERE id &gt; :oxirgi ORDER BY id LIMIT 20</code>).';}
+  ];
+  mkStepper('ex',ex.length,function(i){[].slice.call(ordEl.children).forEach(function(c,k){c.classList.toggle('cur',k===i);c.classList.toggle('done',k<i);});ex[i]();},3200);
+
+  /* join lab */
+  var M=[[1,'Otabek'],[2,'Dilnoza'],[3,'Sardor']],H=[[1,'UZS',1],[2,'USD',1],[3,'UZS',2],[4,'EUR',null]];
+  var jres=document.getElementById('jres'),jex=document.getElementById('jex'),jsql=document.getElementById('jsql');
+  function join(t){
+    var rows=[],ex='';
+    var pairs=[];M.forEach(function(m){H.forEach(function(h){if(h[2]===m[0])pairs.push([m[0],m[1],'#'+h[0],h[1],'']);});});
+    if(t==='INNER'){rows=pairs;ex='<b>INNER</b>: faqat ON sharti bajarilgan juftliklar. Sardor (hisobsiz) va #4 (egasiz) yo\'q. 3 satr.';}
+    if(t==='LEFT'){rows=pairs.concat([[3,'Sardor',null,null,'um']]);ex='<b>LEFT</b>: mijoz to\'liq. Sardor keldi, hisob ustunlari NULL (sariq). #4 hali ham yo\'q — u o\'ng tomonning "yetimi". 4 satr.';}
+    if(t==='RIGHT'){rows=pairs.concat([[null,null,'#4','EUR','um']]);ex='<b>RIGHT</b>: hisob to\'liq. #4 keldi (mijoz NULL), Sardor yo\'q. Amalda kam ishlatiladi — jadvallarni almashtirib LEFT yoziladi. 4 satr.';}
+    if(t==='FULL'){rows=pairs.concat([[3,'Sardor',null,null,'um'],[null,null,'#4','EUR','um']]);ex='<b>FULL OUTER</b>: ikkala tomonning hammasi. Ikki yetim ham keldi. Ma\'lumot solishtirish (reconciliation) uchun: "qaysi yozuv qaysi tomonda yo\'q?" 5 satr.';}
+    if(t==='CROSS'){M.forEach(function(m){H.forEach(function(h){rows.push([m[0],m[1],'#'+h[0],h[1],'']);});});ex='<b>CROSS</b>: ON yo\'q — har mijoz × har hisob = 3×4 = <b>12</b> satr. Deyarli doim xato (ON unutilgan JOIN shunday bo\'ladi!). Foydali holat: kalendar × filial jadvali yaratish.';}
+    jsql.textContent='SELECT m.id, m.ism, h.id, h.valyuta\nFROM mijoz m '+t+' JOIN hisob h'+(t==='CROSS'?'':' ON h.mijoz_id = m.id')+';';
+    jres.innerHTML=tbl(['m.id','ism','h.id','valyuta'],rows.map(function(r){return r.slice(0,4);}),function(r,i){return rows[i][4];});jex.innerHTML=ex;
+    document.getElementById('vL').classList.toggle('on',t==='LEFT'||t==='FULL'||t==='CROSS');document.getElementById('vR').classList.toggle('on',t==='RIGHT'||t==='FULL'||t==='CROSS');document.getElementById('vM').classList.toggle('on',t!=='CROSS');
+  }
+  document.getElementById('jseg').addEventListener('click',function(e){if(!e.target.dataset.j)return;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});join(e.target.dataset.j);});join('INNER');
+
+  /* equivalents */
+  var eqs=[
+    {l:'JOIN + DISTINCT',c:'SELECT DISTINCT m.*\nFROM mijoz m\nJOIN hisob h ON h.mijoz_id = m.id;',x:'JOIN mijozni har hisob uchun takrorlaydi (Otabek 2 marta) — DISTINCT kerak. Hisob ustunlari ham kerak bo\'lsa — to\'g\'ri tanlov. Faqat "bormi?" savoliga — ortiqcha ish.'},
+    {l:'IN (subquery)',c:'SELECT * FROM mijoz\nWHERE id IN (SELECT mijoz_id FROM hisob);',x:'O\'qish oson. Planner semi-join qiladi. Xavf: subquery\'da NULL bo\'lsa IN ishlaydi, lekin <b>NOT IN</b> bo\'sh natija beradi.'},
+    {l:'EXISTS (correlated)',c:'SELECT * FROM mijoz m\nWHERE EXISTS (SELECT 1 FROM hisob h\n              WHERE h.mijoz_id = m.id);',x:'Har mijoz uchun "kamida bittasi bormi?" — birinchi topilganda to\'xtaydi. NULL\'dan xavfsiz, NOT EXISTS ham to\'g\'ri ishlaydi. Katta jadvallarda ko\'pincha eng barqaror.'}
+  ];
+  var eqv=document.getElementById('eqv');eqv.innerHTML=eqs.map(function(e,i){return '<div class="eqc'+(i===0?' on':'')+'" data-i="'+i+'"><div class="lbl">'+e.l+'</div><pre>'+e.c+'</pre></div>';}).join('');
+  document.getElementById('eqEx').innerHTML=eqs[0].x;
+  eqv.addEventListener('click',function(e){var c=e.target.closest('.eqc');if(!c)return;[].slice.call(eqv.children).forEach(function(x){x.classList.toggle('on',x===c);});document.getElementById('eqEx').innerHTML=eqs[+c.dataset.i].x;});
+
+  /* window */
+  var W=[[1,1,'01-mart',50000],[2,1,'03-mart',120000],[6,1,'09-mart',15000],[3,2,'02-mart',30000],[8,2,'07-mart',25000],[10,2,'10-mart',60000],[5,3,'04-mart',200000],[7,3,'06-mart',40000]];
+  var wres=document.getElementById('wres'),wex=document.getElementById('wex'),wsql=document.getElementById('wsql');
+  function win(t){
+    var cols=['id','hisob_id','vaqt','summa'],rows=[],sql='',x='';
+    if(t==='grp'){var g={};W.forEach(function(r){g[r[1]]=(g[r[1]]||0)+r[3];});rows=Object.keys(g).map(function(k){return [+k,{v:g[k].toLocaleString(),c:'win'}];});cols=['hisob_id','SUM(summa)'];sql='SELECT hisob_id, SUM(summa)\nFROM tranzaksiya GROUP BY hisob_id;';x='<b>GROUP BY</b>: 8 satr → 3 satr. Tranzaksiyalarning o\'zi yo\'qoldi — faqat yig\'indi qoldi.';}
+    else{
+      var run={},prev={},cnt={};
+      rows=W.map(function(r){var h=r[1];cnt[h]=(cnt[h]||0)+1;run[h]=(run[h]||0)+r[3];var v;
+        if(t==='row')v=cnt[h];if(t==='rank')v=cnt[h];if(t==='sum')v=run[h].toLocaleString();if(t==='lag')v=prev[h]===undefined?null:prev[h].toLocaleString();prev[h]=r[3];
+        return [r[0],r[1],r[2],r[3].toLocaleString(),v===null?null:{v:v,c:'win'}];});
+      var f={row:'ROW_NUMBER() OVER (PARTITION BY hisob_id ORDER BY vaqt) AS rn',rank:'RANK() OVER (PARTITION BY hisob_id ORDER BY vaqt) AS rnk',sum:'SUM(summa) OVER (PARTITION BY hisob_id ORDER BY vaqt) AS yigilgan',lag:'LAG(summa) OVER (PARTITION BY hisob_id ORDER BY vaqt) AS oldingi'}[t];
+      cols.push(f.split(' AS ')[1]);sql='SELECT id, hisob_id, vaqt, summa,\n       '+f+'\nFROM tranzaksiya ORDER BY hisob_id, vaqt;';
+      x={row:'<b>ROW_NUMBER</b>: har hisob (partition) ichida vaqt bo\'yicha 1,2,3… 8 satr <b>saqlanib qoldi</b>. "Har hisobning birinchi/oxirgi tranzaksiyasi" — rn = 1.',rank:'<b>RANK</b>: bu yerda vaqtlar takrorlanmagani uchun ROW_NUMBER bilan bir xil. Teng qiymatda RANK 1,1,3 beradi, DENSE_RANK 1,1,2.',sum:'<b>Yig\'ilib boruvchi yig\'indi</b> (running total): har satrda "shu vaqtgacha jami". Hisob ko\'chirmasidagi "qoldiq" ustuni aynan shu. ORDER BY frame\'ni "boshidan hozirgacha" qiladi.',lag:'<b>LAG</b>: oldingi satr qiymati (partition ichida). Birinchi satrda NULL. "Oldingi tranzaksiyadan farqi" — <code>summa - LAG(summa) OVER (...)</code>. LEAD — keyingisi.'}[t];
+    }
+    wsql.textContent=sql;wres.innerHTML=tbl(cols,rows,function(r){return {1:'grp1',2:'grp2',3:'grp3'}[t==='grp'?r[0]:r[1]];});wex.innerHTML=x;
+  }
+  document.getElementById('wseg').addEventListener('click',function(e){if(!e.target.dataset.w)return;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});win(e.target.dataset.w);});win('row');
+
+  /* null */
+  var N=[
+    {q:'NULL = NULL',r:'n',x:'Noma\'lum = noma\'lum? Javob — noma\'lum. WHERE\'da NULL → satr chiqmaydi (faqat TRUE o\'tadi).'},
+    {q:'NULL IS NULL',r:'t',x:'Bu to\'g\'ri usul. IS NULL / IS NOT NULL — NULL\'ni tekshirishning yagona yo\'li.'},
+    {q:'5 + NULL',r:'n',x:'Arifmetika NULL bilan — NULL. SUM(summa) esa NULL\'larni o\'tkazib yuboradi; COUNT(ustun) NULL\'ni sanamaydi, COUNT(*) sanaydi.'},
+    {q:"'a' || NULL",r:'n',x:'Matn ulash ham NULL. concat() funksiyasi esa NULL\'ni bo\'sh deb oladi. COALESCE(x, \'\') — default qiymat.'},
+    {q:'NULL <> 5',r:'n',x:'"Teng emas" ham noma\'lum. Shuning uchun WHERE holat <> \'OK\' — holati NULL satrlarni ham chiqarmaydi! IS DISTINCT FROM ishlating.'},
+    {q:'TRUE OR NULL',r:'t',x:'OR\'da bittasi TRUE bo\'lsa — TRUE. AND\'da bittasi FALSE bo\'lsa — FALSE. Qolgan hollarda NULL.'},
+    {q:'COALESCE(NULL, 0)',r:'t',x:'= 0. Birinchi NULL bo\'lmagan qiymatni qaytaradi. Hisobotda "NULL o\'rniga 0" — doim COALESCE. (Natija TRUE emas, 0 — bu yerda "ishladi" ma\'nosida yashil.)'}
+  ];
+  var nrow=document.getElementById('nrow');nrow.innerHTML=N.map(function(n,i){return '<button class="nq" data-i="'+i+'">'+n.q+'</button>';}).join('');
+  nrow.addEventListener('click',function(e){var b=e.target.closest('.nq');if(!b)return;[].slice.call(nrow.children).forEach(function(x){x.classList.toggle('on',x===b);});var n=N[+b.dataset.i];var r=document.getElementById('nres');r.className='nres '+n.r;r.textContent=n.q+'  →  '+(n.r==='t'?'TRUE':n.r==='f'?'FALSE':'NULL');document.getElementById('nex').innerHTML=n.x;});
+})();
+
+</script>
+</body>
+</html>

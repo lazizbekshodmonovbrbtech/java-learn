@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redis TTL, xotira va eviction</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F7F1F0;--surface:#FFFFFF;--surface-2:#FCF8F7;--sunken:#F2E8E6;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#EADCD9;--border-strong:#DAC5C1;
+  --accent:#C8372D;--accent-ink:#9A2820;--accent-soft:#F8E3E0;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.kg{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:10px}
+.kk{aspect-ratio:1;border-radius:8px;border:1.5px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;transition:background .3s,border-color .3s,transform .3s;position:relative;cursor:pointer}
+.kk b{font-size:11.5px}
+.kk.ttl{border-color:var(--amber)}
+.kk.dead{background:repeating-linear-gradient(45deg,var(--coral-soft),var(--coral-soft) 4px,transparent 4px,transparent 8px);border-color:var(--coral);color:var(--coral)}
+.kk.gone{opacity:.12;transform:scale(.8)}
+.kk.samp{box-shadow:0 0 0 3px var(--accent);transform:scale(1.06)}
+.kk.nottl{border-style:dashed}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1.5px solid}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.stat{border:1px solid var(--border);border-radius:10px;padding:6px 11px;font-family:var(--font-mono);font-size:12px;background:var(--surface-2)}
+.stat b{font-size:15px}
+/* trap */
+.trap{display:grid;grid-template-columns:1fr 220px;gap:14px;align-items:center;margin-top:8px}
+.trap>div{min-width:0}
+.tl2{display:flex;flex-direction:column;gap:6px}
+.tl2 div{font-family:var(--font-mono);font-size:12.5px;padding:7px 10px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface-2);opacity:.3;transition:.3s}
+.tl2 div.on{opacity:1;border-color:var(--accent)}
+.tl2 div.done{opacity:1}
+.tl2 div.bad{border-color:var(--coral);background:var(--coral-soft)}
+.tl2 div span{color:var(--ink-faint);float:right}
+.keyv{border:2px solid var(--border-strong);border-radius:14px;padding:14px;text-align:center;font-family:var(--font-mono);background:var(--surface)}
+.keyv .v{font-size:18px;font-weight:700;margin:6px 0}
+.keyv .clk{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--amber-soft);color:var(--amber);font-size:12px;transition:.3s}
+.keyv .clk.inf{background:var(--coral-soft);color:var(--coral)}
+/* eviction */
+.ev{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:10px}
+.slot{height:62px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface-2);font-family:var(--font-mono);font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:background .25s,border-color .25s,transform .25s;position:relative;overflow:hidden}
+.slot b{font-size:12.5px}
+.slot small{font-size:9.5px;color:var(--ink-faint)}
+.slot.hot{--h:1}
+.slot .heat{position:absolute;left:0;right:0;bottom:0;background:var(--accent);opacity:.18;transition:height .3s}
+.slot.hit{border-color:var(--teal);background:var(--teal-soft)}
+.slot.ins{animation:pop .35s}
+.slot.samp{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.slot.evict{border-color:var(--coral);background:var(--coral-soft);transform:scale(.9)}
+.slot.vol::after{content:"⏱";position:absolute;top:2px;right:4px;font-size:10px}
+.req{display:flex;align-items:center;gap:10px;margin-top:10px;font-family:var(--font-mono);font-size:12.5px;min-height:30px}
+.req .r{padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface)}
+.req .r.h{border-color:var(--teal);color:var(--teal-ink)}.req .r.m{border-color:var(--coral);color:var(--coral)}
+.hr{height:10px;border-radius:5px;background:var(--sunken);overflow:hidden;flex:1;min-width:120px}
+.hr>div{height:100%;background:var(--teal);transition:width .3s}
+.oom{color:var(--coral);font-weight:700}
+.pols{display:flex;gap:6px;flex-wrap:wrap}
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.calc>div{min-width:0}
+.rng{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;font-size:13px}
+.rng input{width:100%;accent-color:var(--accent)}
+.rng b{font-family:var(--font-mono)}
+.memb{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--surface-2)}
+.memb .big{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--accent-ink)}
+.stack{display:flex;height:26px;border-radius:8px;overflow:hidden;margin-top:8px;border:1px solid var(--border)}
+.stack div{height:100%;transition:width .3s;font-size:10px;color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;font-family:var(--font-mono)}
+/* jitter */
+.hist{display:flex;align-items:flex-end;gap:2px;height:140px;border-bottom:1.5px solid var(--border-strong);margin-top:12px;padding:0 2px}
+.hist div{flex:1;background:var(--accent);border-radius:3px 3px 0 0;transition:height .6s cubic-bezier(.2,.8,.2,1);min-height:1px}
+.hist div.peak{background:var(--coral)}
+.hax{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);margin-top:4px}
+@media (max-width:700px){.kg{grid-template-columns:repeat(6,1fr)}.ev{grid-template-columns:repeat(4,1fr)}.trap,.calc{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#C8372D"></span> Redis · 3/7</span><span>· Kurs: 52/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Redis · 52-modul · TTL va xotira</span>
+    <h1>TTL, xotira va <span class="steam">eviction</span></h1>
+    <p class="lead">RAM — cheklangan va qimmat. Redis’da kalitlar ikki yo‘l bilan o‘ladi: <b>vaqti tugaydi</b> (TTL) yoki xotira to‘lganda <b>chiqarib yuboriladi</b> (eviction). Ikkalasini ham noto‘g‘ri tushunish — production’dagi eng ko‘p uchraydigan Redis muammolari manbai.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Kalit qanday o‘ladi: lazy + active expiration</h2></div><p class="sec-sub">TTL tugashi bilan kalit darhol o‘chmaydi! Redis ikki mexanizmdan foydalanadi. Soatni ishga tushiring va kuzating: chiziqli kalitlar — vaqti o‘tgan, lekin hali xotirada turgan "zombi"lar.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="xRun">▶ Soat</button><button class="btn" id="xActive">🔍 Active cycle (1 qadam)</button><button class="btn" id="xAuto">Active: <b id="xAutoS">o‘chiq</b></button><button class="btn" id="xReset">↺</button></div>
+      <div class="kg" id="kg"></div>
+      <div class="legend"><span><i style="border-color:var(--amber)"></i>TTL bor</span><span><i style="border-color:var(--border);border-style:dashed"></i>TTL yo‘q</span><span><i style="border-color:var(--coral);background:var(--coral-soft)"></i>Vaqti o‘tgan (zombi)</span><span>Kalitni bosing = GET (lazy tekshiruv)</span></div>
+      <div class="stats"><span class="stat">Tirik: <b id="xLive">0</b></span><span class="stat">Zombi: <b id="xDead">0</b></span><span class="stat">O‘chirildi (lazy): <b id="xLazy">0</b></span><span class="stat">O‘chirildi (active): <b id="xAct">0</b></span></div>
+      <div class="explain" id="xEx">Har katakda — kalit va qolgan soniyasi. "Soat"ni bosing.</div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>😴 Lazy (passiv)</h4><p>Kalitga murojaat bo‘lganda (GET, EXISTS…) Redis TTL’ni tekshiradi: vaqti o‘tgan bo‘lsa — o‘chiradi va <code>(nil)</code> qaytaradi. Mijoz hech qachon o‘lik kalitni ko‘rmaydi. Lekin hech kim so‘ramasa — xotirada qoladi.</p></div>
+      <div class="card"><h4>🔍 Active (faol)</h4><p>Soniyasiga 10 marta (<code>hz 10</code>): TTL’li kalitlardan <b>20 tasini tasodifiy</b> tanlaydi, o‘liklarni o‘chiradi. Agar 25% dan ko‘pi o‘lik chiqsa — darhol takrorlaydi. Vaqt cheklangan — server bloklanmaydi.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>TTL tuzog‘i: SET TTL’ni o‘chirib yuboradi</h2></div><p class="sec-sub">Eng ko‘p uchraydigan xato: kalitga yangi qiymat yozildi — TTL yo‘qoldi, kalit abadiy qoldi va xotira asta-sekin to‘ldi.</p>
+    <div class="stage">
+      <div class="trap"><div class="tl2" id="tl2"></div><div class="keyv"><div style="font-size:12px;color:var(--ink-faint)">session:ab12</div><div class="v" id="kv">—</div><span class="clk" id="kclk">yo‘q</span></div></div>
+      <div class="ctrls"><button class="btn" id="trPrev">◀</button><button class="btn primary" id="trPlay">▶ Avto</button><button class="btn" id="trNext">▶</button><div class="bar"><div id="trBar"></div></div></div>
+      <div class="explain" id="trEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Buyruq</th><th>TTL’ga ta’siri</th></tr><tr><td><code>SET key val</code></td><td><b>O‘chiradi</b> (kalit abadiy bo‘ladi). <code>SET … KEEPTTL</code> yoki <code>SET … EX n</code> ishlating</td></tr><tr><td><code>INCR</code>, <code>HSET</code>, <code>LPUSH</code>, <code>APPEND</code></td><td>Saqlaydi (qiymat o‘zgaradi, kalit o‘sha)</td></tr><tr><td><code>RENAME a b</code></td><td>TTL <code>b</code>ga ko‘chadi</td></tr><tr><td><code>EXPIRE key 0</code> yoki manfiy</td><td>Kalit darhol o‘chadi</td></tr><tr><td><code>PERSIST key</code></td><td>TTL’ni olib tashlaydi</td></tr><tr><td><code>EXPIRE key 60 NX|XX|GT|LT</code></td><td>7.0+: faqat TTL yo‘q bo‘lsa / bor bo‘lsa / kattaroq / kichikroq bo‘lsa</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Xotira to‘lganda: eviction siyosatlari</h2></div><p class="sec-sub"><code>maxmemory</code> chegarasiga yetganda Redis yangi yozuv uchun joy ochishi kerak. Siyosatni tanlang va trafikni yoqing. Keyin "📊 Hisobot skani"ni yoqib, LRU va LFU farqini ko‘ring.</p>
+    <div class="stage">
+      <div class="pols seg" id="pols"><button class="on" data-p="allkeys-lru">allkeys-lru</button><button data-p="allkeys-lfu">allkeys-lfu</button><button data-p="volatile-lru">volatile-lru</button><button data-p="allkeys-random">allkeys-random</button><button data-p="noeviction">noeviction</button></div>
+      <div class="ev" id="ev"></div>
+      <div class="req"><span>So‘rov:</span><span class="r" id="rq">—</span><span id="rqEx" style="color:var(--ink-soft)"></span></div>
+      <div class="ctrls"><button class="btn primary" id="eRun">▶ Trafik</button><button class="btn" id="eStep">1 so‘rov</button><button class="btn" id="eScan">📊 Hisobot skani: <b id="eScanS">o‘chiq</b></button><button class="btn" id="eReset">↺</button></div>
+      <div class="stats"><span class="stat">Hit rate (oxirgi 100): <b id="eHr">—</b></span><div class="hr"><div id="eHrBar"></div></div><span class="stat">Chiqarildi: <b id="eEv">0</b></span><span class="stat">OOM xato: <b id="eOom">0</b></span></div>
+      <div class="explain" id="eEx">Trafik: <b>h1–h4</b> — "issiq" kalitlar (kurslar, top foydalanuvchilar) so‘rovlarning 60%i; <b>w1–w12</b> — iliq (TTL bilan ⏱); skan yoqilsa — bir martalik <b>s1, s2, …</b> kalitlar oqimi. Katakda: <b>↺</b> — necha so‘rov oldin ishlatilgan (LRU), <b>f</b> — chastota (LFU).</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Siyosat</th><th>Kimni chiqaradi</th><th>Qachon</th></tr><tr><td><code>noeviction</code> (default)</td><td>Hech kimni — yozuvlar <code>OOM</code> xato oladi</td><td>Redis — ma’lumot ombori (navbat, sessiya), yo‘qotish mumkin emas</td></tr><tr><td><code>allkeys-lru</code></td><td>Eng uzoq ishlatilmagan (barcha kalitlardan)</td><td>Umumiy kesh — eng ko‘p tanlanadigan</td></tr><tr><td><code>allkeys-lfu</code></td><td>Eng kam ishlatiladigan (chastota)</td><td>Barqaror "issiq" to‘plam, skanlar bo‘lsa</td></tr><tr><td><code>volatile-lru/lfu</code></td><td>Faqat TTL’li kalitlardan</td><td>Bitta Redis’da kesh + doimiy ma’lumot (tavsiya etilmaydi — ajrating)</td></tr><tr><td><code>volatile-ttl</code></td><td>TTL’i eng kam qolganini</td><td>Kam ishlatiladi</td></tr><tr><td><code>*-random</code></td><td>Tasodifiy</td><td>Kirish bir tekis taqsimlangan bo‘lsa</td></tr></table></div><div class="callout iv"><div class="ct">🎯 Suhbat: Redis LRU haqiqiy LRU emas</div>Haqiqiy LRU har kalit uchun bog‘langan ro‘yxat talab qiladi (xotira va vaqt). Redis <b>taxminiy LRU</b> ishlatadi: har kalitda 24 bitlik vaqt belgisi bor, eviction paytida <code>maxmemory-samples</code> (default 5) ta tasodifiy kalitni oladi va eng eskisini chiqaradi (+ nomzodlar pool’i). LFU’da shu 24 bit — logarifmik hisoblagich (8 bit) + oxirgi pasayish vaqti (16 bit); hisoblagich vaqt o‘tishi bilan kamayadi (<code>lfu-decay-time</code>).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Qancha xotira kerak? Kalkulyator</h2></div><p class="sec-sub">Har kalitning "ko‘rinmas" overhead’i bor: dict yozuvi, redisObject, SDS sarlavhalari, TTL uchun alohida jadval. Kichik qiymatlarda overhead ma’lumotning o‘zidan katta bo‘lishi mumkin.</p>
+    <div class="stage"><div class="calc">
+      <div>
+        <div class="rng"><span>Kalitlar soni: <b id="cN">1 000 000</b></span><input type="range" id="rN" min="4" max="8" step="0.1" value="6"></div>
+        <div class="rng"><span>Kalit uzunligi: <b id="cK">24</b> bayt</span><input type="range" id="rK" min="8" max="100" value="24"></div>
+        <div class="rng"><span>Qiymat hajmi: <b id="cV">100</b> bayt</span><input type="range" id="rV" min="4" max="4000" value="100"></div>
+        <div class="toggle-row" style="justify-content:flex-start;margin:0"><button class="tog on" id="tT" aria-label="TTL"></button><span class="tog-lbl">Hammasida TTL bor</span></div>
+      </div>
+      <div class="memb"><div style="font-size:12px;color:var(--ink-faint)">Taxminiy used_memory</div><div class="big" id="cOut">—</div>
+        <div class="stack"><div id="sK" style="background:#2E6FA8">kalit</div><div id="sV" style="background:var(--accent)">qiymat</div><div id="sO" style="background:#8C8578">overhead</div></div>
+        <div style="font-size:13px;margin-top:10px" id="cTip"></div></div>
+    </div></div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">redis-cli</span></div><pre class="code"><span class="k">INFO</span> <span class="k">memory</span>
+used_memory_human:<span class="nu">1</span>.21G          <span class="cm"># Redis ajratgan</span>
+used_memory_rss_human:<span class="nu">1</span>.43G      <span class="cm"># OS ko'rgan (fragmentatsiya bilan)</span>
+mem_fragmentation_ratio:<span class="nu">1.18</span>     <span class="cm"># 1.0–1.5 normal; &gt;1.5 — fragmentatsiya, &lt;1 — swap!</span>
+maxmemory_human:<span class="nu">2</span>.00G
+maxmemory_policy:allkeys-lru
+evicted_keys:<span class="nu">0</span>                   <span class="cm"># INFO stats: o'sib borsa — xotira yetmayapti</span>
+
+<span class="k">MEMORY</span> USAGE card:<span class="nu">42</span>             <span class="cm"># bitta kalit baytlarda</span>
+(integer) <span class="nu">184</span></pre></div><div class="callout warn"><div class="ct">⚠️ maxmemory’ni RAM’ning 100%iga qo‘ymang</div>RDB/AOF rewrite paytida Redis <code>fork()</code> qiladi — copy-on-write tufayli yozuvlar ko‘p bo‘lsa xotira vaqtincha 2 baravargacha oshishi mumkin. Odatiy qoida: <code>maxmemory</code> ≈ mashina RAM’ining 60–75%i. Kubernetes’da limit’dan oshsa — OOMKilled.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>TTL jitter: hamma kalit bir vaqtda o‘lmasin</h2></div><p class="sec-sub">Tungi job 100 000 ta kurs/limit keshini bir vaqtda <code>EX 3600</code> bilan yozdi. Bir soatdan keyin nima bo‘ladi? Jitter’ni yoqib-o‘chirib ko‘ring.</p>
+    <div class="stage">
+      <div class="toggle-row" style="justify-content:flex-start"><span class="tog-lbl">EX 3600</span><button class="tog" id="jT" aria-label="Jitter"></button><span class="tog-lbl">EX 3600 ± 10% (tasodifiy)</span></div>
+      <div class="hist" id="hist"></div>
+      <div class="hax"><span>50 daq</span><span>55</span><span>60</span><span>65</span><span>70 daq</span></div>
+      <div class="explain" id="jEx"></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">CacheTtl.java</span></div><pre class="code"><span class="ty">Duration</span> ttlWithJitter(<span class="ty">Duration</span> base) {
+    <span class="k">long</span> jitter = <span class="ty">ThreadLocalRandom</span>.current().nextLong(-base.toSeconds() / <span class="nu">10</span>, base.toSeconds() / <span class="nu">10</span> + <span class="nu">1</span>);
+    <span class="k">return</span> base.plusSeconds(jitter);           <span class="cm">// 3600 ± 360 soniya</span>
+}</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Redis’da TTL tugagan kalit qachon o‘chiriladi?<span class="chev">›</span></summary><div class="iv-a">Ikki yo‘l: lazy — murojaat qilinganda tekshiriladi va o‘chiriladi; active — soniyasiga 10 marta TTL’li kalitlardan tasodifiy 20 tasi tekshiriladi, 25% dan ko‘pi o‘lik bo‘lsa sikl takrorlanadi. Shuning uchun o‘lik kalitlar qisqa vaqt xotirada qolishi mumkin, lekin mijozga hech qachon qaytarilmaydi. Replikada kalitlarni master o‘chiradi (DEL replikatsiya qilinadi).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SET bilan qiymatni yangilasam, TTL nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">O‘chadi — kalit abadiy bo‘lib qoladi. KEEPTTL opsiyasi yoki qayta EX berish kerak. INCR/HSET kabi o‘zgartiruvchi buyruqlar TTL’ni saqlaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>maxmemory-policy’larni tushuntiring. Kesh uchun qaysi?<span class="chev">›</span></summary><div class="iv-a">noeviction (default) — yozuv OOM xato oladi; allkeys-lru/lfu — barcha kalitlardan; volatile-* — faqat TTL’lilardan; random; volatile-ttl. Sof kesh uchun odatda allkeys-lru, skanlar va barqaror issiq to‘plam bo‘lsa allkeys-lfu. Redis ma’lumot ombori (navbat, sessiya) bo‘lsa — noeviction va xotira monitoringi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>LRU va LFU farqi, qachon LFU yaxshi?<span class="chev">›</span></summary><div class="iv-a">LRU — qachon oxirgi marta ishlatilgan; LFU — qanchalik tez-tez. Bir martalik ommaviy o‘qish (hisobot, skan) LRU keshini "yuvib" yuboradi — issiq kalitlar chiqib ketadi. LFU buni sezmaydi, chunki bir martalik kalitlar chastotasi past.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Redis xotirasi kutilganidan ko‘p. Qanday tekshirasiz?<span class="chev">›</span></summary><div class="iv-a">INFO memory (used_memory vs rss, fragmentatsiya), INFO keyspace (kalitlar soni, TTL’lilar), redis-cli --bigkeys/--memkeys, MEMORY USAGE, TTL’siz kalitlarni SCAN bilan topish (TTL tuzog‘i), MEMORY DOCTOR. Yechim: TTL qo‘yish, tuzilmani ixchamlashtirish (hash’larda listpack), kalit nomlarini qisqartirish, activedefrag.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Mass expiration nima va qanday oldini olasiz?<span class="chev">›</span></summary><div class="iv-a">Ko‘p kalit bir vaqtda yozilib bir xil TTL olsa, bir vaqtda o‘ladi — kesh bo‘shaydi va barcha so‘rovlar DB’ga tushadi (cache avalanche). Yechim: TTL jitter, keshni oldindan yangilash, so‘rovlarni birlashtirish (53-modul).</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>TTL -1 nimani bildiradi?</div><button class="opt">Kalit yo‘q</button><button class="opt">Kalit bor, lekin TTL yo‘q (abadiy)</button><button class="opt">Vaqti tugagan</button><div class="q-fb" data-ok="To‘g‘ri. -2 — kalit yo‘q." data-no="Yo‘q. -1 — TTL yo‘q, -2 — kalit yo‘q."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>"session:ab" EX 1800 bilan yaratildi. Keyin SET session:ab "{...}" qilindi. TTL?</div><button class="opt">1800 dan davom etadi</button><button class="opt">-1: TTL o‘chdi</button><button class="opt">Kalit o‘chadi</button><div class="q-fb" data-ok="To‘g‘ri — KEEPTTL kerak edi." data-no="Yo‘q. Oddiy SET TTL’ni olib tashlaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Kesh Redis’i to‘ldi, siyosat noeviction. Nima bo‘ladi?</div><button class="opt">Eski kalitlar o‘chadi</button><button class="opt">Yozuv buyruqlari OOM xato oladi, o‘qish ishlaydi</button><button class="opt">Redis qayta ishga tushadi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. noeviction — hech narsa chiqarilmaydi, yozuvlar rad etiladi."></div></div><div class="q" data-correct="0"><div class="q-txt"><span class="qn">4.</span>Tungi hisobot barcha mijozlarni bir marta o‘qiydi va kesh hit rate keskin tushadi. Qaysi siyosat yordam beradi?</div><button class="opt">allkeys-lfu</button><button class="opt">allkeys-random</button><button class="opt">noeviction</button><div class="q-fb" data-ok="To‘g‘ri — bir martalik kalitlarning chastotasi past." data-no="Yo‘q. LFU skan ifloslanishiga chidamli."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Serverda 16 GB RAM. maxmemory uchun oqilona qiymat?</div><button class="opt">16gb</button><button class="opt">~10–12gb (fork/COW va OS uchun zaxira)</button><button class="opt">Cheklovsiz</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. fork paytida xotira oshadi — zaxira kerak."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Redis</span>
+      <h3>Keshlash pattern’lari</h3>
+      <p>Cache-aside, write-through, stampede, penetration, avalanche va Spring @Cacheable — animatsiyada.</p>
+      <div class="topics"><span class="topic-pill">50 · Nega tez</span><span class="topic-pill">51 · Tuzilmalar</span><span class="topic-pill now">52 · TTL va xotira</span><span class="topic-pill">53 · Keshlash</span><span class="topic-pill">54 · Lock va limit</span><span class="topic-pill">55 · Persistence/HA</span><span class="topic-pill">56 · Streams + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="51-malumot-tuzilmalari.html"><span class="cl">← Oldingi dars</span><span class="ct">51 · Ma&#x27;lumot tuzilmalari</span><span class="cs">⚡ Redis</span></a><a class="cn nx" href="53-keshlash-patternlari.html"><span class="cl">Keyingi dars →</span><span class="ct">53 · Keshlash pattern&#x27;lari</span><span class="cs">⚡ Redis</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:59.1%"></i></div><span>52 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(52)<0)v.push(52);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','52');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(52)<0)D[t].push(52);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* ---------- expiration ---------- */
+  var kg=document.getElementById('kg'),K=[],clock=null,auto=false,lazyN=0,actN=0,xEx=document.getElementById('xEx');
+  var NAMES=['otp','sess','kurs','lim','tok','cart','otp','sess','rl','geo'];
+  function init(){K=[];for(var i=0;i<40;i++){var has=Math.random()<0.8;K.push({n:NAMES[i%10]+i,ttl:has?Math.floor(Math.random()*14)+2:null,st:'live'});}lazyN=actN=0;draw();}
+  function draw(){kg.innerHTML=K.map(function(k,i){var c='kk'+(k.st==='gone'?' gone':k.ttl===null?' nottl':k.ttl<=0?' dead':' ttl');return '<div class="'+c+'" data-i="'+i+'"><b>'+(k.st==='gone'?'✕':k.ttl===null?'∞':k.ttl<=0?'☠':k.ttl+'s')+'</b><span>'+k.n+'</span></div>';}).join('');
+    var live=K.filter(function(k){return k.st!=='gone'&&(k.ttl===null||k.ttl>0);}).length,dead=K.filter(function(k){return k.st!=='gone'&&k.ttl!==null&&k.ttl<=0;}).length;
+    document.getElementById('xLive').textContent=live;document.getElementById('xDead').textContent=dead;document.getElementById('xLazy').textContent=lazyN;document.getElementById('xAct').textContent=actN;}
+  function tick(){K.forEach(function(k){if(k.st!=='gone'&&k.ttl!==null&&k.ttl>0)k.ttl--;});if(auto&&Math.random()<0.9)cycle(true);draw();
+    var dead=K.filter(function(k){return k.st!=='gone'&&k.ttl!==null&&k.ttl<=0;}).length;
+    if(!auto&&dead)xEx.innerHTML='<b>'+dead+' ta zombi</b>: vaqti o‘tgan, lekin xotirada. Hech kim so‘ramayapti va active cycle o‘chiq — xotira bekorga band. Zombini bosing (GET) yoki active cycle’ni yoqing.';}
+  function cycle(quiet){var cand=K.map(function(k,i){return i;}).filter(function(i){return K[i].st!=='gone'&&K[i].ttl!==null;});
+    var s=[];while(s.length<Math.min(20,cand.length)){var j=cand[Math.floor(Math.random()*cand.length)];if(s.indexOf(j)<0)s.push(j);}
+    var ex=s.filter(function(i){return K[i].ttl<=0;});
+    draw();s.forEach(function(i){kg.children[i].classList.add('samp');});
+    setTimeout(function(){ex.forEach(function(i){K[i].st='gone';actN++;});draw();},quiet?250:600);
+    var pct=s.length?Math.round(ex.length/s.length*100):0;
+    if(!quiet||ex.length)xEx.innerHTML='Active cycle: TTL’li kalitlardan <b>'+s.length+' ta tasodifiy</b> tanlandi, ulardan <b>'+ex.length+'</b> tasi o‘lik ('+pct+'%) → o‘chirildi. '+(pct>25?'<b>25% dan ko‘p</b> — Redis siklni darhol takrorlaydi.':'25% dan kam — keyingi tick’gacha kutadi (qolgan zombi’lar statistik jihatdan kam).');}
+  kg.addEventListener('click',function(e){var c=e.target.closest('.kk');if(!c)return;var k=K[+c.dataset.i];if(k.st==='gone'){xEx.innerHTML='GET '+k.n+' → <b>(nil)</b>. Kalit allaqachon yo‘q.';return;}
+    if(k.ttl!==null&&k.ttl<=0){k.st='gone';lazyN++;draw();xEx.innerHTML='GET '+k.n+' → Redis TTL’ni tekshirdi: vaqti o‘tgan → <b>shu zahoti o‘chirdi</b> va <b>(nil)</b> qaytardi. Bu — <b>lazy expiration</b>. Mijoz o‘lik qiymatni hech qachon ko‘rmaydi.';}
+    else xEx.innerHTML='GET '+k.n+' → qiymat qaytdi. '+(k.ttl===null?'TTL yo‘q — abadiy.':'Yana '+k.ttl+' s yashaydi.');});
+  document.getElementById('xRun').addEventListener('click',function(){if(clock){clearInterval(clock);clock=null;this.textContent='▶ Soat';}else{clock=setInterval(tick,700);this.textContent='⏸ Soat';}});
+  document.getElementById('xActive').addEventListener('click',function(){cycle(false);});
+  document.getElementById('xAuto').addEventListener('click',function(){auto=!auto;document.getElementById('xAutoS').textContent=auto?'yoqiq (hz 10)':'o‘chiq';if(auto)xEx.innerHTML='Active expiration fon rejimida: zombi’lar ko‘p turmaydi.';});
+  document.getElementById('xReset').addEventListener('click',init);
+  init();
+
+  /* ---------- TTL trap ---------- */
+  var TS=[['SET session:ab12 "{u:42}" EX 1800','OK','{u:42}',1800,'Sessiya 30 daqiqaga yaratildi.'],
+    ['TTL session:ab12','(integer) 1800','{u:42}',1800,'Hammasi joyida.'],
+    ['SET session:ab12 "{u:42,lang:uz}"','OK','{u:42,lang:uz}',-1,'Foydalanuvchi tilni o‘zgartirdi, kod sessiyani qayta yozdi… <b>EX’siz</b>.','bad'],
+    ['TTL session:ab12','(integer) -1','{u:42,lang:uz}',-1,'<b>-1 — TTL yo‘q!</b> Sessiya endi hech qachon o‘chmaydi. Million foydalanuvchida — gigabaytlab "abadiy" sessiya.','bad'],
+    ['SET session:ab12 "{u:42,lang:uz}" KEEPTTL','OK','{u:42,lang:uz}',-1,'<b>KEEPTTL</b> — mavjud TTL’ni saqlaydi (6.0+). Lekin TTL allaqachon yo‘qolgan edi.'],
+    ['SET session:ab12 "{u:42,lang:uz}" EX 1800','OK','{u:42,lang:uz}',1800,'To‘g‘ri yechim: har yozishda TTL’ni aniq bering (yoki HSET bilan faqat maydonni o‘zgartiring — TTL saqlanadi).']];
+  var tl2=document.getElementById('tl2');tl2.innerHTML=TS.map(function(s){return '<div>'+s[0]+'<span>'+s[1]+'</span></div>';}).join('');
+  mkStepper('tr',TS.length,function(i){[].forEach.call(tl2.children,function(d,k){d.className=k<i?'done'+(TS[k][5]?' bad':''):k===i?'on'+(TS[k][5]?' bad':''):'';});
+    document.getElementById('kv').textContent=TS[i][2];var c=document.getElementById('kclk');c.textContent=TS[i][3]<0?'TTL: ∞ (abadiy!)':'TTL: '+TS[i][3]+' s';c.className='clk'+(TS[i][3]<0?' inf':'');
+    document.getElementById('trEx').innerHTML=TS[i][4];},2200);
+
+  /* ---------- eviction ---------- */
+  var CAP=8,S=[],t=0,pol='allkeys-lru',scan=false,sN=0,hist=[],evN=0,oomN=0,eTimer=null;
+  var ev=document.getElementById('ev'),rq=document.getElementById('rq'),rqEx=document.getElementById('rqEx'),eEx=document.getElementById('eEx');
+  function isVol(n){return n[0]==='w'||n[0]==='s';}
+  function pickKey(){if(scan&&Math.random()<0.55){sN++;return 's'+sN;}var r=Math.random();if(r<0.62)return 'h'+(1+Math.floor(Math.random()*4));return 'w'+(1+Math.floor(Math.random()*12));}
+  function drawS(mark){var mx=Math.max.apply(null,S.map(function(s){return s.f;}).concat([1]));ev.innerHTML='';for(var i=0;i<CAP;i++){var s=S[i];var d=document.createElement('div');d.className='slot';
+      if(s){d.className+=(isVol(s.n)?' vol':'')+(mark&&mark[i]?' '+mark[i]:'');d.innerHTML='<span class="heat" style="height:'+(s.f/mx*100)+'%"></span><b>'+s.n+'</b><small>oxirgi: '+(t-s.l)+' oldin</small><small>chastota: '+s.f+'</small>';}
+      else d.innerHTML='<small>bo‘sh</small>';ev.appendChild(d);}}
+  function victim(){var c=S.map(function(s,i){return i;});if(pol.indexOf('volatile')===0)c=c.filter(function(i){return isVol(S[i].n);});if(!c.length)return {i:-1,samp:[]};
+    var samp=[];while(samp.length<Math.min(5,c.length)){var j=c[Math.floor(Math.random()*c.length)];if(samp.indexOf(j)<0)samp.push(j);}
+    if(pol.indexOf('random')>=0)return {i:samp[0],samp:[samp[0]]};
+    var best=samp[0];samp.forEach(function(j){if(pol.indexOf('lfu')>=0?(S[j].f<S[best].f||(S[j].f===S[best].f&&S[j].l<S[best].l)):S[j].l<S[best].l)best=j;});return {i:best,samp:samp};}
+  function req(){t++;var k=pickKey(),i=S.findIndex(function(s){return s.n===k;}),mark={};
+    if(i>=0){S[i].l=t;S[i].f++;hist.push(1);mark[i]='hit';rq.className='r h';rq.textContent='GET '+k+' → HIT';rqEx.textContent='xotirada bor';}
+    else{hist.push(0);rq.className='r m';rq.textContent='GET '+k+' → MISS';
+      if(S.length<CAP){S.push({n:k,l:t,f:1});mark[S.length-1]='ins';rqEx.textContent='DB’dan o‘qildi → Redis’ga yozildi';}
+      else if(pol==='noeviction'){oomN++;rqEx.innerHTML='<span class="oom">SET → (error) OOM command not allowed when used memory &gt; \'maxmemory\'</span>';}
+      else{var v=victim();if(v.i<0){oomN++;rqEx.innerHTML='<span class="oom">OOM: TTL’li kalit qolmadi — volatile-* hech kimni chiqara olmaydi</span>';}
+        else{v.samp.forEach(function(j){mark[j]='samp';});mark[v.i]='evict';var old=S[v.i].n;evN++;
+          rqEx.innerHTML='joy yo‘q → '+(pol.indexOf('random')>=0?'tasodifiy':v.samp.length+' ta namuna olindi')+' → <b>'+old+'</b> chiqarildi'+(old[0]==='h'?' <span class="oom">(issiq kalit!)</span>':'');
+          drawS(mark);var at=v.i;setTimeout(function(){S[at]={n:k,l:t,f:1};drawS({});},eTimer?220:500);}}}
+    if(hist.length>100)hist.shift();var hr=hist.reduce(function(a,b){return a+b;},0)/hist.length*100;
+    document.getElementById('eHr').textContent=hr.toFixed(0)+'%';document.getElementById('eHrBar').style.width=hr+'%';document.getElementById('eEv').textContent=evN;document.getElementById('eOom').textContent=oomN;
+    drawS(mark);}
+  function reset(){S=[];t=0;sN=0;hist=[];evN=0;oomN=0;drawS({});document.getElementById('eHr').textContent='—';document.getElementById('eHrBar').style.width='0';document.getElementById('eEv').textContent=0;document.getElementById('eOom').textContent=0;rq.textContent='—';rq.className='r';rqEx.textContent='';}
+  var PX={'allkeys-lru':'<b>allkeys-lru</b>: 5 ta tasodifiy namunadan eng uzoq ishlatilmaganini chiqaradi. Skan yoqilganda bir martalik s-kalitlar "yangi" bo‘lgani uchun issiq h-kalitlarni siqib chiqaradi — hit rate tushadi.','allkeys-lfu':'<b>allkeys-lfu</b>: eng kam chastotali chiqariladi. Skan kalitlari chastotasi 1 — ular birinchi bo‘lib ketadi, h-kalitlar joyida qoladi.','volatile-lru':'<b>volatile-lru</b>: faqat ⏱ (TTL’li) kalitlardan tanlaydi. h-kalitlar TTL’siz — ularga tegilmaydi. Hammasi TTL’siz bo‘lib qolsa — OOM.','allkeys-random':'<b>allkeys-random</b>: tasodifiy. Issiq kalitlar ham tez-tez chiqib ketadi.','noeviction':'<b>noeviction</b>: xotira to‘lgach hech kim chiqarilmaydi — yangi yozuvlar OOM xato. Kesh uchun yomon, navbat/sessiya uchun to‘g‘ri (ma’lumot yo‘qolmaydi).'};
+  document.getElementById('pols').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});pol=b.dataset.p;reset();eEx.innerHTML=PX[pol];});
+  document.getElementById('eRun').addEventListener('click',function(){if(eTimer){clearInterval(eTimer);eTimer=null;this.textContent='▶ Trafik';}else{eTimer=setInterval(req,450);this.textContent='⏸ To‘xtat';}});
+  document.getElementById('eStep').addEventListener('click',req);
+  document.getElementById('eScan').addEventListener('click',function(){scan=!scan;document.getElementById('eScanS').textContent=scan?'yoqiq':'o‘chiq';hist=[];eEx.innerHTML=scan?'Hisobot ishga tushdi: har 2-so‘rov — bir martalik s-kalit. Hit rate’ni '+(pol==='allkeys-lfu'?'kuzating: LFU’da issiq kalitlar saqlanadi.':'kuzating, keyin allkeys-lfu’ga o‘tib solishtiring.'):PX[pol];});
+  document.getElementById('eReset').addEventListener('click',reset);
+  drawS({});
+
+  /* ---------- calc ---------- */
+  function fmtB(b){return b>=1073741824?(b/1073741824).toFixed(2)+' GB':b>=1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(0)+' KB';}
+  function calc(){var n=Math.round(Math.pow(10,+document.getElementById('rN').value)),k=+document.getElementById('rK').value,v=+document.getElementById('rV').value,ttl=document.getElementById('tT').classList.contains('on');
+    document.getElementById('cN').textContent=n.toLocaleString('ru-RU');document.getElementById('cK').textContent=k;document.getElementById('cV').textContent=v;
+    var sds=function(l){return l<32?l+2:l<256?l+4:l+6;};var al=function(x){return Math.ceil(x/8)*8;};
+    var over=24+16+(ttl?24+8:0)+ (al(sds(k)+1)-k)+(v<=44?0:al(sds(v)+1)-v)+8;
+    var tot=n*(k+v+over)*1.08;
+    document.getElementById('cOut').textContent=fmtB(tot);
+    var s=k+v+over;document.getElementById('sK').style.width=(k/s*100)+'%';document.getElementById('sV').style.width=(v/s*100)+'%';document.getElementById('sO').style.width=(over/s*100)+'%';
+    document.getElementById('cTip').innerHTML='Har kalitga ~<b>'+over+' bayt</b> overhead (dict yozuvi 24, redisObject 16, SDS sarlavhalari'+(ttl?', expires jadvali ~32':'')+' + hash jadval bo‘sh joyi). '+(over>v?'<b>Overhead qiymatdan katta!</b> Kichik qiymatlarni hash’larga guruhlash (masalan, 100 tadan) listpack tufayli xotirani 3–5× kamaytirishi mumkin.':'Qiymat asosiy hajmni egallaydi — siqish (masalan, JSON o‘rniga protobuf) yoki qisqa maydon nomlari yordam beradi.')+' maxmemory ≈ <b>'+fmtB(tot*1.5)+'</b> (fork va o‘sish uchun zaxira bilan).';}
+  ['rN','rK','rV'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+  document.getElementById('tT').addEventListener('click',function(){this.classList.toggle('on');calc();});calc();
+
+  /* ---------- jitter ---------- */
+  var jit=false,hEl=document.getElementById('hist');for(var i=0;i<40;i++)hEl.appendChild(document.createElement('div'));
+  function drawJ(){var b=new Array(40).fill(0),N=100000;
+    if(!jit)b[20]=N;else{for(var i=0;i<4000;i++){var x=3600+(Math.random()*2-1)*360;var k=Math.floor((x-3000)/1200*40);if(k>=0&&k<40)b[k]+=25;}}
+    var mx=jit?Math.max.apply(null,b)*4:N;
+    [].forEach.call(hEl.children,function(d,i){d.style.height=Math.max(0.5,b[i]/mx*100)+'%';d.className=!jit&&i===20?'peak':'';});
+    document.getElementById('jEx').innerHTML=jit?'Kalitlar 54–66 daqiqa oralig‘ida <b>bir tekis</b> o‘ladi: har 30 soniyada ~2 500 ta miss. DB bemalol ko‘taradi.':'<b>100 000 kalit bitta soniyada o‘ladi</b> → 100 000 so‘rov bir vaqtda DB’ga tushadi. Bu <b>cache avalanche</b> (53-modul). DB’da connection pool tugaydi, API timeout beradi.';}
+  document.getElementById('jT').addEventListener('click',function(){jit=!jit;this.classList.toggle('on',jit);drawJ();});drawJ();
+})();
+
+</script>
+</body>
+</html>

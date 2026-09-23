@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Indeks va EXPLAIN</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐘</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F8FB;--sunken:#E6ECF2;
+  --ink:#182430;--ink-soft:#4C5866;--ink-faint:#7C8896;--border:#D8E0E9;--border-strong:#C3CDD8;
+  --accent:#2E6FA8;--accent-ink:#1F5183;--accent-soft:#E1EDF7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* race */
+.race{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.lane{border:1.5px solid var(--border);border-radius:14px;padding:12px;background:var(--surface-2)}
+.lane h4{font-family:var(--font-mono);font-size:12.5px;margin:0 0 8px;display:flex;justify-content:space-between}
+.lane.seq h4{color:var(--coral)}.lane.idx h4{color:var(--teal-ink)}
+.grid{display:grid;grid-template-columns:repeat(20,1fr);gap:2px}
+.cell{aspect-ratio:1;border-radius:2px;background:var(--sunken);transition:.08s}
+.cell.chk{background:var(--amber)}.cell.tgt{background:var(--teal);box-shadow:0 0 0 2px var(--teal)}.cell.path{background:var(--purple)}
+.lane .num{font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:8px}
+.lane.seq .num{color:var(--coral)}.lane.idx .num{color:var(--teal-ink)}
+.lane .num small{font-size:12px;font-family:var(--font-mono);color:var(--ink-soft);font-weight:400}
+/* btree */
+.bt{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.lvl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.node{display:flex;border:1.5px solid var(--border-strong);border-radius:8px;overflow:hidden;background:var(--surface);transition:.3s;font-family:var(--font-mono);font-size:12px}
+.node span{padding:6px 9px;border-right:1px solid var(--border);transition:.3s}
+.node span:last-child{border-right:0}
+.node.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);transform:scale(1.06)}
+.node span.k{background:var(--accent);color:#fff}
+.node span.hit{background:var(--teal);color:#fff}
+.node.leaf{border-style:dashed}
+.node.dim{opacity:.35}
+.lvl-lbl{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);width:100%;text-align:center;margin-bottom:-10px}
+.node.rng span.hit{background:var(--teal-soft);color:var(--teal-ink)}
+/* explain */
+.plan{background:var(--sunken);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.8;overflow-x:auto}
+.plan .ln{display:block;padding:2px 8px;border-radius:7px;cursor:pointer;white-space:pre;transition:.15s}
+.plan .ln:hover,.plan .ln.on{background:var(--accent-soft)}
+.plan .hot{color:var(--coral);font-weight:600}.plan .okc{color:var(--teal-ink);font-weight:600}
+/* index tester */
+.wq{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.wqi{display:flex;gap:10px;align-items:center;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;background:var(--surface-2);cursor:pointer;font-family:var(--font-mono);font-size:12.5px;transition:.2s}
+.wqi.on{border-color:var(--accent);background:var(--accent-soft)}
+.wqi .res{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.wqi .res.y{background:var(--teal-soft);color:var(--teal-ink)}.wqi .res.n{background:var(--coral-soft);color:var(--coral)}.wqi .res.m{background:var(--amber-soft);color:var(--amber)}
+/* write cost */
+.wc{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.wcb{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px}
+.wcb .lbl{width:150px;color:var(--ink-soft)}
+.wcb .bar2{flex:1;height:16px;background:var(--sunken);border-radius:5px;overflow:hidden}
+.wcb .bar2>div{height:100%;border-radius:5px;transition:width .4s}
+.wcb .v{width:60px;text-align:right}
+@media (max-width:560px){.race{grid-template-columns:1fr}.grid{grid-template-columns:repeat(14,1fr)}.wcb .lbl{width:100px}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2E6FA8"></span> PostgreSQL · 3/4</span><span>· Kurs: 35/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>PostgreSQL · 35-modul · noldan</span>
+    <h1>Indeks va <span class="steam">EXPLAIN</span></h1>
+    <p class="lead">"So'rov sekin" — bank backend'ida eng ko'p eshitiladigan shikoyat. 95% holatda javob: indeks yo'q, yoki bor lekin ishlamayapti. Bu modul B-tree ichini ochadi, EXPLAIN'ni o'qishni o'rgatadi va indeks qachon "o'chib qolishini" ko'rsatadi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Poyga: Seq Scan vs Index Scan</h2></div>
+    <p class="sec-sub">200 satrli jadvalda <code>WHERE id = 168</code>. Ikkalasini bir vaqtda ishga tushiring.</p>
+    <div class="stage">
+      <div class="race">
+        <div class="lane seq"><h4>Seq Scan (indekssiz)<span>O(n)</span></h4><div class="grid" id="gSeq"></div><div class="num"><span id="nSeq">0</span> <small>satr tekshirildi</small></div></div>
+        <div class="lane idx"><h4>Index Scan (B-tree)<span>O(log n)</span></h4><div class="grid" id="gIdx"></div><div class="num"><span id="nIdx">0</span> <small>qadam</small></div></div>
+      </div>
+      <div class="ctrls"><button class="btn primary" id="raceGo">▶ Poyga</button><button class="btn" id="raceReset">Tozalash</button></div>
+      <div class="explain" id="raceEx">Sariq — tekshirilgan satrlar, binafsha — indeks yo'li, yashil — topildi.</div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Miqyos</div>200 satrda farq 168 vs 4. <b>10 million</b> satrda: 10 000 000 vs ~24. Indeks katta bo'lgani sari ham log₂ bo'yicha juda sekin o'sadi — B-tree'ning butun sehri shunda.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>B-tree ichida — qidiruv qanday yuradi</h2></div>
+    <p class="sec-sub">B-tree — tartiblangan kalitlar daraxti. Har tugun "yo'l ko'rsatkich": kalit qaysi bolaga tushishini aytadi. Bargda kalit + satr manzili (ctid). Barglar zanjirlangan — diapazon (BETWEEN) shunchaki yon-veriga yurish.</p>
+    <div class="stage">
+      <div class="seg" id="btSeg"><button class="on" data-q="eq">WHERE id = 168</button><button data-q="rng">WHERE id BETWEEN 120 AND 180</button></div>
+      <div class="bt" id="bt"></div>
+      <div class="ctrls"><button class="btn" id="btPrev">‹</button><button class="btn primary" id="btPlay">▶ Avto</button><button class="btn" id="btNext">›</button><div class="bar"><div id="btBar"></div></div></div>
+      <div class="explain" id="btEx"></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Suhbatda</div>"Nega B-tree, binary tree emas?" — Disk sahifalarda (8 KB) o'qiladi. B-tree tuguni bitta sahifaga sig'adi va yuzlab kalit saqlaydi → daraxt <b>past</b> (3–4 daraja million satr uchun) → 3–4 ta disk o'qish. Binary tree 20+ daraja — 20+ disk o'qish.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>EXPLAIN ANALYZE — rejani o'qish</h2></div>
+    <p class="sec-sub">Baza so'rovni qanday bajarganini aytib beradi. Har qatorga bosing. Qizil — muammo belgisi, yashil — yaxshi.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">psql</span></div>
+      <pre class="code"><span class="k">EXPLAIN</span> (<span class="k">ANALYZE</span>, <span class="k">BUFFERS</span>)
+<span class="k">SELECT</span> t.* <span class="k">FROM</span> tranzaksiya t <span class="k">JOIN</span> hisob h <span class="k">ON</span> h.id = t.hisob_id
+<span class="k">WHERE</span> h.mijoz_id = <span class="nu">42</span> <span class="k">AND</span> t.vaqt &gt; now() - <span class="k">interval</span> <span class="st">'30 days'</span>;</pre>
+    </div>
+    <div class="plan" id="plan"></div>
+    <div class="explain" id="planEx">Reja <b>pastdan yuqoriga</b> (ichkaridan tashqariga) o'qiladi. Qatorga bosing.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Indeks bor, lekin ishlamayapti — nega?</h2></div>
+    <p class="sec-sub">Jadval: <code>mijoz(id, email, ism, holat, tug_sana)</code>, indekslar: <code>(email)</code>, <code>(holat, tug_sana)</code>. Har so'rovga bosing — planner indeksni oladimi?</p>
+    <div class="stage">
+      <div class="wq" id="wq"></div>
+      <div class="explain" id="wqEx">So'rovni tanlang.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Indeks turlari va maxsus indekslar</h2></div>
+    <div class="grid3">
+      <div class="card"><h4>B-tree (default)</h4><p>=, &lt;, &gt;, BETWEEN, ORDER BY, LIKE 'abc%'. 95% holat. PK/UNIQUE avtomatik B-tree.</p></div>
+      <div class="card"><h4>Hash</h4><p>Faqat =. B-tree'dan sal kichik; kamdan-kam kerak.</p></div>
+      <div class="card"><h4>GIN</h4><p>jsonb (<code>@&gt;</code>), massiv, full-text search (tsvector), trigram (LIKE '%abc%' uchun pg_trgm).</p></div>
+      <div class="card"><h4>GiST / SP-GiST</h4><p>Geometriya, diapazonlar (tsrange overlap), yaqinlik qidiruvi (PostGIS).</p></div>
+      <div class="card"><h4>BRIN</h4><p>Juda katta, tabiiy tartiblangan jadvallar (vaqt bo'yicha loglar). Kichik, "blok diapazoni" indeksi.</p></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">indexes.sql</span></div>
+      <pre class="code"><span class="cm">-- Composite: chap ustundan boshlab ishlaydi (holat), (holat, sana), lekin faqat (sana) — yo'q</span>
+<span class="k">CREATE INDEX</span> ix_tx_hisob_vaqt <span class="k">ON</span> tranzaksiya (hisob_id, vaqt <span class="k">DESC</span>);
+
+<span class="cm">-- Partial: faqat kerakli qism — kichik va tez</span>
+<span class="k">CREATE INDEX</span> ix_tx_kutilmoqda <span class="k">ON</span> tranzaksiya (yaratilgan) <span class="k">WHERE</span> holat = <span class="st">'KUTILMOQDA'</span>;
+
+<span class="cm">-- Covering (INCLUDE): jadvalga bormasdan javob — Index Only Scan</span>
+<span class="k">CREATE INDEX</span> ix_hisob_mijoz <span class="k">ON</span> hisob (mijoz_id) <span class="k">INCLUDE</span> (raqam, valyuta);
+
+<span class="cm">-- Expression: funksiya natijasiga</span>
+<span class="k">CREATE INDEX</span> ix_mijoz_email_lower <span class="k">ON</span> mijoz (lower(email));
+
+<span class="cm">-- Prod'da jadvalni bloklamasdan</span>
+<span class="k">CREATE INDEX CONCURRENTLY</span> ix_... <span class="k">ON</span> ...;</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Indeks bepul emas — yozish narxi</h2></div>
+    <p class="sec-sub">Har INSERT/UPDATE/DELETE har indeksni ham yangilaydi. Slayderni suring.</p>
+    <div class="stage">
+      <input type="range" id="ixCnt" min="0" max="8" value="1" style="width:100%;accent-color:var(--accent)" aria-label="Indekslar soni">
+      <div style="font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);text-align:center;margin-top:4px">Indekslar soni: <b id="ixN">1</b></div>
+      <div class="wc" id="wc"></div>
+      <div class="explain" id="wcEx"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ Amaliy qoida</div>Indeks — WHERE, JOIN ON, ORDER BY'da <b>tez-tez</b> ishlatiladigan va <b>selektiv</b> (ko'p qiymatli) ustunlarga. <code>holat</code> (3 qiymat) uchun oddiy indeks foydasiz — partial indeks qiling. Ishlatilmayotgan indekslarni <code>pg_stat_user_indexes</code> (idx_scan = 0) orqali toping va o'chiring.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Indeks nima va qanday ishlaydi?<span class="chev">›</span></summary><div class="iv-a">Ustun qiymatlarini tartiblab saqlovchi alohida struktura (default B-tree) — har kalit yonida satr manzili (ctid). Qidiruv daraxt bo'ylab O(log n) qadamda bargga tushadi, keyin heap'dan satrni oladi. Yozishda indeks ham yangilanadi, joy egallaydi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Seq Scan, Index Scan, Index Only Scan, Bitmap Scan farqi?<span class="chev">›</span></summary><div class="iv-a"><b>Seq</b> — butun jadval (kichik jadval yoki ko'p satr kerak bo'lsa to'g'ri tanlov!). <b>Index Scan</b> — indeks → har mos satr uchun heap'ga boradi (kam satr uchun). <b>Index Only</b> — kerakli ustunlar indeksda bor, heap'ga bormaydi (visibility map yordamida). <b>Bitmap</b> — o'rtacha ko'p satr: avval indeksdan sahifalar bitmap'i, keyin heap'ni tartibli o'qish.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Indeks bor, lekin planner ishlatmayapti — sabablari?<span class="chev">›</span></summary><div class="iv-a">1) Ustunga funksiya/cast (lower(email), id::text) — expression index kerak. 2) LIKE '%abc' — oldindan wildcard. 3) Composite indeksning chap ustuni WHERE'da yo'q. 4) Selektivlik past — satrlarning 20–30%+ kerak, Seq Scan arzonroq. 5) Kichik jadval. 6) Statistika eskirgan — ANALYZE. 7) Tip mos emas (bigint ustun vs numeric parametr).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>EXPLAIN va EXPLAIN ANALYZE farqi?<span class="chev">›</span></summary><div class="iv-a">EXPLAIN — faqat reja va taxminiy cost (bajarilmaydi). ANALYZE — haqiqatda bajaradi, actual time/rows beradi. Taxminiy rows vs actual rows farqi katta bo'lsa — statistika muammosi. UPDATE/DELETE'ni ANALYZE qilsangiz — tranzaksiya ichida, ROLLBACK bilan!</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Composite indeksda ustun tartibi muhimmi?<span class="chev">›</span></summary><div class="iv-a">Ha — "chap prefiks" qoidasi. (a, b) indeksi WHERE a=…, WHERE a=… AND b=… uchun ishlaydi, faqat WHERE b=… uchun yo'q. Tenglik ustunlari chapga, diapazon (>, BETWEEN) o'ngga: (hisob_id, vaqt).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>N+1 va indeks bog'liqmi? Sekin so'rovni qanday topasiz?<span class="chev">›</span></summary><div class="iv-a">Alohida muammolar: N+1 — so'rovlar soni (kod), indeks — bitta so'rov tezligi. Topish: <code>pg_stat_statements</code> (eng ko'p vaqt olgan so'rovlar), <code>log_min_duration_statement</code>, keyin EXPLAIN ANALYZE. Spring'da: Hibernate statistikasi, p6spy.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span><code>WHERE lower(email) = 'a@b.uz'</code>, indeks <code>(email)</code> ustida. Ishlaydimi?</div>
+        <button class="opt">Ha</button><button class="opt">Yo'q — funksiya ustunni "yashiradi"</button><button class="opt">Faqat kichik jadvalda</button>
+        <div class="q-fb" data-ok="To'g'ri. lower(email) uchun expression index kerak." data-no="Yo'q. Funksiya qo'llangan ustun uchun oddiy indeks ishlamaydi — CREATE INDEX ON mijoz(lower(email))."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>Indeks <code>(holat, tug_sana)</code>. <code>WHERE tug_sana > '2000-01-01'</code> so'rovi?</div>
+        <button class="opt">Indeks to'liq ishlaydi</button><button class="opt">Faqat tug_sana qismi ishlaydi</button><button class="opt">Ishlamaydi — chap ustun yo'q</button>
+        <div class="q-fb" data-ok="To'g'ri. Chap prefiks qoidasi." data-no="Yo'q. Composite indeks chap ustundan boshlanadi; holat yo'q — indeks foydasiz."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span>Jadvalning 80% satri kerak bo'lsa planner nimani tanlaydi?</div>
+        <button class="opt">Seq Scan — to'g'ri qaror</button><button class="opt">Index Scan — doim tezroq</button><button class="opt">Xato beradi</button>
+        <div class="q-fb" data-ok="To'g'ri. Ko'p satr uchun ketma-ket o'qish arzonroq — indeks tasodifiy o'qishlar keltiradi." data-no="Yo'q. Ko'p satr kerak bo'lsa Seq Scan arzon — indeks har satr uchun heap'ga sakrash bilan qimmat bo'ladi."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Prod'da katta jadvalga indeks qo'shish?</div>
+        <button class="opt">CREATE INDEX</button><button class="opt">CREATE INDEX CONCURRENTLY</button><button class="opt">Jadvalni qayta yaratish</button>
+        <div class="q-fb" data-ok="To'g'ri. Yozishni bloklamaydi (sekinroq, lekin xavfsiz)." data-no="Yo'q. Oddiy CREATE INDEX yozishni bloklaydi — prod'da CONCURRENTLY."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · PostgreSQL yakuni</span>
+      <h3>Tranzaksiya, ACID, izolyatsiya va lock</h3>
+      <p>Ikki tranzaksiya bitta hisobni bir vaqtda o'zgartirsa — lost update, dirty read, phantom. Izolyatsiya darajalari jonli, MVCC, deadlock, SELECT FOR UPDATE.</p>
+      <div class="topics"><span class="topic-pill">34 · SQL chuqur</span><span class="topic-pill now">35 · Indeks & EXPLAIN</span><span class="topic-pill">36 · Tranzaksiya</span><span class="topic-pill">37 · Big-O</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="34-sql-chuqur.html"><span class="cl">← Oldingi dars</span><span class="ct">34 · SQL chuqur</span><span class="cs">🐘 PostgreSQL</span></a><a class="cn nx" href="36-tranzaksiya-acid-lock.html"><span class="cl">Keyingi dars →</span><span class="ct">36 · Tranzaksiya, ACID, lock</span><span class="cs">🐘 PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:39.8%"></i></div><span>35 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(35)<0)v.push(35);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','35');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(35)<0)D[t].push(35);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* race */
+  var N=200,T=167,gS=document.getElementById('gSeq'),gI=document.getElementById('gIdx'),cs=[],ci=[],timers=[];
+  for(var i=0;i<N;i++){var a=document.createElement('div');a.className='cell';gS.appendChild(a);cs.push(a);var b=document.createElement('div');b.className='cell';gI.appendChild(b);ci.push(b);}
+  function rreset(){timers.forEach(clearInterval);timers=[];cs.concat(ci).forEach(function(c){c.className='cell';});cs[T].classList.add('tgt');ci[T].classList.add('tgt');document.getElementById('nSeq').textContent='0';document.getElementById('nIdx').textContent='0';}
+  rreset();
+  document.getElementById('raceReset').addEventListener('click',function(){rreset();document.getElementById('raceEx').innerHTML='Sariq — tekshirilgan satrlar, binafsha — indeks yo\'li, yashil — topildi.';});
+  document.getElementById('raceGo').addEventListener('click',function(){
+    rreset();var i=0,k=0,path=[100,150,175,167],doneS=false,doneI=false;
+    var t1=setInterval(function(){if(i>T){clearInterval(t1);doneS=true;fin();return;}if(i<T)cs[i].classList.add('chk');document.getElementById('nSeq').textContent=i+1;i++;},18);
+    var t2=setInterval(function(){if(k>=path.length){clearInterval(t2);doneI=true;fin();return;}if(path[k]!==T)ci[path[k]].classList.add('path');document.getElementById('nIdx').textContent=k+1;k++;},500);
+    timers.push(t1,t2);
+    function fin(){if(doneI&&!doneS)document.getElementById('raceEx').innerHTML='<b>Index Scan tugadi — 4 qadam.</b> Seq Scan hali yuribdi… U to\'xtash uchun "topdim" deb bilmaydi ham: UNIQUE bo\'lmasa oxirigacha o\'qiydi (yana bitta 168 bo\'lishi mumkin-ku).';if(doneS&&doneI)document.getElementById('raceEx').innerHTML='<b>Natija:</b> Seq Scan — 168 satr, Index Scan — 4 qadam (root → ichki → barg → heap). Bu 200 satr. Million satrda: 1 000 000 vs ~20.';}
+  });
+
+  /* btree */
+  var root=[100,200],mid=[[30,60],[130,160],[230,260]],leaves=[[1,15,29],[30,45,59],[60,80,99],[100,115,129],[130,145,159],[160,168,199],[200,215,229],[230,245,259],[260,280,299]];
+  var bt=document.getElementById('bt'),btEx=document.getElementById('btEx'),q='eq';
+  function nodeHtml(keys,cls,id){return '<div class="node '+cls+'" id="'+id+'">'+keys.map(function(k){return '<span data-k="'+k+'">'+k+'</span>';}).join('')+'</div>';}
+  function drawTree(){bt.innerHTML='<div class="lvl"><div class="lvl-lbl">root (1 sahifa)</div>'+nodeHtml(root,'','r')+'</div><div class="lvl"><div class="lvl-lbl">ichki tugunlar</div>'+mid.map(function(m,i){return nodeHtml(m,'','m'+i);}).join('')+'</div><div class="lvl"><div class="lvl-lbl">barglar (kalit → ctid), zanjirlangan ↔</div>'+leaves.map(function(l,i){return nodeHtml(l,'leaf','l'+i);}).join('')+'</div>';}
+  function clr(){[].slice.call(bt.querySelectorAll('.node')).forEach(function(n){n.classList.remove('on','dim','rng');[].slice.call(n.children).forEach(function(s){s.classList.remove('k','hit');});});}
+  function on(id,k,hit){var n=document.getElementById(id);n.classList.add('on');if(k!==undefined){[].slice.call(n.children).forEach(function(s){if(+s.dataset.k===k)s.classList.add(hit?'hit':'k');});}}
+  function dimAll(){[].slice.call(bt.querySelectorAll('.node')).forEach(function(n){n.classList.add('dim');});}
+  function undim(id){document.getElementById(id).classList.remove('dim');}
+  var eqSteps=[
+    function(){clr();on('r',100);btEx.innerHTML='<b>1. Root.</b> 168 ni qidiramiz. Root kalitlari [100 | 200]: 168 ≥ 100 va &lt; 200 → o\'rta bolaga. <b>1 sahifa o\'qildi.</b>';},
+    function(){clr();dimAll();undim('r');undim('m1');on('r',100);on('m1',160);btEx.innerHTML='<b>2. Ichki tugun</b> [130 | 160]: 168 ≥ 160 → o\'ng bolaga. <b>2-sahifa.</b> Har qadamda qidiruv maydoni 3 marta qisqardi (haqiqiy B-tree\'da yuzlab marta).';},
+    function(){clr();dimAll();undim('r');undim('m1');undim('l5');on('r',100);on('m1',160);on('l5',168,true);btEx.innerHTML='<b>3. Barg</b> [160, 168, 199]: 168 topildi ✓. Yonida ctid — satrning heap\'dagi manzili (sahifa, offset). <b>3-sahifa.</b>';},
+    function(){clr();dimAll();undim('l5');on('l5',168,true);btEx.innerHTML='<b>4. Heap.</b> ctid bo\'yicha jadval sahifasiga boramiz, satrni o\'qiymiz (va MVCC bo\'yicha ko\'rinadimi tekshiramiz). <b>Jami 4 sahifa</b> — 200 satr uchun ham, 200 million uchun ham deyarli shuncha (+1–2 daraja). Index Only Scan bo\'lsa bu qadam yo\'q.';}
+  ];
+  var rngSteps=[
+    function(){clr();on('r',100);btEx.innerHTML='<b>BETWEEN 120 AND 180.</b> Avval <b>120</b> ni qidiramiz (pastki chegara): root → 100 ≤ 120 &lt; 200 → o\'rta.';},
+    function(){clr();dimAll();undim('r');undim('m1');on('r',100);on('m1',130);btEx.innerHTML='Ichki [130 | 160]: 120 &lt; 130 → chap barg.';},
+    function(){clr();dimAll();undim('l3');on('l3',129,true);document.getElementById('l3').classList.add('rng');btEx.innerHTML='Barg [100, 115, 129]: 120 dan boshlab — 129 mos. Endi daraxtga qaytmaymiz…';},
+    function(){clr();dimAll();['l3','l4','l5'].forEach(undim);['l3','l4','l5'].forEach(function(id){var n=document.getElementById(id);n.classList.add('on','rng');[].slice.call(n.children).forEach(function(s){var k=+s.dataset.k;if(k>=120&&k<=180)s.classList.add('hit');});});btEx.innerHTML='<b>Barglar zanjiri bo\'ylab o\'ngga</b> yuramiz: 129 → 130, 145, 159 → 160, 168 → 199 &gt; 180 to\'xtaymiz. Diapazon so\'rovi = bitta tushish + ketma-ket yurish. Shuning uchun B-tree ORDER BY va BETWEEN uchun ham ideal, Hash indeks esa yo\'q.';}
+  ];
+  drawTree();
+  var btSt=mkStepper('bt',4,function(i){(q==='eq'?eqSteps:rngSteps)[i]();},2600);
+  document.getElementById('btSeg').addEventListener('click',function(e){if(!e.target.dataset.q)return;q=e.target.dataset.q;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});btSt.stop();btSt.go(0);});
+
+  /* plan */
+  var plan=[
+    {t:'Nested Loop  (cost=0.85..245.10 rows=38 width=72) (actual time=0.041..0.412 rows=41 loops=1)',x:'<b>Nested Loop</b> — tashqi tugun har satri uchun ichki tugun ishga tushadi. Kam satrda arzon. <b>rows=38</b> taxmin vs <b>rows=41</b> haqiqat — yaqin, statistika yaxshi. Jami 0.4 ms.'},
+    {t:'  ->  Index Scan using ix_hisob_mijoz on hisob h  (cost=0.42..8.44 rows=2 width=8) (actual time=0.020..0.023 rows=2 loops=1)',x:'<b>Tashqi tomon:</b> mijoz_id=42 bo\'yicha hisoblar — indeks orqali 2 satr. <b>loops=1</b> — bir marta bajarildi.',c:'okc'},
+    {t:'        Index Cond: (mijoz_id = 42)',x:'<b>Index Cond</b> — indeks ichida qo\'llangan shart. Bu yaxshi. Agar shart "Filter:" sifatida chiqsa — indeks o\'qigandan keyin filtrlangan, ya\'ni indeks unchalik yordam bermagan.'},
+    {t:'  ->  Index Scan using ix_tx_hisob_vaqt on tranzaksiya t  (cost=0.43..118.12 rows=19 width=72) (actual time=0.015..0.180 rows=20 loops=2)',x:'<b>Ichki tomon:</b> composite indeks (hisob_id, vaqt) — ikkala shart ham indeksda. <b>loops=2</b> — har hisob uchun bir marta; actual rows=20 — <b>har loop uchun o\'rtacha</b>, jami 40.',c:'okc'},
+    {t:'        Index Cond: ((hisob_id = h.id) AND (vaqt > (now() - \'30 days\'::interval)))',x:'Ikkala shart indeksda — chap prefiks (hisob_id tenglik) + diapazon (vaqt). Indeks ustun tartibi to\'g\'ri tanlangan.'},
+    {t:'Planning Time: 0.310 ms',x:'Rejani tuzish vaqti. Murakkab so\'rovlarda (ko\'p JOIN) katta bo\'lishi mumkin — prepared statement yordam beradi.'},
+    {t:'Execution Time: 0.468 ms',x:'<b>Haqiqiy bajarilish.</b> Bu raqam — asosiy ko\'rsatkich. Shu so\'rov indekssiz bo\'lganda:'},
+    {t:'--- indekssiz variant ---',x:''},
+    {t:'  ->  Seq Scan on tranzaksiya t  (cost=0.00..48210.00 rows=19 width=72) (actual time=0.9..612.3 rows=20 loops=2)',x:'<b>Seq Scan</b> — 2 million satr ikki marta (loops=2) to\'liq o\'qildi, 20 tasi kerak edi. <b>612 ms × 2</b>. Indeks bilan 0.18 ms edi — 3000× farq. EXPLAIN\'da <b>Seq Scan + katta rows + kichik natija</b> = indeks kerak.',c:'hot'},
+    {t:'        Filter: (vaqt > (now() - \'30 days\'::interval))',x:'<b>Filter</b> — satrlar o\'qilgandan keyin tashlab yuborildi. "Rows Removed by Filter: 1 999 980" degan qator ham chiqadi — isrof belgisi.',c:'hot'},
+    {t:'Buffers: shared hit=12 read=24 100',x:'<b>BUFFERS</b>: hit — cache\'dan (RAM), read — diskdan. 24 100 sahifa × 8 KB = 190 MB disk o\'qish bitta so\'rov uchun. Indeksli variantda: hit=9.',c:'hot'}
+  ];
+  var pl=document.getElementById('plan');pl.innerHTML=plan.map(function(p,i){return '<span class="ln '+(p.c||'')+'" data-i="'+i+'">'+p.t.replace(/</g,'&lt;')+'</span>';}).join('');
+  pl.addEventListener('click',function(e){var l=e.target.closest('.ln');if(!l||!plan[+l.dataset.i].x)return;[].slice.call(pl.children).forEach(function(x){x.classList.toggle('on',x===l);});document.getElementById('planEx').innerHTML=plan[+l.dataset.i].x;});
+
+  /* index tester */
+  var W=[
+    {q:"WHERE email = 'a@b.uz'",r:'y',x:'<b>Index Scan (email).</b> Tenglik, ustun "toza" — ideal holat.'},
+    {q:"WHERE lower(email) = 'a@b.uz'",r:'n',x:'<b>Seq Scan.</b> Indeks <code>email</code> qiymatlarini saqlaydi, <code>lower(email)</code> ni emas. Yechim: <code>CREATE INDEX ON mijoz (lower(email))</code> yoki citext tipi.'},
+    {q:"WHERE email LIKE 'ota%'",r:'y',x:'<b>Index Scan.</b> Prefiks — B-tree\'da diapazon: \'ota\' ≤ x &lt; \'otb\'. (Lokal C collation yoki text_pattern_ops kerak bo\'lishi mumkin.)'},
+    {q:"WHERE email LIKE '%mail.uz'",r:'n',x:'<b>Seq Scan.</b> Boshi noma\'lum — tartiblangan daraxtda qayerdan boshlashni bilmaydi. Yechim: pg_trgm + GIN indeks.'},
+    {q:"WHERE holat = 'FAOL' AND tug_sana > '1990-01-01'",r:'y',x:'<b>Index Scan (holat, tug_sana).</b> Chap ustun tenglik, o\'ng ustun diapazon — composite indeks to\'liq ishlaydi.'},
+    {q:"WHERE tug_sana > '1990-01-01'",r:'n',x:'<b>Seq Scan.</b> Composite indeksning chap ustuni (holat) yo\'q — daraxt holat bo\'yicha tartiblangan, tug_sana ichida "sochilgan". Yechim: alohida (tug_sana) indeks.'},
+    {q:"WHERE id::text = '42'",r:'n',x:'<b>Seq Scan.</b> Cast — funksiya kabi. Java\'da String parametr yuborsangiz JDBC shunday qiladi! Parametr tipini to\'g\'ri bering: <code>setLong</code>.'},
+    {q:"WHERE holat = 'FAOL'  (satrlarning 90%)",r:'m',x:'<b>Seq Scan — to\'g\'ri qaror.</b> Indeks bor, lekin 90% satr kerak: indeks orqali har satrga sakrash ketma-ket o\'qishdan qimmat. Planner statistikaga (pg_stats) qarab hal qiladi.'},
+    {q:"WHERE email = 'a@b.uz'  (jadvalda 50 satr)",r:'m',x:'<b>Seq Scan.</b> Jadval 1 sahifa — uni o\'qish indeks daraxtidan yurishdan arzon. Kichik jadvalda indeks "ishlamasligi" — xato emas.'},
+    {q:"WHERE email = 'a@b.uz' OR ism = 'Otabek'",r:'m',x:'<b>Bitmap OR</b> — ism\'da indeks bo\'lsa ikkita bitmap birlashtiriladi; bo\'lmasa Seq Scan. OR — ko\'pincha UNION ALL ga aylantirilsa tezroq.'}
+  ];
+  var wq=document.getElementById('wq');wq.innerHTML=W.map(function(w,i){return '<div class="wqi" data-i="'+i+'"><span>'+w.q+'</span><span class="res '+w.r+'">'+(w.r==='y'?'✓ indeks':w.r==='n'?'✗ Seq Scan':'~ bog\'liq')+'</span></div>';}).join('');
+  wq.addEventListener('click',function(e){var c=e.target.closest('.wqi');if(!c)return;[].slice.call(wq.children).forEach(function(x){x.classList.toggle('on',x===c);});document.getElementById('wqEx').innerHTML=W[+c.dataset.i].x;});
+
+  /* write cost */
+  var ix=document.getElementById('ixCnt'),wc=document.getElementById('wc');
+  function wcDraw(){var n=+ix.value;document.getElementById('ixN').textContent=n;var ins=1+n*0.9,sel=n?1:8,size=1+n*0.6;
+    wc.innerHTML=[['INSERT vaqti',ins,'var(--coral)',10],['SELECT (indeksli ustun)',sel,'var(--teal)',10],['Disk hajmi',size,'var(--purple)',10]].map(function(r){return '<div class="wcb"><span class="lbl">'+r[0]+'</span><div class="bar2"><div style="width:'+(r[1]/r[3]*100)+'%;background:'+r[2]+'"></div></div><span class="v">'+r[1].toFixed(1)+'×</span></div>';}).join('');
+    document.getElementById('wcEx').innerHTML=n===0?'<b>Indeks yo\'q:</b> INSERT eng tez, lekin har SELECT — Seq Scan (sekin).':n<=3?'<b>'+n+' indeks:</b> muvozanat. Har INSERT '+n+' ta daraxtni yangilaydi — hali arzon. O\'qish tez.':'<b>'+n+' indeks:</b> har INSERT/UPDATE '+n+' ta B-tree\'ni yangilaydi — yozish '+ins.toFixed(1)+'× qimmat, disk '+size.toFixed(1)+'×. Tranzaksiya jadvali (ko\'p yozish) uchun ortiqcha. Ishlatilmaydiganlarini o\'chiring.';}
+  ix.addEventListener('input',wcDraw);wcDraw();
+})();
+
+</script>
+</body>
+</html>

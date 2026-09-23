@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Testlash</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0E7C7B;--teal-ink:#0A5A59;--teal-soft:#DBF0EF;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(30,36,26,.05),0 8px 24px rgba(30,36,26,.06);
+  --shadow-lift:0 2px 4px rgba(30,36,26,.08),0 16px 40px rgba(30,36,26,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* pyramid */
+.pyr{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:14px}
+.pl{border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;text-align:center;cursor:pointer;transition:.2s;font-family:var(--font-mono);font-size:12.5px;background:var(--surface)}
+.pl:hover{border-color:var(--border-strong)}.pl.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.pl small{display:block;font-weight:400;color:var(--ink-faint);font-size:10.5px}
+.pl.e2e{width:38%}.pl.integ{width:60%}.pl.slice{width:78%}.pl.unit{width:96%}
+.pstat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pstat div{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:8px;text-align:center;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft)}
+.pstat b{display:block;font-size:16px;color:var(--accent-ink);font-family:var(--font-display)}
+.race2{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.rr{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;font-family:var(--font-mono);font-size:12px}
+.rr .bar{height:12px;background:var(--sunken);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.rr .bar i{display:block;height:100%;background:var(--accent);width:0}
+.rr .t{text-align:right;color:var(--ink-soft)}
+
+/* mockito */
+.mk{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.mkc{background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;padding:12px}
+.mkc h5{font-family:var(--font-mono);font-size:11px;margin:0 0 8px;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase}
+.mkopt{display:flex;flex-direction:column;gap:5px}
+.mkopt button{text-align:left;border:1.5px solid var(--border);background:var(--surface);border-radius:9px;padding:7px 10px;cursor:pointer;font-family:var(--font-mono);font-size:11.5px;color:var(--ink)}
+.mkopt button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.tcode{font-family:var(--font-mono);font-size:11.5px;line-height:1.7}
+.tcode .ph{display:block;white-space:pre-wrap;word-break:break-word;padding:3px 8px;border-radius:7px;border-left:3px solid transparent;transition:.25s;color:var(--ink-soft)}
+.tcode .ph.cur{background:var(--accent-soft);border-left-color:var(--accent);color:var(--ink)}
+.tcode .ph b{color:var(--purple-ink)}
+.tres{margin-top:10px;border-radius:10px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;font-weight:600;min-height:44px}
+.tres.pass{background:var(--teal-soft);color:var(--teal-ink)}.tres.fail{background:var(--coral-soft);color:var(--coral)}.tres.wait{background:var(--sunken);color:var(--ink-faint)}
+
+/* slices */
+.slp{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.slp button{border:1.5px solid var(--border);background:var(--surface);border-radius:9px;padding:7px 11px;cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--ink)}
+.slp button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.ctxbox{border:2px dashed var(--accent);border-radius:14px;padding:12px;margin-top:12px;background:var(--accent-soft);display:flex;flex-wrap:wrap;gap:6px;min-height:80px;transition:.3s}
+.bn{font-family:var(--font-mono);font-size:11.5px;border:1.5px solid var(--border);border-radius:8px;padding:5px 9px;background:var(--surface);color:var(--ink-faint);opacity:.4;transition:.3s}
+.bn.on{opacity:1;color:var(--ink);border-color:var(--teal)}
+.bn.mock{opacity:1;border-color:var(--purple);color:var(--purple-ink);border-style:dashed}
+.slstat{font-family:var(--font-mono);font-size:12px;margin-top:8px;color:var(--ink-soft)}
+.slstat b{color:var(--accent-ink)}
+
+/* testcontainers */
+.tcf{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tcs{flex:1;min-width:110px;border:1.5px solid var(--border);border-radius:11px;padding:9px 10px;background:var(--surface-2);font-family:var(--font-mono);font-size:11.5px;text-align:center;transition:.3s}
+.tcs.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-lift)}
+.tcs.done{border-color:var(--teal);color:var(--teal-ink)}
+.tcs small{display:block;color:var(--ink-faint);font-size:10px;margin-top:2px}
+@media (max-width:560px){.mk{grid-template-columns:1fr}.rr{grid-template-columns:110px 1fr 60px}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.an{color:var(--accent-ink);font-weight:500}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 8/9</span><span>· Kurs: 31/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 31-modul · noldan</span>
+    <h1>Testlash: JUnit, Mockito, <span class="steam">Spring Boot Test</span></h1>
+    <p class="lead">Bank kodini "ishlaydi shekilli" deb deploy qilib bo'lmaydi. Test — kodning o'zi tekshiradigan shartnoma. Bu modulda qaysi testni qachon yozishni, Mockito qanday "soxtalashtirishini" va real Postgres bilan testni jonli ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Test piramidasi: ko'p tez, kam sekin</h2></div>
+    <p class="sec-sub">Qatlamni bosing. Pastda — ko'p, tez, arzon. Yuqorida — kam, sekin, lekin real. "Taqqosla" — 200 ta testning vaqtini ko'ring.</p>
+    <div class="demo">
+      <div class="pyr" id="pyr">
+        <div class="pl e2e" data-l="e2e">E2E / UI<small>bir necha ta</small></div>
+        <div class="pl integ" data-l="integ">Integration (@SpringBootTest + Testcontainers)<small>o'nlab</small></div>
+        <div class="pl slice" data-l="slice">Slice (@WebMvcTest, @DataJpaTest)<small>yuzlab</small></div>
+        <div class="pl unit sel" data-l="unit">Unit (JUnit + Mockito, Spring'siz)<small>minglab</small></div>
+      </div>
+      <div class="pstat" id="pstat"></div>
+      <div class="demo-note" id="pyrNote"></div>
+      <div class="controls"><button class="ctl primary" id="raceBtn">▶ 200 test: vaqtni taqqosla</button></div>
+      <div class="race2" id="race2"><div class="rr"><span>Unit ×200</span><div class="bar"><i id="rb0"></i></div><span class="t" id="rt0">—</span></div><div class="rr"><span>Slice ×200</span><div class="bar"><i id="rb1"></i></div><span class="t" id="rt1">—</span></div><div class="rr"><span>Integration ×200</span><div class="bar"><i id="rb2"></i></div><span class="t" id="rt2">—</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Mockito: bog'liqlikni "soxtalashtirish"</h2></div>
+    <p class="sec-sub">TransferService'ni test qilamiz — bazasiz. Repository o'rniga <b>mock</b>: "findById(1) chaqirilsa, shu hisobni qaytar". Mock xatti-harakatini tanlang va testni ishga tushiring:</p>
+    <div class="demo">
+      <div class="mk">
+        <div class="mkc"><h5>Mock sozlamasi (Arrange)</h5><div class="mkopt" id="mkopt">
+          <button class="on" data-m="0">when(repo.findById(1)).thenReturn(Optional.of(hisob(1000)))</button>
+          <button data-m="1">when(repo.findById(1)).thenReturn(Optional.of(hisob(100)))</button>
+          <button data-m="2">when(repo.findById(1)).thenThrow(new DataAccessException("DB down"))</button>
+          <button data-m="3">(stub qilinmadi — mock default)</button>
+        </div></div>
+        <div class="mkc"><h5>Test kodi</h5><div class="tcode" id="tcode">
+          <span class="ph" data-p="0"><b>// Arrange</b> — mock va servis</span>
+          <span class="ph" data-p="1">TransferRepository repo = mock(...);</span>
+          <span class="ph" data-p="2">var svc = new TransferService(repo, clock);</span>
+          <span class="ph" data-p="3"><b>// Act</b></span>
+          <span class="ph" data-p="4">svc.transfer(1L, 2L, of(300));</span>
+          <span class="ph" data-p="5"><b>// Assert</b></span>
+          <span class="ph" data-p="6">verify(repo).save(argThat(t -&gt; t.amount().equals(of(300))));</span>
+          <span class="ph" data-p="7">assertThat(hisob.balance()).isEqualByComparingTo("700");</span>
+        </div></div>
+      </div>
+      <div class="controls"><button class="ctl primary" id="mkRun">▶ Testni ishga tushir</button></div>
+      <div class="tres wait" id="tres">Natija shu yerda</div>
+      <div class="demo-note" id="mkNote">Mock — real klass o'rniga "yozib olingan javoblar". Baza, tarmoq, vaqt — hammasi soxta, test 5 ms.</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TransferServiceTest.java</span></div>
+      <pre class="code"><span class="an">@ExtendWith</span>(MockitoExtension.<span class="k">class</span>)              <span class="cm">// Spring YO'Q — sof unit test</span>
+<span class="k">class</span> <span class="ty">TransferServiceTest</span> {
+    <span class="an">@Mock</span> <span class="ty">TransferRepository</span> repo;
+    <span class="an">@Mock</span> <span class="ty">AccountRepository</span> accRepo;
+    <span class="an">@InjectMocks</span> <span class="ty">TransferService</span> svc;                   <span class="cm">// konstruktor orqali mock'lar beriladi</span>
+
+    <span class="an">@Test</span> <span class="k">void</span> balansYetmasa_exception_vaSaqlanmaydi() {
+        <span class="cm">// given</span>
+        <span class="k">var</span> a = <span class="k">new</span> Account(<span class="nu">1L</span>, <span class="k">new</span> BigDecimal(<span class="st">"100"</span>));
+        when(accRepo.findByIdForUpdate(<span class="nu">1L</span>)).thenReturn(Optional.of(a));
+        <span class="cm">// when / then</span>
+        assertThatThrownBy(() -&gt; svc.transfer(<span class="nu">1L</span>, <span class="nu">2L</span>, <span class="k">new</span> BigDecimal(<span class="st">"300"</span>)))
+            .isInstanceOf(InsufficientFundsException.<span class="k">class</span>)
+            .hasMessageContaining(<span class="st">"100"</span>);
+        verify(repo, never()).save(any());                 <span class="cm">// hech narsa saqlanmadi</span>
+        verifyNoMoreInteractions(repo);
+    }
+
+    <span class="an">@ParameterizedTest</span> <span class="an">@CsvSource</span>({<span class="st">"1000, 300, 700"</span>, <span class="st">"300, 300, 0"</span>})
+    <span class="k">void</span> debit(<span class="ty">BigDecimal</span> bal, <span class="ty">BigDecimal</span> amt, <span class="ty">BigDecimal</span> kutilgan) { ... }
+}</pre>
+    </div>
+    <div class="callout tip"><div class="ct">Test dubllari lug'ati</div><b>Dummy</b> — faqat parametrni to'ldirish. <b>Stub</b> — tayyor javob qaytaradi (when/thenReturn). <b>Mock</b> — stub + chaqiruvlarni tekshirish (verify). <b>Spy</b> — real obyekt, ba'zi metodlari o'zgartirilgan. <b>Fake</b> — soddalashtirilgan ishlaydigan implementatsiya (InMemoryRepo). Mockito mock/spy beradi. Qoida: <b>o'zingizniki bo'lmagan narsani mock qilmang</b> (RestClient'ni emas — uni o'ragan adapter'ingizni).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Slice testlar: konteynerning bir bo'lagi</h2></div>
+    <p class="sec-sub">@SpringBootTest butun ilovani ko'taradi (sekin). Slice — faqat kerakli qatlam. Annotatsiyani tanlang — qaysi bean'lar yuklanishini ko'ring:</p>
+    <div class="demo">
+      <div class="slp" id="slp"><button class="on" data-s="mvc">@WebMvcTest(TransferController)</button><button data-s="jpa">@DataJpaTest</button><button data-s="boot">@SpringBootTest</button><button data-s="unit">Unit (annotatsiyasiz)</button></div>
+      <div class="ctxbox" id="ctxbox"></div>
+      <div class="slstat" id="slstat"></div>
+      <div class="demo-note" id="slNote"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Slice misollari</span></div>
+      <pre class="code"><span class="an">@WebMvcTest</span>(TransferController.<span class="k">class</span>)              <span class="cm">// faqat MVC: controller, advice, filter, Jackson</span>
+<span class="k">class</span> <span class="ty">TransferControllerTest</span> {
+    <span class="an">@Autowired</span> <span class="ty">MockMvc</span> mvc;
+    <span class="an">@MockitoBean</span> <span class="ty">TransferService</span> service;          <span class="cm">// Boot 3.4+ (@MockBean eskirgan)</span>
+
+    <span class="an">@Test</span> <span class="k">void</span> manfiySumma_400() <span class="k">throws</span> Exception {
+        mvc.perform(post(<span class="st">"/api/v1/transfers"</span>).contentType(APPLICATION_JSON)
+                .content(<span class="st">"""{"fromAccount":"2020...","toAccount":"2020...","amount":-5,"currency":"UZS"}"""</span>))
+           .andExpect(status().isBadRequest())
+           .andExpect(jsonPath(<span class="st">"$.errors[0].field"</span>).value(<span class="st">"amount"</span>));
+        verifyNoInteractions(service);                  <span class="cm">// validatsiya servisgacha qo'ymadi</span>
+    }
+}
+
+<span class="an">@DataJpaTest</span>                                          <span class="cm">// faqat JPA: entity, repository, tx (har test rollback)</span>
+<span class="an">@AutoConfigureTestDatabase</span>(replace = NONE)           <span class="cm">// H2 emas — real Postgres (Testcontainers)</span>
+<span class="k">class</span> <span class="ty">TransferRepositoryTest</span> {
+    <span class="an">@Autowired</span> <span class="ty">TransferRepository</span> repo;
+    <span class="an">@Autowired</span> <span class="ty">TestEntityManager</span> em;
+    <span class="an">@Test</span> <span class="k">void</span> derivedQuery_toGriIshlaydi() {
+        em.persistAndFlush(transfer(COMPLETED, <span class="nu">500</span>)); em.persistAndFlush(transfer(PENDING, <span class="nu">900</span>));
+        assertThat(repo.findByStatusAndAmountGreaterThan(COMPLETED, ZERO)).hasSize(<span class="nu">1</span>);
+    }
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Testcontainers: real Postgres, Docker'da</h2></div>
+    <p class="sec-sub">H2 — Postgres emas: jsonb, window funksiyalar, <code>ON CONFLICT</code>, lock xatti-harakati farq qiladi. Testda "o'tdi", prod'da yiqildi. Testcontainers har test yugurishida Docker'da real Postgres ko'taradi:</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="tcPlay">▶ mvn test</button></div>
+      <div class="tcf" id="tcf">
+        <div class="tcs">Docker<small>postgres:16 image</small></div>
+        <div class="tcs">Konteyner<small>tasodifiy port</small></div>
+        <div class="tcs">Flyway<small>V1..Vn migratsiya</small></div>
+        <div class="tcs">Testlar<small>@SpringBootTest</small></div>
+        <div class="tcs">To'xtatish<small>konteyner o'chadi</small></div>
+      </div>
+      <div class="demo-note" id="tcNote">Birinchi marta image yuklanadi (~1 daq), keyin konteyner ~2–3 s'da ko'tariladi. Bitta konteyner hamma test klassiga umumiy (singleton pattern / @ServiceConnection).</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">AbstractIntegrationTest.java</span></div>
+      <pre class="code"><span class="an">@SpringBootTest</span>(webEnvironment = RANDOM_PORT)
+<span class="an">@Testcontainers</span>
+<span class="k">abstract class</span> <span class="ty">AbstractIntegrationTest</span> {
+    <span class="an">@Container</span> <span class="an">@ServiceConnection</span>                          <span class="cm">// Boot 3.1+: url/user/parolni o'zi beradi</span>
+    <span class="k">static</span> <span class="ty">PostgreSQLContainer</span>&lt;?&gt; pg = <span class="k">new</span> PostgreSQLContainer&lt;&gt;(<span class="st">"postgres:16-alpine"</span>);
+    <span class="cm">// static — hamma test klassi uchun bitta konteyner (tez)</span>
+}
+
+<span class="k">class</span> <span class="ty">TransferFlowIT</span> <span class="k">extends</span> <span class="ty">AbstractIntegrationTest</span> {
+    <span class="an">@Autowired</span> <span class="ty">TestRestTemplate</span> http;              <span class="cm">// real HTTP, real Tomcat, real Postgres</span>
+    <span class="an">@Test</span> <span class="k">void</span> otkazma_ikkiMartaYuborilsa_bittaSaqlanadi() {
+        <span class="k">var</span> req = <span class="k">new</span> HttpEntity&lt;&gt;(body, headers(<span class="st">"Idempotency-Key"</span>, <span class="st">"k1"</span>));
+        http.postForEntity(<span class="st">"/api/v1/transfers"</span>, req, TransferResponse.<span class="k">class</span>);
+        http.postForEntity(<span class="st">"/api/v1/transfers"</span>, req, TransferResponse.<span class="k">class</span>);
+        assertThat(jdbc.queryForObject(<span class="st">"select count(*) from transfer"</span>, Long.<span class="k">class</span>)).isEqualTo(<span class="nu">1L</span>);
+    }
+}</pre>
+    </div>
+    <div class="grid2">
+      <div class="card good"><h4>Yaxshi test</h4><pre>Nomi: metod_holat_kutilganNatija
+Bitta sabab uchun yiqiladi (bitta assert g'oyasi)
+Mustaqil: tartib, umumiy holat yo'q
+Deterministik: Clock inject, tasodifsiz
+AssertJ: assertThat(x).isEqualTo(y) — o'qiladi
+Given / When / Then izohlari</pre></div>
+      <div class="card bad"><h4>Test hidlari</h4><pre>Thread.sleep(1000) — flaky
+Testlar bir-biriga bog'liq (@Order)
+Hammasini mock qilib, implementatsiyani test qilish
+100% coverage uchun getter testi
+Prod bazaga ulanadigan test
+try/catch ichida assert (hech qachon yiqilmaydi)</pre></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Unit, integration, e2e test farqi? Piramida nega?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Unit — bitta birlik (klass/metod), bog'liqliklar mock, ms'larda, Spring'siz. Integration — bir nechta komponent birga (Spring kontekst, real DB), sekundlar. E2E — butun tizim foydalanuvchi nuqtai nazaridan. Piramida: pastda ko'p tez arzon testlar (tez feedback, aniq lokalizatsiya), yuqorida kam sekin real testlar (ishonch). Teskari piramida (hammasi e2e) — sekin, mo'rt, xatoni topish qiyin.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Mock va Stub farqi? Spy?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Stub — chaqiruvga tayyor javob (state verification: natijani tekshirasiz). Mock — qo'shimcha o'zaro ta'sirni tekshirish (behavior verification: verify(repo).save(...)). Mockito'da bitta obyekt ikkalasini qiladi. Spy — real obyekt, kerakli metodlari override (doReturn().when(spy)). Stub'ni ko'proq, verify'ni faqat muhim yon ta'sirlar (yuborildi/saqlandi) uchun ishlating — aks holda test implementatsiyaga yopishib qoladi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@Mock, @MockBean/@MockitoBean, @InjectMocks farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@Mock — Mockito, Spring'siz, MockitoExtension bilan. @InjectMocks — test qilinayotgan klassni yaratib, @Mock'larni konstruktor/setter/maydon orqali beradi. @MockBean (Boot 3.4'dan @MockitoBean) — Spring kontekstidagi bean'ni mock bilan almashtiradi (slice/integration testlarda); har xil @MockBean to'plami — yangi kontekst (kesh buziladi, sekin).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@WebMvcTest va @SpringBootTest farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@WebMvcTest — faqat MVC infratuzilma + ko'rsatilgan controller(lar), advice, filter, Jackson, validatsiya; servislar yo'q (mock qilinadi); MockMvc — real server yo'q. @SpringBootTest — to'liq kontekst, ixtiyoriy real server (RANDOM_PORT + TestRestTemplate/WebTestClient), real bazaga ulanishi mumkin. Birinchisi kontrakt/validatsiya, ikkinchisi oqimlar uchun.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nega H2 o'rniga Testcontainers?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">H2 Postgres'ni taqlid qiladi, lekin farqlar bor: jsonb, array, window/CTE nozikliklari, ON CONFLICT, lock semantikasi, tip konvertatsiyasi, migratsiya SQL sintaksisi. Testda o'tib prod'da yiqilish xavfi. Testcontainers Docker'da real Postgres (aynan prod versiyasi) ko'taradi; @ServiceConnection bilan sozlash avtomatik; static konteyner — hamma testga bitta.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Flaky test nima, sabablari?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Kod o'zgarmasa ham goh o'tib goh yiqiladigan test. Sabablar: vaqt (Thread.sleep, real Clock, timeout), tartibga bog'liqlik (umumiy static holat, baza tozalanmagan), parallellik (race), tashqi servis/tarmoq, tasodifiy ma'lumot, xotira/resurs. Yechim: Clock inject, Awaitility (sleep o'rniga), har test mustaqil ma'lumot, mock tashqi servis, deterministik seed.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Testda tranzaksiya qanday ishlaydi, tuzoqlari?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@DataJpaTest va @Transactional test — metod oxirida rollback. Tuzoq 1: flush bo'lmasa INSERT umuman ketmaydi — constraint xatolari ko'rinmaydi (saveAndFlush / em.flush). Tuzoq 2: LAZY yuklash testda ishlaydi (sessiya ochiq) — prod'da LazyInitializationException. Tuzoq 3: REQUIRES_NEW ichki tx test rollback'iga bo'ysunmaydi — baza ifloslanadi. @SpringBootTest + real HTTP'da test tx server thread'iga ta'sir qilmaydi — qo'lda tozalash (@Sql, truncate).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Coverage 100% bo'lsa kod to'g'rimi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Yo'q. Coverage — qaysi qatorlar bajarilgani, to'g'riligini tekshirilgani emas (assert'siz test ham coverage beradi). Muhimi: biznes qoidalar, chegara holatlar (0, manfiy, null, maksimal), xato yo'llari qamrovi. Mutation testing (PIT) — testlar xatoni sezadimi. 70–80% ma'noli coverage + kritik yo'llar 100% — real maqsad.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Tashqi API'ni (masalan, boshqa bank) testda qanday almashtirasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Unit'da — adapter interfeysini mock. Integration'da — WireMock/MockServer (HTTP darajasida stub: javob, kechikish, xato kodlari) yoki Testcontainers'da mock server. Kontrakt testlar (Pact, Spring Cloud Contract) — provayder va iste'molchi kelishuvi. Real API'ga test hech qachon urmasin.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Biznes qoida 'limit 50 mln' ni tekshirish uchun eng mos test?</div><button class="opt">@SpringBootTest + Testcontainers</button><button class="opt">Unit test, repository mock</button><button class="opt">@WebMvcTest</button><button class="opt">E2E</button><div class="q-fb" data-ok="To'g'ri. Sof mantiq — tez unit test." data-no="Unit. Bazaga/HTTP'ga aloqasi yo'q mantiq uchun Spring ko'tarish — vaqt isrofi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Stub qilinmagan Mockito mock metodi Optional<Account> qaytarsa nima bo'ladi?</div><button class="opt">null</button><button class="opt">Optional.empty()</button><button class="opt">Exception</button><button class="opt">Real metod chaqiriladi</button><div class="q-fb" data-ok="To'g'ri. Mockito 'bo'sh' defaultlar: Optional.empty, bo'sh kolleksiya, null, 0, false." data-no="Optional.empty() (Mockito 2+). Obyekt uchun null, kolleksiya uchun bo'sh."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>@WebMvcTest(TransferController.class) da TransferService?</div><button class="opt">Avtomatik yuklanadi</button><button class="opt">Yo'q — @MockitoBean bilan berish kerak</button><button class="opt">Real baza bilan ishlaydi</button><button class="opt">null bo'ladi, xato yo'q</button><div class="q-fb" data-ok="To'g'ri. Servis qatlami slice'ga kirmaydi." data-no="Servis yuklanmaydi → 'No qualifying bean'. @MockitoBean TransferService kerak."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>@DataJpaTest'da repo.save(entity) qildingiz, UNIQUE constraint buzilgan, lekin test o'tdi. Nega?</div><button class="opt">Constraint ishlamaydi</button><button class="opt">flush bo'lmadi — INSERT bazaga bormadi (rollback)</button><button class="opt">H2 constraint'ni tekshirmaydi</button><button class="opt">Mockito</button><div class="q-fb" data-ok="To'g'ri. saveAndFlush yoki em.flush() qiling." data-no="Flush yo'q — INSERT persistence context'da qoldi, test rollback qildi. saveAndFlush() ishlating."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Test Thread.sleep(2000) bilan async natijani kutadi. Muammo va yechim?</div><button class="opt">Muammo yo'q</button><button class="opt">Flaky va sekin — Awaitility (until) ishlatish</button><button class="opt">sleep'ni 5000 qilish</button><button class="opt">Test o'chirish</button><div class="q-fb" data-ok="To'g'ri. Awaitility shart bajarilguncha poll qiladi, maksimal timeout bilan." data-no="Sekin mashinada yiqiladi, tez mashinada vaqt isrof. Awaitility: await().atMost(5, SECONDS).until(...)."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Spring yakuni</span>
+      <h3>Spring Security va JWT</h3>
+      <p>Filter chain qanday ishlaydi, autentifikatsiya vs avtorizatsiya, JWT anatomiyasi (header.payload.signature), token tekshiruvi animatsiyasi, @PreAuthorize, parol hashing, CORS/CSRF.</p>
+      <div class="topics"><span class="topic-pill">30 · @Transactional</span><span class="topic-pill now">31 · Testlash</span><span class="topic-pill">32 · Security & JWT</span><span class="topic-pill">33 · PostgreSQL</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="30-transactional-chuqur.html"><span class="cl">← Oldingi dars</span><span class="ct">30 · @Transactional chuqur</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="32-security-va-jwt.html"><span class="cl">Keyingi dars →</span><span class="ct">32 · Security va JWT</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:35.2%"></i></div><span>31 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(31)<0)v.push(31);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','31');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(31)<0)D[t].push(31);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* pyramid */
+  var PY={unit:{s:['~5 ms','minglab','Spring, DB yo\'q'],n:'<b>Unit</b>: bitta klass, bog\'liqliklar mock. Biznes qoidalar (limit, komissiya, holat o\'tishlari) shu yerda. Tez — har saqlashda ishga tushiring. Kamchilik: integratsiya xatolarini (SQL, JSON, config) ko\'rmaydi.'},slice:{s:['~0.5–1 s','yuzlab','MVC yoki JPA qismi'],n:'<b>Slice</b>: konteynerning bir bo\'lagi. @WebMvcTest — HTTP → controller → JSON → validatsiya → advice (servis mock). @DataJpaTest — entity mapping, derived query, JPQL (real yoki H2 baza). Kontrakt tekshiruvlari.'},integ:{s:['~2–5 s','o\'nlab','Butun ilova + real DB'],n:'<b>Integration</b>: @SpringBootTest + Testcontainers. Real HTTP, real tranzaksiya, real Postgres. Asosiy oqimlar (o\'tkazma end-to-end, idempotency, security). Sekin — CI\'da, muhim yo\'llar uchun.'},e2e:{s:['daqiqalar','bir necha','Brauzer/mobil + backend'],n:'<b>E2E</b>: Selenium/Playwright, real muhit. Eng ishonchli, eng qimmat, eng mo\'rt (flaky). Faqat "pul o\'tkazish" kabi kritik ssenariylar.'}};
+  function showPy(k){[].slice.call(document.querySelectorAll('.pl')).forEach(function(p){p.classList.toggle('sel',p.dataset.l===k);});var d=PY[k];document.getElementById('pstat').innerHTML='<div>Tezlik<b>'+d.s[0]+'</b></div><div>Soni<b>'+d.s[1]+'</b></div><div>Qamrov<b>'+d.s[2]+'</b></div>';document.getElementById('pyrNote').innerHTML=d.n;}
+  [].slice.call(document.querySelectorAll('.pl')).forEach(function(p){p.addEventListener('click',function(){showPy(p.dataset.l);});});showPy('unit');
+  document.getElementById('raceBtn').addEventListener('click',function(){var T=[1,180,600];var W=[1,30,100];[0,1,2].forEach(function(i){var b=document.getElementById('rb'+i),t=document.getElementById('rt'+i);b.style.transition='none';b.style.width='0';t.textContent='…';setTimeout(function(){b.style.transition='width '+(T[i]/100)+'s linear';b.style.width=W[i]+'%';},50);setTimeout(function(){t.textContent=i===0?'1 s':i===1?'3 daq':'10 daq';},T[i]*10+100);});});
+
+  /* mockito */
+  var mkMode=0,mkT=[];
+  [].slice.call(document.querySelectorAll('#mkopt button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#mkopt button')).forEach(function(x){x.classList.toggle('on',x===b);});mkMode=+b.dataset.m;});});
+  document.getElementById('mkRun').addEventListener('click',function(){mkT.forEach(clearTimeout);mkT=[];var ph=[].slice.call(document.querySelectorAll('#tcode .ph')),res=document.getElementById('tres'),note=document.getElementById('mkNote');ph.forEach(function(p){p.classList.remove('cur');});res.className='tres wait';res.textContent='ishlayapti…';
+    function at(i,ms){mkT.push(setTimeout(function(){ph.forEach(function(p,k){p.classList.toggle('cur',k===i);});},ms));}
+    at(0,0);at(1,300);at(2,600);at(3,900);at(4,1200);
+    var R={0:['pass','✓ PASSED (4 ms) — 1 test, 0 failures','Mock 1000 qaytardi → 300 yechildi → 700. verify: save() aynan 300 bilan chaqirildi. Baza ochilmadi, Spring ko\'tarilmadi.'],1:['fail','✗ FAILED: InsufficientFundsException: balans 100 < 300','Servis to\'g\'ri ishladi — balans yetmaydi. Bu test uchun "kutilgan exception" bo\'lishi kerak: assertThatThrownBy(...). Test niyati bilan mock sozlamasi mos kelmadi.'],2:['fail','✗ FAILED: DataAccessException: DB down (at TransferService.transfer:12)','Mock exception tashladi — "baza yiqilsa servis nima qiladi?" ni tekshirish uchun thenThrow. Servis uni o\'rab qaytarishi kerakmi? Test shuni aniqlashtiradi.'],3:['fail','✗ FAILED: NoSuchElementException: No value present (Optional.empty)','Stub qilinmagan mock <b>default</b> qaytaradi: Optional → Optional.empty(), List → bo\'sh, obyekt → null, int → 0. orElseThrow() yiqildi. Mockito strict mode: ishlatilmagan stub — UnnecessaryStubbingException.']}[mkMode];
+    mkT.push(setTimeout(function(){ph.forEach(function(p,k){p.classList.toggle('cur',k>=5);});res.className='tres '+R[0];res.textContent=R[1];note.innerHTML=R[2];},1700));});
+
+  /* slices */
+  var BEANS=['DispatcherServlet','TransferController','GlobalExceptionHandler','Jackson ObjectMapper','Bean Validation','Security filters','TransferService','AccountService','TransferRepository','EntityManager/Hibernate','DataSource (DB)','Flyway','KafkaTemplate','RestClient (tashqi API)','Scheduler'];
+  var SL={mvc:{on:[0,1,2,3,4,5],mock:[6],t:'~0.8 s',n:'<b>@WebMvcTest</b>: faqat web qatlam. Servis <b>@MockitoBean</b> — siz javobini belgilaysiz. Tekshiradi: routing, status kodlar, JSON shakli, validatsiya, advice, security qoidalari (@WithMockUser). Baza yo\'q.'},jpa:{on:[8,9,10,11],mock:[],t:'~1.5 s',n:'<b>@DataJpaTest</b>: faqat JPA. Har test @Transactional — oxirida rollback. Default H2 embedded (replace=NONE bilan real Postgres). Tekshiradi: mapping, so\'rovlar, constraint\'lar (flush qiling!).'},boot:{on:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],mock:[],t:'~4 s',n:'<b>@SpringBootTest</b>: hammasi. Kafka/tashqi API\'ni @MockitoBean yoki Testcontainers (Kafka konteyner) / WireMock bilan almashtiring. Kontekst kesh: bir xil konfiguratsiyali testlar bitta konteynerni bo\'lishadi — @MockitoBean har xil bo\'lsa yangi kontekst (sekin!).'},unit:{on:[],mock:[6,8],t:'~5 ms',n:'<b>Unit</b>: Spring umuman yo\'q. new TransferService(mockRepo, ...). Eng ko\'p test shu yerda bo\'lsin.'}};
+  function showSl(k){[].slice.call(document.querySelectorAll('#slp button')).forEach(function(b){b.classList.toggle('on',b.dataset.s===k);});var d=SL[k];document.getElementById('ctxbox').innerHTML=BEANS.map(function(b,i){return '<span class="bn'+(d.on.indexOf(i)>=0?' on':'')+(d.mock.indexOf(i)>=0?' mock':'')+'">'+b+(d.mock.indexOf(i)>=0?' (mock)':'')+'</span>';}).join('');document.getElementById('slstat').innerHTML='Yuklangan bean\'lar: <b>'+d.on.length+'/'+BEANS.length+'</b> · mock: <b>'+d.mock.length+'</b> · kontekst ko\'tarilishi: <b>'+d.t+'</b>';document.getElementById('slNote').innerHTML=d.n;}
+  [].slice.call(document.querySelectorAll('#slp button')).forEach(function(b){b.addEventListener('click',function(){showSl(b.dataset.s);});});showSl('mvc');
+
+  /* testcontainers */
+  var tcT=[];document.getElementById('tcPlay').addEventListener('click',function(){tcT.forEach(clearTimeout);tcT=[];var s=[].slice.call(document.querySelectorAll('.tcs'));s.forEach(function(x){x.className='tcs';});var N=['docker pull postgres:16-alpine (keshda bo\'lsa — darhol)','Konteyner ishga tushdi: localhost:54873 (har safar boshqa port). @ServiceConnection spring.datasource.url ni o\'zi beradi.','Flyway migratsiyalari — prod bilan bir xil sxema. ddl-auto emas!','12 ta integratsiya testi real Postgres\'da: lock, constraint, jsonb — hammasi real.','Konteyner o\'chirildi (Ryuk). Hech qanday iz qolmadi. CI\'da ham xuddi shunday — Docker bo\'lsa bas.'];
+    N.forEach(function(n,i){tcT.push(setTimeout(function(){s.forEach(function(x,k){x.classList.toggle('on',k===i);x.classList.toggle('done',k<i);});document.getElementById('tcNote').innerHTML=n;},i*1100));});tcT.push(setTimeout(function(){s.forEach(function(x){x.className='tcs done';});},N.length*1100));});
+
+})();
+</script>
+</body>
+</html>

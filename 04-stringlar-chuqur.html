@@ -1,0 +1,452 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>String'lar chuqur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.prose{max-width:68ch;margin-top:14px}.prose p+p{margin-top:12px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+/* immutable demo */
+.imm-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.imm-heap{background:var(--sunken);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:130px;position:relative}
+.imm-tag{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.05em;margin-bottom:12px}
+.strobj{display:inline-block;border:1.5px solid var(--purple);border-radius:10px;padding:10px 16px;background:var(--purple-soft);font-family:var(--font-mono);font-size:14px;color:var(--purple-ink);margin:0 8px 8px 0;transition:.4s;position:relative}
+.strobj.old{opacity:.45;border-style:dashed}
+.strobj.new{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);animation:pop .4s cubic-bezier(.34,1.4,.5,1)}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.strobj .ptr{position:absolute;top:-9px;left:8px;font-size:10px;color:var(--ink-faint);font-family:var(--font-mono)}
+.imm-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.imm-btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:9px;padding:9px 14px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--ink)}
+.imm-btn:hover{border-color:var(--accent)}
+.imm-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.imm-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px}
+.imm-note b{color:var(--accent-ink)}
+
+/* pool demo */
+.pool-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.pool-vis{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.pool-col{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:14px}
+.pool-col h4{font-family:var(--font-mono);font-size:12px;margin:0 0 10px}
+.pool-col.pool h4{color:var(--teal-ink)}.pool-col.heap h4{color:var(--purple-ink)}
+.pobj{border:1.5px solid var(--border);border-radius:9px;padding:8px 12px;margin-bottom:8px;font-family:var(--font-mono);font-size:13px;background:var(--surface);transition:.3s}
+.pobj.hl{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.pool-refs{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);line-height:1.9}
+.pool-refs .arr{color:var(--accent-ink)}
+
+/* eq compare */
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;margin-top:6px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:7px 13px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);transition:.15s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-size:14.5px;min-height:46px}
+.note b{color:var(--accent-ink)}
+
+/* perf demo */
+.perf-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.perf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.perf-side{border-radius:12px;padding:14px;border:1.5px solid var(--border)}
+.perf-side.bad{border-color:var(--coral)}.perf-side.good{border-color:var(--teal)}
+.perf-side h4{font-family:var(--font-mono);font-size:12.5px;margin:0 0 8px}
+.perf-side.bad h4{color:var(--coral)}.perf-side.good h4{color:var(--teal-ink)}
+.perf-count{font-family:var(--font-mono);font-size:30px;font-weight:700;line-height:1.1}
+.perf-side.bad .perf-count{color:var(--coral)}.perf-side.good .perf-count{color:var(--teal-ink)}
+.perf-cl{font-size:11.5px;color:var(--ink-faint);font-family:var(--font-mono)}
+.perf-btns{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.perf-btn{background:var(--accent);border:0;color:#fff;border-radius:9px;padding:9px 16px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px}
+.perf-btn.sec{background:var(--surface-2);border:1.5px solid var(--border);color:var(--ink-soft)}
+
+/* methods */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}
+.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.pool-vis,.perf-row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B5622A"></span> Java asoslari · 4/7</span><span>· Kurs: 4/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Java kursi · 4-modul · noldan</span>
+    <h1>String'lar <span class="steam">chuqur</span></h1>
+    <p class="lead">String — Java'da eng ko'p ishlatiladigan tip, va eng ko'p tuzoqli. Immutability, String pool, <code>==</code> vs <code>equals</code> va StringBuilder — bularsiz suhbatdan o'tib bo'lmaydi.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>String o'zgarmas (immutable)</h2></div>
+    <p class="sec-sub">Eng muhim fakt: String'ni <b>o'zgartirib bo'lmaydi</b>. <code>toUpperCase()</code> yoki <code>+</code> qilganingizda eski String o'zgarmaydi — <b>yangi</b> String yaratiladi. Tugmalarni bosing va kuzating.</p>
+
+    <div class="imm-card">
+      <div class="imm-heap">
+        <div class="imm-tag">HEAP — String obyektlari</div>
+        <div id="immHeap"><span class="strobj" data-id="0"><span class="ptr">ism →</span>"otabek"</span></div>
+      </div>
+      <div class="imm-btns">
+        <button class="imm-btn primary" id="immUpper">ism.toUpperCase()</button>
+        <button class="imm-btn" id="immReset">boshidan</button>
+      </div>
+      <div class="imm-note" id="immNote">Boshlang'ich: <code>String ism = "otabek";</code> — bitta obyekt.</div>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>nega immutable?</div>
+      Xavfsizlik (String pool bo'lishishi mumkin), thread-safe (bir vaqtda o'qishga xavfsiz), va HashMap kaliti sifatida ishonchli (hashCode o'zgarmaydi). Bu suhbatning sevimli savoli.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>String pool — literal vs new</h2></div>
+    <p class="sec-sub">Java bir xil matnli literal'larni <b>String pool</b>da bir marta saqlaydi va qayta ishlatadi (xotira tejash). Lekin <code>new String()</code> majburan yangi obyekt yaratadi. Bu <code>==</code>ning javobini o'zgartiradi.</p>
+
+    <div class="pool-card">
+      <div class="pool-vis">
+        <div class="pool-col pool">
+          <h4>String Pool</h4>
+          <div class="pobj hl" id="p1">"Java"</div>
+        </div>
+        <div class="pool-col heap">
+          <h4>Heap (new)</h4>
+          <div class="pobj" id="p2" style="opacity:.4">— bo'sh —</div>
+        </div>
+      </div>
+      <div class="pool-refs" id="poolRefs"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Pool.java</span></div>
+      <pre class="code"><span class="ty">String</span> a = <span class="st">"Java"</span>;             <span class="cm">// pool'dan</span>
+<span class="ty">String</span> b = <span class="st">"Java"</span>;             <span class="cm">// AYNI pool obyekti</span>
+<span class="ty">String</span> c = <span class="k">new</span> <span class="ty">String</span>(<span class="st">"Java"</span>); <span class="cm">// MAJBURAN yangi Heap obyekti</span>
+
+a == b        <span class="cm">// true  — bir xil pool obyekti</span>
+a == c        <span class="cm">// false — c alohida Heap obyekti</span>
+a.equals(c)   <span class="cm">// true  — mazmun bir xil ✓</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2><code>==</code> vs <code>equals()</code> — asosiy qoida</h2></div>
+    <p class="sec-sub">Java'dagi eng ko'p uchraydigan xato manbasi. <code>==</code> manzilni, <code>equals()</code> mazmunni solishtiradi. Uchta holatni almashtirib ko'ring.</p>
+    <div class="card">
+      <div class="seg" id="eqSeg">
+        <button data-c="lit" class="on">ikki literal</button>
+        <button data-c="new">new String</button>
+        <button data-c="concat">runtime birlashma</button>
+      </div>
+      <div class="code-block" style="margin-top:14px">
+        <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Equals.java</span></div>
+        <pre class="code" id="eqCode"></pre>
+      </div>
+      <div class="note" id="eqNote"></div>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>oltin qoida</div>
+      String (va istalgan obyekt) solishtirishda <b>doim <code>.equals()</code></b> ishlating. <code>==</code> ba'zan tasodifan to'g'ri ishlaydi (pool tufayli) va sizni chalg'itadi — keyin production'da buziladi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>StringBuilder — nega <code>+</code> sikllarda yomon</h2></div>
+    <p class="sec-sub">String immutable bo'lgani uchun, siklda <code>+</code> bilan matn yopishtirish <b>har qadamda yangi obyekt</b> yaratadi — sekin va xotira yeydi. <code>StringBuilder</code> bitta o'zgaruvchan buferdan foydalanadi. "1000 marta qo'sh"ni bosing.</p>
+
+    <div class="perf-card">
+      <div class="perf-row">
+        <div class="perf-side bad">
+          <h4>❌ String + (siklda)</h4>
+          <div class="perf-count" id="badCount">0</div>
+          <div class="perf-cl">yaratilgan obyekt</div>
+        </div>
+        <div class="perf-side good">
+          <h4>✓ StringBuilder</h4>
+          <div class="perf-count" id="goodCount">0</div>
+          <div class="perf-cl">yaratilgan obyekt</div>
+        </div>
+      </div>
+      <div class="perf-btns">
+        <button class="perf-btn" id="perfRun">1000 marta qo'sh</button>
+        <button class="perf-btn sec" id="perfReset">boshidan</button>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Builder.java</span></div>
+      <pre class="code"><span class="cm">// ❌ Yomon — har iteratsiyada yangi String</span>
+<span class="ty">String</span> s = <span class="st">""</span>;
+<span class="k">for</span> (<span class="ty">int</span> i=<span class="nu">0</span>; i&lt;<span class="nu">1000</span>; i++) s = s + i;  <span class="cm">// 1000 ta obyekt!</span>
+
+<span class="cm">// ✓ Yaxshi — bitta bufer</span>
+<span class="ty">StringBuilder</span> sb = <span class="k">new</span> <span class="ty">StringBuilder</span>();
+<span class="k">for</span> (<span class="ty">int</span> i=<span class="nu">0</span>; i&lt;<span class="nu">1000</span>; i++) sb.append(i);
+<span class="ty">String</span> natija = sb.toString();</pre>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>StringBuilder vs StringBuffer</div>
+      Ikkovi ham o'zgaruvchan. <b>StringBuffer</b> — thread-safe (sinxronlangan, sekinroq), <b>StringBuilder</b> — thread-safe emas (tezroq). Bitta thread'da — doim StringBuilder.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Eng muhim metodlar</h2></div>
+    <p class="sec-sub">Kundalik ishda shular kerak bo'ladi.</p>
+    <div class="mgrid">
+      <div class="m"><div class="mn">length()</div><div class="md">uzunlik</div></div>
+      <div class="m"><div class="mn">charAt(i)</div><div class="md">i-belgi</div></div>
+      <div class="m"><div class="mn">substring(a,b)</div><div class="md">qism olish</div></div>
+      <div class="m"><div class="mn">indexOf("x")</div><div class="md">o'rnini topish</div></div>
+      <div class="m"><div class="mn">split(",")</div><div class="md">bo'laklarga</div></div>
+      <div class="m"><div class="mn">trim() / strip()</div><div class="md">bo'sh joyni olib tashlash</div></div>
+      <div class="m"><div class="mn">replace(a,b)</div><div class="md">almashtirish</div></div>
+      <div class="m"><div class="mn">contains("x")</div><div class="md">bormi?</div></div>
+      <div class="m"><div class="mn">toUpperCase()</div><div class="md">katta harf</div></div>
+      <div class="m"><div class="mn">equalsIgnoreCase</div><div class="md">registrsiz solishtirish</div></div>
+      <div class="m"><div class="mn">isBlank()</div><div class="md">bo'shmi? (Java 11)</div></div>
+      <div class="m"><div class="mn">String.format</div><div class="md">shablon bilan</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Text block (ko'p qatorli matn)</h2></div>
+    <p class="sec-sub">Java 15+ da uzun matn (JSON, SQL, HTML) uchun qulay yozuv — <code>+</code> va <code>\n</code> siz.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TextBlock.java</span></div>
+      <pre class="code"><span class="ty">String</span> json = <span class="st">"""
+    {
+        "ism": "Otabek",
+        "yosh": 30
+    }
+    """</span>;  <span class="cm">// ko'ringanidek, toza</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>String nega immutable?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Uch sabab: (1) <b>xavfsizlik</b> va String pool'da bo'lishish mumkin bo'lishi uchun; (2) <b>thread-safe</b> — bir vaqtda o'qishga xavfsiz; (3) <b>HashMap kaliti</b> sifatida ishonchli, chunki hashCode hech qachon o'zgarmaydi. Har o'zgartirish yangi obyekt yaratadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span><code>String s = "a"</code> va <code>new String("a")</code> farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Literal (<code>"a"</code>) — String pool'dan olinadi, takrorlanuvchi literallar bir obyektni bo'lishadi. <code>new String("a")</code> — majburan Heap'da yangi obyekt yaratadi (pool'ga bormaydi). Shuning uchun <code>==</code> ular uchun false qaytaradi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Sikldа matn yopishtirish uchun nima ishlatasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>StringBuilder</b>. String immutable bo'lgani uchun siklda <code>+</code> har qadamda yangi obyekt yaratadi (O(n²) ishlash). StringBuilder bitta o'zgaruvchan buferda ishlaydi (O(n)).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>StringBuilder va StringBuffer farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ikkovi o'zgaruvchan (mutable). StringBuffer — thread-safe (metodlari <code>synchronized</code>, sekinroq), StringBuilder — thread-safe emas, lekin tezroq. Bir thread doirasida doim StringBuilder tanlanadi.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">1.</span><code>ism.toUpperCase()</code> chaqirsangiz, asl <code>ism</code> o'zgaradimi?</div>
+        <button class="opt">Ha, katta harfga aylanadi</button>
+        <button class="opt">Yo'q — yangi String qaytadi, asl o'zgarmaydi (immutable)</button>
+        <button class="opt">Xato beradi</button>
+        <div class="q-fb" data-ok="To'g'ri. String immutable — metodlar yangi obyekt qaytaradi. Natijani saqlamasangiz, yo'qoladi: ism = ism.toUpperCase()." data-no="Yo'q. String immutable — asl o'zgarmaydi, yangi String qaytadi."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">2.</span>Ikki String mazmunini solishtirish uchun?</div>
+        <button class="opt">==</button>
+        <button class="opt">></button>
+        <button class="opt">.equals()</button>
+        <div class="q-fb" data-ok="To'g'ri. equals() mazmunni solishtiradi. == manzilni solishtiradi va String pool tufayli chalg'itadi." data-no="Yo'q. Mazmun uchun .equals(). == manzilni solishtiradi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">3.</span>Siklda ko'p matn yopishtirish uchun eng samarali?</div>
+        <button class="opt">StringBuilder</button>
+        <button class="opt">String + operatori</button>
+        <button class="opt">new String() har safar</button>
+        <div class="q-fb" data-ok="To'g'ri. StringBuilder bitta buferda ishlaydi — siklda + dan ancha tez, chunki + har qadamda yangi obyekt yaratadi." data-no="Yo'q. StringBuilder eng samarali. + siklda har qadamda yangi obyekt yaratadi (sekin)."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span><code>"Java" == new String("Java")</code> natijasi?</div>
+        <button class="opt">true</button>
+        <button class="opt">false (new alohida Heap obyekti)</button>
+        <button class="opt">Xato</button>
+        <div class="q-fb" data-ok="To'g'ri. Literal pool'da, new String Heap'da alohida obyekt — == manzilni solishtiradi → false. equals() esa true." data-no="Yo'q. new String() alohida obyekt yaratadi, == false qaytaradi. equals() true bo'lardi."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Massivlar (arrays)</h3>
+      <p>Bir tipdagi ko'p qiymatni saqlash: array e'lon qilish, indeks, uzunlik, ko'p o'lchovli array, Arrays utility va nega ArrayIndexOutOfBounds eng ko'p uchraydigan runtime xatosi.</p>
+      <div class="topics">
+        <span class="topic-pill">3 · Tiplar</span>
+        <span class="topic-pill now">4 · String'lar</span>
+        <span class="topic-pill">5 · Massivlar</span>
+        <span class="topic-pill">6 · Shartlar &amp; sikllar</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="03-tiplar-va-operatorlar.html"><span class="cl">← Oldingi dars</span><span class="ct">03 · Tiplar va operatorlar</span><span class="cs">☕ Java asoslari</span></a><a class="cn nx" href="05-massivlar.html"><span class="cl">Keyingi dars →</span><span class="ct">05 · Massivlar</span><span class="cs">☕ Java asoslari</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:4.5%"></i></div><span>4 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(4)<0)v.push(4);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','4');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(4)<0)D[t].push(4);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* immutable */
+  var immHeap=document.getElementById('immHeap'),immNote=document.getElementById('immNote');
+  var immState=0;
+  document.getElementById('immUpper').addEventListener('click',function(){
+    if(immState===1)return; immState=1;
+    immHeap.innerHTML='<span class="strobj old" data-id="0">"otabek"</span><span class="strobj new"><span class="ptr">ism →</span>"OTABEK"</span>';
+    immNote.innerHTML='<code>ism = ism.toUpperCase()</code> — eski "otabek" <b>o\'zgarmadi</b> (xira). Yangi "OTABEK" obyekti yaratildi va ism endi unga ko\'rsatadi. Eski obyekt keyin GC tozalaydi.';
+  });
+  document.getElementById('immReset').addEventListener('click',function(){
+    immState=0;
+    immHeap.innerHTML='<span class="strobj" data-id="0"><span class="ptr">ism →</span>"otabek"</span>';
+    immNote.innerHTML='Boshlang\'ich: <code>String ism = "otabek";</code> — bitta obyekt.';
+  });
+
+  /* pool refs — static illustration reveal on load */
+  document.getElementById('poolRefs').innerHTML='a <span class="arr">→</span> pool "Java" &nbsp;&nbsp; b <span class="arr">→</span> pool "Java" (ayni) &nbsp;&nbsp; c <span class="arr">→</span> Heap "Java" (alohida)';
+
+  /* eq compare */
+  var eqCode=document.getElementById('eqCode'),eqNote=document.getElementById('eqNote');
+  var EQ={
+    lit:{code:'<span class="ty">String</span> a = <span class="st">"Java"</span>;\n<span class="ty">String</span> b = <span class="st">"Java"</span>;\n\na == b        <span class="cm">// true  ✓</span>\na.equals(b)   <span class="cm">// true  ✓</span>',
+      note:'Ikki literal — <b>ayni pool obyekti</b>. Shuning uchun <code>==</code> ham tasodifan true. Bu chalg\'ituvchi!'},
+    "new":{code:'<span class="ty">String</span> a = <span class="st">"Java"</span>;\n<span class="ty">String</span> c = <span class="k">new</span> <span class="ty">String</span>(<span class="st">"Java"</span>);\n\na == c        <span class="cm">// false ✗</span>\na.equals(c)   <span class="cm">// true  ✓</span>',
+      note:'<code>new String</code> — <b>alohida Heap obyekti</b>. <code>==</code> manzilni solishtiradi → false. <code>equals()</code> mazmunni → true.'},
+    concat:{code:'<span class="ty">String</span> a = <span class="st">"Java"</span>;\n<span class="ty">String</span> x = <span class="st">"Ja"</span>;\n<span class="ty">String</span> d = x + <span class="st">"va"</span>;  <span class="cm">// runtime\'da hisoblanadi</span>\n\na == d        <span class="cm">// false ✗ (yangi obyekt)</span>\na.equals(d)   <span class="cm">// true  ✓</span>',
+      note:'Runtime\'da <code>+</code> bilan yasalgan String pool\'ga tushmaydi — <b>yangi obyekt</b>. Yana <code>==</code> false, <code>equals()</code> true. Xulosa: doim equals!'}
+  };
+  var eqBtns=[].slice.call(document.querySelectorAll('#eqSeg button'));
+  function showEq(c){eqBtns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-c')===c);});eqCode.innerHTML=EQ[c].code;eqNote.innerHTML=EQ[c].note;}
+  eqBtns.forEach(function(b){b.addEventListener('click',function(){showEq(b.getAttribute('data-c'));});});
+  showEq('lit');
+
+  /* perf */
+  var badCount=document.getElementById('badCount'),goodCount=document.getElementById('goodCount');
+  document.getElementById('perfRun').addEventListener('click',function(){
+    var bad=0,good=1; // builder ~1 object
+    var t=setInterval(function(){
+      bad+=37; good=1;
+      if(bad>=1000){bad=1000;clearInterval(t);}
+      badCount.textContent=bad.toLocaleString('en-US');
+      goodCount.textContent=good.toLocaleString('en-US');
+    },30);
+  });
+  document.getElementById('perfReset').addEventListener('click',function(){badCount.textContent='0';goodCount.textContent='0';});
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keycloak va IAM</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F1F2;--surface:#FFFFFF;--surface-2:#FBF7F8;--sunken:#F1E8EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E8DCDF;--border-strong:#D7C5CA;
+  --accent:#A3344A;--accent-ink:#7D2236;--accent-soft:#F6E4E8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* before/after systems */
+.sysgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+.sys{border:1.5px solid var(--border);border-radius:12px;background:var(--surface-2);padding:10px 8px;text-align:center;font-size:12px;transition:.35s;position:relative}
+.sys .ic{font-size:20px}
+.sys .nm{font-weight:600;font-family:var(--font-display);font-size:13px;margin-top:2px}
+.sys .db{margin-top:8px;font-family:var(--font-mono);font-size:10.5px;border:1px dashed var(--border-strong);border-radius:7px;padding:4px;color:var(--ink-soft);transition:.35s}
+.sys .db.gone{opacity:.15;text-decoration:line-through}
+.sys.off{border-color:var(--teal);background:var(--teal-soft)}
+.sys.leak{border-color:var(--coral);background:var(--coral-soft);animation:shake .4s}
+.sys.work{border-color:var(--amber);background:var(--amber-soft)}
+.hub{margin:14px auto 0;max-width:340px;border:2px solid var(--border);border-radius:14px;padding:12px;text-align:center;background:var(--surface);transition:.4s;opacity:.25}
+.hub.on{opacity:1;border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 4px var(--accent-soft)}
+.hub b{font-family:var(--font-display);font-size:16px;color:var(--accent-ink)}
+.hub small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}
+.wires{height:26px;display:grid;grid-template-columns:repeat(5,1fr);margin-top:4px}
+.wires i{justify-self:center;width:2px;height:100%;background:var(--accent);opacity:0;transition:.4s}
+.wires.on i{opacity:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.st{border:1px solid var(--border);border-radius:11px;padding:9px 11px;background:var(--surface)}
+.st .v{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent-ink);transition:.3s}
+.st .l{font-size:11.5px;color:var(--ink-soft)}
+/* tree explorer */
+.kcx{display:grid;grid-template-columns:260px 1fr;gap:14px;margin-top:14px;align-items:start}
+.tree{border:1px solid var(--border);border-radius:14px;background:var(--surface);padding:8px;font-family:var(--font-mono);font-size:12.5px}
+.tn{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.tn:hover{background:var(--sunken)}
+.tn.on{background:var(--accent);color:#fff}
+.tn .e{width:18px;text-align:center}
+.tn.l1{padding-left:22px}.tn.l2{padding-left:40px}.tn.l3{padding-left:58px}
+.detail{border:1.5px solid var(--border);border-radius:14px;background:var(--surface-2);padding:16px;min-height:280px;animation:pop .3s}
+.detail h3{font-size:20px;margin-bottom:6px}
+.detail .kind{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+.detail p{font-size:14.5px;margin-top:8px}
+.detail .ex{margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.detail .ex b{color:var(--accent-ink)}
+.detail .iv{margin-top:10px;background:var(--purple-soft);border-left:3px solid var(--purple);border-radius:0 10px 10px 0;padding:9px 12px;font-size:13.5px}
+/* realm isolation */
+.realms{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.rm{border:2px solid var(--border);border-radius:14px;padding:12px;background:var(--surface-2);transition:.3s}
+.rm h4{margin:0 0 6px;font-family:var(--font-mono);font-size:13px}
+.rm .u{font-family:var(--font-mono);font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 9px;margin-top:6px}
+.rm.src{border-color:var(--accent)}
+.rm.ok{border-color:var(--teal);background:var(--teal-soft)}
+.rm.bad{border-color:var(--coral);background:var(--coral-soft);animation:shake .4s}
+.tokpill{display:inline-block;font-family:var(--font-mono);font-size:12px;padding:5px 10px;border-radius:999px;background:var(--accent);color:#fff;margin-top:10px}
+@media (max-width:640px){.sysgrid{grid-template-columns:repeat(2,1fr)}.wires{display:none}.stats{grid-template-columns:1fr 1fr}.kcx,.realms{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#A3344A"></span> Keycloak · 1/10</span><span>· Kurs: 40/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Keycloak · 40-modul · noldan</span>
+    <h1>Keycloak va <span class="steam">IAM</span></h1>
+    <p class="lead">Bankda 5 ta ilova bo'lsa, har biri o'z login sahifasini, o'z parol jadvalini va o'z "kim nima qila oladi" mantig'ini yozishi kerakmi? Yo'q. <b>IAM</b> (Identity and Access Management) buni bitta joyga yig'adi. <b>Keycloak</b> esa shu vazifani bajaradigan ochiq kodli, eng ko'p ishlatiladigan server.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Muammo: har ilovada o'z login'i</h2></div>
+    <p class="sec-sub">Rejimni tanlang. Keyin <b>"Xodim ishdan ketdi"</b> tugmasini bosing va uning kirish huquqi qanday yopilishini kuzating.</p>
+    <div class="stage">
+      <div class="seg" id="mode"><button class="on" data-m="no">Keycloak'siz</button><button data-m="kc">Keycloak bilan</button></div>
+      <div class="sysgrid" id="sys"></div>
+      <div class="wires" id="wires"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="hub" id="hub"><b>🔐 Keycloak</b><small>realm: bank · users · roles · sessions</small></div>
+      <div class="stats" id="stats"></div>
+      <div class="ctrls"><button class="btn primary" id="leave">👤 Xodim (Sardor) ishdan ketdi</button><button class="btn" id="rst">Tiklash</button></div>
+      <div class="explain" id="ex"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Asosiy lug'at — 6 ta so'z</h2></div>
+    <div class="grid3">
+      <div class="card"><h4>🪪 Authentication (AuthN)</h4><p>"Sen kimsan?" — shaxsni tekshirish: parol, OTP, barmoq izi. Keycloak'ning asosiy ishi.</p></div>
+      <div class="card"><h4>🔑 Authorization (AuthZ)</h4><p>"Senga mumkinmi?" — rollar va ruxsatlar. Keycloak rollarni tokenga yozadi, qaror esa ko'pincha ilovaning o'zida qabul qilinadi.</p></div>
+      <div class="card"><h4>🏛 IdP — Identity Provider</h4><p>Shaxsni tasdiqlab, "bu Otabek" degan imzolangan hujjat (token) beruvchi server. Keycloak — IdP.</p></div>
+      <div class="card"><h4>🔁 SSO — Single Sign-On</h4><p>Bir marta kirasiz, qolgan ilovalar sizni taniydi. Internet-bankka kirdingiz, kassir paneliga yana parol so'ralmaydi.</p></div>
+      <div class="card"><h4>🔗 Federation</h4><p>Foydalanuvchilar boshqa joyda turadi (LDAP/Active Directory, Google), Keycloak ularga ko'prik bo'ladi.</p></div>
+      <div class="card"><h4>📜 Protokol</h4><p>Ilova va Keycloak "qaysi tilda" gaplashadi: <b>OpenID Connect</b> (OAuth 2.0 ustida, zamonaviy) yoki <b>SAML</b> (XML, eski korporativ tizimlar).</p></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Suhbatda</div>"Keycloak nima?" — "Ochiq kodli IAM server (hozir CNCF loyihasi). OIDC/OAuth 2.0 va SAML orqali markazlashgan autentifikatsiya, SSO, foydalanuvchi va rollarni boshqarish, identity brokering (Google va boshqalar) va LDAP federatsiyasini beradi. Ilovalar parol bilan emas, tokenlar bilan ishlaydi."</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Keycloak ichida nima bor — explorer</h2></div>
+    <p class="sec-sub">Chapdagi daraxt — admin konsolda ko'radigan tuzilma. Har tugunga bosing: u nima, bankdagi misoli va suhbatda nima so'ralishi chiqadi.</p>
+    <div class="kcx"><div class="tree" id="tree"></div><div class="detail" id="det"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Realm — to'liq izolyatsiya</h2></div>
+    <p class="sec-sub">Ikki realmda bir xil <code>otabek</code> foydalanuvchisi bor, lekin bular <b>ikki xil odam</b>. Token qaysi realm'dan olinganini tanlang va boshqa realm'ning API'siga yuboring.</p>
+    <div class="stage">
+      <div class="seg" id="rsel"><button class="on" data-r="bank">Token: realm "bank"</button><button data-r="staff">Token: realm "staff"</button></div>
+      <div class="realms">
+        <div class="rm" id="rBank"><h4>realm: bank (mijozlar)</h4><div class="u">otabek · id=7f3a… · MIJOZ</div><div class="u">dilnoza · id=c21e…</div></div>
+        <div class="rm" id="rStaff"><h4>realm: staff (xodimlar)</h4><div class="u">otabek · id=19bd… · KASSIR</div><div class="u">sardor · id=a004…</div></div>
+      </div>
+      <div style="text-align:center"><span class="tokpill" id="tok"></span></div>
+      <div class="ctrls"><button class="btn primary" id="sendB">→ Mijoz API'siga yubor (bank realm'iga ishonadi)</button><button class="btn primary" id="sendS">→ Kassa API'siga yubor (staff realm'iga ishonadi)</button></div>
+      <div class="explain" id="rex">Tokenni tanlang va yuboring.</div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>Realm nimani ajratadi</h4><p>Foydalanuvchilar, parollar, rollar, client'lar, sessiyalar, login sahifa dizayni, parol siyosati, MFA qoidalari, <b>imzo kalitlari</b>. Realm'lar bir-birini umuman ko'rmaydi.</p></div>
+      <div class="card bad"><h4>⚠ master realm</h4><p>Faqat Keycloak'ni boshqarish uchun (super-admin). Ilovalar va foydalanuvchilarni u yerga qo'ymang. Har loyiha yoki tenant uchun o'z realm'ini yarating.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Keycloak yoki boshqasi?</h2></div>
+    <table class="tbl">
+      <tr><th>Variant</th><th>Qachon to'g'ri</th><th>Kamchiligi</th></tr>
+      <tr><td><b>Keycloak</b> (o'zingiz host qilasiz)</td><td>Ma'lumot mamlakat ichida qolishi shart (bank regulyatsiyasi), to'liq nazorat, bepul, ko'p funksiya</td><td>O'zingiz yangilaysiz, klaster qurasiz, monitoring qilasiz</td></tr>
+      <tr><td>Auth0 / Okta / Entra ID (SaaS)</td><td>Tez boshlash, ops ishi yo'q</td><td>Pullik, ma'lumot tashqarida, vendor lock-in</td></tr>
+      <tr><td>Spring Authorization Server</td><td>Juda o'ziga xos, kichik ehtiyoj; hammasi Java kodida</td><td>Admin UI, federatsiya, MFA — hammasini o'zingiz yozasiz</td></tr>
+      <tr><td>O'zimiz yozamiz</td><td>Hech qachon</td><td>Xavfsizlik teshiklari, protokol xatolari, cheksiz texnik qarz</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nega autentifikatsiyani ilovaning o'zida qilmaymiz?<span class="chev">›</span></summary><div class="iv-a">Parollar bir joyda saqlanadi (bitta hujum yuzasi). MFA, parol siyosati va brute-force himoyasi bir marta sozlanadi. SSO ishlaydi. Xodimni bitta joyda bloklash yetadi. Ilovalar parolni ko'rmaydi, faqat imzolangan tokenni tekshiradi. Audit ham bir joyda yig'iladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Realm nima? Qachon bir nechta realm kerak?<span class="chev">›</span></summary><div class="iv-a">Realm — foydalanuvchilar, client'lar, rollar, sessiyalar va kalitlardan iborat izolyatsiyalangan maydon. Alohida realm kerak bo'lgan holatlar: auditoriya tubdan farq qilsa (mijozlar va xodimlar), multi-tenant SaaS bo'lsa (har kompaniyaga bittadan), siyosatlar (MFA, parol, sessiya) har xil bo'lsa. Bir auditoriya uchun bitta realm, ilovalar esa unda client sifatida.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Client va user farqi?<span class="chev">›</span></summary><div class="iv-a">User — odam (yoki service account). Client — Keycloak'dan token so'raydigan ilova: mobil ilova, SPA, backend servis. Client "public" (sirni saqlay olmaydi: brauzer, mobil) yoki "confidential" (client_secret saqlaydi: backend) bo'ladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak autorizatsiya qiladimi yoki ilova?<span class="chev">›</span></summary><div class="iv-a">Odatda Keycloak rollar va claim'larni tokenga yozadi, qarorni esa resource server (Spring API) qabul qiladi: <code>hasRole('KASSIR')</code>, "bu hisob shu mijoznikimi" kabi tekshiruvlar. Keycloak'da markazlashgan Authorization Services (policy, permission, UMA) ham bor, lekin murakkab va kam ishlatiladi. Biznesga bog'liq egalik tekshiruvi baribir ilovada qoladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>OIDC va SAML farqi?<span class="chev">›</span></summary><div class="iv-a">OIDC: JSON/JWT, REST, mobil va SPA uchun qulay, OAuth 2.0 ustiga qurilgan. SAML: XML, brauzer redirect/POST, asosan eski korporativ SSO tizimlari. Yangi loyihada deyarli doim OIDC. Keycloak ikkalasini ham qo'llaydi va ular orasida ko'prik bo'la oladi.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Mijozlar va xodimlar uchun to'g'ri tuzilma?</div>
+        <button class="opt">Hammasi master realm'da</button><button class="opt">Ikki alohida realm: bank va staff</button><button class="opt">Bitta realm, har ilova uchun alohida user</button>
+        <div class="q-fb" data-ok="To'g'ri. Auditoriya va siyosatlar har xil — alohida realm." data-no="Yo'q. master faqat Keycloak admin uchun; auditoriyalar farqli bo'lsa — alohida realm."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>"bank" realm'ida olingan token "staff" realm'ga ishonadigan API'ga yuborildi. Natija?</div>
+        <button class="opt">Qabul qilinadi — username bir xil</button><button class="opt">Qabul qilinadi, lekin rollar yo'q</button><button class="opt">Rad etiladi — iss (issuer) va imzo kaliti boshqa</button>
+        <div class="q-fb" data-ok="To'g'ri. Har realm o'z kaliti bilan imzolaydi, iss ham farqli." data-no="Yo'q. Realm'lar alohida kalit va issuer'ga ega — token boshqa realm'da yaroqsiz."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span>Mobil ilova qanday client turi?</div>
+        <button class="opt">Public — sirni xavfsiz saqlay olmaydi</button><button class="opt">Confidential — client_secret bilan</button><button class="opt">Bearer-only</button>
+        <div class="q-fb" data-ok="To'g'ri. Ilova faylini ochib sirni topish mumkin — shuning uchun public + PKCE." data-no="Yo'q. Mobil/SPA — public client; ular sir saqlay olmaydi, PKCE ishlatadi (43-modul)."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Xodim ishdan ketdi. Keycloak bilan nima qilinadi?</div>
+        <button class="opt">Har ilovada alohida o'chiriladi</button><button class="opt">Keycloak'da o'chiriladi/bloklanadi, sessiyalari tugatiladi</button><button class="opt">Parolini o'zgartirish kifoya</button>
+        <div class="q-fb" data-ok="To'g'ri. Bitta joy. Faqat access token muddati tugaguncha kutish qoladi (47-modul)." data-no="Yo'q. Markaziy IdP'ning asosiy foydasi — bitta joyda o'chirish."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Keycloak</span>
+      <h3>O'rnatish va birinchi realm</h3>
+      <p>Docker Compose bilan Keycloak + PostgreSQL, admin konsolda qadamma-qadam realm, client, rol va foydalanuvchi yaratish, birinchi tokenni curl bilan olish.</p>
+      <div class="topics"><span class="topic-pill">39 · Suhbat</span><span class="topic-pill now">40 · Keycloak va IAM</span><span class="topic-pill">41 · O'rnatish</span><span class="topic-pill">42 · OAuth2/OIDC</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="39-savol-javoblar.html"><span class="cl">← Oldingi dars</span><span class="ct">39 · Savol-javoblar</span><span class="cs">🎯 Suhbatga tayyorgarlik</span></a><a class="cn nx" href="41-ornatish-va-birinchi-realm.html"><span class="cl">Keyingi dars →</span><span class="ct">41 · O&#x27;rnatish va birinchi realm</span><span class="cs">🔐 Keycloak</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:45.5%"></i></div><span>40 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(40)<0)v.push(40);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','40');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(40)<0)D[t].push(40);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var S=[['📱','Mobil ilova','users_mob'],['💻','Internet-bank','ib_users'],['🧾','Kassir paneli','kassa_acc'],['📊','Hisobotlar','rep_login'],['🌍','ITR servisi','itr_users']];
+  var mode='no',sys=document.getElementById('sys'),hub=document.getElementById('hub'),wires=document.getElementById('wires'),ex=document.getElementById('ex'),stats=document.getElementById('stats'),timers=[];
+  function st(a,b,c,d){stats.innerHTML=[[a,'parol jadvali'],[b,'login sahifa'],[c,'joyda MFA sozlash'],[d,'joyda xodimni o’chirish']].map(function(x){return '<div class="st"><div class="v">'+x[0]+'</div><div class="l">'+x[1]+'</div></div>';}).join('');}
+  function draw(){
+    timers.forEach(clearTimeout);timers=[];
+    sys.innerHTML=S.map(function(s){return '<div class="sys"><div class="ic">'+s[0]+'</div><div class="nm">'+s[1]+'</div><div class="db'+(mode==='kc'?' gone':'')+'">🗄 '+s[2]+'<br>parol_hash</div></div>';}).join('');
+    hub.classList.toggle('on',mode==='kc');wires.classList.toggle('on',mode==='kc');
+    if(mode==='no'){st(5,5,5,5);ex.innerHTML='<b>Keycloak’siz:</b> 5 ilova — 5 ta parol jadvali, 5 ta login sahifa, 5 xil parol siyosati. Mijoz 5 ta parol eslab qoladi. Bitta ilovada SQL injection bo’lsa, o’sha jadvaldagi parol hash’lari tashqariga chiqadi.';}
+    else{st(1,1,1,1);ex.innerHTML='<b>Keycloak bilan:</b> ilovalarda parol jadvali yo’q, ular faqat Keycloak bergan <b>tokenni</b> tekshiradi. Login sahifa, MFA, parol siyosati va bloklash — bitta joyda.';}
+  }
+  document.getElementById('mode').addEventListener('click',function(e){if(!e.target.dataset.m)return;mode=e.target.dataset.m;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});draw();});
+  document.getElementById('rst').addEventListener('click',draw);
+  document.getElementById('leave').addEventListener('click',function(){
+    draw();var els=sys.children;
+    if(mode==='no'){
+      var forgot=3;
+      [0,1,2,3,4].forEach(function(i,k){timers.push(setTimeout(function(){
+        if(i===forgot){els[i].classList.add('leak');ex.innerHTML='Admin tizimlarni birma-bir aylanib chiqyapti… <b>Hisobotlar</b> tizimi <b>unutildi</b> — Sardor hali ham kira oladi va mijozlar ma’lumotini yuklab olishi mumkin. Bunday holat audit’da odatda bir necha oydan keyin ma’lum bo’ladi.';}
+        else{els[i].classList.add('work');timers.push(setTimeout(function(){els[i].classList.remove('work');els[i].classList.add('off');},500));ex.innerHTML='Admin '+S[i][1]+' tizimiga kirib, Sardor’ni qo’lda o’chiryapti… ('+(k+1)+'/5)';}
+      },k*900));});
+      timers.push(setTimeout(function(){ex.innerHTML='<b>Natija:</b> 4 ta tizimda qo’lda o’chirildi, <b>Hisobotlar unutildi</b> (qizil) — Sardor hali ham kira oladi va mijozlar ma’lumotini yuklab olishi mumkin. Har tizimda o’z audit logi. Bunday holat odatda audit’da oylar o’tib topiladi va jiddiy “finding” hisoblanadi.';},5*900+200));
+    } else {
+      hub.style.transform='scale(1.04)';timers.push(setTimeout(function(){hub.style.transform='';},400));
+      [].slice.call(els).forEach(function(el,i){timers.push(setTimeout(function(){el.classList.add('off');},300+i*120));});
+      ex.innerHTML='<b>Keycloak’da bitta amal:</b> Users → sardor → <code>Enabled: OFF</code> va Sessions → <b>Sign out</b>. 5 ilovaning hammasi darhol yangi token ololmaydi. Access token qisqa (5 daqiqa) bo’lgani uchun ko’pi bilan 5 daqiqada hamma kirish yopiladi. Audit bitta Events logida.';
+    }
+  });
+  draw();
+
+  /* tree */
+  var T=[
+    ['srv',0,'🖥','Keycloak server','Server','Bitta Keycloak o’rnatmasi (yoki klaster). Ichida bir nechta realm turadi. Ma’lumotlarni tashqi bazada (PostgreSQL) saqlaydi, sessiyalar esa Infinispan kesh’ida.','Bankda: 2–3 nodali klaster, orqasida PostgreSQL, oldida load balancer.','"Keycloak holatni qayerda saqlaydi?" — doimiy ma’lumot (users, clients, realm sozlamalari) — DB. Sessiyalar — Infinispan (xotirada, nodalar orasida tarqatilgan). 26-versiyadan boshlab sessiyalar DB’da ham saqlanishi mumkin (persistent sessions).'],
+    ['master',1,'👑','master','Realm','Maxsus realm: Keycloak’ni boshqarish uchun. Undagi admin boshqa realm’larni yaratadi.','Bankda: faqat 2–3 ta platforma admini. Ilova ham, mijoz ham bu yerda bo’lmaydi.','Xavfsizlik: master admin’ga MFA majburiy, admin konsolni tashqi tarmoqqa ochmang.'],
+    ['bank',1,'🏦','bank','Realm','Mijozlar uchun realm. O’z foydalanuvchilari, client’lari, rollari, kalitlari va login dizayni bor.','Issuer: <code>https://auth.bank.uz/realms/bank</code> — tokendagi <code>iss</code> aynan shu.','"Issuer URL nima?" — realm’ning manzili. Undan <code>/.well-known/openid-configuration</code> orqali endpoint’lar va JWKS topiladi.'],
+    ['clients',2,'🧩','Clients','Realm ichida','Keycloak’dan token so’raydigan ilovalar. Har birining <code>client_id</code>, turi (public/confidential), ruxsat etilgan redirect URI’lari va yoqilgan flow’lari bor.','','"Nega redirect URI’ni aniq yozish kerak?" — aks holda hujumchi kodni o’z saytiga yo’naltirib o’g’irlaydi. Wildcard (*) prod’da taqiqlanadi.'],
+    ['c-mob',3,'📱','mobile-app','Client · public','Mobil ilova. Sirni saqlay olmaydi (APK’ni ochish mumkin), shuning uchun <b>public</b> + <b>PKCE</b>. Flow: Authorization Code.','Redirect: <code>uz.bank.app://callback</code>','Public client’da client_secret yo’q — himoyani PKCE beradi (43-modul).'],
+    ['c-ib',3,'💻','internet-bank','Client · confidential','Server tomonli veb-ilova (yoki BFF). client_secret server’da saqlanadi. Flow: Authorization Code (+ PKCE — tavsiya).','Redirect: <code>https://ib.bank.uz/login/oauth2/code/keycloak</code>','SPA uchun zamonaviy tavsiya — BFF (Backend for Frontend): tokenlar brauzerga chiqmaydi, faqat httpOnly cookie.'],
+    ['c-svc',3,'⚙️','tolov-service','Client · service account','Foydalanuvchisiz, servisdan servisga murojaat. <b>Client Credentials</b> flow, o’z service account’i va rollari bor.','ITR servisi tolov-service’ga murojaat qilganda o’z tokenini oladi.','"Servislararo autentifikatsiya qanday?" — client_credentials + audience cheklovi + minimal rollar. Muqobil: mTLS.'],
+    ['users',2,'👤','Users','Realm ichida','Foydalanuvchilar: username, email, atributlar, credential’lar (parol, OTP), required actions, rol va guruh a’zoligi.','otabek — atribut <code>filial_id=12</code>, <code>mijoz_id=500123</code>.','"User ID nima?" — UUID, tokendagi <code>sub</code>. Username o’zgarishi mumkin, sub o’zgarmaydi — bazada sub bo’yicha bog’lang.'],
+    ['groups',2,'👥','Groups','Realm ichida','Foydalanuvchilarni daraxtga guruhlash. Guruhga rol bersangiz, a’zolarning hammasi meros oladi. Atributlar ham meros qilinadi.','<code>/Filiallar/Chilonzor/Kassirlar</code> → KASSIR roli + <code>filial_id=12</code>.','Rolni har userga emas, guruhga bering — boshqaruv osonlashadi (45-modul).'],
+    ['rroles',2,'🎖','Realm roles','Realm ichida','Butun realm bo’yicha rollar: MIJOZ, KASSIR, ADMIN. Tokenda <code>realm_access.roles</code> ichida keladi.','','Realm role — "kim" (lavozim), client role — "shu ilovada nima qila oladi".'],
+    ['croles',2,'🏷','Client roles','Client ichida','Faqat bitta client’ga tegishli rollar: <code>tolov-service: transfer.create</code>. Tokenda <code>resource_access.tolov-service.roles</code>.','','Spring’da ularni ROLE_* ga aylantirish — 46-modul.'],
+    ['scopes',2,'📦','Client scopes','Realm ichida','Tokenga nimalar tushishini belgilovchi to’plamlar: <code>profile</code>, <code>email</code>, <code>roles</code>, o’zingizniki. Ichida protocol mapper’lar bor.','<code>filial</code> scope → tokenga <code>filial_id</code> claim qo’shadi.','Default va optional scope farqi: optional faqat so’ralganda (scope=... parametri) qo’shiladi.'],
+    ['idp',2,'🌐','Identity providers','Realm ichida','Tashqi login: Google, boshqa Keycloak, ADFS, OneID. Keycloak "broker" bo’ladi.','Xodimlar korporativ AD orqali kiradi.',''],
+    ['fed',2,'🗂','User federation','Realm ichida','Foydalanuvchilarni tashqi bazadan o’qish: LDAP / Active Directory. Parol LDAP’da tekshiriladi.','staff realm → bank AD.',''],
+    ['flows',2,'🔀','Authentication flows','Realm ichida','Login qadamlari: cookie → parol → shartli OTP. Qadamlarni yoqish-o’chirish mumkin (48-modul).','',''],
+    ['sess',2,'⏱','Sessions & Events','Realm ichida','Faol sessiyalar (kim, qachon, qaysi client’lar) va audit hodisalari: LOGIN, LOGIN_ERROR, LOGOUT, CODE_TO_TOKEN.','Shubhali kirishlar — LOGIN_ERROR, brute-force.','']
+  ];
+  var tree=document.getElementById('tree'),det=document.getElementById('det');
+  tree.innerHTML=T.map(function(t,i){return '<div class="tn l'+t[1]+'" data-i="'+i+'"><span class="e">'+t[2]+'</span>'+t[3]+'</div>';}).join('');
+  function sel(i){[].slice.call(tree.children).forEach(function(x,k){x.classList.toggle('on',k===i);});var t=T[i];det.innerHTML='<div class="kind">'+t[4]+'</div><h3>'+t[3]+'</h3><p>'+t[5]+'</p>'+(t[6]?'<div class="ex"><b>Bankda:</b> '+t[6]+'</div>':'')+(t[7]?'<div class="iv">🎯 '+t[7]+'</div>':'');det.style.animation='none';det.offsetHeight;det.style.animation='';}
+  tree.addEventListener('click',function(e){var n=e.target.closest('.tn');if(n)sel(+n.dataset.i);});sel(2);
+
+  /* realm isolation */
+  var r='bank',tok=document.getElementById('tok'),rB=document.getElementById('rBank'),rS=document.getElementById('rStaff'),rex=document.getElementById('rex');
+  function rd(){rB.className='rm'+(r==='bank'?' src':'');rS.className='rm'+(r==='staff'?' src':'');tok.textContent='JWT · iss=…/realms/'+r+' · sub='+(r==='bank'?'7f3a…':'19bd…')+' · kid='+(r==='bank'?'bk-01':'st-07');rex.innerHTML='Token tanlandi. Endi API’ga yuboring.';}
+  document.getElementById('rsel').addEventListener('click',function(e){if(!e.target.dataset.r)return;r=e.target.dataset.r;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});rd();});
+  function send(target){var el=target==='bank'?rB:rS;rd();el.classList.add(r===target?'ok':'bad');
+    rex.innerHTML=r===target?'<b>200 OK.</b> API <code>iss</code> o’z realm’iga tengligini ko’rdi, imzoni shu realm’ning JWKS’idagi <code>'+(r==='bank'?'bk-01':'st-07')+'</code> kaliti bilan tekshirdi — to’g’ri.':'<b>401 Unauthorized.</b> Ikki sabab: 1) <code>iss</code> = …/realms/'+r+', API esa …/realms/'+target+' kutadi. 2) Token <code>kid</code> kaliti bilan imzolangan, bu kalit '+target+' realm’ining JWKS’ida yo’q, imzoni tekshirib bo’lmaydi. Username bir xil (“otabek”) — lekin bu ahamiyatsiz: bular ikki xil odam.';}
+  document.getElementById('sendB').addEventListener('click',function(){send('bank');});document.getElementById('sendS').addEventListener('click',function(){send('staff');});rd();
+})();
+
+</script>
+</body>
+</html>

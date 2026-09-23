@@ -1,0 +1,489 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Shartlar va sikllar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+
+/* operators */
+.opgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:16px}
+.opcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow)}
+.opcard h4{font-family:var(--font-display);font-size:14.5px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.opcard h4 .pin{width:9px;height:9px;border-radius:3px}
+.oprow{display:flex;justify-content:space-between;gap:10px;font-family:var(--font-mono);font-size:13px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.oprow:last-child{border-bottom:0}.oprow .sym{color:var(--accent-ink);font-weight:500}.oprow .ds{color:var(--ink-soft)}
+
+/* if/else slider */
+.slide-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.slide-row label{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);white-space:nowrap}
+input[type=range]{flex:1;min-width:160px;accent-color:var(--accent);height:6px}
+.balval{font-family:var(--font-mono);font-weight:600;font-size:16px;color:var(--accent-ink);min-width:78px;text-align:right}
+.branch{font-family:var(--font-mono);font-size:14px;border-radius:10px;padding:11px 14px;margin-top:8px;border:1.5px solid var(--border);background:var(--surface-2);color:var(--ink-faint);transition:.2s;line-height:1.6}
+.branch .cond{color:var(--ink-soft)}
+.branch.hit{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.branch.hit .cond{color:var(--teal-ink)}
+.branch .out{display:block;margin-top:4px;color:var(--ink-faint);font-family:var(--font-body);font-size:13px}
+.branch.hit .out{color:var(--teal-ink)}.skip{opacity:.55}
+
+/* loop viz */
+.loop-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.loop-state{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.svar{background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;padding:10px 16px;min-width:96px}
+.svar .sn{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint)}
+.svar .sv{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent-ink);line-height:1.2}
+.svar.upd{border-color:var(--accent);background:var(--accent-soft)}
+.cond-badge{margin-left:auto;align-self:center;font-family:var(--font-mono);font-size:13px;padding:8px 14px;border-radius:10px;font-weight:500}
+.cond-badge.t{background:var(--teal-soft);color:var(--teal-ink)}.cond-badge.f{background:var(--coral-soft);color:var(--coral)}.cond-badge.idle{background:var(--sunken);color:var(--ink-faint)}
+.iters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.iter{flex:1;min-width:46px;text-align:center;padding:11px 4px;border-radius:11px;border:1.5px solid var(--border);background:var(--surface-2);font-family:var(--font-mono);transition:.25s}
+.iter .il{font-size:10px;color:var(--ink-faint)}.iter .iv{font-size:17px;font-weight:600;margin-top:2px}
+.iter.active{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-3px);box-shadow:var(--shadow-lift);color:var(--accent-ink)}
+.iter.done{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink)}
+.iter.skipped{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
+.iter.broke{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.loop-cap{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-height:74px}
+.loop-cap .phase{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.loop-cap .phase.init{color:var(--purple-ink)}.loop-cap .phase.check{color:var(--amber)}.loop-cap .phase.body{color:var(--accent-ink)}.loop-cap .phase.step{color:var(--teal-ink)}.loop-cap .phase.done{color:var(--teal-ink)}.loop-cap .phase.skip{color:var(--amber)}.loop-cap .phase.brk{color:var(--coral)}
+.loop-cap .ct2{font-size:15px}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl:active{transform:scale(.95)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.primary:hover{background:var(--accent-ink)}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+
+/* break/continue toggle */
+.bc-seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;margin-bottom:14px}
+.bc-seg button{border:0;background:transparent;padding:8px 15px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);transition:.15s}
+.bc-seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+
+/* loop types */
+.lt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.lt{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow)}
+.lt h4{font-family:var(--font-mono);font-size:13.5px;margin:0 0 6px;color:var(--accent-ink)}
+.lt p{font-size:13px;color:var(--ink-soft)}
+.lt code{display:block;background:var(--sunken);padding:7px 10px;border-radius:7px;font-size:11.5px;margin-top:8px;color:var(--ink)}
+
+/* switch seg */
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;margin-top:6px}
+.seg button{border:0;background:transparent;padding:7px 15px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);transition:.15s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-size:14.5px;min-height:48px}
+.note b{color:var(--accent-ink)}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B5622A"></span> Java asoslari · 6/7</span><span>· Kurs: 6/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Java kursi · 6-modul · noldan</span>
+    <h1>Shartlar va <span class="steam">sikllar</span></h1>
+    <p class="lead">O'zgaruvchilar ma'lumotni saqlaydi. Endi dasturga aql beramiz: taqqoslash, qaror qabul qilish (<code>if</code>, <code>switch</code>) va takrorlash (<code>for</code>, <code>while</code>). Sikl har bosqichda nima qilishini jonli ko'ramiz.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Taqqoslash va mantiqiy operatorlar</h2></div>
+    <p class="sec-sub">Shartlar <code>boolean</code> (true/false) beradigan taqqoslashlarga tayanadi. Mantiqiy operatorlar ularni birlashtiradi.</p>
+    <div class="opgrid">
+      <div class="opcard"><h4><span class="pin" style="background:var(--purple)"></span>Taqqoslash</h4>
+        <div class="oprow"><span class="sym">== !=</span><span class="ds">teng / teng emas</span></div>
+        <div class="oprow"><span class="sym">&gt; &lt;</span><span class="ds">katta / kichik</span></div>
+        <div class="oprow"><span class="sym">&gt;= &lt;=</span><span class="ds">katta-teng / kichik-teng</span></div>
+      </div>
+      <div class="opcard"><h4><span class="pin" style="background:var(--teal)"></span>Mantiqiy</h4>
+        <div class="oprow"><span class="sym">&amp;&amp;</span><span class="ds">VA (ikkalasi)</span></div>
+        <div class="oprow"><span class="sym">||</span><span class="ds">YOKI (kamida biri)</span></div>
+        <div class="oprow"><span class="sym">!</span><span class="ds">EMAS (teskari)</span></div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>eng ko'p xato</div>
+      <code>==</code> — taqqoslash (teng-mi?), <code>=</code> — tayinlash (qiymat ber). <code>if (x = 5)</code> — xato! To'g'risi <code>if (x == 5)</code>. Va obyektlarni <code>equals()</code> bilan (4-modul).
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>if / else — jonli qaror</h2></div>
+    <p class="sec-sub">Java yuqoridan pastga <b>birinchi mos kelgan</b> shoxda to'xtaydi. Slayderni suring — balansga qarab qaysi shox yonishini ko'ring.</p>
+    <div class="card">
+      <div class="slide-row"><label>balans</label><input type="range" id="bal" min="0" max="2000" value="1200" step="50"><span class="balval" id="balv">1200</span></div>
+      <div class="branch" id="br0"><span class="cond">if (balans &gt;= 1000)</span><span class="out">→ "Oltin mijoz"</span></div>
+      <div class="branch" id="br1"><span class="cond">else if (balans &gt;= 100)</span><span class="out">→ "Oddiy mijoz"</span></div>
+      <div class="branch" id="br2"><span class="cond">else</span><span class="out">→ "Yangi mijoz"</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>for sikli — qadam-baqadam</h2></div>
+    <p class="sec-sub"><code>for</code>ning uch qismi bor: <b>boshlash</b>, <b>shart</b>, <b>qadam</b>. Quyida 1 dan 5 gacha qo'shamiz. Har bosqichda: shart tekshiriladi → tana bajariladi → i oshadi. Diagramma o'zi yuradi.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Loop.java</span></div>
+      <pre class="code"><span class="ty">int</span> sum = <span class="nu">0</span>;
+<span class="k">for</span> (<span class="ty">int</span> i = <span class="nu">1</span>; i &lt;= <span class="nu">5</span>; i++) {
+    sum = sum + i;
+}
+<span class="cm">// oxirida sum = 15</span></pre>
+    </div>
+    <div class="loop-card">
+      <div class="loop-state">
+        <div class="svar" id="vi"><div class="sn">i</div><div class="sv">–</div></div>
+        <div class="svar" id="vsum"><div class="sn">sum</div><div class="sv">0</div></div>
+        <div class="cond-badge idle" id="condB">i &lt;= 5 ?</div>
+      </div>
+      <div class="iters" id="iters">
+        <div class="iter" data-i="1"><div class="il">i =</div><div class="iv">1</div></div>
+        <div class="iter" data-i="2"><div class="il">i =</div><div class="iv">2</div></div>
+        <div class="iter" data-i="3"><div class="il">i =</div><div class="iv">3</div></div>
+        <div class="iter" data-i="4"><div class="il">i =</div><div class="iv">4</div></div>
+        <div class="iter" data-i="5"><div class="il">i =</div><div class="iv">5</div></div>
+      </div>
+      <div class="loop-cap" aria-live="polite"><div class="phase init" id="lphase">boshlash</div><div class="ct2" id="lcap"></div></div>
+      <div class="controls">
+        <button class="ctl" id="lprev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-6-6 6-6M18 18l-6-6 6-6"/></svg></button>
+        <button class="ctl primary" id="lplay"><svg id="lplayIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span id="lplayLbl">Pauza</span></button>
+        <button class="ctl" id="lnext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 18l6-6-6-6M6 18l6-6-6-6"/></svg></button>
+        <div class="prog"><div class="bar" id="lbar"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>break va continue — jonli farq</h2></div>
+    <p class="sec-sub">Sikl ichida oqimni boshqarish. Bu safar: 1 dan 6 gacha yuramiz, lekin <b>i = 3</b> da nima bo'lishini almashtiring. <code>continue</code> — 3 ni tashlab keyingisiga o'tadi. <code>break</code> — 3 da butunlay to'xtaydi.</p>
+    <div class="loop-card">
+      <div class="bc-seg" id="bcSeg">
+        <button data-m="continue" class="on">continue (tashlab o't)</button>
+        <button data-m="break">break (to'xta)</button>
+      </div>
+      <div class="iters" id="bcIters">
+        <div class="iter" data-i="1"><div class="il">i =</div><div class="iv">1</div></div>
+        <div class="iter" data-i="2"><div class="il">i =</div><div class="iv">2</div></div>
+        <div class="iter" data-i="3"><div class="il">i =</div><div class="iv">3</div></div>
+        <div class="iter" data-i="4"><div class="il">i =</div><div class="iv">4</div></div>
+        <div class="iter" data-i="5"><div class="il">i =</div><div class="iv">5</div></div>
+        <div class="iter" data-i="6"><div class="il">i =</div><div class="iv">6</div></div>
+      </div>
+      <div class="loop-cap" aria-live="polite"><div class="phase init" id="bcPhase">tayyor</div><div class="ct2" id="bcCap"></div></div>
+      <div class="controls">
+        <button class="ctl primary" id="bcPlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l12 7-12 7z"/></svg><span>Yugurt</span></button>
+        <div class="prog"><div class="bar" id="bcBar"></div></div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">BreakContinue.java</span></div>
+      <pre class="code"><span class="k">for</span> (<span class="ty">int</span> i = <span class="nu">1</span>; i &lt;= <span class="nu">6</span>; i++) {
+    <span class="k">if</span> (i == <span class="nu">3</span>) <span class="k">continue</span>;  <span class="cm">// 3 ni tashla, davom et → 1,2,4,5,6</span>
+    <span class="cm">// yoki: if (i == 3) break;  // 3 da butunlay to'xta → 1,2</span>
+    <span class="ty">System</span>.out.println(i);
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Sikl turlari</h2></div>
+    <p class="sec-sub">To'rt xil sikl. Qaysi birini tanlash — vaziyatga bog'liq.</p>
+    <div class="lt-grid">
+      <div class="lt"><h4>for</h4><p>Sanoqli takror (aniq necha marta)</p><code>for(int i=0; i&lt;n; i++)</code></div>
+      <div class="lt"><h4>while</h4><p>Shart to'g'ri ekan takrorlaydi (necha marta noma'lum)</p><code>while(shart) { ... }</code></div>
+      <div class="lt"><h4>do-while</h4><p>Kamida <b>bir marta</b> ishlaydi, keyin shartni tekshiradi</p><code>do { ... } while(shart);</code></div>
+      <div class="lt"><h4>for-each</h4><p>Kolleksiya/massiv bo'ylab, indekssiz</p><code>for(int x : arr) { ... }</code></div>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>while vs do-while</div>
+      <b>while</b> avval shartni tekshiradi — 0 marta ishlashi mumkin. <b>do-while</b> avval tanani bajaradi — <b>kamida 1 marta</b> ishlaydi. "Menyuni kamida bir marta ko'rsat, keyin chiqishni so'ra" — do-while uchun ideal.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>switch — zamonaviy ko'rinishda</h2></div>
+    <p class="sec-sub">Ko'p variantli tanlovda <code>if-else</code> zanjiri o'rniga. Zamonaviy Java (14+) uni ancha toza qildi. Solishtiring.</p>
+    <div class="card">
+      <div class="seg" id="swSeg"><button data-m="old" class="on">eski uslub</button><button data-m="new">zamonaviy (→)</button></div>
+      <div class="code-block" style="margin-top:14px">
+        <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Switch.java</span></div>
+        <pre class="code" id="swCode"></pre>
+      </div>
+      <div class="note" id="swNote"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>break va continue farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>break</b> — sikldan butunlay chiqadi. <b>continue</b> — joriy takrorni tashlab, keyingisiga o'tadi (sikl davom etadi). break to'xtatadi, continue o'tkazib yuboradi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>while va do-while qachon qaysi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">while — shartni avval tekshiradi, 0 marta ishlashi mumkin. do-while — tanani avval bajaradi, kamida 1 marta ishlaydi. Foydalanuvchiga menyuni kamida bir marta ko'rsatish kerak bo'lsa — do-while.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Cheksiz sikl (infinite loop) qanday yuz beradi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Shart hech qachon yolg'on bo'lmasa: <code>while(true)</code>, yoki <code>for</code>da <code>i++</code>ni unutish, yoki shartni noto'g'ri yozish. Dastur qotib qoladi. Ba'zan <code>while(true) { ... break; }</code> ataylab ishlatiladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Zamonaviy switch nima yaxshi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><code>-&gt;</code> sintaksisi: <code>break</code> kerak emas (fall-through xatosi yo'q), va butun switch <b>qiymat qaytaradi</b>. Eski switch'da break unutish keyingi case'ga "oqib" o'tishga sabab bo'lardi — bu mashhur xato.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">1.</span><code>for(int i=1; i&lt;=5; i++)</code> tanasi necha marta ishlaydi?</div>
+        <button class="opt">4</button><button class="opt">6</button><button class="opt">5</button>
+        <div class="q-fb" data-ok="To'g'ri. i = 1,2,3,4,5 — beshta. i=6 da shart yolg'on, sikl to'xtaydi." data-no="Yo'q. i 1 dan 5 gacha (5 ni ham) — 5 marta."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">2.</span><code>continue</code> nima qiladi?</div>
+        <button class="opt">Sikldan butunlay chiqadi</button>
+        <button class="opt">Joriy takrorni tashlab keyingisiga o'tadi</button>
+        <button class="opt">Dasturni to'xtatadi</button>
+        <div class="q-fb" data-ok="To'g'ri. continue faqat joriy iteratsiyani o'tkazib yuboradi, sikl davom etadi. break esa butunlay to'xtatadi." data-no="Yo'q. continue joriy takrorni o'tkazib yuboradi (sikl davom etadi). break butunlay chiqadi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">3.</span>Kamida bir marta ishlashi kafolatlangan sikl?</div>
+        <button class="opt">do-while</button><button class="opt">while</button><button class="opt">for</button>
+        <div class="q-fb" data-ok="To'g'ri. do-while tanani avval bajaradi, keyin shartni tekshiradi — shuning uchun kamida 1 marta ishlaydi." data-no="Yo'q. do-while — u tanani avval bajaradi. while/for shartni avval tekshiradi (0 marta bo'lishi mumkin)."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Zamonaviy <code>switch (x) { case 1 -&gt; ... }</code> da break kerakmi?</div>
+        <button class="opt">Ha, har case'da</button>
+        <button class="opt">Yo'q — → sintaksisi fall-through qilmaydi</button>
+        <button class="opt">Faqat default'da</button>
+        <div class="q-fb" data-ok="To'g'ri. -> ishlatilganda break kerak emas, keyingi case'ga oqib o'tmaydi. Eski : sintaksisida break shart edi." data-no="Yo'q. -> sintaksisida break kerak emas — u avtomatik to'xtaydi."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Metodlar</h3>
+      <p>Kodni takrorlamaslik uchun uni "qadoqlaymiz". Metod kirish oladi, ish qiladi, natija qaytaradi. Call stack animatsiyasi va Java'ning eng chalkash mavzusi — pass-by-value.</p>
+      <div class="topics">
+        <span class="topic-pill">5 · Massivlar</span>
+        <span class="topic-pill now">6 · Shartlar &amp; sikllar</span>
+        <span class="topic-pill">7 · Metodlar</span>
+        <span class="topic-pill">8 · OOP klass</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="05-massivlar.html"><span class="cl">← Oldingi dars</span><span class="ct">05 · Massivlar</span><span class="cs">☕ Java asoslari</span></a><a class="cn nx" href="07-metodlar.html"><span class="cl">Keyingi dars →</span><span class="ct">07 · Metodlar</span><span class="cs">☕ Java asoslari</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:6.8%"></i></div><span>6 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(6)<0)v.push(6);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','6');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(6)<0)D[t].push(6);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* if/else */
+  var bal=document.getElementById('bal'),balv=document.getElementById('balv');
+  var brs=[document.getElementById('br0'),document.getElementById('br1'),document.getElementById('br2')];
+  function evalBal(){var v=+bal.value;balv.textContent=v;var hit=v>=1000?0:v>=100?1:2;brs.forEach(function(b,k){b.classList.toggle('hit',k===hit);b.classList.toggle('skip',k>hit);});}
+  bal.addEventListener('input',evalBal);evalBal();
+
+  /* loop viz */
+  var frames=[
+    {ph:'init',pt:'boshlash',ct:'i = 1, sum = 0. Sikl boshlanmoqda.',i:1,sum:0,cond:'idle',active:null,done:[]},
+    {ph:'check',pt:'shart',ct:'i (1) <= 5 ? <b>Ha</b> → tanaga kiramiz.',i:1,sum:0,cond:'t',active:1,done:[]},
+    {ph:'body',pt:'tana',ct:'sum = 0 + 1 = <b>1</b>',i:1,sum:1,cond:'t',active:1,done:[],upd:'sum'},
+    {ph:'step',pt:'qadam',ct:'i++ → i endi <b>2</b>',i:2,sum:1,cond:'idle',active:null,done:[1],upd:'i'},
+    {ph:'check',pt:'shart',ct:'i (2) <= 5 ? <b>Ha</b>',i:2,sum:1,cond:'t',active:2,done:[1]},
+    {ph:'body',pt:'tana',ct:'sum = 1 + 2 = <b>3</b>',i:2,sum:3,cond:'t',active:2,done:[1],upd:'sum'},
+    {ph:'step',pt:'qadam',ct:'i++ → i endi <b>3</b>',i:3,sum:3,cond:'idle',active:null,done:[1,2],upd:'i'},
+    {ph:'check',pt:'shart',ct:'i (3) <= 5 ? <b>Ha</b>',i:3,sum:3,cond:'t',active:3,done:[1,2]},
+    {ph:'body',pt:'tana',ct:'sum = 3 + 3 = <b>6</b>',i:3,sum:6,cond:'t',active:3,done:[1,2],upd:'sum'},
+    {ph:'step',pt:'qadam',ct:'i++ → i endi <b>4</b>',i:4,sum:6,cond:'idle',active:null,done:[1,2,3],upd:'i'},
+    {ph:'check',pt:'shart',ct:'i (4) <= 5 ? <b>Ha</b>',i:4,sum:6,cond:'t',active:4,done:[1,2,3]},
+    {ph:'body',pt:'tana',ct:'sum = 6 + 4 = <b>10</b>',i:4,sum:10,cond:'t',active:4,done:[1,2,3],upd:'sum'},
+    {ph:'step',pt:'qadam',ct:'i++ → i endi <b>5</b>',i:5,sum:10,cond:'idle',active:null,done:[1,2,3,4],upd:'i'},
+    {ph:'check',pt:'shart',ct:'i (5) <= 5 ? <b>Ha</b>',i:5,sum:10,cond:'t',active:5,done:[1,2,3,4]},
+    {ph:'body',pt:'tana',ct:'sum = 10 + 5 = <b>15</b>',i:5,sum:15,cond:'t',active:5,done:[1,2,3,4],upd:'sum'},
+    {ph:'step',pt:'qadam',ct:'i++ → i endi <b>6</b>',i:6,sum:15,cond:'idle',active:null,done:[1,2,3,4,5],upd:'i'},
+    {ph:'check',pt:'shart',ct:'i (6) <= 5 ? <b>Yo\'q</b> → sikldan chiqamiz.',i:6,sum:15,cond:'f',active:null,done:[1,2,3,4,5]},
+    {ph:'done',pt:'tugadi',ct:'Sikl tugadi. Yakuniy <b>sum = 15</b> ✓',i:6,sum:15,cond:'idle',active:null,done:[1,2,3,4,5]}
+  ];
+  var vi=document.getElementById('vi'),vsum=document.getElementById('vsum'),condB=document.getElementById('condB');
+  var iters=[].slice.call(document.querySelectorAll('#iters .iter'));
+  var lphase=document.getElementById('lphase'),lcap=document.getElementById('lcap'),lbar=document.getElementById('lbar');
+  var li=0,lplaying=true,ltimer=null;
+  function lrender(){var f=frames[li];vi.querySelector('.sv').textContent=f.ph==='init'?'1':f.i;vsum.querySelector('.sv').textContent=f.sum;
+    vi.classList.toggle('upd',f.upd==='i');vsum.classList.toggle('upd',f.upd==='sum');
+    condB.className='cond-badge '+(f.cond==='t'?'t':f.cond==='f'?'f':'idle');condB.innerHTML=f.cond==='t'?'i &lt;= 5 ✓':f.cond==='f'?'i &lt;= 5 ✗':'i &lt;= 5 ?';
+    iters.forEach(function(it){var n=+it.getAttribute('data-i');it.classList.toggle('active',n===f.active);it.classList.toggle('done',f.done.indexOf(n)>=0);});
+    lphase.className='phase '+f.ph;lphase.textContent=f.pt;lcap.innerHTML=f.ct;lbar.style.width=((li/(frames.length-1))*100)+'%';}
+  function lgo(n){li=(n+frames.length)%frames.length;lrender();if(lplaying)lsched();}
+  function lsched(){clearTimeout(ltimer);ltimer=setTimeout(function(){lgo(li+1);},1800);}
+  function lsetBtn(){document.getElementById('lplayLbl').textContent=lplaying?'Pauza':'Davom';document.getElementById('lplayIcon').innerHTML=lplaying?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>';}
+  function lplay(){lplaying=true;lsetBtn();lsched();}function lpause(){lplaying=false;lsetBtn();clearTimeout(ltimer);}
+  document.getElementById('lplay').addEventListener('click',function(){lplaying?lpause():lplay();});
+  document.getElementById('lnext').addEventListener('click',function(){lgo(li+1);lpause();});
+  document.getElementById('lprev').addEventListener('click',function(){lgo(li-1);lpause();});
+  lrender();lsetBtn();lsched();
+
+  /* break/continue */
+  var bcIters=[].slice.call(document.querySelectorAll('#bcIters .iter'));
+  var bcPhase=document.getElementById('bcPhase'),bcCap=document.getElementById('bcCap'),bcBar=document.getElementById('bcBar');
+  var bcMode='continue',bcTimer=null;
+  function bcReset(){clearTimeout(bcTimer);bcIters.forEach(function(it){it.className='iter';});bcBar.style.width='0';bcPhase.className='phase init';bcPhase.textContent='tayyor';
+    bcCap.innerHTML=bcMode==='continue'?'i=3 da <b>continue</b>: 3 tashlab yuboriladi, sikl davom etadi.':'i=3 da <b>break</b>: 3 da butunlay to\'xtaydi.';}
+  function bcRun(){
+    bcReset();
+    var seq=[];
+    for(var i=1;i<=6;i++){
+      if(i===3){
+        if(bcMode==='continue'){seq.push({i:3,type:'skip'});continue;}
+        else{seq.push({i:3,type:'break'});break;}
+      }
+      seq.push({i:i,type:'done'});
+    }
+    var k=0;
+    bcTimer=setInterval(function(){
+      if(k>=seq.length){clearInterval(bcTimer);
+        bcPhase.className='phase done';bcPhase.textContent='tugadi';
+        bcCap.innerHTML=bcMode==='continue'?'Natija: <b>1, 2, 4, 5, 6</b> chop etildi — 3 tashlab yuborildi (continue).':'Natija: <b>1, 2</b> chop etildi — 3 da to\'xtadi (break).';
+        return;}
+      var s=seq[k];var cell=bcIters[s.i-1];
+      bcIters.forEach(function(it){it.classList.remove('active');});
+      cell.classList.add('active');
+      if(s.type==='skip'){cell.classList.remove('active');cell.classList.add('skipped');bcPhase.className='phase skip';bcPhase.textContent='continue';bcCap.innerHTML='i = 3 → <b>continue</b>: bu takror tashlab yuborildi, keyingisiga o\'tamiz.';}
+      else if(s.type==='break'){cell.classList.remove('active');cell.classList.add('broke');bcPhase.className='phase brk';bcPhase.textContent='break';bcCap.innerHTML='i = 3 → <b>break</b>: sikl shu yerda butunlay to\'xtaydi.';}
+      else{cell.classList.add('done');bcPhase.className='phase body';bcPhase.textContent='chop etildi';bcCap.innerHTML='i = '+s.i+' → chop etildi.';}
+      bcBar.style.width=(((k+1)/seq.length)*100)+'%';
+      k++;
+    },800);
+  }
+  [].slice.call(document.querySelectorAll('#bcSeg button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#bcSeg button')).forEach(function(x){x.classList.toggle('on',x===b);});bcMode=b.getAttribute('data-m');bcReset();});});
+  document.getElementById('bcPlay').addEventListener('click',bcRun);
+  bcReset();
+
+  /* switch */
+  var SW={
+    old:'<span class="ty">String</span> nom;\n<span class="k">switch</span> (kun) {\n  <span class="k">case</span> <span class="nu">1</span>: nom = <span class="st">"Dush"</span>; <span class="k">break</span>;\n  <span class="k">case</span> <span class="nu">2</span>: nom = <span class="st">"Sesh"</span>; <span class="k">break</span>;\n  <span class="k">default</span>: nom = <span class="st">"?"</span>;\n}',
+    "new":'<span class="ty">String</span> nom = <span class="k">switch</span> (kun) {\n  <span class="k">case</span> <span class="nu">1</span> -&gt; <span class="st">"Dush"</span>;\n  <span class="k">case</span> <span class="nu">2</span> -&gt; <span class="st">"Sesh"</span>;\n  <span class="k">default</span> -&gt; <span class="st">"?"</span>;\n};'
+  };
+  var SWN={old:'Har case oxirida <code>break</code> shart — unutsangiz keyingi case\'ga "oqib" o\'tadi (mashhur xato).',"new":'<b>-&gt;</b> break talab qilmaydi, va switch <b>qiymat qaytaradi</b>. Toza va xavfsiz — bugungi uslub.'};
+  var swCode=document.getElementById('swCode'),swNote=document.getElementById('swNote');
+  function setSw(m){[].slice.call(document.querySelectorAll('#swSeg button')).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-m')===m);});swCode.innerHTML=SW[m];swNote.innerHTML=SWN[m];}
+  [].slice.call(document.querySelectorAll('#swSeg button')).forEach(function(b){b.addEventListener('click',function(){setSw(b.getAttribute('data-m'));});});
+  setSw('old');
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

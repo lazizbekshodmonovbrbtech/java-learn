@@ -1,0 +1,425 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Exceptions chuqur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(34px,7vw,56px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+.kw-catch{color:var(--teal-ink);font-weight:500}.kw-try{color:var(--accent-ink);font-weight:500}
+
+/* hierarchy tree */
+.tree-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.tnode{border:1.5px solid var(--border);border-radius:11px;padding:9px 16px;font-family:var(--font-mono);font-size:13px;background:var(--surface-2);cursor:pointer;transition:.2s;color:var(--ink)}
+.tnode:hover{border-color:var(--border-strong)}
+.tnode.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600;box-shadow:var(--shadow-lift)}
+.tnode.err{border-color:var(--coral)}.tnode.chk{border-color:var(--amber)}.tnode.unchk{border-color:var(--purple)}
+.tstem{width:2px;height:14px;background:var(--border-strong)}
+.trow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tbranch{display:flex;flex-direction:column;align-items:center}
+.tree-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:16px;font-size:14px;min-height:60px}
+.tree-note b{color:var(--accent-ink)}
+.tree-note .tag{font-family:var(--font-mono);font-size:11px;padding:2px 8px;border-radius:6px;margin-right:6px;font-weight:600}
+.tag.err{background:var(--coral-soft);color:var(--coral)}.tag.chk{background:var(--amber-soft);color:var(--amber)}.tag.unchk{background:var(--purple-soft);color:var(--purple-ink)}
+
+/* propagation */
+.prop-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;margin-bottom:18px}
+.seg button{border:0;background:transparent;padding:8px 15px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);transition:.15s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.pstack{display:flex;flex-direction:column;gap:9px}
+.pframe{border:1.5px solid var(--border);border-radius:12px;padding:12px 15px;background:var(--surface-2);transition:.3s;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pframe .pfn{font-family:var(--font-mono);font-size:13.5px;font-weight:600}
+.pframe .pfh{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.pframe.throw,.pframe.passing{border-color:var(--coral);background:var(--coral-soft)}
+.pframe.throw .pfn,.pframe.passing .pfn{color:var(--coral)}
+.pframe.passing{animation:shake .4s}
+.pframe.caught{border-color:var(--teal);background:var(--teal-soft)}.pframe.caught .pfn{color:var(--teal-ink)}
+.pframe.crash{border-color:var(--coral);background:var(--coral)}.pframe.crash .pfn,.pframe.crash .pfh{color:#fff}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.exc-badge{font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:6px;background:var(--coral);color:#fff;white-space:nowrap}
+.pframe.caught .exc-badge{background:var(--teal)}
+.prop-cap{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 15px;margin-top:16px;min-height:72px;font-size:14.5px}
+.prop-cap b{color:var(--accent-ink)}.prop-cap .red{color:var(--coral)}.prop-cap .grn{color:var(--teal-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl:active{transform:scale(.95)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.primary:hover{background:var(--accent-ink)}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+
+/* best practices */
+.bp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.bpc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.bpc h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px}
+.bpc.bad h4{color:var(--coral)}.bpc.good h4{color:var(--teal-ink)}
+.bpc pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.bpc .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.bp{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#8A6A1E"></span> Java Core · 3/7</span><span>· Kurs: 16/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Core · 16-modul · noldan</span>
+    <h1>Exceptions <span class="steam">chuqur</span></h1>
+    <p class="lead">Dastur ideal dunyoda yashamaydi: fayl yo'qoladi, tarmoq uziladi, nol'ga bo'linadi. Java bularni exception bilan boshqaradi. Bu modulda ierarxiya, ko'tarilish, o'z exception'ingiz va professional qoidalar.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Ierarxiya — tugunni bosing</h2></div>
+    <p class="sec-sub">Hamma xatolar <code>Throwable</code>dan keladi. Ikki katta shox: <b>Error</b> (JVM darajasi, tuzatib bo'lmaydi) va <b>Exception</b>. Exception ichida <b>RuntimeException</b> (unchecked) va qolganlari (checked). Tugunni bosing.</p>
+    <div class="tree-card">
+      <div class="tree">
+        <div class="tnode" data-n="throwable">Throwable</div>
+        <div class="tstem"></div>
+        <div class="trow">
+          <div class="tbranch"><div class="tnode err" data-n="error">Error</div><div class="tstem"></div><div class="tnode err" data-n="oom">OutOfMemoryError</div></div>
+          <div class="tbranch"><div class="tnode" data-n="exception">Exception</div><div class="tstem"></div>
+            <div class="trow">
+              <div class="tbranch"><div class="tnode chk" data-n="io">IOException</div></div>
+              <div class="tbranch"><div class="tnode unchk" data-n="rte">RuntimeException</div><div class="tstem"></div><div class="trow"><div class="tnode unchk" data-n="npe">NPE</div><div class="tnode unchk" data-n="iae">IllegalArgument</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tree-note" id="treeNote">Tugunni bosing — u checked, unchecked yoki Error ekanini va qachon uchrashini ko'rasiz.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Checked vs unchecked — qoida</h2></div>
+    <div class="bp">
+      <div class="bpc good"><h4>checked (Exception vorisi)</h4><pre>IOException
+SQLException
+FileNotFoundException</pre><div class="why">Kompilyator <b>majbur qiladi</b>: try/catch YOKI <code>throws</code>. Tashqi sabablar (fayl, tarmoq, baza) — kutilgan, tiklanishi mumkin.</div></div>
+      <div class="bpc bad"><h4>unchecked (RuntimeException vorisi)</h4><pre>NullPointerException
+IllegalArgumentException
+ArithmeticException
+IndexOutOfBounds</pre><div class="why">Majbur qilmaydi. Odatda <b>dasturchi xatosi</b> — ushlash emas, oldini olish kerak (null tekshirish, validatsiya).</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Ko'tarilish — kim ushlaydi?</h2></div>
+    <p class="sec-sub">Xato chuqur metodda chiqsa, u chaqiruvchilar zanjiri bo'ylab yuqoriga ko'tariladi — kimdir <code>catch</code> qilguncha. Hech kim ushlamasa — stack trace bilan qulaydi.</p>
+    <div class="prop-card">
+      <div class="seg" id="modeSeg"><button data-m="caught" class="on">main'da catch bor</button><button data-m="crash">hech kim ushlamaydi</button></div>
+      <div class="pstack" id="pstack"></div>
+      <div class="prop-cap" aria-live="polite" id="propCap"></div>
+      <div class="controls">
+        <button class="ctl" id="eprev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-6-6 6-6M18 18l-6-6 6-6"/></svg></button>
+        <button class="ctl primary" id="eplay"><svg id="eplayIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span id="eplayLbl">Pauza</span></button>
+        <button class="ctl" id="enext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 18l6-6-6-6M6 18l6-6-6-6"/></svg></button>
+        <div class="prog"><div class="bar" id="ebar"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>try / catch / finally — tartib</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Tartib.java</span></div>
+      <pre class="code"><span class="kw-try">try</span> {
+    <span class="ty">int</span> x = <span class="nu">10</span> / <span class="nu">0</span>;                     <span class="cm">// 1) xato shu yerda</span>
+} <span class="kw-catch">catch</span> (<span class="ty">ArithmeticException</span> e) {
+    System.out.println(<span class="st">"Nol'ga bo'lish"</span>);   <span class="cm">// 2) ushlandi</span>
+} <span class="kw-catch">catch</span> (<span class="ty">Exception</span> e) {              <span class="cm">// umumiy — OXIRIDA (tor→keng)</span>
+    System.out.println(<span class="st">"Boshqa xato"</span>);
+} <span class="k">finally</span> {
+    System.out.println(<span class="st">"Har doim"</span>);        <span class="cm">// 3) xato bo'lsa ham, bo'lmasa ham</span>
+}
+<span class="cm">// multi-catch: catch (IOException | SQLException e) { ... }</span></pre>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>tartib muhim</div>
+      catch bloklari <b>tordan kengga</b>: avval <code>ArithmeticException</code>, keyin <code>Exception</code>. Teskari yozsangiz — kompilyatsiya xatosi ("already caught"), chunki keng catch hammasini yutib, tor catch'ga yetmaydi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>O'z exception'ingiz va chaining</h2></div>
+    <p class="sec-sub">Biznes xatolarini (masalan "balans yetarli emas") o'z exception'ingiz bilan ifodalang — kod o'qiladigan bo'ladi. <b>Chaining</b> — asl sababni (cause) yo'qotmasdan yangi exception'ga o'rash.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Custom.java</span></div>
+      <pre class="code"><span class="cm">// o'z exception — RuntimeException'dan (unchecked, zamonaviy uslub)</span>
+<span class="k">public class</span> <span class="ty">YetarliEmasException</span> <span class="k">extends</span> <span class="ty">RuntimeException</span> {
+    <span class="k">public</span> <span class="ty">YetarliEmasException</span>(<span class="ty">String</span> msg) { <span class="k">super</span>(msg); }
+}
+
+<span class="k">void</span> yech(<span class="ty">int</span> s) {
+    <span class="k">if</span> (s &gt; balans) <span class="k">throw new</span> <span class="ty">YetarliEmasException</span>(<span class="st">"Balans: "</span> + balans);
+}
+
+<span class="cm">// chaining — asl sababni saqlash</span>
+<span class="kw-try">try</span> { baza.saqla(); }
+<span class="kw-catch">catch</span> (<span class="ty">SQLException</span> e) {
+    <span class="k">throw new</span> <span class="ty">SaqlashException</span>(<span class="st">"Saqlab bo'lmadi"</span>, e);  <span class="cm">// e = cause</span>
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>try-with-resources</h2></div>
+    <p class="sec-sub">Fayl, baza ulanishi kabi resurslarni <b>yopish</b> shart. <code>try(...)</code> qavsida ochsangiz, Java uni o'zi yopadi — xato bo'lsa ham. <code>finally</code>da qo'lda yopish endi kerak emas.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Resource.java</span></div>
+      <pre class="code"><span class="kw-try">try</span> (<span class="ty">var</span> fayl = <span class="k">new</span> <span class="ty">FileReader</span>(<span class="st">"data.txt"</span>);
+     <span class="ty">var</span> conn = dataSource.getConnection()) {   <span class="cm">// bir nechta resurs</span>
+    <span class="cm">// ishlaymiz</span>
+}   <span class="cm">// Java ikkovini ham avtomatik yopadi (teskari tartibda) ✓</span>
+<span class="cm">// Shart: resurs AutoCloseable bo'lishi kerak</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Professional qoidalar</h2></div>
+    <div class="bp">
+      <div class="bpc bad"><h4>❌ xatoni yutish</h4><pre>catch (Exception e) {
+  <span class="cm">// hech narsa</span>
+}</pre><div class="why">Xato yo'qoladi, muammo yashirinadi. Kamida log qiling.</div></div>
+      <div class="bpc bad"><h4>❌ hammasini ushlash</h4><pre>catch (Throwable t)</pre><div class="why">Error'larni ham yutadi (OOM). Faqat kerakli exception'ni ushlang.</div></div>
+      <div class="bpc good"><h4>✓ aniq va ma'noli</h4><pre>throw new YetarliEmasException(
+  "Balans: " + balans);</pre><div class="why">Xabar tushunarli, tur aniq — debug oson.</div></div>
+      <div class="bpc good"><h4>✓ oqim boshqaruvi uchun EMAS</h4><pre><span class="cm">// if bilan tekshiring,</span>
+<span class="cm">// exception bilan emas</span></pre><div class="why">Exception qimmat (stack trace). Kutilgan holatlarni if bilan hal qiling.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Checked va unchecked farqi, qachon qaysi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Checked (Exception vorisi, RuntimeException emas) — kompilyator try/catch yoki throws talab qiladi; tashqi, tiklanadigan holatlar (IO, SQL). Unchecked (RuntimeException vorisi) — majburiy emas; dasturchi xatolari (NPE, IllegalArgument). Zamonaviy uslub: biznes xatolari uchun ham unchecked (Spring shunday).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Error va Exception farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Error — JVM darajasidagi jiddiy muammo (OutOfMemoryError, StackOverflowError), dastur tiklanolmaydi, ushlash ma'nosiz. Exception — dastur darajasidagi, ushlab tiklanishi mumkin bo'lgan holat.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>finally qachon ishlamaydi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Deyarli doim ishlaydi — faqat <code>System.exit()</code> chaqirilsa yoki JVM qulasa (OOM, o'chirish) ishlamaydi. try'da return bo'lsa ham finally ishlaydi (return'dan oldin).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>throw va throws farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><code>throw</code> — exception'ni <b>otish</b> (metod ichida, bitta obyekt). <code>throws</code> — metod imzosida "bu metod shu exception'ni chiqarishi mumkin" deb <b>e'lon qilish</b> (checked uchun majburiy). throw — harakat, throws — ogohlantirish.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">1.</span>NullPointerException qaysi turga kiradi?</div>
+        <button class="opt">checked</button><button class="opt">Error</button><button class="opt">unchecked (RuntimeException)</button>
+        <div class="q-fb" data-ok="To'g'ri. NPE — RuntimeException vorisi, unchecked. Ushlash emas, oldini olish kerak." data-no="Yo'q. NPE unchecked — RuntimeException'dan keladi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">2.</span>catch bloklari qanday tartibda yoziladi?</div>
+        <button class="opt">Tordan kengga (aniq → umumiy)</button><button class="opt">Kengdan torga</button><button class="opt">Ahamiyati yo'q</button>
+        <div class="q-fb" data-ok="To'g'ri. Avval aniq (ArithmeticException), keyin umumiy (Exception). Teskari — kompilyatsiya xatosi." data-no="Yo'q. Tordan kengga. Keng catch birinchi bo'lsa, torlari hech qachon ishlamaydi (xato)."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">3.</span>try-with-resources resursni qachon yopadi?</div>
+        <button class="opt">Faqat xato bo'lmasa</button><button class="opt">Har doim, avtomatik — xato bo'lsa ham</button><button class="opt">Qo'lda yopish kerak</button>
+        <div class="q-fb" data-ok="To'g'ri. try(...) qavsidagi AutoCloseable resurs blok tugashi bilan avtomatik yopiladi — xato bo'lsa ham." data-no="Yo'q. try-with-resources har doim, avtomatik yopadi."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">4.</span>Bo'sh <code>catch (Exception e) {}</code> nega yomon?</div>
+        <button class="opt">Sekin ishlaydi</button><button class="opt">Kompilyatsiya xatosi</button><button class="opt">Xato yutiladi, muammo yashirin qoladi</button>
+        <div class="q-fb" data-ok="To'g'ri. Xato izsiz yo'qoladi — debug qilish imkonsiz. Kamida log qiling yoki qayta oting." data-no="Yo'q. Bo'sh catch xatoni yutadi — muammo yashirinadi. Kamida log qiling."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Lambda va funksional interfeyslar</h3>
+      <p>Java 8'ning inqilobi: kodni qiymat sifatida uzatish. Anonymous class'dan lambda'ga, Predicate/Function/Consumer, method reference — Stream API uchun poydevor.</p>
+      <div class="topics">
+        <span class="topic-pill">15 · Generics</span>
+        <span class="topic-pill now">16 · Exceptions</span>
+        <span class="topic-pill">17 · Lambda</span>
+        <span class="topic-pill">18 · Stream</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="15-generics.html"><span class="cl">← Oldingi dars</span><span class="ct">15 · Generics</span><span class="cs">⚙️ Java Core</span></a><a class="cn nx" href="17-lambda.html"><span class="cl">Keyingi dars →</span><span class="ct">17 · Lambda</span><span class="cs">⚙️ Java Core</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:18.2%"></i></div><span>16 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(16)<0)v.push(16);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','16');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(16)<0)D[t].push(16);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* tree */
+  var TN={
+    throwable:{tag:'',t:'Throwable',d:'Hamma xatolar va exception\'larning ildizi. throw qilinadigan hamma narsa shundan keladi.'},
+    error:{tag:'err',t:'Error',d:'JVM darajasidagi jiddiy muammo — OutOfMemoryError, StackOverflowError. Dastur tiklanolmaydi, ushlash ma\'nosiz.'},
+    oom:{tag:'err',t:'OutOfMemoryError',d:'Heap to\'lib ketdi (23-modul). Ushlab bo\'lmaydi — xotira sozlamasi yoki memory leak\'ni tuzatish kerak.'},
+    exception:{tag:'',t:'Exception',d:'Dastur darajasidagi, ushlab tiklanishi mumkin bo\'lgan holatlar. Ikki shoxi: checked (to\'g\'ridan vorislar) va unchecked (RuntimeException).'},
+    io:{tag:'chk',t:'IOException (checked)',d:'Fayl/tarmoq bilan ishlashda. Kompilyator try/catch yoki throws talab qiladi — chunki bu kutilgan, tiklanadigan holat.'},
+    rte:{tag:'unchk',t:'RuntimeException (unchecked)',d:'Odatda dasturchi xatosi. Kompilyator majbur qilmaydi. Zamonaviy kutubxonalar (Spring) biznes xatolarini ham shundan yasaydi.'},
+    npe:{tag:'unchk',t:'NullPointerException',d:'null obyekt ustida metod chaqirish. Eng mashhur xato. Yechim — null tekshirish, Optional (19-modul).'},
+    iae:{tag:'unchk',t:'IllegalArgumentException',d:'Metodga noto\'g\'ri argument berildi (manfiy summa). Validatsiyada ishlatiladi.'}
+  };
+  var tnodes=[].slice.call(document.querySelectorAll('.tnode')),treeNote=document.getElementById('treeNote');
+  tnodes.forEach(function(n){n.addEventListener('click',function(){
+    tnodes.forEach(function(x){x.classList.remove('sel');});n.classList.add('sel');
+    var d=TN[n.getAttribute('data-n')];
+    var tagH=d.tag==='err'?'<span class="tag err">Error</span>':d.tag==='chk'?'<span class="tag chk">checked</span>':d.tag==='unchk'?'<span class="tag unchk">unchecked</span>':'';
+    treeNote.innerHTML=tagH+'<b>'+d.t+'</b><br>'+d.d;
+  });});
+
+  /* propagation */
+  var pstack=document.getElementById('pstack'),propCap=document.getElementById('propCap'),ebar=document.getElementById('ebar');
+  var FRAMES=[{n:'main()',h:'try/catch bor',key:'main'},{n:'hisobla()',h:'catch yo\'q',key:'hisobla'},{n:'bol(10, 0)',h:'← xato shu yerda',key:'bol'}];
+  var SC={
+    caught:[
+      {st:{},cap:'Zanjir: main → hisobla → bol.'},
+      {st:{bol:'throw'},cap:'<span class="red">bol(10, 0)</span> nol\'ga bo\'lmoqchi → <b>ArithmeticException</b> otildi. bol\'da catch yo\'q.'},
+      {st:{bol:'gone',hisobla:'passing'},cap:'Xato <span class="red">hisobla()</span>ga ko\'tarildi. Catch yo\'q → yuqoriga.'},
+      {st:{bol:'gone',hisobla:'gone',main:'caught'},cap:'<span class="grn">main()</span>da catch bor → <b>ushlandi</b>! Dastur davom etadi ✓'}
+    ],
+    crash:[
+      {st:{},cap:'main\'da ham catch yo\'q.'},
+      {st:{bol:'throw'},cap:'<span class="red">bol(10, 0)</span> → <b>ArithmeticException</b>.'},
+      {st:{bol:'gone',hisobla:'passing'},cap:'hisobla()ga ko\'tarildi — catch yo\'q.'},
+      {st:{bol:'gone',hisobla:'gone',main:'passing'},cap:'main()ga yetdi — bu yerda ham yo\'q.'},
+      {st:{bol:'gone',hisobla:'gone',main:'crash'},cap:'Hech kim ushlamadi → <span class="red">dastur quladi</span>. Konsolga stack trace. 💥'}
+    ]
+  };
+  var mode='caught',ei=0,eplaying=true,etimer=null;
+  function erender(){var seq=SC[mode],s=seq[ei];
+    pstack.innerHTML=FRAMES.map(function(f){var cls=s.st[f.key]||'';var badge='';
+      if(cls==='throw'||cls==='passing')badge='<span class="exc-badge">ArithmeticException ↑</span>';
+      if(cls==='caught')badge='<span class="exc-badge">ushlandi ✓</span>';
+      if(cls==='crash')badge='<span class="exc-badge">CRASH 💥</span>';
+      if(cls==='gone')return '<div class="pframe" style="opacity:.4"><div><div class="pfn">'+f.n+'</div><div class="pfh">'+f.h+'</div></div></div>';
+      return '<div class="pframe '+cls+'"><div><div class="pfn">'+f.n+'</div><div class="pfh">'+f.h+'</div></div>'+badge+'</div>';}).join('');
+    propCap.innerHTML=s.cap;ebar.style.width=((ei/(seq.length-1))*100)+'%';}
+  function ego(n){var len=SC[mode].length;ei=(n+len)%len;erender();if(eplaying)esched();}
+  function esched(){clearTimeout(etimer);etimer=setTimeout(function(){ego(ei+1);},2500);}
+  function esetBtn(){document.getElementById('eplayLbl').textContent=eplaying?'Pauza':'Davom';document.getElementById('eplayIcon').innerHTML=eplaying?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>';}
+  function eplay(){eplaying=true;esetBtn();esched();}function epause(){eplaying=false;esetBtn();clearTimeout(etimer);}
+  document.getElementById('eplay').addEventListener('click',function(){eplaying?epause():eplay();});
+  document.getElementById('enext').addEventListener('click',function(){ego(ei+1);epause();});
+  document.getElementById('eprev').addEventListener('click',function(){ego(ei-1);epause();});
+  [].slice.call(document.querySelectorAll('#modeSeg button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#modeSeg button')).forEach(function(x){x.classList.toggle('on',x===b);});mode=b.getAttribute('data-m');ei=0;erender();eplay();});});
+  erender();esetBtn();esched();
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

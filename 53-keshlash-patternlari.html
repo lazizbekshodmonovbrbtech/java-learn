@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redis keshlash pattern'lari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F7F1F0;--surface:#FFFFFF;--surface-2:#FCF8F7;--sunken:#F2E8E6;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#EADCD9;--border-strong:#DAC5C1;
+  --accent:#C8372D;--accent-ink:#9A2820;--accent-soft:#F8E3E0;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.seqd{position:relative;margin-top:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);padding:10px 0 12px}
+.lh{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-family:var(--font-mono);font-size:12px;font-weight:600;margin-bottom:6px}
+.lh div span{display:inline-block;padding:5px 10px;border-radius:9px;border:1.5px solid var(--border-strong);background:var(--surface)}
+.lanes{position:absolute;top:44px;bottom:10px;left:0;right:0;pointer-events:none}
+.lanes i{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--border-strong)}
+.msgs{position:relative;display:flex;flex-direction:column;gap:4px;min-height:210px}
+.msg{position:relative;height:30px;opacity:.12;transition:opacity .3s}
+.msg.on,.msg.done{opacity:1}
+.msg .ln{position:absolute;top:18px;height:2px;background:var(--ink-soft)}
+.msg.on .ln{background:var(--accent);animation:grow .5s ease-out}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.msg .ln.r{transform-origin:left}.msg .ln.l{transform-origin:right}
+.msg .ln::after{content:"";position:absolute;top:-4px;border:5px solid transparent}
+.msg .ln.r::after{right:-2px;border-left:7px solid currentColor;border-right:0;color:inherit}
+.msg .ln.l::after{left:-2px;border-right:7px solid currentColor;border-left:0}
+.msg .ln{color:var(--ink-soft)}.msg.on .ln{color:var(--accent)}
+.msg .ln.dash{background:repeating-linear-gradient(90deg,var(--ink-soft) 0 6px,transparent 6px 10px)}
+.msg .lb{position:absolute;top:0;font-family:var(--font-mono);font-size:11px;white-space:nowrap;transform:translateX(-50%);background:var(--surface-2);padding:0 4px;border-radius:4px}
+.msg.on .lb{color:var(--accent-ink);font-weight:600}
+.msg.self .lb{transform:none}
+.msg.miss .lb{color:var(--coral)}
+.msg.hit .lb{color:var(--teal-ink)}
+/* race */
+.race2{display:grid;grid-template-columns:1fr 1fr 170px;gap:10px;margin-top:10px}
+.race2>div{min-width:0}
+.lane2{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--surface-2);display:flex;flex-direction:column;gap:5px}
+.lane2 h5{margin:0 0 4px;font-family:var(--font-mono);font-size:12px}
+.ev2{font-family:var(--font-mono);font-size:11.5px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);opacity:.2;transition:.3s;min-height:32px}
+.ev2.on{opacity:1;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ev2.done{opacity:1}
+.ev2.bad{border-color:var(--coral);background:var(--coral-soft)}
+.ev2.blank{visibility:hidden}
+.state{display:flex;flex-direction:column;gap:8px}
+.sbox{border:2px solid var(--border-strong);border-radius:12px;padding:8px;text-align:center;font-family:var(--font-mono);font-size:12px;background:var(--surface);transition:.3s}
+.sbox b{display:block;font-size:20px;font-family:var(--font-display)}
+.sbox.stale{border-color:var(--coral);background:var(--coral-soft)}
+.sbox.fresh2{border-color:var(--teal);background:var(--teal-soft)}
+/* sim */
+.simtop{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.prot{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.prot label{display:flex;gap:6px;align-items:center;border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;cursor:pointer;background:var(--surface-2);user-select:none}
+.prot label.on{border-color:var(--teal);background:var(--teal-soft)}
+.prot label.danger.on{border-color:var(--coral);background:var(--coral-soft)}
+.prot input{accent-color:var(--teal)}
+canvas#sim{width:100%;height:280px;display:block;margin-top:10px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border)}
+.meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.mt2{border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:var(--surface-2);font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft)}
+.mt2 b{display:block;font-size:20px;color:var(--ink);font-family:var(--font-display)}
+.mt2.bad b{color:var(--coral)}
+@media (max-width:700px){.race2{grid-template-columns:1fr 1fr}.race2 .state{grid-column:1/-1;flex-direction:row}.sbox{flex:1}.meters{grid-template-columns:1fr 1fr}.msg .lb{font-size:9.5px}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#C8372D"></span> Redis · 4/7</span><span>· Kurs: 53/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Redis · 53-modul · keshlash</span>
+    <h1>Keshlash <span class="steam">pattern’lari</span></h1>
+    <p class="lead">"Keshni qo‘shdik — tezlashdi" — bu hikoyaning faqat boshi. Kesh ikkita yangi muammo olib keladi: <b>eskirgan ma’lumot</b> va <b>kesh bo‘shaganda DB’ga tushadigan to‘lqin</b>. Bu modulda pattern’larni ketma-ketlik diagrammalarida, poyga holatini vaqt chizig‘ida, uch klassik muammoni esa jonli simulyatorda ko‘ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Pattern’lar: kim kimga murojaat qiladi</h2></div><p class="sec-sub">Pattern’ni tanlang va qadamlarni o‘ting. Bankdagi 90% holat — <b>cache-aside</b>.</p>
+    <div class="stage">
+      <div class="seg" id="pseg"><button class="on" data-p="0">Cache-aside (o‘qish)</button><button data-p="1">Cache-aside (yozish)</button><button data-p="2">Read-through</button><button data-p="3">Write-through</button><button data-p="4">Write-behind</button><button data-p="5">Refresh-ahead</button></div>
+      <div class="seqd"><div class="lh"><div><span>📱 Ilova</span></div><div><span>⚡ Redis</span></div><div><span>🐘 PostgreSQL</span></div></div><div class="lanes"><i style="left:16.66%"></i><i style="left:50%"></i><i style="left:83.33%"></i></div><div class="msgs" id="msgs"></div></div>
+      <div class="ctrls"><button class="btn" id="sqPrev">◀</button><button class="btn primary" id="sqPlay">▶ Avto</button><button class="btn" id="sqNext">▶</button><div class="bar"><div id="sqBar"></div></div></div>
+      <div class="explain" id="sqEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Pattern</th><th>Afzallik</th><th>Kamchilik</th><th>Bankda</th></tr><tr><td><b>Cache-aside</b></td><td>Oddiy; Redis yiqilsa ham ishlaydi (sekinroq); faqat so‘ralgan narsa keshlanadi</td><td>Birinchi so‘rov sekin; poyga holatida eskirgan qiymat</td><td>Kurslar, profillar, ma’lumotnomalar — standart</td></tr><tr><td><b>Read-through</b></td><td>Kod toza: kesh o‘zi yuklaydi</td><td>Kutubxona/provayder kerak</td><td>Spring <code>@Cacheable</code> ilova nuqtai nazaridan shunday ko‘rinadi</td></tr><tr><td><b>Write-through</b></td><td>Kesh doim yangi</td><td>Har yozuv sekinroq; hech kim o‘qimaydigan narsa ham keshlanadi</td><td>Kam o‘zgaradigan, ko‘p o‘qiladigan sozlamalar</td></tr><tr><td><b>Write-behind</b></td><td>Yozish juda tez, DB’ga paketlab</td><td><b>Ma’lumot yo‘qolishi mumkin</b></td><td>Pul uchun — hech qachon. Analitika, "ko‘rishlar soni"</td></tr><tr><td><b>Refresh-ahead</b></td><td>Issiq kalit hech qachon "sovumaydi"</td><td>Keraksiz yangilashlar</td><td>Valyuta kurslari, tariflar</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Poyga holati: nega kesh eskirib qoladi?</h2></div><p class="sec-sub">Cache-aside + "yozishda DEL" ham 100% kafolat bermaydi. Ikki ip: A — o‘qiydi, B — yangilaydi. Qadamlarni kuzating.</p>
+    <div class="stage">
+      <div class="race2">
+        <div class="lane2"><h5>🧵 A ip (o‘qish: GET /kurs)</h5><div id="la"></div></div>
+        <div class="lane2"><h5>🧵 B ip (admin kursni o‘zgartiradi)</h5><div id="lb"></div></div>
+        <div class="state"><div class="sbox" id="sDb">PostgreSQL<b>12 650</b></div><div class="sbox" id="sCa">Redis<b>—</b></div></div>
+      </div>
+      <div class="ctrls"><button class="btn" id="rcPrev">◀</button><button class="btn primary" id="rcPlay">▶ Avto</button><button class="btn" id="rcNext">▶</button><div class="bar"><div id="rcBar"></div></div></div>
+      <div class="explain" id="rcEx"></div>
+    </div>
+    <div class="grid2">
+      <div class="card good"><h4>Yechimlar</h4><p><b>1)</b> Har doim TTL — eskirish vaqt bilan chegaralanadi. <b>2)</b> Delayed double delete: DEL → yozish → 500 ms keyin yana DEL. <b>3)</b> CDC: Debezium PG WAL’ni o‘qib, o‘zgarishda keshni o‘chiradi (Kafka orqali). <b>4)</b> Versiya: qiymat bilan <code>version</code> saqlash, eskisi yangisini bosmasin (Lua).</p></div>
+      <div class="card bad"><h4>Qilmang</h4><p><b>Yozishda SET cache</b> (DEL o‘rniga): ikki parallel yozuvchi DB’ni bir tartibda, keshni boshqa tartibda yangilasa — kesh abadiy noto‘g‘ri (TTL tugaguncha). <b>Avval keshni, keyin DB’ni</b> yangilash: DB tranzaksiyasi rollback bo‘lsa, kesh yolg‘on gapiradi.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Uch klassik muammo — jonli simulyator</h2></div><p class="sec-sub">Har nuqta — bitta so‘rov (25/s). <b style="color:var(--teal-ink)">Yashil</b> — Redis’dan javob, <b style="color:var(--coral)">qizil</b> — DB’ga tushdi, <b style="color:var(--amber)">sariq</b> — kutyapti, kulrang — rad etildi. DB bir vaqtda 6 ta so‘rovni ko‘taradi, ko‘prog‘i — timeout. Muammoni tanlang, ishga tushiring, keyin himoyalarni yoqing.</p>
+    <div class="stage">
+      <div class="simtop"><div class="seg" id="sseg"><button class="on" data-s="stampede">🐃 Stampede</button><button data-s="pen">🕳 Penetration</button><button data-s="aval">🏔 Avalanche</button></div><button class="btn primary" id="simGo">▶ Boshlash</button></div>
+      <div class="prot" id="prot"></div>
+      <canvas id="sim" width="800" height="280"></canvas>
+      <div class="meters"><div class="mt2" id="m1">DB so‘rov/s<b>0</b></div><div class="mt2" id="m2">Timeout<b>0</b></div><div class="mt2" id="m3">Kesh hit<b>—</b></div><div class="mt2" id="m4">Vaqt<b>0.0 s</b></div></div>
+      <div class="explain" id="simEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Muammo</th><th>Nima bo‘ladi</th><th>Himoya</th></tr><tr><td><b>Stampede</b> (thundering herd, hot key)</td><td>Bitta issiq kalit o‘ladi → yuklanayotgan 500 ms ichida kelgan <b>barcha</b> so‘rovlar DB’ga tushadi</td><td>Mutex / single-flight (faqat bittasi yuklaydi), stale-while-revalidate (logik muddat), refresh-ahead</td></tr><tr><td><b>Penetration</b></td><td>Mavjud bo‘lmagan kalitlar (hujumchi <code>card:99999…</code>) — keshda hech qachon bo‘lmaydi → har doim DB</td><td>Null’ni qisqa TTL bilan keshlash (takroriy ID’lar uchun), <b>Bloom filter</b> (tasodifiy ID’lar uchun), kirish validatsiyasi, rate limit</td></tr><tr><td><b>Avalanche</b></td><td>Ko‘p kalit bir vaqtda o‘ladi yoki Redis yiqiladi → butun trafik DB’ga</td><td>TTL jitter, lokal kesh (Caffeine) + circuit breaker, Redis HA (55-modul), keshni oldindan isitish (warm-up)</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Spring Boot: @Cacheable + Redis</h2></div><p class="sec-sub">Spring Cache abstraksiyasi — cache-aside’ni annotatsiya bilan. Konfiguratsiya va eng ko‘p uchraydigan tuzoqlar.</p><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">build.gradle / application.yml</span></div><pre class="code">implementation <span class="st">'org.springframework.boot:spring-boot-starter-data-redis'</span>
+implementation <span class="st">'org.springframework.boot:spring-boot-starter-cache'</span>
+
+<span class="ty">spring</span>:
+  data.<span class="ty">redis</span>:
+    <span class="ty">host</span>: redis.bank.local
+    <span class="ty">port</span>: <span class="nu">6379</span>
+    <span class="ty">timeout</span>: 200ms          <span class="cm"># Redis sekinlashsa — tez voz kechamiz</span>
+  <span class="ty">cache</span>:
+    <span class="ty">type</span>: redis</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">CacheConfig.java</span></div><pre class="code"><span class="k">@Configuration</span>
+<span class="k">@EnableCaching</span>
+<span class="k">class</span> <span class="ty">CacheConfig</span> {
+    <span class="k">@Bean</span>
+    <span class="ty">RedisCacheManagerBuilderCustomizer</span> caches() {
+        <span class="k">var</span> json = <span class="ty">RedisSerializationContext</span>.<span class="ty">SerializationPair</span>
+            .fromSerializer(<span class="k">new</span> <span class="ty">GenericJackson2JsonRedisSerializer</span>());   <span class="cm">// JDK serializatsiya emas!</span>
+        <span class="k">var</span> base = <span class="ty">RedisCacheConfiguration</span>.defaultCacheConfig()
+            .serializeValuesWith(json)
+            .prefixCacheNameWith(<span class="st">"bank:v1:"</span>)           <span class="cm">// versiya — DTO o'zgarsa v2</span>
+            .disableCachingNullValues();
+        <span class="k">return</span> b -&gt; b
+            .withCacheConfiguration(<span class="st">"kurslar"</span>,  base.entryTtl(<span class="ty">Duration</span>.ofSeconds(<span class="nu">60</span>)))
+            .withCacheConfiguration(<span class="st">"mijozlar"</span>, base.entryTtl(<span class="ty">Duration</span>.ofMinutes(<span class="nu">10</span>)));
+    }
+}</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">KursService.java</span></div><pre class="code"><span class="k">@Service</span>
+<span class="k">class</span> <span class="ty">KursService</span> {
+    <span class="k">@Cacheable</span>(cacheNames = <span class="st">"kurslar"</span>, key = <span class="st">"#valyuta"</span>, sync = <span class="k">true</span>)   <span class="cm">// sync: bitta JVM ichida single-flight</span>
+    <span class="k">public</span> <span class="ty">KursDto</span> kurs(<span class="ty">String</span> valyuta) {
+        <span class="k">return</span> repo.findLatest(valyuta);                                   <span class="cm">// faqat miss bo'lganda chaqiriladi</span>
+    }
+
+    <span class="k">@CacheEvict</span>(cacheNames = <span class="st">"kurslar"</span>, key = <span class="st">"#dto.valyuta()"</span>)          <span class="cm">// DB'dan KEYIN o'chiradi</span>
+    <span class="k">@Transactional</span>
+    <span class="k">public</span> <span class="k">void</span> yangilash(<span class="ty">KursDto</span> dto) { repo.save(dto.toEntity()); }
+}</pre></div>
+    <div class="grid2">
+      <div class="card bad"><h4>Tuzoq 1: self-invocation</h4><p>Xuddi <code>@Transactional</code> kabi: <code>this.kurs("USD")</code> proxy’dan o‘tmaydi — kesh ishlamaydi. Boshqa bean orqali chaqiring.</p></div>
+      <div class="card bad"><h4>Tuzoq 2: sync=true — faqat bitta JVM</h4><p>10 pod bo‘lsa, har pod bittadan — 10 ta so‘rov DB’ga. Klaster bo‘ylab single-flight uchun Redis lock (54-modul) yoki SWR kerak.</p></div>
+      <div class="card bad"><h4>Tuzoq 3: @CacheEvict + tranzaksiya</h4><p>Evict metod tugagach ishlaydi, lekin commit undan keyin bo‘lishi mumkin — oraliqda boshqa ip eski qiymatni qayta keshlaydi. Ishonchli: <code>TransactionSynchronization.afterCommit</code> yoki <code>@TransactionalEventListener(phase = AFTER_COMMIT)</code>da o‘chirish.</p></div>
+      <div class="card bad"><h4>Tuzoq 4: serializatsiya</h4><p>JDK serializatsiya — o‘qib bo‘lmaydi, klass o‘zgarsa buziladi, xavfsizlik riski. JSON + kesh prefiksida versiya. DTO’ni keshlang, JPA entity’ni emas (lazy proxy!).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Ikki qatlamli kesh: Caffeine + Redis</h2></div><p class="sec-sub">Juda issiq kalitlar (kurslar) uchun hatto Redis’gacha borish ham qimmat: 10 pod × 5000 RPS = 50 000 so‘rov bitta kalitga (hot key → bitta Redis shard). Yechim — L1 lokal kesh.</p><div class="tbl-wrap"><table class="tbl"><tr><th></th><th>L1: Caffeine (JVM ichida)</th><th>L2: Redis</th></tr><tr><td>Kechikish</td><td>~100 ns</td><td>~300 µs</td></tr><tr><td>Hajm</td><td>Kichik (MB)</td><td>Katta (GB)</td></tr><tr><td>Podlar orasida</td><td>Har pod’da alohida nusxa</td><td>Umumiy</td></tr><tr><td>Invalidatsiya</td><td>Qisqa TTL (5–30 s) yoki Pub/Sub orqali "o‘chir" xabari</td><td>DEL</td></tr><tr><td>Nimaga</td><td>Juda issiq, kam o‘zgaradigan: kurslar, sozlamalar</td><td>Qolgan hamma narsa</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Cache-aside pattern’ni tushuntiring. Yozishda nega keshni yangilash emas, o‘chirish kerak?<span class="chev">›</span></summary><div class="iv-a">O‘qish: keshdan, bo‘lmasa DB’dan o‘qib keshga TTL bilan yozish. Yozish: avval DB, keyin keshdan DEL. SET qilsak, ikki parallel yozuvchi DB va keshni turli tartibda yangilab, keshda eski qiymat qolishi mumkin; bundan tashqari, hech kim o‘qimaydigan qiymatni hisoblashga vaqt ketadi. DEL — keyingi o‘quvchi yangi qiymatni yuklaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>DB’dan keyin DEL qilsak ham eskirgan qiymat qolishi mumkinmi?<span class="chev">›</span></summary><div class="iv-a">Ha: A miss bo‘lib DB’dan eski qiymatni o‘qidi, shu payt B DB’ni yangilab DEL qildi, keyin A eski qiymatni SET qildi. Ehtimoli past (o‘qish odatda yozishdan tez), lekin bor. Yumshatish: TTL, delayed double delete, CDC orqali invalidatsiya, versiyalash.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Cache stampede nima va qanday oldini olasiz?<span class="chev">›</span></summary><div class="iv-a">Issiq kalit o‘lganda parallel so‘rovlar birdaniga DB’ga boradi. Yechimlar: mutex/single-flight (SET lock NX, faqat bittasi yuklaydi, qolganlari kutadi yoki eski qiymat oladi), stale-while-revalidate (logik muddat: eski qiymat qaytariladi, fonda yangilanadi), refresh-ahead, ehtimoliy erta yangilash (XFetch).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Cache penetration va Bloom filter?<span class="chev">›</span></summary><div class="iv-a">Mavjud bo‘lmagan kalitlar so‘rovi keshda hech qachon topilmaydi va har doim DB’ga tushadi. Takrorlanuvchi ID’lar uchun null’ni qisqa TTL bilan keshlash yetadi; tasodifiy ID’lar hujumida — Bloom filter (mavjud ID’lar to‘plami, "yo‘q" javobi 100% aniq, "bor" — ehtimoliy), plus validatsiya va rate limit.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Cache avalanche va farqi?<span class="chev">›</span></summary><div class="iv-a">Ko‘p kalit bir vaqtda muddati tugaydi yoki Redis butunlay ishdan chiqadi — trafik to‘lqini DB’ga. Stampede — bitta issiq kalit, avalanche — ommaviy. Yechim: TTL jitter, HA Redis, circuit breaker + lokal kesh, DB oldida rate limit/bulkhead, warm-up.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@Cacheable(sync = true) nima qiladi va cheklovi?<span class="chev">›</span></summary><div class="iv-a">Bitta kesh kaliti uchun bir vaqtda faqat bitta ip metodni chaqiradi, qolganlari natijani kutadi — lekin faqat bitta JVM ichida. Ko‘p pod’li tizimda har pod o‘z yuklashini qiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keshdagi ma’lumot bilan DB mos kelmasligini qancha vaqt qabul qila olasiz? Bu kimning qarori?<span class="chev">›</span></summary><div class="iv-a">Bu biznes qarori: kurs uchun 60 s normal, balans uchun — 0 (keshlanmaydi yoki faqat ko‘rsatish uchun va pul operatsiyasi oldidan DB’dan tekshiriladi). TTL shu toqat chegarasiga qarab tanlanadi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Cache-aside’da kurs yangilanganda nima qilish kerak?</div><button class="opt">Avval keshni SET, keyin DB</button><button class="opt">DB’ni yangilab, keyin keshni DEL</button><button class="opt">Faqat keshni yangilash</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Avval DB (haqiqat manbai), keyin DEL."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Hujumchi har soniyada 1000 ta tasodifiy mavjud bo‘lmagan karta raqamini so‘ramoqda. Eng samarali himoya?</div><button class="opt">Null keshlash</button><button class="opt">Bloom filter + rate limit</button><button class="opt">TTL jitter</button><div class="q-fb" data-ok="To‘g‘ri — tasodifiy ID’lar takrorlanmaydi, null kesh yordam bermaydi." data-no="Yo‘q. Tasodifiy ID’larda null kesh foydasiz — Bloom filter kerak."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Tungi job 100k kalitni bir xil TTL bilan yozdi. Bir soatdan keyin DB yiqildi. Bu?</div><button class="opt">Penetration</button><button class="opt">Avalanche</button><button class="opt">Stampede</button><div class="q-fb" data-ok="To‘g‘ri. Yechim — jitter." data-no="Yo‘q. Ommaviy bir vaqtda o‘lish — avalanche."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>10 pod, @Cacheable(sync=true). Issiq kalit o‘ldi. DB’ga nechta so‘rov boradi?</div><button class="opt">1</button><button class="opt">~10 (har pod’dan bittadan)</button><button class="opt">Yuzlab</button><div class="q-fb" data-ok="To‘g‘ri — sync faqat JVM ichida." data-no="Yo‘q. sync har JVM’da alohida."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Write-behind’ni qayerda ishlatish mumkin?</div><button class="opt">Mijoz balansi</button><button class="opt">Maqola ko‘rishlar soni</button><button class="opt">Tranzaksiyalar jurnali</button><div class="q-fb" data-ok="To‘g‘ri — yo‘qolsa ham fojia emas." data-no="Yo‘q. Write-behind’da ma’lumot yo‘qolishi mumkin — pul uchun emas."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Redis</span>
+      <h3>Atomiklik, distributed lock va rate limiter</h3>
+      <p>MULTI/EXEC, Lua, SET NX PX, Redlock bahsi, fencing token va token bucket — animatsiyada.</p>
+      <div class="topics"><span class="topic-pill">50 · Nega tez</span><span class="topic-pill">51 · Tuzilmalar</span><span class="topic-pill">52 · TTL va xotira</span><span class="topic-pill now">53 · Keshlash</span><span class="topic-pill">54 · Lock va limit</span><span class="topic-pill">55 · Persistence/HA</span><span class="topic-pill">56 · Streams + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="52-ttl-xotira-va-eviction.html"><span class="cl">← Oldingi dars</span><span class="ct">52 · TTL, xotira va eviction</span><span class="cs">⚡ Redis</span></a><a class="cn nx" href="54-atomiklik-lock-va-rate-limiter.html"><span class="cl">Keyingi dars →</span><span class="ct">54 · Atomiklik, lock va rate limiter</span><span class="cs">⚡ Redis</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:60.2%"></i></div><span>53 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(53)<0)v.push(53);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','53');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(53)<0)D[t].push(53);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* ---------- sequence diagrams ---------- */
+  var X=[16.66,50,83.33];
+  var P=[
+   [[0,1,'GET kurs:USD','Ilova avval Redis’dan so‘raydi.'],[1,0,'(nil) — miss','Kalit yo‘q (birinchi so‘rov yoki TTL tugagan).','miss'],[0,2,'SELECT … WHERE valyuta=\'USD\'','Miss bo‘lgani uchun ilova <b>o‘zi</b> DB’ga boradi (≈ 2 ms).'],[2,0,'12650','DB javobi.'],[0,1,'SET kurs:USD 12650 EX 60','Natijani TTL bilan keshga yozadi. TTL — eskirishning yuqori chegarasi.'],[0,0,'→ mijozga javob','Birinchi so‘rov: ~3 ms.'],[0,1,'GET kurs:USD (2-so‘rov)','Keyingi so‘rov…'],[1,0,'"12650" — hit','…Redis’dan, ~0.3 ms. DB’ga tegilmadi. 60 soniya davomida barcha so‘rovlar shunday.','hit']],
+   [[0,2,'UPDATE kurs SET qiymat=12700','Admin kursni o‘zgartirdi. <b>Avval DB</b> — haqiqat manbai.'],[2,0,'COMMIT ✓','Tranzaksiya tasdiqlandi.'],[0,1,'DEL kurs:USD','Keyin keshni <b>o‘chiramiz</b> (yangilamaymiz). Commit’dan keyin!'],[0,1,'GET kurs:USD (keyingi o‘quvchi)','Keyingi o‘qish…'],[1,0,'(nil)','…miss.','miss'],[0,2,'SELECT','…DB’dan yangi qiymat.'],[0,1,'SET kurs:USD 12700 EX 60','Kesh yangilandi. Kesh "dangasa" — faqat kerak bo‘lganda to‘ldiriladi.']],
+   [[0,1,'cache.get("USD")','Ilova faqat kesh bilan gaplashadi.'],[1,2,'loader: SELECT','Miss bo‘lsa <b>kesh qatlami o‘zi</b> DB’dan yuklaydi (loader). Redis o‘zida buni qila olmaydi — bu kutubxona qatlami: Spring @Cacheable, Caffeine LoadingCache.'],[2,1,'12650','—'],[1,0,'12650','Ilova kodi DB’ni umuman ko‘rmaydi — toza.']],
+   [[0,1,'cache.put("USD", 12700)','Ilova keshga yozadi…'],[1,2,'UPDATE (sinxron)','…kesh qatlami <b>shu zahoti</b> DB’ga ham yozadi.'],[2,1,'OK','—'],[1,0,'OK','Ikkalasi ham yangilangandan keyin javob. Kesh doim yangi, lekin yozish sekinroq.']],
+   [[0,1,'HINCRBY views:article:7 count 1','Ilova faqat Redis’ga yozadi — juda tez.'],[1,0,'OK (darhol)','Javob darhol qaytadi.'],[1,1,'… 5 soniya yig‘iladi …','Yozuvlar Redis’da to‘planadi.'],[1,2,'UPDATE … batch (asinxron)','Fon jarayoni paketlab DB’ga yozadi.','dash'],[1,1,'⚠ Redis yiqilsa — 5 s ma’lumot yo‘q','<b>Xavf:</b> DB’ga yetib bormagan yozuvlar yo‘qoladi. Pul uchun — hech qachon.','miss']],
+   [[0,1,'GET kurs:USD (TTL 60, qoldi 8 s)','Kalit hali tirik, lekin muddati tugashiga oz qoldi.'],[1,0,'"12650" + TTL ≈ 8','Qiymat qaytdi, ilova TTL’ni ham ko‘rdi.'],[0,2,'fonda: SELECT','TTL chegaradan (masalan 20%) kam — <b>fonda</b> yangilash boshlanadi, foydalanuvchi kutmaydi.','dash'],[0,1,'SET kurs:USD … EX 60','Kalit hech qachon o‘lmaydi — issiq kalit uchun ideal.']]];
+  var pi=0,msgs=document.getElementById('msgs'),sq;
+  function drawP(){msgs.innerHTML=P[pi].map(function(m){var a=X[m[0]],b=X[m[1]],self=a===b,l=Math.min(a,b),w=Math.abs(a-b),dir=m[1]>m[0]?'r':'l';
+      var ln=self?'<span class="ln r" style="left:'+(a+1)+'%;width:10%"></span>':'<span class="ln '+dir+(m[4]==='dash'?' dash':'')+'" style="left:'+l+'%;width:'+w+'%"></span>';
+      var lb=self?'<span class="lb" style="left:'+(a+2)+'%">'+m[2]+'</span>':'<span class="lb" style="left:'+(l+w/2)+'%">'+m[2]+'</span>';
+      return '<div class="msg'+(self?' self':'')+(m[4]&&m[4]!=='dash'?' '+m[4]:'')+'">'+ln+lb+'</div>';}).join('');}
+  function mk(){drawP();if(sq)sq.stop();sq=mkStepper('sq',P[pi].length,function(i){[].forEach.call(msgs.children,function(d,k){d.classList.toggle('on',k===i);d.classList.toggle('done',k<i);});document.getElementById('sqEx').innerHTML=(i+1)+'/'+P[pi].length+'. '+P[pi][i][3];},2000);}
+  document.getElementById('pseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});pi=+b.dataset.p;
+    ['sqPrev','sqPlay','sqNext'].forEach(function(id){var o=document.getElementById(id),n=o.cloneNode(true);o.parentNode.replaceChild(n,o);});mk();});
+  mk();
+
+  /* ---------- race ---------- */
+  var RS=[['a','GET kurs:USD → (nil)','Miss. A DB’dan o‘qishga ketadi.','12 650','—'],
+    ['a','SELECT → 12 650','A eski qiymatni o‘qidi va… GC pauza / tarmoq sekinlashdi (bir necha ms).','12 650','—'],
+    ['b','UPDATE → 12 700, COMMIT','B DB’ni yangiladi.','12 700','—'],
+    ['b','DEL kurs:USD','B keshni o‘chirdi (keshda baribir hech narsa yo‘q edi).','12 700','—'],
+    ['a','SET kurs:USD 12 650 EX 60','A "uyg‘ondi" va o‘zi o‘qigan <b>eski</b> qiymatni keshga yozdi!','12 700','12 650','bad'],
+    ['a','… 60 s davomida hamma 12 650 ko‘radi','DB = 12 700, kesh = 12 650. <b>TTL tugaguncha</b> eskirgan. Shuning uchun TTL shart. Delayed double delete: B 500 ms keyin yana DEL qilganda bu oyna qisqarardi.','12 700','12 650','bad']];
+  var la=document.getElementById('la'),lb=document.getElementById('lb');
+  la.innerHTML=RS.map(function(r){return '<div class="ev2'+(r[0]==='a'?'':' blank')+'">'+r[1]+'</div>';}).join('');
+  lb.innerHTML=RS.map(function(r){return '<div class="ev2'+(r[0]==='b'?'':' blank')+'">'+r[1]+'</div>';}).join('');
+  mkStepper('rc',RS.length,function(i){[la,lb].forEach(function(L){[].forEach.call(L.children,function(d,k){var bad=RS[k][5]&&k<=i;d.className='ev2'+(d.className.indexOf('blank')>=0?' blank':'')+(k===i?' on':k<i?' done':'')+(bad?' bad':'');});});
+    var r=RS[i];document.getElementById('sDb').innerHTML='PostgreSQL<b>'+r[3]+'</b>';var c=document.getElementById('sCa');c.innerHTML='Redis<b>'+r[4]+'</b>';c.className='sbox'+(r[5]?' stale':r[4]!=='—'?' fresh2':'');
+    document.getElementById('rcEx').innerHTML=r[2];},2400);
+
+  /* ---------- simulator ---------- */
+  var cv=document.getElementById('sim'),ctx=cv.getContext('2d'),W=800,H=280,DPR=Math.min(2,window.devicePixelRatio||1);
+  function size(){var r=cv.getBoundingClientRect();W=Math.max(300,r.width);H=280;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+  var scen='stampede',Pr={},running=false,raf=null,t=0,last=0,spawnAcc=0,dots=[],cache={},loading={},waiters={},local={},dbIn=0,CAP=6,dbLog=[],to=0,hits=0,tot=0,T_END=12000;
+  var PROT={stampede:[['mutex','🔒 Mutex / single-flight'],['swr','♻️ Stale-while-revalidate']],pen:[['repeat','🔁 Hujumchi ID’larni takrorlaydi',1],['nullc','∅ Null keshlash (TTL 5 s)'],['bloom','🌸 Bloom filter']],aval:[['jitter','🎲 TTL jitter ±40%'],['down','💥 Redis o‘chdi',1],['local','🧊 Lokal kesh + circuit breaker']]};
+  var prot=document.getElementById('prot'),simEx=document.getElementById('simEx');
+  function drawProt(){prot.innerHTML=PROT[scen].map(function(p){return '<label class="'+(Pr[p[0]]?'on':'')+(p[2]?' danger':'')+'"><input type="checkbox" data-p="'+p[0]+'"'+(Pr[p[0]]?' checked':'')+'>'+p[1]+'</label>';}).join('');}
+  prot.addEventListener('change',function(e){var k=e.target.dataset.p;Pr[k]=e.target.checked;e.target.parentNode.classList.toggle('on',Pr[k]);reset();explain();});
+  var col={ink:'#8C8578',teal:'#0F6E56',coral:'#C8372D',amber:'#D08A1C',gray:'#B9B2A6',purple:'#6A4BB0'};
+  function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+  function rnd(a,b){return a+Math.random()*(b-a);}
+  function ttlFor(k){if(scen==='stampede')return 5000;if(scen==='aval')return Pr.jitter?rnd(2400,5600):4000;return 1e9;}
+  function reset(){t=0;dots=[];cache={};loading={};waiters={};local={};dbIn=0;dbLog=[];to=0;hits=0;tot=0;spawnAcc=0;
+    if(scen==='stampede')cache.kurs={exp:Pr.swr?60000:1500,soft:1500};
+    if(scen==='aval'){for(var i=0;i<30;i++){var e=Pr.jitter?rnd(1000,3200):2000;cache['k'+i]={exp:e,soft:e};local['k'+i]=1e9;}}
+    if(scen==='pen'){for(var j=0;j<10;j++)cache['k'+j]={exp:1e9,soft:1e9};}
+    meters();drawSim();}
+  function key(){if(scen==='stampede')return 'kurs';if(scen==='aval')return 'k'+Math.floor(Math.random()*30);
+    if(Math.random()<0.5)return 'k'+Math.floor(Math.random()*10);return Pr.repeat?'x'+Math.floor(Math.random()*5):'x'+Math.floor(Math.random()*1e6);}
+  var CX=function(){return 46;},RX=function(){return W*0.5;},DX=function(){return W-60;};
+  function spawn(){var y=rnd(34,H-40);dots.push({k:key(),x:CX(),y:y,y0:y,fx:CX(),tx:RX(),t0:t,dur:420,st:'toR',c:col.ink});tot++;}
+  function leg(d,tx,st,c,dur){d.fx=d.x;d.tx=tx;d.t0=t;d.dur=dur||420;d.st=st;if(c)d.c=c;}
+  function toDb(d){leg(d,DX(),'toD',col.coral);}
+  function onR(d){var k=d.k,e=cache[k];
+    if(scen==='aval'&&Pr.down){if(Pr.local&&local[k]>t){hits++;leg(d,CX(),'back',col.teal);return;}toDb(d);return;}
+    var valid=e&&t<e.exp;
+    if(valid&&(!Pr.swr||t<e.soft)){hits++;leg(d,CX(),'back',e.isNull?col.gray:col.teal);return;}
+    if(valid&&Pr.swr){hits++;leg(d,CX(),'back',col.teal);if(!loading[k]){loading[k]=1;var r={k:k,x:RX(),y:d.y,fx:RX(),tx:DX(),t0:t,dur:420,st:'toD',c:col.purple,refresh:1};dots.push(r);}return;}
+    if(scen==='pen'&&Pr.bloom&&k[0]==='x'){leg(d,CX(),'back',col.gray);return;}
+    if(Pr.mutex){if(loading[k]){d.st='wait';d.c=col.amber;(waiters[k]=waiters[k]||[]).push(d);return;}loading[k]=1;}
+    toDb(d);}
+  function onD(d){dbLog.push(t);if(dbIn>=CAP){to++;release(d.k,false);leg(d,d.refresh?RX():CX(),'back',col.coral,300);d.fail=1;return;}dbIn++;d.st='inD';d.done=t+550;}
+  function release(k,ok){loading[k]=0;(waiters[k]||[]).forEach(function(w){if(ok)hits++;leg(w,CX(),'back',ok?col.teal:col.coral);});waiters[k]=[];}
+  function finish(d){dbIn--;var k=d.k;
+    if(k[0]==='x'){if(Pr.nullc)cache[k]={exp:t+5000,soft:t+5000,isNull:1};}
+    else{var tt=ttlFor(k);cache[k]={exp:Pr.swr?t+60000:t+tt,soft:t+tt};local[k]=t+10000;}
+    release(k,true);
+    if(d.refresh){leg(d,RX(),'gone',col.purple);}else leg(d,CX(),'back',col.teal);}
+  function step(dt){t+=dt;spawnAcc+=dt;while(spawnAcc>=40){spawnAcc-=40;spawn();}
+    dots.forEach(function(d){if(d.st==='wait')return;if(d.st==='inD'){if(t>=d.done)finish(d);return;}
+      var p=Math.min(1,(t-d.t0)/d.dur);d.x=d.fx+(d.tx-d.fx)*p;
+      if(p>=1){if(d.st==='toR')onR(d);else if(d.st==='toD')onD(d);else if(d.st==='back'||d.st==='gone')d.dead=1;}});
+    dots=dots.filter(function(d){return !d.dead;});
+    dbLog=dbLog.filter(function(x){return x>t-1000;});}
+  function meters(){var q=dbLog.length;var m1=document.getElementById('m1');m1.innerHTML='DB so‘rov/s<b>'+q+'</b>';m1.className='mt2'+(q>CAP*2?' bad':'');
+    var m2=document.getElementById('m2');m2.innerHTML='Timeout<b>'+to+'</b>';m2.className='mt2'+(to?' bad':'');
+    document.getElementById('m3').innerHTML='Kesh hit<b>'+(tot?Math.round(hits/tot*100)+'%':'—')+'</b>';document.getElementById('m4').innerHTML='Vaqt<b>'+(t/1000).toFixed(1)+' s</b>';}
+  function box(x,y,w,h,label,sub,hot){ctx.fillStyle=css('--surface');ctx.strokeStyle=hot?col.coral:css('--border-strong');ctx.lineWidth=hot?3:2;ctx.beginPath();ctx.roundRect(x,y,w,h,12);ctx.fill();ctx.stroke();
+    ctx.fillStyle=css('--ink');ctx.font='600 13px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y+22);ctx.fillStyle=css('--ink-faint');ctx.font='11px monospace';ctx.fillText(sub,x+w/2,y+40);}
+  function drawSim(){ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=css('--ink-faint');ctx.font='11px monospace';ctx.textAlign='left';ctx.fillText('📱 mijozlar',8,18);
+    var down=scen==='aval'&&Pr.down;
+    box(RX()-52,H/2-34,104,68,down?'⚡ Redis ✕':'⚡ Redis',scen==='stampede'?'kurs:USD':scen==='aval'?'30 kalit':'k0..k9',false);
+    if(down){ctx.strokeStyle=col.coral;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(RX()-40,H/2-24);ctx.lineTo(RX()+40,H/2+24);ctx.stroke();}
+    var hot=dbIn>=CAP;box(DX()-48,H/2-44,96,88,'🐘 DB',dbIn+'/'+CAP+' band',hot);
+    for(var i=0;i<CAP;i++){ctx.fillStyle=i<dbIn?(hot?col.coral:col.amber):css('--sunken');ctx.fillRect(DX()-40+i*13.5,H/2+22,11,10);}
+    if(scen==='stampede'&&cache.kurs){var e=cache.kurs,left=Math.max(0,(e.soft-t)/1000);ctx.fillStyle=left>0?col.teal:col.coral;ctx.font='11px monospace';ctx.textAlign='center';ctx.fillText(left>0?'TTL '+left.toFixed(1)+'s':(Pr.swr&&t<e.exp?'eskirgan (SWR)':'o‘ldi!'),RX(),H/2+50);}
+    if(loading.kurs&&scen==='stampede'){ctx.fillStyle=col.amber;ctx.fillText(Pr.mutex?'🔒 lock: 1 ta yuklayapti':'yuklanmoqda',RX(),H/2-44);}
+    var wn=0;dots.forEach(function(d){var x=d.x,y=d.y;if(d.st==='wait'){x=RX()-60-(wn%6)*7;y=H/2-26+Math.floor(wn/6)*7;wn++;}else if(d.st==='inD'){x=DX()+rnd(-20,20);y=H/2+rnd(-8,8);}
+      ctx.fillStyle=d.c;ctx.beginPath();ctx.arc(x,y,d.refresh?5:3.4,0,7);ctx.fill();});}
+  function loop(now){if(!running)return;var dt=Math.min(50,now-(last||now));last=now;step(dt);drawSim();meters();
+    if(t>=T_END){running=false;document.getElementById('simGo').textContent='▶ Qayta';summary();return;}raf=requestAnimationFrame(loop);}
+  function summary(){simEx.innerHTML='<b>Natija:</b> timeout — '+to+', kesh hit — '+Math.round(hits/tot*100)+'%. '+simEx.getAttribute('data-hint');}
+  function explain(){var h='';
+    if(scen==='stampede')h=Pr.swr?'<b>SWR:</b> kalitda ikki muddat bor — "logik" (5 s) va haqiqiy (uzoq). Logik muddat o‘tgach ham eski qiymat darhol qaytadi, bitta fon so‘rov (binafsha) yangilaydi. Foydalanuvchi hech qachon kutmaydi, DB’ga faqat 1 so‘rov.':Pr.mutex?'<b>Mutex:</b> birinchi miss lock oladi (<code>SET lock:kurs 1 NX PX 3000</code>) va DB’ga boradi, qolganlar sariq — kutadi (yoki qisqa uxlab qayta GET qiladi). DB’ga 1 so‘rov.':'Kalit 1.5 s da o‘ladi. DB so‘rovi 550 ms davom etadi — shu oynada kelgan <b>har bir</b> so‘rov miss bo‘lib DB’ga ketadi. DB 6 tadan ko‘pini ko‘tara olmaydi → timeout.';
+    if(scen==='pen')h=Pr.bloom?'<b>Bloom filter</b> "bu ID mavjud emas" deb aniq ayta oladi — kulrang nuqtalar DB’ga yetmasdan qaytadi. Redis’da: <code>BF.ADD cards 8600…</code>, <code>BF.EXISTS</code> (Redis 8 / RedisBloom).':Pr.nullc?(Pr.repeat?'Null keshlash ishladi: takrorlanuvchi 5 ta ID bir marta DB’ga borgach, keshda "yo‘q" deb saqlandi (kulrang).':'Null keshlash <b>deyarli foydasiz</b>: hujumchi har safar yangi tasodifiy ID yuboradi — keshda hech qachon takrorlanmaydi. Keshni esa axlat bilan to‘ldiradi. Bloom filter kerak.'):'Yarim so‘rovlar mavjud bo‘lmagan ID’lar. Ular keshda hech qachon bo‘lmaydi → har biri DB’ga tushadi. Hit rate ~50% dan oshmaydi.';
+    if(scen==='aval')h=Pr.down?(Pr.local?'Redis o‘chdi, lekin <b>lokal kesh</b> (Caffeine, 10 s) va circuit breaker bor: issiq kalitlar pod xotirasidan beriladi. DB faqat lokal keshda yo‘qlar uchun.':'<b>Redis o‘chdi</b> — 100% trafik DB’ga. Circuit breaker yo‘q bo‘lsa, har so‘rov Redis timeout’ini ham kutadi (200 ms) va keyin DB’ni bosadi.'):Pr.jitter?'<b>Jitter:</b> kalitlar 1–3.2 s oralig‘ida sochilib o‘ladi — DB yuk ko‘taradi. Qayta yuklangandan keyin ham TTL tasodifiy.':'30 kalit hammasi <b>2.0 s da bir vaqtda</b> o‘ladi → to‘lqin DB’ga. Keyin ular bir xil TTL (4 s) bilan qayta yoziladi — to‘lqin <b>takrorlanadi</b> (6 s, 10 s…).';
+    simEx.innerHTML=h;simEx.setAttribute('data-hint',h);}
+  document.getElementById('sseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});scen=b.dataset.s;Pr={};drawProt();running=false;document.getElementById('simGo').textContent='▶ Boshlash';reset();explain();});
+  document.getElementById('simGo').addEventListener('click',function(){if(running){running=false;this.textContent='▶ Davom';return;}if(t>=T_END)reset();running=true;last=0;this.textContent='⏸ Pauza';explain();raf=requestAnimationFrame(loop);});
+  window.addEventListener('resize',function(){size();drawSim();});
+  size();drawProt();reset();explain();
+  new MutationObserver(function(){drawSim();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+
+</script>
+</body>
+</html>

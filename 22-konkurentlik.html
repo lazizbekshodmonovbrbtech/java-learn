@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Konkurentlik</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* race demo */
+.race{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-top:14px}
+.thr{background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;padding:12px;transition:.3s}
+.thr.act{border-color:var(--accent);box-shadow:var(--shadow-lift)}
+.thr.wait{border-color:var(--amber);background:var(--amber-soft)}
+.thr h4{font-family:var(--font-mono);font-size:12.5px;margin:0 0 8px;display:flex;justify-content:space-between}
+.thr .st{font-weight:400;color:var(--ink-faint);font-size:11px}
+.thr .ln{font-family:var(--font-mono);font-size:12px;padding:4px 8px;border-radius:7px;border-left:3px solid transparent;color:var(--ink-soft);transition:.25s}
+.thr .ln.cur{background:var(--accent-soft);border-left-color:var(--accent);color:var(--ink)}
+.thr .ln.done{opacity:.5}
+.thr .local{margin-top:8px;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:8px;padding:5px 9px}
+.thr .local b{color:var(--purple-ink)}
+.acct{text-align:center;padding-top:8px;min-width:120px}
+.acct .lbl{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.acct .bal{font-family:var(--font-display);font-size:34px;font-weight:700;transition:.3s;font-variant-numeric:tabular-nums}
+.acct .bal.neg{color:var(--coral);animation:shake .4s}
+.acct .lock{margin-top:8px;font-size:22px;transition:.3s}
+.acct .lock.held{filter:drop-shadow(0 0 6px var(--amber))}
+.acct .who{font-family:var(--font-mono);font-size:10.5px;color:var(--amber)}
+.log{margin-top:12px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px 13px;font-family:var(--font-mono);font-size:12px;line-height:1.8;min-height:90px;max-height:170px;overflow:auto}
+.log .bad{color:var(--coral);font-weight:600}.log .good{color:var(--teal-ink);font-weight:600}.log .t1{color:var(--purple-ink)}.log .t2{color:var(--accent-ink)}
+
+/* lifecycle */
+.life{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px;align-items:center}
+.ls{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;font-family:var(--font-mono);font-size:11.5px;font-weight:600;transition:.2s;box-shadow:var(--shadow)}
+.ls:hover{border-color:var(--border-strong)}.ls.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.ls small{display:block;font-weight:400;color:var(--ink-faint);font-size:10px;margin-top:2px}
+.ls.sub{grid-column:span 1}
+@media (max-width:560px){.life{grid-template-columns:repeat(2,1fr)}.race{grid-template-columns:1fr}.acct{min-width:0}}
+
+/* inc demo */
+.incs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.inc{background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;padding:12px}
+.inc h4{font-family:var(--font-mono);font-size:12.5px;margin:0 0 6px}
+.inc.plain h4{color:var(--coral)}.inc.atomic h4{color:var(--teal-ink)}
+.inc .big{font-family:var(--font-display);font-size:30px;font-weight:700;text-align:center;margin:6px 0}
+.inc .sm{font-size:12px;color:var(--ink-soft);text-align:center;font-family:var(--font-mono)}
+.inc .big.bad{color:var(--coral)}.inc .big.ok{color:var(--teal-ink)}
+.bar-h{height:8px;background:var(--sunken);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar-h i{display:block;height:100%;background:var(--accent);width:0;transition:width .05s linear}
+
+/* cf timing */
+.cf{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.cfr{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;font-family:var(--font-mono);font-size:12px}
+.cfr .lane{position:relative;height:22px;background:var(--sunken);border:1px solid var(--border);border-radius:6px}
+.cfr .seg{position:absolute;top:2px;bottom:2px;border-radius:4px;font-size:10.5px;color:#fff;display:flex;align-items:center;justify-content:center;width:0;transition:width .6s ease;overflow:hidden;white-space:nowrap}
+.cfr .seg.a{background:var(--purple)}.cfr .seg.b{background:var(--teal)}.cfr .seg.c{background:var(--accent)}.cfr .seg.d{background:var(--ink-soft)}
+.cf-total{font-family:var(--font-mono);font-size:12.5px;margin-top:6px}.cf-total b{color:var(--accent-ink)}
+
+/* deadlock */
+.dl{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:14px}
+.dl .lk{text-align:center;font-family:var(--font-mono);font-size:12px;display:flex;flex-direction:column;gap:10px}
+.lockbox{border:2px solid var(--border-strong);border-radius:12px;padding:10px;background:var(--surface);transition:.3s;min-width:110px}
+.lockbox.t1{border-color:var(--purple);background:var(--purple-soft)}.lockbox.t2{border-color:var(--accent);background:var(--accent-soft)}
+.lockbox .own{font-size:10.5px;color:var(--ink-faint);display:block;margin-top:3px}
+.dl .thr .ln.blocked{border-left-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.dead{margin-top:12px;background:var(--coral-soft);color:var(--coral);border-radius:10px;padding:10px 13px;font-size:13.5px;font-weight:600;display:none;animation:shake .4s}
+.dead.show{display:block}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#7A4B8C"></span> Advanced Java · 2/3</span><span>· Kurs: 22/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Advanced · 22-modul · noldan</span>
+    <h1>Konkurentlik va thread'lar<span class="steam">.</span></h1>
+    <p class="lead">Server bir vaqtda minglab so'rovga xizmat qiladi — har biri o'z thread'ida. Ikki thread bitta hisobga tegsa nima bo'ladi? Bu modulda <b>race condition</b>'ni o'z ko'zingiz bilan ko'rasiz va uni to'g'ri yopishni o'rganasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Race condition: ikki thread, bitta hisob</h2></div>
+    <p class="sec-sub">Hisobda 1 000 so'm. Ikki so'rov bir vaqtda 600 so'm yechmoqchi. Har biri: <b>o'qi → tekshir → yoz</b>. Tekshiruv "yetarli" desa-da, ikkinchisi yozguncha birinchisi allaqachon yechib bo'lgan. Ishga tushiring, keyin <code>synchronized</code>'ni yoqing.</p>
+    <div class="demo">
+      <div class="controls">
+        <button class="ctl primary" id="racePlay">▶ Ikkalasini ishga tushir</button>
+        <button class="ctl wide" id="raceReset">Boshidan</button>
+        <label style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12.5px;margin-left:auto"><input type="checkbox" id="syncTog" style="accent-color:var(--accent);width:16px;height:16px"> synchronized</label>
+      </div>
+      <div class="race">
+        <div class="thr" id="thr1"><h4><span>Thread-1 · yech(600)</span><span class="st" id="st1">NEW</span></h4>
+          <div class="ln" data-l="0">lock ol</div><div class="ln" data-l="1">int b = balans;</div><div class="ln" data-l="2">if (b &gt;= 600)</div><div class="ln" data-l="3">balans = b - 600;</div><div class="ln" data-l="4">lock qo'yib yubor</div>
+          <div class="local">lokal b = <b id="b1">—</b></div></div>
+        <div class="acct"><div class="lbl">balans (heap)</div><div class="bal" id="bal">1000</div><div class="lock" id="lockIco">🔓</div><div class="who" id="lockWho"></div></div>
+        <div class="thr" id="thr2"><h4><span>Thread-2 · yech(600)</span><span class="st" id="st2">NEW</span></h4>
+          <div class="ln" data-l="0">lock ol</div><div class="ln" data-l="1">int b = balans;</div><div class="ln" data-l="2">if (b &gt;= 600)</div><div class="ln" data-l="3">balans = b - 600;</div><div class="ln" data-l="4">lock qo'yib yubor</div>
+          <div class="local">lokal b = <b id="b2">—</b></div></div>
+      </div>
+      <div class="log" id="raceLog">Tayyor. "Ishga tushir"ni bosing.</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Hisob.java</span></div>
+      <pre class="code"><span class="cm">// ❌ check-then-act — atomik emas</span>
+<span class="k">public void</span> yech(<span class="k">long</span> summa) {
+    <span class="k">if</span> (balans &gt;= summa) {          <span class="cm">// tekshirdi... shu orada boshqa thread yozib qo'ydi</span>
+        balans -= summa;
+    }
+}
+<span class="cm">// ✓ synchronized — bir vaqtda faqat bitta thread kiradi (monitor lock = this)</span>
+<span class="k">public synchronized void</span> yech(<span class="k">long</span> summa) { ... }
+
+<span class="cm">// ✓ Aniq lock — tryLock, timeout, fairness</span>
+<span class="k">private final</span> <span class="ty">ReentrantLock</span> lock = <span class="k">new</span> <span class="ty">ReentrantLock</span>();
+<span class="k">public void</span> yech(<span class="k">long</span> summa) {
+    lock.lock();
+    <span class="k">try</span> { <span class="k">if</span> (balans &gt;= summa) balans -= summa; }
+    <span class="k">finally</span> { lock.unlock(); }         <span class="cm">// finally — exception bo'lsa ham bo'shatiladi</span>
+}</pre>
+    </div>
+    <div class="callout iv"><div class="ct">Suhbatda so'raladi</div>Bankda real yechim — bu Java lock emas, <b>bazadagi lock</b>: <code>SELECT ... FOR UPDATE</code> yoki optimistic <code>@Version</code>. Chunki server bir nechta instance bo'lsa, JVM ichidagi synchronized boshqa serverdagi thread'ni to'xtata olmaydi. Java lock — bitta JVM ichida; bazadagi lock — butun tizim uchun. (36-modulda chuqur.)</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Thread hayot sikli</h2></div>
+    <p class="sec-sub">Thread — dastur ichidagi mustaqil bajarilish yo'li. Har bir thread o'z stek'iga ega, heap umumiy (shuning uchun balans umumiy edi). Holatni bosing.</p>
+    <div class="life" id="life">
+      <div class="ls" data-i="0">NEW<small>new Thread()</small></div>
+      <div class="ls" data-i="1">RUNNABLE<small>start() → CPU</small></div>
+      <div class="ls" data-i="2">BLOCKED<small>lock kutmoqda</small></div>
+      <div class="ls" data-i="3">WAITING<small>wait/join/park</small></div>
+      <div class="ls" data-i="4">TERMINATED<small>run() tugadi</small></div>
+    </div>
+    <div class="demo-note" id="lifeNote">Holatni tanlang. (TIMED_WAITING — sleep(ms), wait(ms) — muddatli kutish.)</div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Thread.java</span></div>
+      <pre class="code"><span class="ty">Thread</span> t = <span class="k">new</span> <span class="ty">Thread</span>(() -&gt; System.out.println(<span class="st">"salom "</span> + <span class="ty">Thread</span>.currentThread().getName()));
+t.start();     <span class="cm">// ✓ yangi thread'da ishlaydi</span>
+t.run();       <span class="cm">// ❌ oddiy metod chaqiruvi — shu thread'da! (klassik suhbat savoli)</span>
+t.join();      <span class="cm">// t tugaguncha kut</span>
+t.interrupt(); <span class="cm">// "to'xta" belgisi — thread o'zi tekshirishi kerak (isInterrupted / InterruptedException)</span>
+<span class="cm">// Amalda new Thread() yozmaysiz — ExecutorService ishlatasiz (pastda)</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>counter++ atomik emas</h2></div>
+    <p class="sec-sub"><code>count++</code> aslida 3 ta amal: o'qi, 1 qo'sh, yoz. Ikki thread o'rtada aralashsa — bitta qo'shish yo'qoladi ("lost update"). 2 thread × 1000 marta:</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="incPlay">▶ 2 × 1000 marta oshir</button></div>
+      <div class="incs">
+        <div class="inc plain"><h4>int count; count++</h4><div class="big" id="incA">0</div><div class="sm">kutilgan: 2000</div><div class="bar-h"><i id="barA"></i></div></div>
+        <div class="inc atomic"><h4>AtomicInteger.incrementAndGet()</h4><div class="big" id="incB">0</div><div class="sm">kutilgan: 2000</div><div class="bar-h"><i id="barB"></i></div></div>
+      </div>
+      <div class="demo-note" id="incNote">Chapda natija har safar boshqacha va 2000 dan kam bo'ladi. O'ngda CAS (compare-and-swap) — protsessor darajasidagi atomik amal, lock'siz.</div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>volatile — ko'rinish (visibility)</h4><pre>private volatile boolean stop;
+<span class="cm">// volatile'siz: thread o'z keshidagi
+// eski qiymatni cheksiz o'qishi mumkin</span>
+while (!stop) { ... }</pre><div class="why">volatile: har o'qish/yozish asosiy xotiradan. Atomiklik bermaydi (count++ uchun yetmaydi), faqat ko'rinish + tartib (happens-before).</div></div>
+      <div class="card"><h4>Atomic* — lock'siz atomiklik</h4><pre>AtomicLong seq = new AtomicLong();
+seq.incrementAndGet();
+seq.compareAndSet(kutilgan, yangi);
+LongAdder — juda ko'p yozuvda tezroq</pre><div class="why">Bitta o'zgaruvchi uchun ideal. Bir nechta o'zgaruvchi birga o'zgarishi kerak bo'lsa — lock kerak.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>ExecutorService va CompletableFuture</h2></div>
+    <p class="sec-sub">Thread yaratish qimmat — pool'da qayta ishlatiladi. Mijoz sahifasi uchun 3 ta servisdan ma'lumot kerak: profil (300ms), hisoblar (500ms), kartalar (400ms). Ketma-ket vs parallel:</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="cfPlay">▶ Taqqosla</button></div>
+      <div class="cf">
+        <div class="cfr"><span>Ketma-ket</span><div class="lane" id="laneSeq"></div></div>
+        <div class="cfr"><span>Parallel (CF)</span><div class="lane" id="lanePar"></div></div>
+      </div>
+      <div class="cf-total" id="cfTotal">Ketma-ket: — ms · Parallel: — ms</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">MijozSahifa.java</span></div>
+      <pre class="code"><span class="ty">ExecutorService</span> pool = Executors.newFixedThreadPool(<span class="nu">8</span>);   <span class="cm">// yoki Spring'ning @Async</span>
+
+<span class="k">var</span> profil   = CompletableFuture.supplyAsync(() -&gt; profilSvc.ol(id), pool);
+<span class="k">var</span> hisoblar = CompletableFuture.supplyAsync(() -&gt; hisobSvc.ol(id), pool);
+<span class="k">var</span> kartalar = CompletableFuture.supplyAsync(() -&gt; kartaSvc.ol(id), pool);
+
+<span class="ty">Sahifa</span> s = profil.thenCombine(hisoblar, (p, h) -&gt; <span class="k">new</span> Sahifa(p, h))
+                 .thenCombine(kartalar, Sahifa::kartalarBilan)
+                 .exceptionally(ex -&gt; Sahifa.bosh())   <span class="cm">// xato bo'lsa fallback</span>
+                 .orTimeout(<span class="nu">2</span>, TimeUnit.SECONDS)
+                 .join();                              <span class="cm">// natijani kut</span>
+
+<span class="cm">// Future.get() — bloklaydi; CompletableFuture — zanjir: thenApply / thenAccept / thenCompose / allOf</span></pre>
+    </div>
+    <div class="callout warn"><div class="ct">Pool o'lchami</div>CPU-og'ir ish: yadro soni (+1). I/O-og'ir: ko'proq (yadro × (1 + kutish/ish)), yoki Java 21 virtual thread. <code>newCachedThreadPool</code> — chegarasiz, xavfli. Pool'ni <code>shutdown()</code> qiling, Spring'da <code>ThreadPoolTaskExecutor</code> bean sifatida.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Deadlock: ikki lock, ikki tartib</h2></div>
+    <p class="sec-sub">O'tkazma A→B hisob A'ni, keyin B'ni lock qiladi. Bir vaqtda B→A o'tkazma B'ni, keyin A'ni. Har biri o'zinikini olib, boshqasinikini kutadi — abadiy.</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="dlPlay">▶ Deadlock qil</button><button class="ctl wide" id="dlFix">Tartiblab tuzat</button><button class="ctl wide" id="dlReset">Boshidan</button></div>
+      <div class="dl">
+        <div class="thr" id="dt1"><h4><span>T1: A → B o'tkazma</span></h4><div class="ln" data-l="0">lock(A)</div><div class="ln" data-l="1">lock(B)</div><div class="ln" data-l="2">o'tkaz, unlock</div></div>
+        <div class="lk"><div class="lockbox" id="lockA">🔒 Hisob A<span class="own" id="ownA">bo'sh</span></div><div class="lockbox" id="lockB">🔒 Hisob B<span class="own" id="ownB">bo'sh</span></div></div>
+        <div class="thr" id="dt2"><h4><span>T2: B → A o'tkazma</span></h4><div class="ln" data-l="0" id="dt2l0">lock(B)</div><div class="ln" data-l="1" id="dt2l1">lock(A)</div><div class="ln" data-l="2">o'tkaz, unlock</div></div>
+      </div>
+      <div class="dead" id="dead">☠ DEADLOCK — T1 B'ni kutadi (T2'da), T2 A'ni kutadi (T1'da). Ikkalasi ham abadiy BLOCKED.</div>
+      <div class="demo-note" id="dlNote">Yechim: lock'larni <b>doim bir xil tartibda</b> oling (masalan, hisob ID bo'yicha kichigini birinchi). Yoki <code>tryLock(timeout)</code>. Bazada ham xuddi shu: UPDATE'larni id tartibida bajaring.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Thread-safe asboblar</h2></div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>Muammo</th><th>Yechim</th><th>Izoh</th></tr>
+      <tr><td>Umumiy Map</td><td><code>ConcurrentHashMap</code></td><td>Segmentli lock, o'qish lock'siz. <code>Collections.synchronizedMap</code> — butun map lock, sekin. <code>HashMap</code> — ko'p thread'da buziladi.</td></tr>
+      <tr><td>Umumiy List</td><td><code>CopyOnWriteArrayList</code></td><td>O'qish ko'p, yozish kam bo'lsa (listener ro'yxati).</td></tr>
+      <tr><td>Navbat (producer/consumer)</td><td><code>BlockingQueue</code> (LinkedBlockingQueue, ArrayBlockingQueue)</td><td><code>put</code> to'lsa kutadi, <code>take</code> bo'sh bo'lsa kutadi.</td></tr>
+      <tr><td>Har thread'ga o'z nusxa</td><td><code>ThreadLocal</code></td><td>Spring Security context, tranzaksiya konteksti shunday. Pool'da <code>remove()</code> qilmasa — leak.</td></tr>
+      <tr><td>N ta ish tugashini kutish</td><td><code>CountDownLatch</code>, <code>CompletableFuture.allOf</code></td><td>Latch bir martalik; <code>CyclicBarrier</code> qayta ishlatiladi.</td></tr>
+      <tr><td>Bir vaqtda N ta ruxsat</td><td><code>Semaphore</code></td><td>Tashqi API'ga bir vaqtda 5 ta so'rov chegarasi.</td></tr>
+      <tr><td>Immutable obyekt</td><td><code>record</code>, final maydonlar</td><td>Eng oson thread-safety: o'zgarmaydigan narsani himoya qilish shart emas.</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Process va thread farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Process — o'z xotirasiga ega alohida dastur (JVM — bitta process). Thread — process ichidagi bajarilish yo'li; thread'lar heap'ni bo'lishadi, har birining o'z stek'i va PC registri bor. Shuning uchun thread'lar orasida ma'lumot almashish oson, lekin race condition xavfi bor.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Race condition nima? Qanday oldini olasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Natija thread'larning bajarilish tartibiga bog'liq bo'lib qolishi (check-then-act, read-modify-write). Yechimlar: synchronized/ReentrantLock (o'zaro istisno), Atomic* (CAS), immutable obyektlar, thread-confinement (ThreadLocal), concurrent kolleksiyalar. Bank amaliyotida — baza darajasida: SELECT FOR UPDATE yoki optimistic locking (@Version).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>synchronized qanday ishlaydi? volatile bilan farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Har obyektda monitor bor; synchronized blok/metod monitorni oladi, boshqa thread'lar BLOCKED bo'ladi; chiqishda bo'shatadi va o'zgarishlar ko'rinadigan bo'ladi (happens-before). <b>volatile</b> faqat ko'rinish va tartibni kafolatlaydi (kesh emas, asosiy xotira), atomiklik bermaydi — <code>count++</code> uchun yetmaydi. Bayroq (flag) uchun volatile, murakkab holat uchun lock.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>start() va run() farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><code>start()</code> yangi OS thread yaratib, unda run()ni chaqiradi. <code>run()</code>ni to'g'ridan-to'g'ri chaqirsangiz — oddiy metod, joriy thread'da ishlaydi, parallellik yo'q. start()ni ikki marta chaqirish — IllegalThreadStateException.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Deadlock nima, qanday oldini olasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ikki+ thread bir-birining lock'ini siklik kutishi. 4 shart: mutual exclusion, hold-and-wait, no preemption, circular wait. Oldini olish: lock'larni global tartibda olish (circular wait'ni sindiradi), tryLock(timeout), bitta lock ostida ishlash, lock hold vaqtini qisqartirish. Aniqlash: jstack thread dump 'Found one Java-level deadlock'.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ExecutorService nima uchun? Thread pool o'lchami?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Thread yaratish/yo'q qilish qimmat; pool thread'larni qayta ishlatadi va navbatni boshqaradi. FixedThreadPool (chegarali), CachedThreadPool (chegarasiz — xavfli), ScheduledThreadPool, virtual (21). O'lcham: CPU-bound → yadro soni; I/O-bound → yadro × (1 + kutish/hisob vaqti). Har doim shutdown() / try-with-resources (21).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>CompletableFuture va Future farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Future — faqat get() (bloklaydi) va isDone(). CompletableFuture — zanjir (thenApply/thenCompose/thenCombine), xato boshqaruvi (exceptionally/handle), allOf/anyOf, timeout, manual complete(). Non-blocking kompozitsiya — bir nechta servisni parallel chaqirib birlashtirish.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ConcurrentHashMap qanday ishlaydi? HashMap'dan farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">HashMap thread-safe emas — parallel put'da ma'lumot yo'qolishi, hatto cheksiz sikl (Java 7) bo'lishi mumkin. ConcurrentHashMap: bucket darajasida lock (Java 8: CAS + synchronized per bin), o'qish lock'siz, iterator weakly-consistent (CME tashlamaydi). null kalit/qiymatga ruxsat yo'q. compute/merge atomik.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ThreadLocal nima, qayerda xavfli?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Har thread uchun alohida qiymat (Map<Thread, T> kabi). Spring Security'da SecurityContextHolder, tranzaksiya konteksti, MDC log. Xavf: thread pool'da thread qayta ishlatiladi — remove() qilinmasa eski foydalanuvchi ma'lumoti keyingi so'rovga 'o'tib' qoladi (leak + xavfsizlik). finally'da remove().</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>wait/notify va sleep farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">sleep — thread muddat kutadi, lock'ni QO'YMAYDI, Thread'ning static metodi. wait — monitor lock'ni bo'shatib, notify/notifyAll'ni kutadi, faqat synchronized ichida chaqiriladi, Object metodi. Zamonaviy kodda wait/notify o'rniga BlockingQueue, CountDownLatch, Condition ishlatiladi.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>count++ ni 2 thread bir vaqtda 1000 martadan bajarsa natija?</div><button class="opt">Doim 2000</button><button class="opt">2000 yoki kam — noaniq</button><button class="opt">Doim 1000</button><button class="opt">Exception</button><div class="q-fb" data-ok="To'g'ri. read-modify-write atomik emas — lost update bo'ladi. AtomicInteger yoki synchronized kerak." data-no="2000 dan kam bo'lishi mumkin va har safar boshqacha. count++ 3 amal — o'rtada boshqa thread aralashadi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>volatile boolean flag ga count++ qo'shsak thread-safe bo'ladimi?</div><button class="opt">Ha</button><button class="opt">Yo'q — volatile atomiklik bermaydi</button><button class="opt">Faqat int uchun ha</button><button class="opt">Faqat long uchun ha</button><div class="q-fb" data-ok="To'g'ri. volatile faqat ko'rinish. count++ uchun Atomic yoki lock." data-no="Yo'q. volatile o'qish/yozishni asosiy xotiradan qiladi, lekin o'qi-qo'sh-yoz uchligini atomik qilmaydi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>t.run() chaqirsak nima bo'ladi?</div><button class="opt">Yangi thread ochiladi</button><button class="opt">Joriy thread'da oddiy metod sifatida ishlaydi</button><button class="opt">Exception</button><button class="opt">Thread NEW holatda qoladi va hech narsa bo'lmaydi</button><div class="q-fb" data-ok="To'g'ri. Parallellik uchun start() kerak." data-no="run() — oddiy metod chaqiruvi, joriy thread'da. Yangi thread faqat start() bilan."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Deadlock'ning oldini olishning eng ishonchli usuli?</div><button class="opt">Ko'proq thread qo'shish</button><button class="opt">Lock'larni doim bir xil tartibda olish</button><button class="opt">sleep() qo'yish</button><button class="opt">volatile ishlatish</button><div class="q-fb" data-ok="To'g'ri. Global lock tartibi circular wait'ni imkonsiz qiladi." data-no="Lock tartibini standartlashtirish (masalan, id bo'yicha). sleep tasodifan yordam berishi mumkin, lekin yechim emas."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Ikki serverda ishlayotgan ilovada bitta hisobdan bir vaqtda yechishni synchronized to'xtatadimi?</div><button class="opt">Ha, to'liq</button><button class="opt">Yo'q — faqat bitta JVM ichida ishlaydi</button><button class="opt">Ha, agar static bo'lsa</button><button class="opt">Faqat ReentrantLock to'xtatadi</button><div class="q-fb" data-ok="To'g'ri. Ko'p instance uchun baza lock'i (SELECT FOR UPDATE / @Version) yoki distributed lock kerak." data-no="synchronized — JVM ichidagi monitor. Boshqa serverdagi thread uni ko'rmaydi. Baza darajasida lock kerak."></div></div>
+<div class="q" data-correct="2"><div class="q-txt"><span class="qn">6.</span>I/O-og'ir 1000 parallel so'rov uchun eng mos?</div><button class="opt">newFixedThreadPool(4)</button><button class="opt">Har so'rovga new Thread()</button><button class="opt">Virtual thread executor (Java 21)</button><button class="opt">Bitta thread, ketma-ket</button><div class="q-fb" data-ok="To'g'ri. Virtual thread I/O kutishda arzon. Java 21 gacha — kattaroq pool yoki async (WebFlux)." data-no="Virtual thread (newVirtualThreadPerTaskExecutor). 4 ta thread I/O'da tiqiladi, 1000 platform thread og'ir."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Advanced yakuni</span>
+      <h3>Xotira va Garbage Collector chuqur</h3>
+      <p>Eden, Survivor, Old — obyektlar qanday "qariydi". GC roots, xotira oqishi (memory leak) demo, G1/ZGC, OutOfMemoryError va -Xmx.</p>
+      <div class="topics"><span class="topic-pill">21 · Zamonaviy Java</span><span class="topic-pill now">22 · Konkurentlik</span><span class="topic-pill">23 · Xotira & GC</span><span class="topic-pill">24 · Spring DI</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="21-zamonaviy-java-8-21.html"><span class="cl">← Oldingi dars</span><span class="ct">21 · Zamonaviy Java 8→21</span><span class="cs">🚀 Advanced Java</span></a><a class="cn nx" href="23-xotira-va-gc.html"><span class="cl">Keyingi dars →</span><span class="ct">23 · Xotira va GC</span><span class="cs">🚀 Advanced Java</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:25.0%"></i></div><span>22 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(22)<0)v.push(22);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','22');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(22)<0)D[t].push(22);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* race */
+  var raceT=[],sync=false,balEl=document.getElementById('bal'),logEl=document.getElementById('raceLog'),lockIco=document.getElementById('lockIco'),lockWho=document.getElementById('lockWho');
+  var syncTog=document.getElementById('syncTog');syncTog.addEventListener('change',function(){sync=syncTog.checked;raceReset();});
+  function lines(t){return [].slice.call(document.querySelectorAll('#thr'+t+' .ln'));}
+  function setLine(t,i){lines(t).forEach(function(l,k){l.classList.toggle('cur',k===i);l.classList.toggle('done',k<i);});}
+  function log(html){logEl.innerHTML+=html+'<br>';logEl.scrollTop=logEl.scrollHeight;}
+  function st(t,s){document.getElementById('st'+t).textContent=s;var el=document.getElementById('thr'+t);el.classList.toggle('act',s==='RUNNABLE');el.classList.toggle('wait',s==='BLOCKED');}
+  function after(ms,fn){raceT.push(setTimeout(fn,ms));}
+  function raceReset(){raceT.forEach(clearTimeout);raceT=[];balEl.textContent='1000';balEl.classList.remove('neg');['1','2'].forEach(function(t){setLine(t,-1);st(t,'NEW');document.getElementById('b'+t).textContent='—';});lockIco.textContent='🔓';lockIco.classList.remove('held');lockWho.textContent='';logEl.innerHTML=sync?'synchronized yoqilgan. "Ishga tushir"ni bosing.':'Tayyor. "Ishga tushir"ni bosing.';}
+  document.getElementById('raceReset').addEventListener('click',raceReset);
+  document.getElementById('racePlay').addEventListener('click',function(){
+    raceReset();logEl.innerHTML='';
+    var bal=1000;
+    function lockTake(t){lockIco.textContent='🔒';lockIco.classList.add('held');lockWho.textContent='Thread-'+t+' ushlab turibdi';}
+    function lockFree(){lockIco.textContent='🔓';lockIco.classList.remove('held');lockWho.textContent='';}
+    if(!sync){
+      after(0,function(){st('1','RUNNABLE');st('2','RUNNABLE');setLine('1',1);setLine('2',-1);document.getElementById('b1').textContent='1000';log('<span class="t1">T1</span> o\'qidi: b = 1000');});
+      after(900,function(){setLine('2',1);document.getElementById('b2').textContent='1000';log('<span class="t2">T2</span> o\'qidi: b = 1000 &nbsp;← T1 hali yozmagan!');});
+      after(1800,function(){setLine('1',2);log('<span class="t1">T1</span> tekshirdi: 1000 ≥ 600 ✓');});
+      after(2500,function(){setLine('2',2);log('<span class="t2">T2</span> tekshirdi: 1000 ≥ 600 ✓ &nbsp;(eskirgan qiymat)');});
+      after(3300,function(){setLine('1',3);bal=400;balEl.textContent='400';log('<span class="t1">T1</span> yozdi: balans = 1000 − 600 = <b>400</b>');});
+      after(4200,function(){setLine('2',3);bal=400;balEl.textContent='400';log('<span class="t2">T2</span> yozdi: balans = 1000 − 600 = <b>400</b> &nbsp;← T1\'ning yechgani "yo\'qoldi"');});
+      after(5100,function(){setLine('1',5);setLine('2',5);st('1','TERMINATED');st('2','TERMINATED');log('<span class="bad">Natija: balans 400, lekin 1 200 so\'m yechildi. Bank 800 so\'m yo\'qotdi. Yoki boshqa aralashuvda −200 (overdraft).</span>');balEl.textContent='400 (−800 yo\'q)';balEl.classList.add('neg');});
+    } else {
+      after(0,function(){st('1','RUNNABLE');st('2','RUNNABLE');setLine('1',0);lockTake(1);log('<span class="t1">T1</span> lock oldi');});
+      after(700,function(){setLine('2',0);st('2','BLOCKED');log('<span class="t2">T2</span> lock so\'radi → <b>BLOCKED</b>, kutadi');});
+      after(1400,function(){setLine('1',1);document.getElementById('b1').textContent='1000';log('<span class="t1">T1</span> o\'qidi: b = 1000');});
+      after(2100,function(){setLine('1',2);log('<span class="t1">T1</span> tekshirdi ✓');});
+      after(2800,function(){setLine('1',3);balEl.textContent='400';log('<span class="t1">T1</span> yozdi: balans = <b>400</b>');});
+      after(3500,function(){setLine('1',4);lockFree();setLine('1',5);st('1','TERMINATED');log('<span class="t1">T1</span> lock bo\'shatdi');});
+      after(4000,function(){st('2','RUNNABLE');lockTake(2);setLine('2',1);document.getElementById('b2').textContent='400';log('<span class="t2">T2</span> lock oldi, o\'qidi: b = <b>400</b> (yangi qiymat!)');});
+      after(4800,function(){setLine('2',2);log('<span class="t2">T2</span> tekshirdi: 400 ≥ 600 ✗ → rad etildi');});
+      after(5500,function(){setLine('2',4);lockFree();setLine('2',5);st('2','TERMINATED');log('<span class="good">Natija: balans 400, faqat 600 yechildi. To\'g\'ri ✓ (lekin T2 kutdi — lock narxi)</span>');});
+    }
+  });
+
+  /* lifecycle */
+  var lifeN=['<b>NEW</b> — obyekt yaratildi, hali start() chaqirilmagan. OS thread yo\'q.','<b>RUNNABLE</b> — ishga tayyor yoki ishlayapti (JVM ikkisini farqlamaydi; OS scheduler CPU beradi).','<b>BLOCKED</b> — synchronized blokka kirmoqchi, lekin monitor boshqa thread\'da. Race demo\'da T2 shunday kutdi.','<b>WAITING</b> — wait(), join(), LockSupport.park(). Boshqa thread notify/unpark qilguncha. TIMED_WAITING — sleep(ms), wait(ms), join(ms).','<b>TERMINATED</b> — run() tugadi yoki exception. Qayta start() qilib bo\'lmaydi (IllegalThreadStateException).'];
+  [].slice.call(document.querySelectorAll('#life .ls')).forEach(function(el){el.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#life .ls')).forEach(function(x){x.classList.toggle('sel',x===el);});document.getElementById('lifeNote').innerHTML=lifeN[+el.dataset.i];});});
+
+  /* inc */
+  document.getElementById('incPlay').addEventListener('click',function(){
+    var a=0,b=0,i=0,lost=0,incA=document.getElementById('incA'),incB=document.getElementById('incB'),barA=document.getElementById('barA'),barB=document.getElementById('barB');
+    incA.className='big';incB.className='big';
+    var iv=setInterval(function(){
+      for(var k=0;k<40;k++){i++;b++;if(Math.random()<0.18){lost++;}else{a++;}}
+      incA.textContent=a;incB.textContent=b;barA.style.width=(i/2000*100)+'%';barB.style.width=(i/2000*100)+'%';
+      if(i>=2000){clearInterval(iv);incA.classList.add('bad');incB.classList.add('ok');document.getElementById('incNote').innerHTML='count++ natijasi: <b>'+a+'</b> — '+lost+' ta qo\'shish yo\'qoldi (ikki thread bir xil eski qiymatni o\'qib, bir xil yangi qiymatni yozdi). AtomicInteger: <b>2000</b> ✓. Yana bosing — chap natija har safar boshqacha, bu race condition\'ning belgisi: <b>tasodifiy, qayta chiqarish qiyin</b>.';}
+    },30);
+  });
+
+  /* cf */
+  document.getElementById('cfPlay').addEventListener('click',function(){
+    var seq=document.getElementById('laneSeq'),par=document.getElementById('lanePar');var W=1200;
+    function seg(cls,l,w,txt){var s=document.createElement('div');s.className='seg '+cls;s.style.left=(l/W*100)+'%';s.textContent=txt;return s;}
+    seq.innerHTML='';par.innerHTML='';
+    var s1=seg('a',0,300,'profil 300'),s2=seg('b',300,500,'hisoblar 500'),s3=seg('c',800,400,'kartalar 400');seq.appendChild(s1);seq.appendChild(s2);seq.appendChild(s3);
+    var p1=seg('a',0,300,'profil'),p2=seg('b',0,500,'hisoblar 500'),p3=seg('c',0,400,'kartalar');par.appendChild(p1);par.appendChild(p2);par.appendChild(p3);
+    p2.style.top='2px';p1.style.top='2px';p3.style.top='2px';p1.style.height='5px';p3.style.height='5px';p1.style.top='2px';p3.style.top='15px';p2.style.top='8px';p2.style.height='5px';
+    setTimeout(function(){s1.style.width=(300/W*100)+'%';},50);setTimeout(function(){s2.style.width=(500/W*100)+'%';},650);setTimeout(function(){s3.style.width=(400/W*100)+'%';},1250);
+    setTimeout(function(){p1.style.width=(300/W*100)+'%';p2.style.width=(500/W*100)+'%';p3.style.width=(400/W*100)+'%';},50);
+    setTimeout(function(){document.getElementById('cfTotal').innerHTML='Ketma-ket: <b>1200 ms</b> (300+500+400) · Parallel: <b>500 ms</b> (eng uzuni) — 2.4× tez. Foydalanuvchi sahifani 0.5 s\'da ko\'radi.';},1900);
+  });
+
+  /* deadlock */
+  var dlT=[];
+  function dlAfter(ms,fn){dlT.push(setTimeout(fn,ms));}
+  function dlLine(t,i,blocked){[].slice.call(document.querySelectorAll('#dt'+t+' .ln')).forEach(function(l,k){l.classList.toggle('cur',k===i&&!blocked);l.classList.toggle('blocked',k===i&&!!blocked);l.classList.toggle('done',k<i);});}
+  function dlReset(){dlT.forEach(clearTimeout);dlT=[];dlLine(1,-1);dlLine(2,-1);['A','B'].forEach(function(x){var lb=document.getElementById('lock'+x);lb.className='lockbox';document.getElementById('own'+x).textContent='bo\'sh';});document.getElementById('dead').classList.remove('show');document.getElementById('dt2l0').textContent='lock(B)';document.getElementById('dt2l1').textContent='lock(A)';document.getElementById('dlNote').innerHTML='Yechim: lock\'larni <b>doim bir xil tartibda</b> oling (masalan, hisob ID bo\'yicha kichigini birinchi). Yoki <code>tryLock(timeout)</code>. Bazada ham xuddi shu: UPDATE\'larni id tartibida bajaring.';}
+  function own(x,t){var lb=document.getElementById('lock'+x);lb.className='lockbox'+(t?' t'+t:'');document.getElementById('own'+x).textContent=t?'T'+t+' ushlab turibdi':'bo\'sh';}
+  document.getElementById('dlReset').addEventListener('click',dlReset);
+  document.getElementById('dlPlay').addEventListener('click',function(){dlReset();
+    dlAfter(0,function(){dlLine(1,0);own('A',1);});dlAfter(600,function(){dlLine(2,0);own('B',2);});
+    dlAfter(1300,function(){dlLine(1,1,true);});dlAfter(1900,function(){dlLine(2,1,true);});
+    dlAfter(2600,function(){document.getElementById('dead').classList.add('show');});});
+  document.getElementById('dlFix').addEventListener('click',function(){dlReset();document.getElementById('dt2l0').textContent='lock(A)  ← tartib: avval A';document.getElementById('dt2l1').textContent='lock(B)';
+    dlAfter(0,function(){dlLine(1,0);own('A',1);});dlAfter(600,function(){dlLine(2,0,true);document.getElementById('dlNote').innerHTML='T2 ham avval A\'ni so\'raydi → T1 tugaguncha <b>kutadi</b> (BLOCKED, lekin deadlock emas).';});
+    dlAfter(1300,function(){dlLine(1,1);own('B',1);});dlAfter(2000,function(){dlLine(1,2);own('A',null);own('B',null);dlLine(1,3);});
+    dlAfter(2600,function(){dlLine(2,0);own('A',2);});dlAfter(3200,function(){dlLine(2,1);own('B',2);});dlAfter(3800,function(){dlLine(2,2);own('A',null);own('B',null);dlLine(2,3);document.getElementById('dlNote').innerHTML='<b>Ikkalasi ham tugadi ✓.</b> Qoida: hamma joyda lock\'lar bir xil global tartibda — deadlock bo\'lishi mumkin emas (siklik kutish yo\'q).';});});
+
+})();
+</script>
+</body>
+</html>

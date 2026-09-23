@@ -1,0 +1,61 @@
+{
+  "realm": "bank",
+  "enabled": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "bruteForceProtected": true,
+  "roles": {
+    "realm": [
+      { "name": "MIJOZ" },
+      { "name": "KASSIR" },
+      { "name": "ADMIN" }
+    ],
+    "client": {
+      "tolov-service": [ { "name": "transfer.create" }, { "name": "transfer.read" } ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "internet-bank",
+      "publicClient": false,
+      "secret": "ib-secret-change-me",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:8081/login/oauth2/code/keycloak"],
+      "webOrigins": ["http://localhost:8081"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    },
+    {
+      "clientId": "mobile-app",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["uz.bank.app://callback"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    },
+    {
+      "clientId": "tolov-service",
+      "publicClient": false,
+      "secret": "svc-secret-change-me",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true
+    }
+  ],
+  "users": [
+    {
+      "username": "otabek",
+      "email": "otabek@bank.uz",
+      "firstName": "Otabek",
+      "emailVerified": true,
+      "enabled": true,
+      "attributes": { "filial_id": ["12"] },
+      "credentials": [ { "type": "password", "value": "otabek123", "temporary": false } ],
+      "realmRoles": ["MIJOZ"]
+    },
+    {
+      "username": "service-account-tolov-service",
+      "enabled": true,
+      "serviceAccountClientId": "tolov-service",
+      "clientRoles": { "tolov-service": ["transfer.read"] }
+    }
+  ]
+}

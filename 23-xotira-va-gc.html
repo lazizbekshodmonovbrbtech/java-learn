@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xotira va GC</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* heap */
+.heap{display:grid;grid-template-columns:2fr 1fr 1fr 2.2fr;gap:8px;margin-top:14px}
+.reg{background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;padding:8px;min-height:150px;transition:.3s}
+.reg.flash{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.reg h5{font-family:var(--font-mono);font-size:11px;margin:0 0 6px;color:var(--ink-soft);display:flex;justify-content:space-between}
+.reg h5 b{color:var(--accent-ink)}
+.cells{display:flex;flex-wrap:wrap;gap:3px}
+.ob{width:16px;height:16px;border-radius:4px;background:var(--purple);transition:.3s;animation:pop .3s;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-family:var(--font-mono)}
+.ob.dead{background:var(--border-strong);opacity:.6}
+.ob.old{background:var(--accent)}
+.ob.a1{background:#6f67c9}.ob.a2{background:#8a83d6}.ob.a3{background:#a49ee0}
+.gcstat{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-family:var(--font-mono);font-size:12px}
+.gcstat span{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 10px}
+.gcstat b{color:var(--accent-ink)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--ink-soft);font-family:var(--font-mono)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+
+/* graph */
+.graph{position:relative;height:300px;margin-top:14px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+.graph svg{position:absolute;inset:0;width:100%;height:100%}
+.graph .node{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--purple);background:var(--purple-soft);color:var(--purple-ink);border-radius:10px;padding:5px 9px;font-family:var(--font-mono);font-size:11.5px;cursor:pointer;transition:.35s;white-space:nowrap}
+.graph .node.root{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);border-radius:999px;cursor:default}
+.graph .node.dead{border-color:var(--border-strong);background:var(--sunken);color:var(--ink-faint);border-style:dashed}
+.graph .node.gone{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+.graph line{stroke:var(--purple);stroke-width:2;transition:.35s}
+.graph line.cut{stroke:var(--coral);stroke-dasharray:4 4;opacity:.5}
+.graph line.dead{stroke:var(--border-strong);stroke-dasharray:3 3}
+.graph line.gone{opacity:0}
+.graph .hint{position:absolute;bottom:6px;right:10px;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+
+/* leak chart */
+.chart{position:relative;height:200px;margin-top:14px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+.chart svg{width:100%;height:100%}
+.chart .max{position:absolute;top:8px;right:10px;font-family:var(--font-mono);font-size:10.5px;color:var(--coral)}
+.chart path{fill:none;stroke-width:2.5}
+.chart .fillp{fill:var(--accent-soft);stroke:none;opacity:.6}
+.oom{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(180,71,31,.12);font-family:var(--font-mono);font-weight:700;color:var(--coral);font-size:15px;opacity:0;transition:.4s;pointer-events:none}
+.oom.show{opacity:1}
+
+/* gc table bars */
+.gcb{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.gcr{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;font-family:var(--font-mono);font-size:12px}
+.gcr .pb{height:14px;background:var(--sunken);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.gcr .pb i{display:block;height:100%;background:var(--coral);width:0;transition:width .8s}
+.gcr .pb i.g{background:var(--teal)}
+.gcr .d{color:var(--ink-soft);text-align:right}
+@media (max-width:560px){.heap{grid-template-columns:1fr 1fr}.gcr{grid-template-columns:90px 1fr 70px}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#7A4B8C"></span> Advanced Java · 3/3</span><span>· Kurs: 23/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Advanced · 23-modul · noldan</span>
+    <h1>Xotira va Garbage Collector<span class="steam">.</span></h1>
+    <p class="lead">Java'da xotirani qo'lda bo'shatmaysiz — GC qiladi. Lekin "avtomatik" degani "o'ylamasa bo'ladi" emas: memory leak, OutOfMemoryError, uzun GC pauzalar — hammasi shu yerdan. Bu modulda obyektlarning butun hayotini ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Heap: obyektlar qanday "qariydi"</h2></div>
+    <p class="sec-sub">Gipoteza: obyektlarning ko'pi <b>yosh o'ladi</b> (so'rov tugadi — DTO kerak emas). Shuning uchun heap avlodlarga bo'lingan. Yangi obyekt Eden'ga tushadi. Eden to'lsa — <b>Minor GC</b>: tiriklar Survivor'ga ko'chadi, o'liklar tashlanadi. Bir necha GC'dan omon qolgan — Old'ga.</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="hPlay">▶ Avto</button><button class="ctl wide" id="hAlloc">+ 6 obyekt</button><button class="ctl wide" id="hReset">Boshidan</button></div>
+      <div class="heap">
+        <div class="reg" id="rEden"><h5>Eden <b id="nEden">0/24</b></h5><div class="cells" id="cEden"></div></div>
+        <div class="reg" id="rS0"><h5>S0 <b id="nS0">0</b></h5><div class="cells" id="cS0"></div></div>
+        <div class="reg" id="rS1"><h5>S1 <b id="nS1">0</b></h5><div class="cells" id="cS1"></div></div>
+        <div class="reg" id="rOld"><h5>Old <b id="nOld">0</b></h5><div class="cells" id="cOld"></div></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--purple)"></i>yosh (raqam = yosh)</span><span><i style="background:var(--border-strong)"></i>o'lik (havola yo'q)</span><span><i style="background:var(--accent)"></i>Old'da</span></div>
+      <div class="gcstat"><span>Minor GC: <b id="gMinor">0</b></span><span>Old'ga ko'chdi: <b id="gProm">0</b></span><span>Tashlandi: <b id="gFree">0</b></span><span>Chegara yosh: <b>3</b></span></div>
+      <div class="demo-note" id="hNote">"+ 6 obyekt" — so'rov keldi, DTO/String'lar yaratildi. Eden to'lganda Minor GC bo'ladi.</div>
+    </div>
+    <div class="callout iv"><div class="ct">Suhbatda so'raladi</div><b>Minor GC</b> — Young (Eden+Survivor), tez, tez-tez. <b>Major/Full GC</b> — Old ham, sekin, "stop-the-world" uzunroq. Survivor ikkita (S0/S1) — ko'chirish (copying) fragmentatsiyasiz bo'lishi uchun: har GC'da tiriklar bittasidan ikkinchisiga ko'chadi, birinchisi to'liq bo'shaydi. Yosh chegarasi (tenuring threshold) default ~15, JVM moslashtiradi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>GC nimani "axlat" deydi? Reachability</h2></div>
+    <p class="sec-sub">GC hisoblagich sanamaydi. U <b>ildizlardan</b> (GC roots: thread stek'idagi lokal o'zgaruvchilar, static maydonlar) boshlab havolalar bo'ylab yuradi. Yetib bo'lmagan hamma narsa — axlat, hatto bir-biriga havola qilsa ham. Havolani <b>bosib uzing</b>.</p>
+    <div class="graph" id="graph">
+      <svg id="gsvg"></svg>
+      <div class="hint">obyektni bosing → unga kelgan havola uziladi</div>
+    </div>
+    <div class="controls"><button class="ctl wide" id="gGc">🧹 GC ishga tushir</button><button class="ctl wide" id="gReset">Boshidan</button></div>
+    <div class="demo-note" id="gNote">Yashil — GC roots (stek o'zgaruvchisi, static). Binafsha — heap obyektlari. Hozir hammasi yetib boriladigan (reachable).</div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Roots.java</span></div>
+      <pre class="code"><span class="k">static</span> <span class="ty">Map</span>&lt;String, Mijoz&gt; kesh = <span class="k">new</span> HashMap&lt;&gt;();   <span class="cm">// GC root: static → hech qachon o'lmaydi</span>
+
+<span class="k">void</span> ishla() {
+    <span class="ty">Mijoz</span> m = repo.top(<span class="nu">1</span>);        <span class="cm">// GC root: stek'dagi lokal o'zgaruvchi</span>
+    m.manzil = <span class="k">new</span> Manzil();        <span class="cm">// m orqali yetib boriladi</span>
+    m = <span class="k">null</span>;                       <span class="cm">// havola uzildi → Mijoz VA Manzil axlat (Manzil'ga boshqa yo'l yo'q)</span>
+}                                   <span class="cm">// metod tugadi → stek freymi yo'q → hamma lokal havola yo'q</span>
+<span class="cm">// System.gc() — faqat "iltimos", kafolat yo'q. Ishlab chiqarishda chaqirmang.</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Memory leak: GC bor, lekin xotira tugaydi</h2></div>
+    <p class="sec-sub">Java'da leak — "unutilgan havola": obyekt kerak emas, lekin kimdir (static kesh, listener, ThreadLocal) uni ushlab turibdi. GC uni tirik deb hisoblaydi. Har so'rovda static keshga qo'shamiz va hech qachon o'chirmaymiz:</p>
+    <div class="demo">
+      <div class="controls">
+        <div class="seg" id="leakSeg"><button class="on" data-m="leak">static kesh, o'chirilmaydi</button><button data-m="ok">chegarali kesh (LRU / TTL)</button></div>
+        <button class="ctl primary" id="leakPlay">▶ So'rovlar oqimi</button>
+      </div>
+      <div class="chart"><svg id="lsvg" viewBox="0 0 600 200" preserveAspectRatio="none"><line x1="0" y1="20" x2="600" y2="20" stroke="var(--coral)" stroke-dasharray="4 4" stroke-width="1"/><path class="fillp" id="lfill"/><path id="lpath" stroke="var(--accent)"/></svg><div class="max">-Xmx (maksimal heap)</div><div class="oom" id="oom">java.lang.OutOfMemoryError: Java heap space</div></div>
+      <div class="demo-note" id="leakNote">Grafik — heap band hajmi. Arra tishlari — GC bo'shatgan joylar. Leak'da har tish avvalgisidan balandroq: <b>baseline o'sib boradi</b>. Bu — leak'ning klassik belgisi.</div>
+    </div>
+    <div class="grid2">
+      <div class="card bad"><h4>Tipik leak manbalari</h4><pre>static List/Map — cheksiz o'sadi
+Listener/callback — unregister yo'q
+ThreadLocal — pool'da remove() yo'q
+Ochilmagan resurs — Connection, Stream
+Ichki (non-static) class → tashqi obyektni ushlaydi
+HashMap kaliti mutable — topib o'chirib bo'lmaydi</pre></div>
+      <div class="card good"><h4>Yechim va aniqlash</h4><pre>Chegarali kesh: Caffeine (maximumSize, expireAfter)
+WeakHashMap / WeakReference — GC olib ketishi mumkin
+try-with-resources
+-XX:+HeapDumpOnOutOfMemoryError
+jcmd &lt;pid&gt; GC.heap_info · jmap -histo
+Heap dump → Eclipse MAT / VisualVM: "Leak suspects"</pre></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>GC algoritmlari: pauza vs o'tkazuvchanlik</h2></div>
+    <p class="sec-sub">Hamma GC "stop-the-world" (STW) qiladi — dastur to'xtaydi. Farq: qancha va qanchalik tez-tez. 8 GB heap uchun taxminiy pauza:</p>
+    <div class="demo">
+      <div class="controls"><button class="ctl primary" id="gcbPlay">▶ Taqqosla</button></div>
+      <div class="gcb" id="gcb"></div>
+      <div class="demo-note">Bank API'da SLA 200ms bo'lsa, 2 soniyalik Full GC = timeout. Java 17+ default <b>G1</b>: heap'ni regionlarga bo'lib, eng "axlatli" regionlarni birinchi yig'adi (Garbage-First), pauza maqsadi <code>-XX:MaxGCPauseMillis=200</code>. <b>ZGC</b> — heap hajmidan qat'i nazar &lt;1ms pauza, parallel (concurrent) ishlaydi, CPU ko'proq yeydi.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>JVM sozlamalari va OOM turlari</h2></div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>Flag</th><th>Ma'no</th><th>Maslahat</th></tr>
+      <tr><td><code>-Xms2g -Xmx2g</td><td>Boshlang'ich / maksimal heap</td><td>Konteynerda teng qiling (resize yo'q). Konteyner limitining ~75%; JVM 10+ <code>-XX:MaxRAMPercentage=75</code> avtomatik.</td></tr>
+      <tr><td><code>-XX:+UseG1GC / UseZGC</code></td><td>GC tanlash</td><td>17+ default G1. Kechikish muhim, heap katta → ZGC.</td></tr>
+      <tr><td><code>-XX:MaxMetaspaceSize</code></td><td>Klass metadata chegarasi</td><td>Default chegarasiz; classloader leak (hot redeploy) bo'lsa o'sadi.</td></tr>
+      <tr><td><code>-Xss512k</code></td><td>Thread stek hajmi</td><td>Default ~1MB. Chuqur rekursiya → StackOverflowError.</td></tr>
+      <tr><td><code>-Xlog:gc*:file=gc.log</code></td><td>GC log</td><td>Prod'da doim yoqing — pauzalarni tahlil qilish uchun.</td></tr>
+      <tr><td><code>-XX:+HeapDumpOnOutOfMemoryError</code></td><td>OOM'da heap dump</td><td>+ <code>-XX:HeapDumpPath=/dumps</code>. Leak tahlili uchun.</td></tr>
+    </table></div>
+    <div class="grid2">
+      <div class="card"><h4>OutOfMemoryError turlari</h4><pre><b>Java heap space</b> — heap to'ldi (leak yoki -Xmx kichik)
+<b>GC overhead limit exceeded</b> — 98% vaqt GC, 2% ish
+<b>Metaspace</b> — juda ko'p klass (classloader leak)
+<b>unable to create native thread</b> — OS thread chegarasi
+<b>Direct buffer memory</b> — NIO off-heap</pre><div class="why">OOM — Error, ushlab davom etish odatda ma'nosiz. Dump oling, tahlil qiling.</div></div>
+      <div class="card"><h4>Kuzatuv (observability)</h4><pre>jcmd &lt;pid&gt; GC.heap_info
+jcmd &lt;pid&gt; Thread.print   (deadlock ham)
+jmap -dump:live,format=b,file=h.hprof &lt;pid&gt;
+jstat -gcutil &lt;pid&gt; 1000
+Spring Actuator + Micrometer → Grafana:
+  jvm_memory_used_bytes, jvm_gc_pause_seconds</pre><div class="why">Prod'da GC pauzalar va heap trend — dashboard'da bo'lsin.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JVM xotira sohalari qaysilar?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Heap</b> (obyektlar; Young: Eden+S0+S1, Old), <b>Metaspace</b> (klass metadata, Java 8+ native xotirada, ilgari PermGen), <b>Thread stack</b> (har thread'ga freymlar, lokal o'zgaruvchilar, primitivlar va havolalar), <b>PC register</b>, <b>Native method stack</b>, <b>Code cache</b> (JIT kompilyatsiya qilingan kod). String pool — Java 7+ heap'da.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>GC qanday ishlaydi? Mark-sweep-compact?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">1) <b>Mark</b>: GC roots'dan (stek lokal o'zgaruvchilar, static maydonlar, JNI, aktiv thread'lar) havolalar bo'ylab yurib, tiriklarni belgilaydi. 2) <b>Sweep</b>: belgilanmaganlarni bo'shatadi. 3) <b>Compact</b>: tiriklarni zichlab fragmentatsiyani yo'qotadi. Young'da 'copying' (tiriklarni Survivor'ga ko'chirish — o'liklar ko'p bo'lgani uchun arzon). Reference counting ishlatilmaydi — siklik havolalar muammo emas.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nega heap avlodlarga bo'lingan?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">'Generational hypothesis': ko'p obyektlar tez o'ladi (so'rov davomidagi DTO, String). Yosh avlodni tez-tez, kichik, arzon GC qilish (Minor) — tiriklari kam, ko'chirish oson. Uzoq yashaganlar Old'ga o'tadi va kam yig'iladi. Natija: umumiy pauza kam.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Minor va Major/Full GC farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Minor — faqat Young (Eden to'lganda), tez (ms), tez-tez. Major — Old avlod; Full — butun heap + Metaspace, sekin (100ms–soniyalar), STW uzoq. Tez-tez Full GC — Old to'lib borayotgani belgisi: leak, katta kesh, yoki -Xmx kichik.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Memory leak Java'da qanday bo'ladi? Qanday topasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Kerak bo'lmagan obyektga havola saqlanib qoladi: static kolleksiya, unregister qilinmagan listener, ThreadLocal.remove() yo'q, yopilmagan resurs, non-static ichki klass. Belgisi: GC'dan keyin heap baseline o'sib boradi, oxiri OOM. Topish: <code>-XX:+HeapDumpOnOutOfMemoryError</code>, heap dump → Eclipse MAT 'dominator tree / leak suspects', jmap -histo bilan klasslar sonini solishtirish.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Strong, Soft, Weak, Phantom reference?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Strong</b> — oddiy havola, hech qachon yig'ilmaydi. <b>Soft</b> — xotira yetishmasa yig'iladi (kesh uchun). <b>Weak</b> — keyingi GC'da yig'iladi agar faqat weak havola qolsa (WeakHashMap, kanonik map). <b>Phantom</b> — obyekt yig'ilganini bilish uchun (resurs tozalash, Cleaner API). finalize() — deprecated, ishlatmang.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>G1 va ZGC farqi? Qaysi birini tanlaysiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">G1 (default 9+): heap'ni ~2048 regionga bo'ladi, eng ko'p axlatli regionlarni birinchi yig'adi, pauza maqsadi sozlanadi (MaxGCPauseMillis), ko'p ish concurrent, lekin evacuation STW. ZGC (15+ production): deyarli hamma ish concurrent, pauza <1ms heap hajmidan qat'i nazar (TB gacha), colored pointers, lekin CPU/throughput ~10% ko'proq. Kechikish kritik (to'lov API) va heap katta → ZGC; umumiy holat → G1.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Stack va heap farqi? StackOverflowError qachon?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Stack — har thread'ga alohida, LIFO freymlar, lokal primitivlar va havolalar, metod tugashi bilan avtomatik bo'shaydi, GC kerak emas. Heap — barcha thread'larga umumiy, obyektlar, GC boshqaradi. StackOverflowError — chuqur/cheksiz rekursiya (stek ~1MB tugadi). OOM — heap tugadi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>String pool va intern()?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">String literallari heap'dagi maxsus pool'da saqlanadi — bir xil literal bitta obyekt. <code>new String("a")</code> pool'dan tashqarida yangi obyekt. <code>intern()</code> pool'dagi nusxani qaytaradi. Ko'p takrorlanadigan string (valyuta kodi) uchun xotira tejaydi; G1'da <code>-XX:+UseStringDeduplication</code> avtomatik.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Konteynerda JVM xotirasini qanday sozlaysiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Konteyner limitini JVM 10+ ko'radi. <code>-XX:MaxRAMPercentage=75</code> (heap) — qolgan 25% Metaspace, thread stek, off-heap, GC uchun. Xms=Xmx qiling (resize pauzalarini oldini oladi). Actuator/Micrometer bilan jvm_memory_used va GC pauzalarni kuzating. OOM'da konteyner o'ladi (OOMKilled) — bu heap OOM'dan farq qiladi: JVM konteyner limitidan oshdi.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Ikki obyekt bir-biriga havola qiladi, lekin GC root'dan yo'l yo'q. Nima bo'ladi?</div><button class="opt">Hech qachon yig'ilmaydi</button><button class="opt">Yig'iladi — reachability bo'yicha ular axlat</button><button class="opt">Faqat Full GC'da</button><button class="opt">Memory leak</button><div class="q-fb" data-ok="To'g'ri. Java reachability ishlatadi, reference counting emas — sikllar muammo emas." data-no="Yig'iladi. GC ildizlardan yuradi; sikl ichida bo'lsa ham yetib bo'lmasa — axlat."></div></div>
+<div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>Yangi obyekt qayerga tushadi?</div><button class="opt">Old</button><button class="opt">Survivor S0</button><button class="opt">Eden</button><button class="opt">Metaspace</button><div class="q-fb" data-ok="To'g'ri. Eden'ga (juda katta massivlar to'g'ridan-to'g'ri Old'ga tushishi mumkin)." data-no="Eden. Survivor'ga faqat Minor GC'dan omon qolganlar ko'chadi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Heap grafigi har GC'dan keyin avvalgidan balandroq minimumga tushadi. Bu nima?</div><button class="opt">Normal</button><button class="opt">Memory leak belgisi</button><button class="opt">GC ishlamayapti</button><button class="opt">Xms kichik</button><div class="q-fb" data-ok="To'g'ri. O'sib boruvchi baseline — kimdir obyektlarni ushlab turibdi." data-no="Memory leak belgisi. Sog'lom ilovada baseline barqaror bo'ladi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Chuqur rekursiya qaysi xatoni beradi?</div><button class="opt">OutOfMemoryError: heap</button><button class="opt">StackOverflowError</button><button class="opt">GC overhead limit</button><button class="opt">Metaspace</button><div class="q-fb" data-ok="To'g'ri. Thread steki tugadi." data-no="StackOverflowError — stek freymlar heap'da emas, stek'da. -Xss bilan hajmi sozlanadi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>System.gc() chaqirish nima qiladi?</div><button class="opt">Darhol GC qiladi</button><button class="opt">Faqat 'iltimos' — JVM e'tiborsiz qoldirishi mumkin</button><button class="opt">Heap'ni tozalab Xmx'ni kamaytiradi</button><button class="opt">Exception</button><div class="q-fb" data-ok="To'g'ri. Kafolat yo'q, prod'da chaqirmang (Full GC pauzasi)." data-no="Bu faqat tavsiya. -XX:+DisableExplicitGC bilan butunlay o'chiriladi."></div></div>
+<div class="q" data-correct="2"><div class="q-txt"><span class="qn">6.</span>To'lov API'da p99 kechikish 50ms bo'lishi kerak, heap 16GB. Qaysi GC?</div><button class="opt">Serial</button><button class="opt">Parallel</button><button class="opt">ZGC</button><button class="opt">CMS</button><div class="q-fb" data-ok="To'g'ri. ZGC — heap hajmidan qat'i nazar <1ms pauza." data-no="ZGC. Parallel — throughput uchun, pauzalar uzun. CMS o'chirilgan (14). G1 ham yaxshi, lekin 16GB'da pauzalar 50ms'dan oshishi mumkin."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Java yakunlandi ✓ · Keyingi trek: Spring Boot</span>
+      <h3>Spring Boot: IoC va Dependency Injection</h3>
+      <p>Java mustahkam. Endi freymvork: Spring konteyner obyektlarni o'zi yaratadi va bog'laydi. @Component, @Autowired, bean hayot sikli, scope — jonli konteyner animatsiyasi bilan.</p>
+      <div class="topics"><span class="topic-pill">22 · Konkurentlik</span><span class="topic-pill now">23 · Xotira & GC</span><span class="topic-pill">24 · Spring DI</span><span class="topic-pill">25 · Konfiguratsiya</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="22-konkurentlik.html"><span class="cl">← Oldingi dars</span><span class="ct">22 · Konkurentlik</span><span class="cs">🚀 Advanced Java</span></a><a class="cn nx" href="24-spring-boot-va-di.html"><span class="cl">Keyingi dars →</span><span class="ct">24 · Spring Boot va DI</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:26.1%"></i></div><span>23 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(23)<0)v.push(23);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','23');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(23)<0)D[t].push(23);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* heap sim */
+  var E=24,eden=[],s=[[],[]],svi=0,old=[],stats={minor:0,prom:0,free:0},auto=null,nextId=1;
+  function ob(o){return '<div class="ob '+(o.age>=1?'a'+Math.min(o.age,3):'')+(o.dead?' dead':'')+(o.old?' old':'')+'" title="#'+o.id+'">'+(o.old?'':o.age||'')+'</div>';}
+  function draw(){
+    document.getElementById('cEden').innerHTML=eden.map(ob).join('');document.getElementById('nEden').textContent=eden.length+'/'+E;
+    document.getElementById('cS0').innerHTML=s[0].map(ob).join('');document.getElementById('nS0').textContent=s[0].length;
+    document.getElementById('cS1').innerHTML=s[1].map(ob).join('');document.getElementById('nS1').textContent=s[1].length;
+    document.getElementById('cOld').innerHTML=old.map(ob).join('');document.getElementById('nOld').textContent=old.length;
+    document.getElementById('gMinor').textContent=stats.minor;document.getElementById('gProm').textContent=stats.prom;document.getElementById('gFree').textContent=stats.free;
+  }
+  function flash(id){var r=document.getElementById(id);r.classList.add('flash');setTimeout(function(){r.classList.remove('flash');},500);}
+  function alloc(n){var added=0;while(added<n&&eden.length<E){eden.push({id:nextId++,age:0});added++;}draw();flash('rEden');
+    if(eden.length>=E){document.getElementById('hNote').innerHTML='Eden to\'ldi → <b>Minor GC</b> boshlanmoqda…';setTimeout(minorGC,700);}else{document.getElementById('hNote').innerHTML='Eden: '+eden.length+'/'+E+'. Ajratish juda tez — TLAB (thread-local buffer) ichida shunchaki ko\'rsatkichni surish.';}}
+  function minorGC(){
+    // mark dead: ~70% eden dies, ~35% survivor dies
+    eden.forEach(function(o){o.dead=Math.random()<0.7;});s[svi].forEach(function(o){o.dead=Math.random()<0.35;});draw();
+    setTimeout(function(){
+      var to=1-svi,freed=0,prom=0;var live=eden.concat(s[svi]).filter(function(o){if(o.dead){freed++;return false;}return true;});
+      s[to]=[];live.forEach(function(o){o.age++;if(o.age>=3){o.old=true;old.push(o);prom++;}else s[to].push(o);});
+      eden=[];s[svi]=[];svi=to;stats.minor++;stats.free+=freed;stats.prom+=prom;draw();flash('rS'+svi);if(prom)flash('rOld');
+      document.getElementById('hNote').innerHTML='<b>Minor GC #'+stats.minor+'</b>: '+freed+' ta o\'lik tashlandi (Eden bo\'shadi), '+(live.length-prom)+' ta tirik S'+svi+'\'ga ko\'chdi (yosh +1)'+(prom?', <b>'+prom+' ta yosh≥3 → Old\'ga</b>':'')+'. Bu vaqtda ilova to\'xtab turdi (STW, odatda 5–50 ms).';
+      if(old.length>=20){document.getElementById('hNote').innerHTML+=' <b>Old to\'lib bormoqda → tez orada Major GC (sekin, 100ms–soniyalar).</b>';}
+    },800);
+  }
+  function hReset(){clearInterval(auto);auto=null;eden=[];s=[[],[]];svi=0;old=[];stats={minor:0,prom:0,free:0};nextId=1;draw();document.getElementById('hPlay').textContent='▶ Avto';document.getElementById('hNote').innerHTML='"+ 6 obyekt" — so\'rov keldi, DTO/String\'lar yaratildi. Eden to\'lganda Minor GC bo\'ladi.';}
+  document.getElementById('hAlloc').addEventListener('click',function(){alloc(6);});
+  document.getElementById('hReset').addEventListener('click',hReset);
+  document.getElementById('hPlay').addEventListener('click',function(){if(auto){clearInterval(auto);auto=null;this.textContent='▶ Avto';return;}this.textContent='⏸ To\'xtat';auto=setInterval(function(){if(eden.length<E)alloc(6);},1900);});
+  draw();
+
+  /* reachability graph */
+  var GN=[{id:'r1',x:12,y:25,t:'stek: m',root:1},{id:'r2',x:12,y:75,t:'static kesh',root:1},{id:'a',x:35,y:25,t:'Mijoz'},{id:'b',x:58,y:20,t:'Manzil'},{id:'c',x:58,y:45,t:'List<Karta>'},{id:'d',x:80,y:45,t:'Karta'},{id:'e',x:35,y:75,t:'HashMap'},{id:'f',x:60,y:80,t:'Mijoz#2'},{id:'g',x:82,y:80,t:'Sessiya'},{id:'h',x:85,y:15,t:'Log'}];
+  var GE=[['r1','a'],['a','b'],['a','c'],['c','d'],['r2','e'],['e','f'],['f','g'],['g','f'],['d','h']];
+  var graph=document.getElementById('graph'),gsvg=document.getElementById('gsvg'),cut={};
+  function gBuild(){cut={};graph.querySelectorAll('.node').forEach(function(n){n.remove();});gsvg.innerHTML='';
+    GE.forEach(function(e,i){var a=GN.find(function(n){return n.id===e[0];}),b=GN.find(function(n){return n.id===e[1];});var l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',a.x+'%');l.setAttribute('y1',a.y+'%');l.setAttribute('x2',b.x+'%');l.setAttribute('y2',b.y+'%');l.dataset.i=i;gsvg.appendChild(l);});
+    GN.forEach(function(n){var d=document.createElement('div');d.className='node'+(n.root?' root':'');d.style.left=n.x+'%';d.style.top=n.y+'%';d.textContent=n.t;d.dataset.id=n.id;if(!n.root)d.addEventListener('click',function(){GE.forEach(function(e,i){if(e[1]===n.id)cut[i]=true;});gMark();});graph.appendChild(d);});
+    gMark();}
+  function reach(){var seen={};var q=GN.filter(function(n){return n.root;}).map(function(n){return n.id;});q.forEach(function(i){seen[i]=1;});
+    while(q.length){var x=q.shift();GE.forEach(function(e,i){if(e[0]===x&&!cut[i]&&!seen[e[1]]){seen[e[1]]=1;q.push(e[1]);}});}return seen;}
+  function gMark(){var seen=reach();var deadN=[];
+    graph.querySelectorAll('.node').forEach(function(d){var id=d.dataset.id;var dead=!seen[id];d.classList.toggle('dead',dead);if(dead)deadN.push(d.textContent);});
+    gsvg.querySelectorAll('line').forEach(function(l){var i=+l.dataset.i,e=GE[i];l.classList.toggle('cut',!!cut[i]);l.classList.toggle('dead',!cut[i]&&(!seen[e[0]]||!seen[e[1]]));});
+    var note=document.getElementById('gNote');
+    if(deadN.length){note.innerHTML='Yetib bo\'lmaydiganlar (kulrang): <b>'+deadN.join(', ')+'</b>. '+(deadN.indexOf('Mijoz#2')>=0&&deadN.indexOf('Sessiya')>=0?'Mijoz#2 ↔ Sessiya bir-biriga havola qiladi, lekin ildizdan yo\'l yo\'q — <b>baribir axlat</b> (reference counting bo\'lsa qolib ketardi, Java\'da yo\'q). ':'')+'"GC ishga tushir"ni bosing.';}
+    else note.innerHTML='Yashil — GC roots (stek o\'zgaruvchisi, static). Binafsha — heap obyektlari. Hozir hammasi yetib boriladigan (reachable).';}
+  document.getElementById('gGc').addEventListener('click',function(){var seen=reach();var n=0;graph.querySelectorAll('.node').forEach(function(d){if(!seen[d.dataset.id]){d.classList.add('gone');n++;}});gsvg.querySelectorAll('line').forEach(function(l){var e=GE[+l.dataset.i];if(cut[+l.dataset.i]||!seen[e[0]]||!seen[e[1]])l.classList.add('gone');});document.getElementById('gNote').innerHTML=n?'<b>'+n+' ta obyekt yig\'ib olindi</b>, xotira bo\'shadi. Qolganlari — ildizdan yetib boriladi, tirik.':'Hech narsa yig\'ilmadi — hammasi tirik. Avval havolani uzing.';});
+  document.getElementById('gReset').addEventListener('click',gBuild);gBuild();
+
+  /* leak chart */
+  var leakMode='leak',lpath=document.getElementById('lpath'),lfill=document.getElementById('lfill'),oom=document.getElementById('oom'),leakT=null;
+  [].slice.call(document.querySelectorAll('#leakSeg button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#leakSeg button')).forEach(function(x){x.classList.toggle('on',x===b);});leakMode=b.dataset.m;});});
+  document.getElementById('leakPlay').addEventListener('click',function(){clearInterval(leakT);oom.classList.remove('show');var pts=[],x=0,used=40,base=40;
+    leakT=setInterval(function(){x+=4;used+=9;if(used>=base+70){used=base;if(leakMode==='leak')base+=14;}var y=200-(used/200*180);pts.push([x,y]);
+      var d='M'+pts.map(function(p){return p[0]+','+p[1];}).join(' L');lpath.setAttribute('d',d);lfill.setAttribute('d',d+' L'+x+',200 L0,200 Z');
+      if(y<=20){clearInterval(leakT);oom.classList.add('show');document.getElementById('leakNote').innerHTML='<b>OutOfMemoryError</b> — baseline har GC\'dan keyin balandroq bo\'ldi, oxiri -Xmx\'ga yetdi. GC hech narsa qila olmadi: hamma obyekt static kesh orqali "tirik". Dump oling: eng katta "retained heap" — o\'sha kesh.';}
+      if(x>=600){clearInterval(leakT);if(leakMode==='ok')document.getElementById('leakNote').innerHTML='<b>Sog\'lom arra tishi</b>: har GC xotirani bir xil darajaga qaytaradi. Chegarali kesh (Caffeine maximumSize=10000, expireAfterWrite=10m) eski yozuvlarni o\'zi chiqaradi.';}
+    },40);});
+
+  /* gc bars */
+  var GCS=[['Serial',2200,'bitta thread, STW','r'],['Parallel',900,'ko\'p thread, throughput','r'],['G1 (default)',180,'regionli, pauza maqsadi','g'],['ZGC',1,'concurrent, <1ms','g'],['Shenandoah',3,'concurrent, RedHat','g']];
+  document.getElementById('gcb').innerHTML=GCS.map(function(g){return '<div class="gcr"><span>'+g[0]+'</span><div class="pb"><i class="'+g[3]+'" data-w="'+(Math.max(g[1],4)/2200*100)+'"></i></div><span class="d">'+g[1]+' ms · '+g[2]+'</span></div>';}).join('');
+  document.getElementById('gcbPlay').addEventListener('click',function(){[].slice.call(document.querySelectorAll('.gcr i')).forEach(function(i){i.style.width='0';setTimeout(function(){i.style.width=i.dataset.w+'%';},80);});});
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOLID va design pattern'lar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F2F0F7;--surface:#FFFFFF;--surface-2:#F8F7FB;--sunken:#EAE7F2;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDD9E8;--border-strong:#C9C3DA;
+  --accent:#6A4BB0;--accent-ink:#4E3488;--accent-soft:#EDE8F7;
+  --purple:#0F6E56;--purple-ink:#0A5443;--purple-soft:#DEF0EA;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#120F1A;--surface:#1B1726;--surface-2:#221D30;--sunken:#16121F;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2E2740;--border-strong:#3F3655;
+  --accent:#A99CE0;--accent-ink:#BCB2E8;--accent-soft:#221D33;--purple:#4FC29D;--purple-ink:#6FD1B2;--purple-soft:#14261F;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#120F1A;--surface:#1B1726;--surface-2:#221D30;--sunken:#16121F;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2E2740;--border-strong:#3F3655;
+  --accent:#A99CE0;--accent-ink:#BCB2E8;--accent-soft:#221D33;--purple:#4FC29D;--purple-ink:#6FD1B2;--purple-soft:#14261F;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* solid tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tab{border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:8px 12px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;transition:.2s;display:flex;align-items:center;gap:8px}
+.tab .L{width:26px;height:26px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--font-display)}
+.tab.on{border-color:var(--accent);background:var(--accent-soft)}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bac{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface-2)}
+.bac h5{margin:0;padding:7px 12px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.bac.bad h5{color:var(--coral);background:var(--coral-soft)}.bac.good h5{color:var(--teal-ink);background:var(--teal-soft)}
+.bac pre{margin:0;padding:10px 12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;overflow-x:auto;white-space:pre}
+.viz{margin-top:12px;min-height:90px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.bx{border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--font-mono);font-size:12px;background:var(--surface);transition:.4s;text-align:center}
+.bx.big{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.bx.ok{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);animation:pop .4s}
+.bx.hub{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.bx.dim{opacity:.35}
+.bx small{display:block;font-size:10.5px;color:var(--ink-faint)}
+.ar{font-family:var(--font-mono);font-size:16px;color:var(--ink-faint);transition:.4s}
+.ar.flip{transform:rotate(180deg);color:var(--teal)}
+/* patterns */
+.pg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.pc{border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;cursor:pointer;background:var(--surface-2);transition:.2s}
+.pc.on{border-color:var(--accent);background:var(--accent-soft)}
+.pc .pn{font-family:var(--font-display);font-weight:600;font-size:14px}.pc .pk{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.05em;text-transform:uppercase}
+.pdet{margin-top:12px;border:1.5px solid var(--border);border-radius:14px;padding:14px;background:var(--surface-2)}
+.pdet pre{margin:10px 0 0;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;overflow-x:auto;background:var(--sunken);padding:10px 12px;border-radius:10px;white-space:pre}
+.pdet .sp{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);margin-top:8px}
+/* strategy demo */
+.stratrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.stratrow input{font-family:var(--font-mono);font-size:13px;padding:7px 9px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);color:var(--ink);width:130px}
+.sres{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent-ink);margin-top:8px}
+/* observer */
+.obs{display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-top:10px;align-items:start}
+.sub{border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--font-mono);font-size:12px;background:var(--surface);margin-bottom:6px;transition:.3s}
+.sub.hit{border-color:var(--teal);background:var(--teal-soft);animation:pop .3s}
+/* proxy */
+.px{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.px .bx{min-width:110px}
+.px .bx.cur{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.05)}
+@media (max-width:560px){.ba,.obs{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#6A4BB0"></span> Suhbatga tayyorgarlik · 2/3</span><span>· Kurs: 38/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Suhbat · 38-modul</span>
+    <h1>SOLID va <span class="steam">design pattern'lar</span></h1>
+    <p class="lead">"SOLID'ni tushuntiring" va "qaysi pattern'larni ishlatgansiz?" — senior suhbatlarining doimiy savollari. Yodlash emas: har tamoyil uchun <b>buzilgan kod → tuzatilgan kod</b>, har pattern uchun <b>Spring ichida qayerda uchraydi</b>.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>SOLID — 5 tamoyil, jonli</h2></div>
+    <p class="sec-sub">Tamoyilni tanlang. Chapda "hid" (code smell), o'ngda tuzatilgani, pastda vizual.</p>
+    <div class="stage">
+      <div class="tabs" id="stabs"></div>
+      <div class="explain" id="sEx"></div>
+      <div class="ba"><div class="bac bad"><h5>✗ buzilgan</h5><pre id="sBad"></pre></div><div class="bac good"><h5>✓ tuzatilgan</h5><pre id="sGood"></pre></div></div>
+      <div class="viz" id="sViz"></div>
+      <div class="ctrls"><button class="btn primary" id="sAnim">▶ Vizualni ko'rsat</button></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Pattern galereyasi — Spring ichida qayerda</h2></div>
+    <p class="sec-sub">Pattern'ni bosing. Har biri uchun: muammo, yechim, Spring/Java misoli.</p>
+    <div class="pg" id="pg"></div>
+    <div class="pdet" id="pdet">Pattern'ni tanlang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Strategy — jonli: komissiya siyosati</h2></div>
+    <p class="sec-sub">Bitta interfeys, bir nechta amalga oshirish. Strategiyani almashtiring — <code>if/else</code> yo'q, yangi strategiya = yangi klass.</p>
+    <div class="stage">
+      <div class="stratrow"><span style="font-family:var(--font-mono);font-size:12.5px">summa:</span><input id="stSum" type="number" value="1000000"><div class="seg" id="stSeg"><button class="on" data-s="karta">KartaKomissiya</button><button data-s="naqd">NaqdKomissiya</button><button data-s="vip">VipKomissiya</button></div></div>
+      <div class="sres" id="stRes"></div>
+      <div class="explain" id="stEx"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Strategy.java (Spring uslubi)</span></div>
+      <pre class="code"><span class="k">interface</span> <span class="ty">KomissiyaSiyosati</span> { <span class="ty">BigDecimal</span> hisobla(<span class="ty">BigDecimal</span> summa); <span class="ty">TolovTuri</span> turi(); }
+
+<span class="k">@Component class</span> <span class="ty">KartaKomissiya</span> <span class="k">implements</span> <span class="ty">KomissiyaSiyosati</span> { ... turi() { <span class="k">return</span> KARTA; } }
+<span class="k">@Component class</span> <span class="ty">NaqdKomissiya</span>  <span class="k">implements</span> <span class="ty">KomissiyaSiyosati</span> { ... }
+
+<span class="k">@Service class</span> <span class="ty">TolovService</span> {
+    <span class="k">private final</span> <span class="ty">Map</span>&lt;<span class="ty">TolovTuri</span>, <span class="ty">KomissiyaSiyosati</span>&gt; siyosatlar;
+    <span class="ty">TolovService</span>(<span class="ty">List</span>&lt;<span class="ty">KomissiyaSiyosati</span>&gt; list) {           <span class="cm">// Spring hamma bean'ni List qilib beradi</span>
+        siyosatlar = list.stream().collect(toMap(<span class="ty">KomissiyaSiyosati</span>::turi, s -&gt; s));
+    }
+    <span class="ty">BigDecimal</span> komissiya(<span class="ty">Tolov</span> t) { <span class="k">return</span> siyosatlar.get(t.turi()).hisobla(t.summa()); }   <span class="cm">// switch yo'q</span>
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Observer — jonli: hodisa va obunachilar</h2></div>
+    <p class="sec-sub">To'lov tugadi → SMS, audit, cashback — har biri mustaqil. To'lov servisi ularni <b>bilmaydi</b>. Spring'da: <code>ApplicationEventPublisher</code> + <code>@EventListener</code>.</p>
+    <div class="stage">
+      <div class="obs">
+        <div><button class="btn primary" id="obGo">publish(TolovTugadi)</button><div class="explain" id="obEx" style="margin-top:10px">Tugmani bosing.</div></div>
+        <div id="subs"></div>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Events.java</span></div>
+      <pre class="code"><span class="k">record</span> <span class="ty">TolovTugadi</span>(<span class="ty">Long</span> tolovId, <span class="ty">BigDecimal</span> summa) {}
+
+<span class="cm">// Publisher — kim tinglashini bilmaydi</span>
+publisher.publishEvent(<span class="k">new</span> <span class="ty">TolovTugadi</span>(t.id(), t.summa()));
+
+<span class="cm">// Listener'lar — alohida klasslarda, alohida mas'uliyat</span>
+<span class="k">@TransactionalEventListener</span>(phase = AFTER_COMMIT)   <span class="cm">// faqat COMMIT bo'lgach — SMS "o'tdi" deb yolg'on gapirmasin</span>
+<span class="k">void</span> smsYubor(<span class="ty">TolovTugadi</span> e) { ... }
+
+<span class="k">@EventListener</span> <span class="k">@Async</span>
+<span class="k">void</span> cashback(<span class="ty">TolovTugadi</span> e) { ... }</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Proxy — Spring'ning "sehri" aslida shu</h2></div>
+    <p class="sec-sub"><code>@Transactional</code>, <code>@Cacheable</code>, <code>@Async</code>, security — hammasi bean'ni <b>proxy</b> bilan o'rab, chaqiriqni ushlab qoladi. Qadamlab ko'ring.</p>
+    <div class="stage">
+      <div class="px" id="px"></div>
+      <div class="ctrls"><button class="btn" id="pxPrev">‹</button><button class="btn primary" id="pxPlay">▶ Avto</button><button class="btn" id="pxNext">›</button><div class="bar"><div id="pxBar"></div></div></div>
+      <div class="explain" id="pxEx"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ Klassik tuzoq (30-modulda ham)</div>Bir klass ichida <code>this.otkazma()</code> chaqirsangiz — proxy chetlab o'tiladi, <code>@Transactional</code> ishlamaydi. Sabab: proxy tashqaridan kelgan chaqiriqni ushlaydi, <code>this</code> — asl obyekt. Yechim: boshqa bean'ga ajratish.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SOLID'ni bir jumladan tushuntiring.<span class="chev">›</span></summary><div class="iv-a"><b>S</b> — klass bitta sabab bilan o'zgarsin. <b>O</b> — yangi xususiyat = yangi kod, eski kodni o'zgartirmasdan (interface + yangi implementatsiya). <b>L</b> — bola klass ota o'rnida ishlatilsa hech narsa buzilmasin. <b>I</b> — mijozga kerak bo'lmagan metodni majburlamang (kichik interface'lar). <b>D</b> — yuqori daraja abstraksiyaga bog'lansin, konkret klassga emas (DI shundan).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Spring'da qaysi pattern'lar bor?<span class="chev">›</span></summary><div class="iv-a"><b>Singleton</b> — bean scope default. <b>Factory</b> — BeanFactory/ApplicationContext, @Bean metodlari. <b>Proxy</b> — AOP, @Transactional, @Cacheable. <b>Template Method</b> — JdbcTemplate, RestTemplate (resurs ochish/yopish shablon, siz faqat mantiq). <b>Observer</b> — ApplicationEvent. <b>Strategy</b> — interface + List&lt;Impl&gt; inject. <b>Builder</b> — UriComponentsBuilder, RestClient.builder(), Lombok @Builder. <b>Adapter</b> — HandlerAdapter (MVC). <b>Decorator</b> — BufferedReader(new FileReader), Servlet filter zanjiri. <b>Front Controller</b> — DispatcherServlet.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Singleton pattern va Spring singleton bean farqi?<span class="chev">›</span></summary><div class="iv-a">GoF Singleton — klass o'zi bitta nusxani kafolatlaydi (private ctor + static getInstance), JVM bo'yicha bitta, testlash qiyin, global holat. Spring singleton — <b>container</b> bitta nusxa saqlaydi (ApplicationContext bo'yicha), klass oddiy, test uchun mock bilan almashtiriladi. Spring'da qo'lda Singleton yozish — anti-pattern.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Liskov'ni buzgan mashhur misol?<span class="chev">›</span></summary><div class="iv-a">Square extends Rectangle: setWidth(5) kvadratda balandlikni ham o'zgartiradi — Rectangle kutgan xatti-harakat buziladi. Java'dan: <code>Collections.unmodifiableList</code> — List interfeysi, lekin add() UnsupportedOperationException (ataylab qilingan murosa). Belgi: bola klass ota metodini "bo'sh" yoki exception bilan override qilsa — LSP buzilgan.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Anemic domain model nima?<span class="chev">›</span></summary><div class="iv-a">Entity faqat getter/setter, butun mantiq Service'da — obyekt "qonsiz". Muqobil: rich domain — <code>hisob.yech(summa)</code> o'zi tekshiradi va holatini o'zgartiradi, Service faqat orkestratsiya. Bank domenida rich model invariantlarni (balans ≥ 0) bir joyda ushlaydi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Pattern'ni qachon ishlatmaslik kerak?<span class="chev">›</span></summary><div class="iv-a">Muammo yo'q joyda. Ikkita implementatsiya bo'lmasa Strategy ortiqcha; oddiy 3 maydonli obyekt uchun Builder ortiqcha. Qoida: avval oddiy kod, takrorlanish/o'zgarish og'rig'i paydo bo'lganda refactor → pattern. "Pattern uchun pattern" — over-engineering.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Yangi to'lov turi qo'shish uchun 5 ta switch'ni o'zgartirish kerak. Qaysi tamoyil buzilgan?</div>
+        <button class="opt">SRP</button><button class="opt">OCP (Open/Closed)</button><button class="opt">ISP</button>
+        <div class="q-fb" data-ok="To'g'ri. Kengaytirish uchun mavjud kodni o'zgartirishga majbur — OCP buzilgan. Strategy/polimorfizm yechadi." data-no="Yo'q. Bu OCP: yangi xususiyat mavjud kodni o'zgartirmasdan qo'shilishi kerak."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">2.</span>@Transactional qaysi pattern orqali ishlaydi?</div>
+        <button class="opt">Proxy</button><button class="opt">Builder</button><button class="opt">Observer</button>
+        <div class="q-fb" data-ok="To'g'ri. Bean proxy bilan o'raladi, metod chaqirig'i ushlab qolinadi." data-no="Yo'q. AOP annotatsiyalari — Proxy pattern."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">3.</span>Servis interfeysga emas, konkret PostgresRepository'ga bog'langan. Qaysi tamoyil?</div>
+        <button class="opt">LSP</button><button class="opt">SRP</button><button class="opt">DIP (Dependency Inversion)</button>
+        <div class="q-fb" data-ok="To'g'ri. Abstraksiyaga bog'lanish kerak — DIP." data-no="Yo'q. Konkretga bog'lanish — DIP buzilishi."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Spring bean default scope?</div>
+        <button class="opt">prototype</button><button class="opt">singleton</button><button class="opt">request</button>
+        <div class="q-fb" data-ok="To'g'ri. Container bo'yicha bitta nusxa." data-no="Yo'q. Default — singleton."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Yakuniy modul</span>
+      <h3>Suhbat savol-javoblar to'plami</h3>
+      <p>39 modulning "eng ko'p so'raladigan" savollari bir joyda: Java, Spring, PostgreSQL, tizim dizayni — qisqa, aniq javob; flashcard rejimi bilan mashq.</p>
+      <div class="topics"><span class="topic-pill">37 · Big-O</span><span class="topic-pill now">38 · SOLID & patterns</span><span class="topic-pill">39 · Savol-javob</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="37-big-o-va-tuzilmalar.html"><span class="cl">← Oldingi dars</span><span class="ct">37 · Big-O va tuzilmalar</span><span class="cs">🎯 Suhbatga tayyorgarlik</span></a><a class="cn nx" href="39-savol-javoblar.html"><span class="cl">Keyingi dars →</span><span class="ct">39 · Savol-javoblar</span><span class="cs">🎯 Suhbatga tayyorgarlik</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:43.2%"></i></div><span>38 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(38)<0)v.push(38);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','38');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(38)<0)D[t].push(38);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* SOLID */
+  var S=[
+    {L:'S',n:'Single Responsibility',ex:'<b>Bitta klass — bitta o\'zgarish sababi.</b> TolovService to\'lovni ham hisoblaydi, ham PDF yasaydi, ham SMS yuboradi, ham bazaga yozadi. PDF shablon o\'zgarsa — to\'lov klassi o\'zgaradi. 4 ta jamoa bitta faylda urishadi.',
+     bad:'class TolovService {\n  void otkaz(Tolov t) {\n    tekshir(t);\n    jdbc.update("INSERT ...");\n    byte[] pdf = pdfYasa(t);\n    smsYubor(t.tel(), "...");\n  }\n}',
+     good:'class TolovService {          // faqat biznes\n  TolovRepository repo;\n  KvitansiyaService kv;\n  Xabarnoma xabar;\n  void otkaz(Tolov t) {\n    tekshir(t); repo.save(t);\n    kv.yarat(t); xabar.yubor(t);\n  }\n}',
+     viz:function(v,anim){v.innerHTML=anim?'<div class="bx ok">TolovService<small>biznes</small></div><div class="bx ok">TolovRepository<small>baza</small></div><div class="bx ok">KvitansiyaService<small>PDF</small></div><div class="bx ok">Xabarnoma<small>SMS</small></div>':'<div class="bx big">TolovService<small>biznes + baza + PDF + SMS</small></div>';}},
+    {L:'O',n:'Open / Closed',ex:'<b>Kengaytirishga ochiq, o\'zgartirishga yopiq.</b> Yangi to\'lov turi (Wallet) qo\'shish uchun mavjud switch\'ni o\'zgartirasiz — va shu bilan Karta mantig\'ini buzib qo\'yishingiz mumkin. Interface bilan: yangi klass qo\'shasiz, eski kod tegilmaydi.',
+     bad:'BigDecimal komissiya(Tolov t) {\n  switch (t.turi()) {\n    case KARTA: return ...;\n    case NAQD:  return ...;\n    // WALLET qo\'shish uchun\n    // BU metodni o\'zgartirish kerak\n  }\n}',
+     good:'interface Komissiya { BigDecimal hisobla(Tolov t); }\nclass KartaKomissiya implements Komissiya {...}\nclass NaqdKomissiya  implements Komissiya {...}\nclass WalletKomissiya implements Komissiya {...} // YANGI\n// TolovService o\'zgarmadi',
+     viz:function(v,anim){v.innerHTML='<div class="bx hub">TolovService</div><span class="ar">→</span><div class="bx">Komissiya<small>interface</small></div><span class="ar">←</span><div style="display:flex;flex-direction:column;gap:6px"><div class="bx">Karta</div><div class="bx">Naqd</div>'+(anim?'<div class="bx ok">Wallet ✚</div>':'')+'</div>';}},
+    {L:'L',n:'Liskov Substitution',ex:'<b>Bola klass ota o\'rnida ishlatilganda kod buzilmasin.</b> Kvadrat "to\'rtburchak"mi? Matematikada ha, kodda yo\'q: setWidth(5) kvadratda balandlikni ham o\'zgartiradi — Rectangle bilan ishlaydigan kod noto\'g\'ri natija oladi.',
+     bad:'class Rectangle { setWidth(w); setHeight(h); area() }\nclass Square extends Rectangle {\n  setWidth(w)  { this.w = w; this.h = w; }\n  setHeight(h) { this.w = h; this.h = h; }\n}\nRectangle r = new Square();\nr.setWidth(5); r.setHeight(4);\nr.area(); // 20 kutildi, 16 chiqdi!',
+     good:'interface Shakl { double area(); }\nrecord Rectangle(double w, double h) implements Shakl {...}\nrecord Square(double s) implements Shakl {...}\n// Meros emas — umumiy interface.\n// Belgi: override ichida throw new\n// UnsupportedOperationException — LSP buzilgan',
+     viz:function(v,anim){v.innerHTML='<div class="bx">Rectangle r = new Square()</div><span class="ar">→</span><div class="bx">setWidth(5); setHeight(4)</div><span class="ar">→</span><div class="bx '+(anim?'big':'')+'">area() = '+(anim?'16 ✗ (20 kutilgan)':'?')+'</div>';}},
+    {L:'I',n:'Interface Segregation',ex:'<b>Mijozni kerak bo\'lmagan metodga majburlamang.</b> Bitta katta Hisob interfeysi: kredit ham, depozit ham, karta ham hamma metodni implement qilishi kerak — ko\'pi "throw Unsupported". Kichik, rolli interfeyslar: kimga nima kerak — shuni oladi.',
+     bad:'interface Hisob {\n  void yech(); void qoy();\n  void foizHisobla();\n  void kreditToLa();\n  void kartaBlokla();\n}\nclass DepozitHisob implements Hisob {\n  void kartaBlokla() { throw new Unsupported...; }\n  void kreditToLa()  { throw new Unsupported...; }\n}',
+     good:'interface Yechiladigan { void yech(); }\ninterface Foizli { void foizHisobla(); }\ninterface Kartali { void kartaBlokla(); }\n\nclass DepozitHisob implements Yechiladigan, Foizli {}\nclass KartaHisob implements Yechiladigan, Kartali {}\n// Har klass faqat o\'ziga kerakini',
+     viz:function(v,anim){v.innerHTML=anim?'<div class="bx ok">Yechiladigan</div><div class="bx ok">Foizli</div><div class="bx ok">Kartali</div><span class="ar">←</span><div class="bx">DepozitHisob<small>2 ta</small></div>':'<div class="bx big">Hisob<small>5 metod</small></div><span class="ar">←</span><div class="bx">DepozitHisob<small>3 tasi throw</small></div>';}},
+    {L:'D',n:'Dependency Inversion',ex:'<b>Yuqori daraja (biznes) pastki darajaga (baza, HTTP) bog\'lanmasin — ikkalasi abstraksiyaga bog\'lansin.</b> Service ichida new PostgresRepo() — bazani almashtirish, test qilish mumkin emas. Interface + inject (Spring DI) — bog\'liqlik yo\'nalishi "ag\'dariladi".',
+     bad:'class TolovService {\n  private PostgresTolovRepo repo\n      = new PostgresTolovRepo();   // konkret!\n  // testda haqiqiy baza kerak\n}',
+     good:'interface TolovRepository { void save(Tolov t); }\n\n@Service class TolovService {\n  private final TolovRepository repo;   // abstraksiya\n  TolovService(TolovRepository repo) { this.repo = repo; } // Spring beradi\n}\n// test: new TolovService(mock(TolovRepository.class))',
+     viz:function(v,anim){v.innerHTML='<div class="bx hub">TolovService<small>yuqori daraja</small></div><span class="ar'+(anim?' flip':'')+'">→</span><div class="bx '+(anim?'ok':'')+'">'+(anim?'TolovRepository<small>interface</small>':'PostgresTolovRepo<small>konkret</small>')+'</div>'+(anim?'<span class="ar flip">→</span><div class="bx">PostgresTolovRepo<small>implements</small></div>':'');}}
+  ];
+  var cur=0,anim=false,tabs=document.getElementById('stabs');
+  tabs.innerHTML=S.map(function(s,i){return '<div class="tab'+(i===0?' on':'')+'" data-i="'+i+'"><span class="L">'+s.L+'</span>'+s.n+'</div>';}).join('');
+  function drawS(){var s=S[cur];[].slice.call(tabs.children).forEach(function(t,k){t.classList.toggle('on',k===cur);});document.getElementById('sEx').innerHTML=s.ex;document.getElementById('sBad').textContent=s.bad;document.getElementById('sGood').textContent=s.good;s.viz(document.getElementById('sViz'),anim);document.getElementById('sAnim').textContent=anim?'↺ Boshiga':'▶ Tuzatilganini ko\'rsat';}
+  tabs.addEventListener('click',function(e){var t=e.target.closest('.tab');if(!t)return;cur=+t.dataset.i;anim=false;drawS();});
+  document.getElementById('sAnim').addEventListener('click',function(){anim=!anim;drawS();});drawS();
+
+  /* patterns */
+  var P=[
+    {n:'Singleton',k:'creational',p:'Bitta nusxa, global kirish.',s:'Spring bean default scope — container bitta nusxa saqlaydi. Qo\'lda: enum Singleton (thread-safe, serializable). Muammo: global holat, testlash.',c:'enum Config { INSTANCE; ... }\n// Spring: @Service — allaqachon singleton'},
+    {n:'Factory Method',k:'creational',p:'Obyekt yaratishni bir joyga jamlash, mijoz konkret klassni bilmaydi.',s:'@Bean metodlari, BeanFactory. Java: List.of(), Executors.newFixedThreadPool(), LocalDate.of().',c:'static Tolov yarat(TolovTuri t, ...) {\n  return switch (t) { case KARTA -> new KartaTolov(..); ... };\n}'},
+    {n:'Builder',k:'creational',p:'Ko\'p parametrli obyektni o\'qiladigan, bosqichma-bosqich yaratish.',s:'Lombok @Builder, StringBuilder, UriComponentsBuilder, HttpRequest.newBuilder(), RestClient.builder().',c:'Kredit k = Kredit.builder()\n  .summa(...).muddat(12)\n  .foiz("24.5").build();'},
+    {n:'Strategy',k:'behavioral',p:'Algoritmni almashtiriladigan qilish — if/else o\'rniga polimorfizm.',s:'Comparator, interface + List<Impl> inject, PasswordEncoder (BCrypt/Argon2), spring RetryPolicy.',c:'interface Komissiya { BigDecimal hisobla(..); }\nMap<TolovTuri, Komissiya> siyosatlar;'},
+    {n:'Observer',k:'behavioral',p:'Hodisa yuz berganda ko\'p obunachi xabar oladi, publisher ularni bilmaydi.',s:'ApplicationEventPublisher + @EventListener / @TransactionalEventListener, Kafka listener\'lar, JavaFX/Swing listener.',c:'publisher.publishEvent(new TolovTugadi(id));\n@EventListener void sms(TolovTugadi e){}'},
+    {n:'Template Method',k:'behavioral',p:'Algoritm skeleti ota klassda, qadamlar bolada.',s:'JdbcTemplate (ulanish ochish/yopish, xato — shablon; siz faqat SQL + mapper), AbstractController, JUnit @BeforeEach lifecycle.',c:'jdbc.query("SELECT ...", (rs, i) -> new Hisob(..));\n// ulanish/statement/close — template ichida'},
+    {n:'Proxy',k:'structural',p:'Obyektga kirishni nazorat qilish — oldin/keyin qo\'shimcha ish.',s:'@Transactional, @Cacheable, @Async, @PreAuthorize — Spring AOP (JDK dynamic proxy yoki CGLIB). Hibernate lazy loading proxy.',c:'// proxy.otkazma() → begin tx → real.otkazma() → commit'},
+    {n:'Decorator',k:'structural',p:'Obyektni o\'rab, xatti-harakat qo\'shish (meros o\'rniga).',s:'java.io: new BufferedReader(new InputStreamReader(in)). Servlet Filter zanjiri. Collections.unmodifiableList.',c:'Reader r = new BufferedReader(\n  new InputStreamReader(in, UTF_8));'},
+    {n:'Adapter',k:'structural',p:'Mos kelmaydigan interfeysni kutilgan interfeysga moslash.',s:'Spring MVC HandlerAdapter, Arrays.asList (massiv → List), tashqi bank API mijozini ichki interfeysga o\'rash (anti-corruption layer).',c:'class AstraSendAdapter implements OtkazmaProvayder {\n  AstraSendClient client; ... }'},
+    {n:'Facade',k:'structural',p:'Murakkab quyi tizimga oddiy kirish nuqtasi.',s:'Spring: JdbcTemplate ham facade (JDBC ustidan), RestClient (HTTP ustidan). O\'zingizda: OtkazmaFacade — validatsiya+limit+komissiya+yozish bitta metodda.',c:'class OtkazmaFacade {\n  Natija bajar(So\'rov s) { valid(); limit(); kom(); saqla(); }\n}'},
+    {n:'Chain of Responsibility',k:'behavioral',p:'So\'rov handler\'lar zanjiridan o\'tadi, har biri hal qiladi yoki uzatadi.',s:'Servlet Filter / Spring Security filter chain (32-modul), Spring interceptor\'lar, exception handler\'lar tartibi.',c:'chain.doFilter(req, res); // keyingisiga uzat'},
+    {n:'Repository / DTO',k:'enterprise',p:'Ma\'lumotga kirishni abstraksiya; qatlamlar orasida ma\'lumot tashish.',s:'Spring Data JpaRepository. DTO — entity\'ni tashqariga chiqarmaslik (record). MapStruct — mapping.',c:'interface HisobRepository extends JpaRepository<Hisob, Long> {}\nrecord HisobDto(String raqam, BigDecimal balans) {}'}
+  ];
+  var pg=document.getElementById('pg');pg.innerHTML=P.map(function(p,i){return '<div class="pc" data-i="'+i+'"><div class="pk">'+p.k+'</div><div class="pn">'+p.n+'</div></div>';}).join('');
+  pg.addEventListener('click',function(e){var c=e.target.closest('.pc');if(!c)return;[].slice.call(pg.children).forEach(function(x){x.classList.toggle('on',x===c);});var p=P[+c.dataset.i];document.getElementById('pdet').innerHTML='<b>'+p.n+'</b> — '+p.p+'<div class="sp">Spring / Java\'da: '+p.s+'</div><pre>'+p.c.replace(/</g,'&lt;')+'</pre>';});
+
+  /* strategy demo */
+  var st='karta',stS=document.getElementById('stSum');
+  var STR={karta:{f:function(s){return Math.max(s*0.01,1000);},d:'1% (min 1 000 so\'m)'},naqd:{f:function(s){return 0;},d:'0 — naqd komissiyasiz'},vip:{f:function(s){return s>5e6?0:s*0.005;},d:'0.5%, 5 mln dan yuqori — bepul'}};
+  function stDraw(){var s=+stS.value||0,r=STR[st].f(s);document.getElementById('stRes').textContent=r.toLocaleString()+' so\'m';document.getElementById('stEx').innerHTML='<b>'+st.charAt(0).toUpperCase()+st.slice(1)+'Komissiya</b>: '+STR[st].d+'. TolovService faqat <code>siyosat.hisobla(summa)</code> deydi — qaysi klass ishlaganini bilmaydi. Yangi siyosat = yangi @Component, eski kod tegilmaydi (OCP).';}
+  stS.addEventListener('input',stDraw);document.getElementById('stSeg').addEventListener('click',function(e){if(!e.target.dataset.s)return;st=e.target.dataset.s;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});stDraw();});stDraw();
+
+  /* observer */
+  var subs=[['SmsListener','SMS: "500 000 so\'m o\'tdi"'],['AuditListener','audit_log ga yozildi'],['CashbackListener','1% cashback hisoblandi'],['AntifraudListener','xavf skoring: OK']];
+  var sd=document.getElementById('subs');sd.innerHTML=subs.map(function(s){return '<div class="sub"><b>'+s[0]+'</b><span style="color:var(--ink-faint)"> — kutmoqda</span></div>';}).join('');
+  document.getElementById('obGo').addEventListener('click',function(){var els=sd.children;[].slice.call(els).forEach(function(e,i){e.className='sub';e.innerHTML='<b>'+subs[i][0]+'</b><span style="color:var(--ink-faint)"> — kutmoqda</span>';});subs.forEach(function(s,i){setTimeout(function(){els[i].className='sub hit';els[i].innerHTML='<b>'+s[0]+'</b> — '+s[1];},300+i*350);});document.getElementById('obEx').innerHTML='<b>TolovService</b> bitta qator yozdi: <code>publishEvent(...)</code>. 4 ta listener mustaqil ishladi. Ertaga 5-chisi (Telegram) qo\'shilsa — TolovService o\'zgarmaydi. Listener\'lardan biri xato bersa? Sync\'da — publisher\'ga qaytadi (tranzaksiya ham rollback!). Shuning uchun AFTER_COMMIT + @Async.';});
+
+  /* proxy stepper */
+  var px=document.getElementById('px');px.innerHTML='<div class="bx">Controller</div><span class="ar">→</span><div class="bx">TolovService$$Proxy<small>Spring yaratgan</small></div><span class="ar">→</span><div class="bx">TolovService<small>sizniki</small></div><span class="ar">→</span><div class="bx">Repository / DB</div>';
+  var pxs=['<b>1.</b> Controller <code>tolovService.otkazma()</code> chaqiradi. U ushlab turgan obyekt — <b>aslida proxy</b> (Spring inject qilgan), sizning klassingiz emas.','<b>2.</b> Proxy: metodda @Transactional bor → <code>TransactionManager.begin()</code>, ulanishni oladi, autocommit=false.','<b>3.</b> Proxy asl metodni chaqiradi — sizning kod ishlaydi. Repository o\'sha tranzaksiya ulanishida yozadi.','<b>4.</b> Metod tugadi: exception yo\'q → <code>commit()</code>; RuntimeException → <code>rollback()</code>. Proxy natijani Controller\'ga qaytaradi. @Cacheable, @Async, @PreAuthorize — aynan shu joyda, faqat "oldin/keyin" mantig\'i boshqa.'];
+  mkStepper('px',4,function(i){var b=px.querySelectorAll('.bx');[].slice.call(b).forEach(function(x){x.classList.remove('cur');});b[[0,1,2,1][i]].classList.add('cur');document.getElementById('pxEx').innerHTML=pxs[i];},2600);
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JPA bog'lanishlar va N+1</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0E7C7B;--teal-ink:#0A5A59;--teal-soft:#DBF0EF;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(30,36,26,.05),0 8px 24px rgba(30,36,26,.06);
+  --shadow-lift:0 2px 4px rgba(30,36,26,.08),0 16px 40px rgba(30,36,26,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+:root{--blue:#2166A8;--blue-soft:#E3EEF7;--blue-ink:#184D7F}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){--blue:#5B9BD8;--blue-soft:#15243A;--blue-ink:#7DB3E8}}
+:root[data-theme="dark"]{--blue:#5B9BD8;--blue-soft:#15243A;--blue-ink:#7DB3E8}
+/* rel diagram */
+.relpick{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.relpick button{border:1.5px solid var(--border);background:var(--surface);border-radius:10px;padding:8px 13px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--ink)}
+.relpick button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.reld{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:14px}
+.tb{background:var(--surface);border:1.5px solid var(--blue);border-radius:12px;overflow:hidden;font-family:var(--font-mono);font-size:12px}
+.tb h5{margin:0;background:var(--blue-soft);color:var(--blue-ink);padding:7px 10px;font-size:12px}
+.tb .c{padding:5px 10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
+.tb .c.fk{background:var(--amber-soft);color:var(--amber);font-weight:600}
+.tb .c.pk{color:var(--accent-ink)}
+.tb .c small{color:var(--ink-faint);font-weight:400}
+.relmid{text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);min-width:90px}
+.relmid .ln{height:2px;background:var(--purple);margin:6px 0;position:relative}
+.relmid .ln::before,.relmid .ln::after{content:"";position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--purple)}
+.relmid .ln::before{left:-2px}.relmid .ln::after{right:-2px}
+.jt{grid-column:1/4;justify-self:center;max-width:280px;width:100%}
+
+/* n+1 */
+.np1{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.npc{background:var(--surface-2);border:1.5px solid var(--border);border-radius:13px;padding:11px}
+.npc h5{font-family:var(--font-mono);font-size:11px;margin:0 0 8px;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase;display:flex;justify-content:space-between}
+.npc h5 b{color:var(--coral)}
+.accs{display:flex;flex-direction:column;gap:4px}
+.acc{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);border-radius:7px;padding:5px 8px;background:var(--surface);display:flex;justify-content:space-between;transition:.25s}
+.acc.cur{border-color:var(--accent);background:var(--accent-soft)}
+.acc .tr{color:var(--ink-faint)}.acc .tr.ok{color:var(--teal-ink)}
+.qlog{font-family:var(--font-mono);font-size:11px;line-height:1.7;max-height:200px;overflow:auto;color:var(--blue-ink)}
+.qlog .q1{color:var(--accent-ink);font-weight:600}
+.qlog .qn{color:var(--coral)}
+.nstat{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-family:var(--font-mono);font-size:12px}
+.nstat span{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 10px}
+.nstat b{color:var(--accent-ink)}.nstat b.bad{color:var(--coral)}
+.fixes{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.fixes button{border:1.5px solid var(--border);background:var(--surface);border-radius:9px;padding:6px 11px;cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--ink)}
+.fixes button.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:600}
+.fixes button.bad.on{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.tbar{height:10px;background:var(--sunken);border:1px solid var(--border);border-radius:5px;overflow:hidden;margin-top:8px}
+.tbar i{display:block;height:100%;background:var(--coral);width:0;transition:width .5s}
+.tbar i.ok{background:var(--teal)}
+
+/* lazy */
+.lz{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.lzc{background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:var(--font-mono);font-size:12px;line-height:1.7;cursor:pointer;transition:.2s}
+.lzc:hover{border-color:var(--border-strong)}
+.lzc h5{margin:0 0 6px;font-size:12px}
+.lzc.good h5{color:var(--teal-ink)}.lzc.bad h5{color:var(--coral)}
+.lzc .res{margin-top:8px;padding:7px 9px;border-radius:8px;font-size:11.5px;display:none}
+.lzc.open .res{display:block}
+.lzc.good .res{background:var(--teal-soft);color:var(--teal-ink)}.lzc.bad .res{background:var(--coral-soft);color:var(--coral)}
+@media (max-width:560px){.reld{grid-template-columns:1fr}.jt{grid-column:1}.np1,.lz{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.an{color:var(--accent-ink);font-weight:500}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 6/9</span><span>· Kurs: 29/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 29-modul · noldan</span>
+    <h1>JPA bog'lanishlar va <span class="steam">N+1</span></h1>
+    <p class="lead">Hisobda ko'p o'tkazma bor. Bu "ko'p" ni JPA'da qanday ifodalash? Va nega 5 ta hisobni ko'rsatish uchun 6 ta (100 ta uchun 101 ta) SQL ketadi? JPA'ning eng mashhur muammosi — jonli.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Bog'lanish turlari — jadval darajasida</h2></div>
+    <p class="sec-sub">Bazada bog'lanish — bu <b>foreign key</b> ustuni (yoki oraliq jadval). JPA annotatsiyasi shuni tasvirlaydi. Turni tanlang:</p>
+    <div class="demo">
+      <div class="relpick" id="relpick"><button class="on" data-r="m1">@ManyToOne</button><button data-r="1m">@OneToMany</button><button data-r="11">@OneToOne</button><button data-r="mm">@ManyToMany</button></div>
+      <div class="reld" id="reld"></div>
+      <div class="demo-note" id="relNote"></div>
+      <div class="code-block" style="margin-top:12px"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Mapping</span></div><pre class="code" id="relCode"></pre></div>
+    </div>
+    <div class="callout iv"><div class="ct">Suhbatda so'raladi: owning side</div>Bidirectional bog'lanishda <b>FK ustuni bor tomon — egasi (owning side)</b>; JPA faqat shu tomondagi o'zgarishni bazaga yozadi. <code>mappedBy</code> — "men ega emasman, u tomonga qara". <code>account.getTransfers().add(t)</code> qilib <code>t.setAccount(account)</code> qilmasangiz — FK null qoladi. Shuning uchun helper metod: <code>addTransfer(t){ transfers.add(t); t.setAccount(this); }</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>N+1: 5 hisob = 6 so'rov</h2></div>
+    <p class="sec-sub">Kod: <code>accounts = repo.findAll(); for (a : accounts) a.getTransfers().size()</code>. Har <code>getTransfers()</code> — LAZY kolleksiya — alohida SELECT. Ishga tushiring, keyin tuzatishlarni sinang:</p>
+    <div class="demo">
+      <div class="controls"><label style="font-family:var(--font-mono);font-size:12px">Hisoblar: <b id="nLbl">5</b></label><input type="range" id="nRng" min="2" max="50" value="5" style="width:140px;accent-color:var(--accent)"><button class="ctl primary" id="npPlay">▶ Ishga tushir</button></div>
+      <div class="fixes" id="fixes"><button class="bad on" data-f="lazy">LAZY (default)</button><button data-f="fetch">JOIN FETCH</button><button data-f="graph">@EntityGraph</button><button data-f="batch">@BatchSize(10)</button><button data-f="dto">DTO projection</button><button class="bad" data-f="eager">EAGER</button></div>
+      <div class="np1">
+        <div class="npc"><h5>Java: sikl</h5><div class="accs" id="accs"></div></div>
+        <div class="npc"><h5>SQL log <b id="qCount">0 so'rov</b></h5><div class="qlog" id="qlog"></div></div>
+      </div>
+      <div class="nstat"><span>Jami: <b id="qTot">0</b> so'rov</span><span>Taxminiy vaqt: <b id="qTime">0</b> ms</span><span>Yuklangan qatorlar: <b id="qRows">0</b></span></div>
+      <div class="tbar"><i id="tbar"></i></div>
+      <div class="demo-note" id="npNote">LAZY: kolleksiya birinchi murojaatda yuklanadi — har hisob uchun alohida. Hisoblar sonini oshiring va farqni ko'ring.</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Yechimlar</span></div>
+      <pre class="code"><span class="cm">// 1. JOIN FETCH — bitta so'rovda hammasi (kolleksiya uchun DISTINCT / Set)</span>
+<span class="an">@Query</span>(<span class="st">"select distinct a from Account a left join fetch a.transfers where a.customer.id = :cid"</span>)
+<span class="ty">List</span>&lt;Account&gt; withTransfers(<span class="ty">Long</span> cid);
+<span class="cm">// ⚠ ikki kolleksiyani birga fetch qilsangiz — MultipleBagFetchException (List×List). Set ishlating yoki ikki so'rov.</span>
+<span class="cm">// ⚠ JOIN FETCH + Pageable — Hibernate xotirada sahifalaydi (HHH90003004) — katta jadvalda xavfli.</span>
+
+<span class="cm">// 2. @EntityGraph — derived query bilan</span>
+<span class="an">@EntityGraph</span>(attributePaths = {<span class="st">"transfers"</span>, <span class="st">"customer"</span>})
+<span class="ty">List</span>&lt;Account&gt; findByStatus(<span class="ty">Status</span> s);
+
+<span class="cm">// 3. @BatchSize — N+1 o'rniga N/10+1: WHERE account_id IN (?,?,...,?)</span>
+<span class="an">@OneToMany</span>(mappedBy = <span class="st">"account"</span>) <span class="an">@BatchSize</span>(size = <span class="nu">10</span>) <span class="ty">Set</span>&lt;Transfer&gt; transfers;
+<span class="cm">// global: spring.jpa.properties.hibernate.default_batch_fetch_size=16</span>
+
+<span class="cm">// 4. DTO — entity umuman yuklamang, faqat kerakli ustunlar</span>
+<span class="an">@Query</span>(<span class="st">"select new uz.bank.AccountSummary(a.id, a.number, count(t), sum(t.amount)) from Account a left join a.transfers t group by a.id, a.number"</span>)
+<span class="ty">List</span>&lt;AccountSummary&gt; summaries();</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>LAZY: "keyin yuklayman" — lekin qachon?</h2></div>
+    <p class="sec-sub">LAZY maydon — Hibernate proxy. Birinchi murojaatda SQL ketadi — <b>agar sessiya (tranzaksiya) hali ochiq bo'lsa</b>. Yopiq bo'lsa — mashhur <code>LazyInitializationException</code>. Kartani bosing:</p>
+    <div class="lz">
+      <div class="lzc bad" id="lz1"><h5>❌ Controller'da (tx yo'q, OSIV=false)</h5>Account a = service.get(1);<br>a.getTransfers().size();<div class="res">org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: Account.transfers: could not initialize proxy - no Session</div></div>
+      <div class="lzc good" id="lz2"><h5>✓ @Transactional service ichida</h5>@Transactional(readOnly = true)<br>int count(Long id) {<br>&nbsp;&nbsp;return repo.findById(id).orElseThrow()<br>&nbsp;&nbsp;&nbsp;&nbsp;.getTransfers().size();<br>}<div class="res">SELECT ... FROM transfer WHERE account_id=1 — sessiya ochiq, yuklandi ✓ (lekin bu ham N+1 bo'lishi mumkin — JOIN FETCH yaxshiroq)</div></div>
+      <div class="lzc bad" id="lz3"><h5>❌ Entity'ni JSON'ga berish</h5>@GetMapping("/{id}")<br>Account get(@PathVariable Long id) {<br>&nbsp;&nbsp;return repo.findById(id).get();<br>}<div class="res">Jackson getTransfers() ni chaqiradi → LazyInitializationException (yoki OSIV=true bo'lsa N+1 + cheksiz rekursiya: transfer.account.transfers...). Yechim: DTO.</div></div>
+      <div class="lzc good" id="lz4"><h5>✓ DTO bilan</h5>@Transactional(readOnly = true)<br>AccountDto get(Long id) {<br>&nbsp;&nbsp;Account a = repo.findWithTransfers(id);<br>&nbsp;&nbsp;return AccountDto.from(a);  // tx ichida<br>}<div class="res">Kerakli ma'lumot tx ichida DTO'ga ko'chirildi. Controller entity ko'rmaydi. ✓</div></div>
+    </div>
+    <div class="callout warn"><div class="ct">EAGER nega yomon</div><code>@ManyToOne</code> default EAGER! Har Transfer yuklanganda Account ham (JOIN yoki alohida SELECT). Account'da EAGER Customer, Customer'da EAGER Branch… — bitta findById butun grafni yuklaydi. Qoida: <b>hamma bog'lanish LAZY</b>, kerak bo'lganda so'rovda fetch. <code>@ManyToOne(fetch = LAZY)</code> ni doim yozing.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Cascade va orphanRemoval</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>cascade — amal "yuqadi"</h4><pre>@OneToMany(mappedBy="order", cascade = ALL,
+           orphanRemoval = true)
+List&lt;OrderItem&gt; items;
+
+repo.save(order);   // items ham INSERT
+repo.delete(order); // items ham DELETE
+order.getItems().remove(0); // orphanRemoval → DELETE</pre><div class="why">Faqat "ota-bola" (composition) uchun: OrderItem Order'siz ma'nosiz. <b>Transfer→Account</b>'ga cascade qo'ymang — o'tkazmani o'chirib hisobni o'chirib yubormang!</div></div>
+      <div class="card"><h4>Kolleksiya tipi</h4><pre>Set&lt;Transfer&gt;  — dublikat yo'q, ikki JOIN FETCH ok,
+                 equals/hashCode kerak
+List&lt;Transfer&gt; — tartib, "bag": remove() butun
+                 kolleksiyani qayta yozishi mumkin
+@OrderBy("createdAt DESC")</pre><div class="why">Ko'p elementli bog'lanish (hisob → 1 mln o'tkazma) — umuman mapping qilmang, repo orqali sahifalab so'rang.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>N+1 muammosi nima? Qanday aniqlaysiz va hal qilasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">1 so'rov bilan N ta ota entity olinadi, keyin har birining LAZY bog'lanishiga murojaat N ta qo'shimcha SELECT beradi. Aniqlash: SQL log (show-sql, datasource-proxy, p6spy), Hibernate statistikasi (hibernate.generate_statistics), testda so'rov sonini assert qilish. Yechim: JOIN FETCH / @EntityGraph (1 so'rov), @BatchSize / default_batch_fetch_size (N/k+1), DTO projection (entity'siz), kerak bo'lmasa umuman yuklamaslik.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>LAZY va EAGER farqi? Default qaysi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">LAZY — bog'lanish birinchi murojaatda yuklanadi (proxy), EAGER — ota entity bilan darhol. Default: @ManyToOne va @OneToOne — EAGER, @OneToMany va @ManyToMany — LAZY. Tavsiya: hammasini LAZY qiling (EAGER global 'har doim yuklash' — nazorat yo'q, kaskadli yuklash), kerak bo'lganda so'rov darajasida fetch.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>LazyInitializationException nima, qanday oldini olasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">LAZY proxy'ga sessiya (persistence context) yopilgandan keyin murojaat — Hibernate SQL yubora olmaydi. Sabab: tranzaksiyadan tashqarida (controller, Jackson serializatsiya, async thread). Yechim: kerakli ma'lumotni tranzaksiya ichida yuklash (JOIN FETCH/EntityGraph), DTO'ga tx ichida o'tkazish, Hibernate.initialize(). open-in-view=true 'yashiradi' lekin muammoni kattalashtiradi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Owning side va mappedBy?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Bidirectional bog'lanishda bazadagi FK'ni qaysi tomon boshqarishini belgilaydi. Owning side — FK ustuni bor entity (@ManyToOne tomoni, yoki @JoinColumn/@JoinTable qo'yilgan tomon). Inverse side — mappedBy='maydonNomi' bilan; undagi o'zgarish bazaga yozilmaydi. Shuning uchun ikkala tomonni sinxron tutuvchi helper metodlar (addChild/removeChild).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@OneToMany'da List va Set farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">List (bag) — tartib yo'q, dublikat mumkin; remove() Hibernate'da ba'zan butun kolleksiyani o'chirib qayta yozadi; ikkita List'ni JOIN FETCH — MultipleBagFetchException. Set — dublikat yo'q, ikkita Set fetch mumkin, lekin to'g'ri equals/hashCode kerak (id null bo'lganda ham ishlaydigan), va add() har element uchun hashCode → kolleksiya initsializatsiyasi. @OrderColumn bilan List indeksli bo'ladi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>cascade turlari? Qachon ishlatmaslik kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">PERSIST, MERGE, REMOVE, REFRESH, DETACH, ALL. orphanRemoval=true — kolleksiyadan olib tashlangan bola DELETE. Faqat composition ('bola otasiz yashamaydi': Order→OrderItem) uchun. Aggregation/reference'da (Transfer→Account, Employee→Department) hech qachon REMOVE/ALL — bola o'chganda ota o'chib ketadi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JOIN FETCH bilan sahifalash nega muammo?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Kolleksiya JOIN FETCH natijada ota qatorlari takrorlanadi (har bola uchun); SQL LIMIT qatorlarga qo'llanadi, entity'larga emas. Hibernate 'firstResult/maxResults specified with collection fetch; applying in memory' — butun natijani yuklab, xotirada sahifalaydi. Yechim: 2 so'rov (avval ota ID'larini sahifalab, keyin IN bilan bolalarni), yoki @BatchSize, yoki DTO.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@ManyToMany o'rniga nima tavsiya qilasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Oraliq jadvalni alohida entity qilib ikki @ManyToOne bilan mapping qilish. Sabab: oraliq jadvalga deyarli doim qo'shimcha ustun kerak bo'ladi (sana, holat, kim qo'shdi), @ManyToMany'da bunga joy yo'q; cascade REMOVE @ManyToMany'da xavfli; so'rovlar aniqroq.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="2"><div class="q-txt"><span class="qn">1.</span>100 ta hisobni olib, har birining transfers.size() ni chaqirdingiz (LAZY). Nechta SQL?</div><button class="opt">1</button><button class="opt">2</button><button class="opt">101</button><button class="opt">100</button><div class="q-fb" data-ok="To'g'ri. 1 (hisoblar) + 100 (har bir kolleksiya) = N+1." data-no="101. Har LAZY kolleksiya alohida SELECT — N+1 muammosi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>@ManyToOne default fetch?</div><button class="opt">LAZY</button><button class="opt">EAGER</button><button class="opt">Sozlanmagan</button><button class="opt">BATCH</button><div class="q-fb" data-ok="To'g'ri — va bu tuzoq. fetch = LAZY ni doim yozing." data-no="EAGER. Faqat kolleksiyalar (OneToMany/ManyToMany) default LAZY."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>account.getTransfers().add(t) qildingiz, t.setAccount(account) qilmadingiz (OneToMany mappedBy). Saqlangach FK?</div><button class="opt">To'ldiriladi</button><button class="opt">NULL — inverse side o'zgarishi yozilmaydi</button><button class="opt">Exception</button><button class="opt">Yangi jadval yaratiladi</button><div class="q-fb" data-ok="To'g'ri. Owning side (Transfer.account) o'rnatilmagan." data-no="NULL. mappedBy tomoni bazaga ta'sir qilmaydi — Transfer.setAccount() kerak. Helper metod yozing."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Transfer→Account bog'lanishiga cascade = ALL qo'yilsa, transferRepo.delete(t) nima qiladi?</div><button class="opt">Faqat o'tkazmani o'chiradi</button><button class="opt">Hisobni ham o'chiradi (yoki FK xatosi)</button><button class="opt">Hech narsa</button><button class="opt">Faqat FK'ni null qiladi</button><div class="q-fb" data-ok="To'g'ri. Kaskad REMOVE Account'ga yuqadi — bank uchun falokat. Cascade faqat composition'da." data-no="Kaskad o'chirish Account'ga boradi. Reference bog'lanishlarda cascade REMOVE/ALL — hech qachon."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Controller entity'ni qaytardi, Jackson LAZY kolleksiyaga murojaat qildi, OSIV=false. Natija?</div><button class="opt">JSON'da bo'sh massiv</button><button class="opt">LazyInitializationException</button><button class="opt">N+1 so'rov</button><button class="opt">Ishlaydi</button><div class="q-fb" data-ok="To'g'ri. Sessiya yopiq. DTO ishlating." data-no="LazyInitializationException — tx tugagan. Entity'ni JSON'ga bermang, DTO qaytaring."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Spring</span>
+      <h3>@Transactional chuqur</h3>
+      <p>Proxy qanday ishlaydi, nega self-invocation'da ishlamaydi, propagation (REQUIRED/REQUIRES_NEW), rollback qoidalari, readOnly, isolation — pul o'tkazmasi misolida jonli.</p>
+      <div class="topics"><span class="topic-pill">28 · Spring Data JPA</span><span class="topic-pill now">29 · Bog'lanishlar & N+1</span><span class="topic-pill">30 · @Transactional</span><span class="topic-pill">31 · Testlash</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="28-spring-data-jpa.html"><span class="cl">← Oldingi dars</span><span class="ct">28 · Spring Data JPA</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="30-transactional-chuqur.html"><span class="cl">Keyingi dars →</span><span class="ct">30 · @Transactional chuqur</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:33.0%"></i></div><span>29 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(29)<0)v.push(29);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','29');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(29)<0)D[t].push(29);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* relationships */
+  function tblH(name,cols){return '<div class="tb"><h5>'+name+'</h5>'+cols.map(function(c){return '<div class="c '+(c[2]||'')+'"><span>'+c[0]+'</span><small>'+c[1]+'</small></div>';}).join('')+'</div>';}
+  var REL={
+    m1:{d:tblH('transfer',[['id','PK','pk'],['amount',''],['account_id','FK → account.id','fk']])+'<div class="relmid">ko\'p → bitta<div class="ln"></div>N : 1</div>'+tblH('account',[['id','PK','pk'],['number','']]),
+        n:'<b>Ko\'p o\'tkazma → bitta hisob.</b> FK "ko\'p" tomonda (transfer.account_id). Eng ko\'p ishlatiladigan va eng xavfsiz bog\'lanish. Transfer — owning side. Default fetch EAGER — LAZY qiling!',
+        c:'<span class="cm">// Transfer.java (owning side — FK shu yerda)</span>\n<span class="an">@ManyToOne</span>(fetch = FetchType.LAZY, optional = <span class="k">false</span>)\n<span class="an">@JoinColumn</span>(name = <span class="st">"account_id"</span>)\n<span class="k">private</span> <span class="ty">Account</span> account;\n\n<span class="cm">// Ko\'p holatda faqat shu tomon yetarli — Account\'da List<Transfer> shart emas.</span>\n<span class="cm">// O\'tkazmalar kerak bo\'lsa: transferRepo.findByAccountId(id, pageable)</span>'},
+    '1m':{d:tblH('account',[['id','PK','pk'],['number','']])+'<div class="relmid">bitta → ko\'p<div class="ln"></div>1 : N</div>'+tblH('transfer',[['id','PK','pk'],['account_id','FK → account.id','fk']]),
+        n:'<b>Bitta hisob → ko\'p o\'tkazma.</b> Bazada YANGI ustun yo\'q — o\'sha transfer.account_id. Account tomoni <code>mappedBy</code> — ega emas, faqat "ko\'rish oynasi". Kolleksiya LAZY (default).',
+        c:'<span class="cm">// Account.java (inverse side)</span>\n<span class="an">@OneToMany</span>(mappedBy = <span class="st">"account"</span>, cascade = CascadeType.ALL, orphanRemoval = <span class="k">true</span>)\n<span class="k">private</span> <span class="ty">Set</span>&lt;Transfer&gt; transfers = <span class="k">new</span> HashSet&lt;&gt;();\n\n<span class="k">public void</span> addTransfer(<span class="ty">Transfer</span> t) {   <span class="cm">// ikki tomonni sinxron tutish</span>\n    transfers.add(t);\n    t.setAccount(<span class="k">this</span>);              <span class="cm">// owning side! busiz FK null</span>\n}\n<span class="cm">// mappedBy\'siz @OneToMany — Hibernate oraliq jadval (account_transfers) yaratadi. Xato!</span>'},
+    '11':{d:tblH('customer',[['id','PK','pk'],['name','']])+'<div class="relmid">bitta → bitta<div class="ln"></div>1 : 1</div>'+tblH('passport',[['id','PK','pk'],['customer_id','FK UNIQUE','fk'],['serial','']]),
+        n:'<b>Mijoz → pasport.</b> FK + UNIQUE. FK\'ni "bola" jadvalga qo\'ying (passport). Tuzoq: @OneToOne inverse tomoni (mappedBy) LAZY bo\'la olmaydi — Hibernate null yoki yo\'qligini bilish uchun SELECT qiladi. Yechim: @MapsId (umumiy PK) yoki faqat owning tomonni mapping qilish.',
+        c:'<span class="cm">// Passport.java (owning)</span>\n<span class="an">@OneToOne</span>(fetch = FetchType.LAZY)\n<span class="an">@JoinColumn</span>(name = <span class="st">"customer_id"</span>, unique = <span class="k">true</span>)\n<span class="k">private</span> <span class="ty">Customer</span> customer;\n\n<span class="cm">// Umumiy PK varianti (tavsiya):</span>\n<span class="an">@Id</span> <span class="k">private</span> <span class="ty">Long</span> id;\n<span class="an">@OneToOne</span>(fetch = LAZY) <span class="an">@MapsId</span> <span class="an">@JoinColumn</span>(name = <span class="st">"id"</span>)\n<span class="k">private</span> <span class="ty">Customer</span> customer;   <span class="cm">// passport.id = customer.id</span>'},
+    mm:{d:tblH('customer',[['id','PK','pk'],['name','']])+'<div class="relmid">ko\'p ↔ ko\'p<div class="ln"></div>N : M</div>'+tblH('product',[['id','PK','pk'],['title','']])+'<div class="jt">'+tblH('customer_product (join table)',[['customer_id','FK','fk'],['product_id','FK','fk'],['(PK: ikkalasi)','']])+'</div>',
+        n:'<b>Mijoz ↔ mahsulot</b> (bir mijozda ko\'p mahsulot, bir mahsulot ko\'p mijozda). Oraliq jadval. Amalda deyarli doim oraliq jadvalga qo\'shimcha ustun kerak bo\'ladi (ulangan sana, holat) — shunda @ManyToMany o\'rniga <b>alohida entity + ikki @ManyToOne</b>.',
+        c:'<span class="cm">// Oddiy variant</span>\n<span class="an">@ManyToMany</span>\n<span class="an">@JoinTable</span>(name = <span class="st">"customer_product"</span>,\n    joinColumns = <span class="an">@JoinColumn</span>(name = <span class="st">"customer_id"</span>),\n    inverseJoinColumns = <span class="an">@JoinColumn</span>(name = <span class="st">"product_id"</span>))\n<span class="k">private</span> <span class="ty">Set</span>&lt;Product&gt; products;\n\n<span class="cm">// Tavsiya: aniq entity</span>\n<span class="an">@Entity</span> <span class="k">class</span> <span class="ty">Subscription</span> {\n    <span class="an">@ManyToOne</span>(fetch = LAZY) Customer customer;\n    <span class="an">@ManyToOne</span>(fetch = LAZY) Product product;\n    <span class="ty">Instant</span> activatedAt; <span class="ty">Status</span> status;   <span class="cm">// qo\'shimcha ma\'lumot</span>\n}'}
+  };
+  function showRel(k){[].slice.call(document.querySelectorAll('#relpick button')).forEach(function(b){b.classList.toggle('on',b.dataset.r===k);});document.getElementById('reld').innerHTML=REL[k].d;document.getElementById('relNote').innerHTML=REL[k].n;document.getElementById('relCode').innerHTML=REL[k].c;}
+  [].slice.call(document.querySelectorAll('#relpick button')).forEach(function(b){b.addEventListener('click',function(){showRel(b.dataset.r);});});showRel('m1');
+
+  /* n+1 */
+  var fix='lazy',N=5,npT=[];
+  document.getElementById('nRng').addEventListener('input',function(){N=+this.value;document.getElementById('nLbl').textContent=N;});
+  [].slice.call(document.querySelectorAll('#fixes button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#fixes button')).forEach(function(x){x.classList.toggle('on',x===b);});fix=b.dataset.f;});});
+  document.getElementById('npPlay').addEventListener('click',function(){npT.forEach(clearTimeout);npT=[];
+    var accs=document.getElementById('accs'),qlog=document.getElementById('qlog');accs.innerHTML='';qlog.innerHTML='';
+    var show=Math.min(N,12);for(var i=1;i<=show;i++){var d=document.createElement('div');d.className='acc';d.innerHTML='<span>Account#'+i+'</span><span class="tr">transfers: ?</span>';accs.appendChild(d);}
+    if(N>show){var m=document.createElement('div');m.className='acc';m.innerHTML='<span>… yana '+(N-show)+' ta</span>';accs.appendChild(m);}
+    var q=0,rows=0,time=0;function cnt(){document.getElementById('qCount').textContent=q+' so\'rov';document.getElementById('qTot').textContent=q;document.getElementById('qTot').className=q>N?'bad':'';document.getElementById('qTime').textContent=time;document.getElementById('qRows').textContent=rows;document.getElementById('tbar').firstChild&&0;var i=document.getElementById('tbar');i.className=q<=3?'ok':'';i.style.width=Math.min(100,time/(N*3+5)*100)+'%';}
+    function logq(html,cls){var d=document.createElement('div');d.className=cls||'';d.innerHTML=html;qlog.appendChild(d);qlog.scrollTop=qlog.scrollHeight;}
+    function mark(i,txt){var el=accs.children[i-1];if(!el||i>show)return;[].slice.call(accs.children).forEach(function(x){x.classList.remove('cur');});el.classList.add('cur');el.lastChild.textContent='transfers: '+txt;el.lastChild.className='tr ok';}
+    var note=document.getElementById('npNote');
+    if(fix==='lazy'){q=1;time=3;rows=N;logq('SELECT * FROM account WHERE customer_id=?  <span class="q1">(1)</span>');cnt();
+      for(let i=1;i<=N;i++){npT.push(setTimeout(function(){q++;time+=3;rows+=4;logq('SELECT * FROM transfer WHERE account_id='+i+'  <span class="qn">(+1)</span>');mark(i,'4');cnt();if(i===N)note.innerHTML='<b>N+1 = '+(N+1)+' so\'rov.</b> Har hisob uchun bazaga alohida sayohat (network round-trip). 5 ta bilinmaydi, 1000 mijoz × 50 hisob — sekundlar. Dev\'da SQL log yoqilmasa <b>ko\'rinmaydi</b> — shuning uchun show-sql / datasource-proxy.';},Math.min(i,12)*180));}}
+    else if(fix==='fetch'||fix==='graph'){q=1;time=6;rows=N*4;logq('SELECT a.*, t.* FROM account a LEFT JOIN transfer t ON t.account_id=a.id WHERE a.customer_id=?  <span class="q1">(1)</span>');cnt();
+      for(let i=1;i<=show;i++){npT.push(setTimeout(function(){mark(i,'4 (xotirada)');},i*80));}note.innerHTML='<b>1 so\'rov.</b> '+(fix==='fetch'?'JOIN FETCH':'@EntityGraph')+' — hisob va o\'tkazmalar bitta natija to\'plamida ('+N*4+' qator, hisob ustunlari 4 marta takrorlanadi — "kartezian" narxi). Sikl bazaga bormaydi. Kolleksiya bilan Pageable — ehtiyot.';}
+    else if(fix==='batch'){q=1;time=3;rows=N;logq('SELECT * FROM account WHERE customer_id=?  <span class="q1">(1)</span>');cnt();var batches=Math.ceil(N/10);
+      for(let b=0;b<batches;b++){npT.push(setTimeout(function(){q++;time+=4;var from=b*10+1,to=Math.min(N,b*10+10);rows+=(to-from+1)*4;logq('SELECT * FROM transfer WHERE account_id IN ('+from+'…'+to+')  <span class="qn">(+1)</span>');for(var i=from;i<=to;i++)mark(i,'4');cnt();if(b===batches-1)note.innerHTML='<b>1 + '+batches+' so\'rov.</b> @BatchSize(10): birinchi LAZY murojaatda Hibernate 10 ta hisobning o\'tkazmalarini bitta IN (...) bilan oladi. Oddiy, global sozlanadi (default_batch_fetch_size), JOIN kartezianisiz. Ko\'p holatda eng amaliy yechim.';},(b+1)*250));}}
+    else if(fix==='dto'){q=1;time=4;rows=N;logq('SELECT a.id, a.number, count(t.id), sum(t.amount) FROM account a LEFT JOIN transfer t ON ... GROUP BY a.id  <span class="q1">(1)</span>');cnt();for(let i=1;i<=show;i++){npT.push(setTimeout(function(){mark(i,'count=4');},i*80));}note.innerHTML='<b>1 so\'rov, '+N+' qator.</b> Entity umuman yuklanmadi — baza sanadi va yig\'di. Ro\'yxat/hisobot ekranlari uchun eng tez yo\'l: kerakli ustunlar, persistence context bo\'sh, dirty checking yo\'q.';}
+    else if(fix==='eager'){q=1;time=6;rows=N*4;logq('SELECT a.*, t.* FROM account a LEFT JOIN transfer t ON ...  <span class="q1">(1, lekin HAR DOIM)</span>');cnt();for(let i=1;i<=show;i++){npT.push(setTimeout(function(){mark(i,'4 (majburan)');},i*80));}note.innerHTML='EAGER bu yerda 1 so\'rov berdi — lekin <b>har doim</b>: faqat hisob raqami kerak bo\'lganda ham 1 mln o\'tkazma yuklanadi. Va findAll() + EAGER kolleksiya ko\'pincha baribir N+1 beradi (JPQL so\'rovlar EAGER\'ni JOIN qilmaydi, alohida SELECT). EAGER — nazorat yo\'qotish.';}
+  });
+
+  /* lazy cards */
+  [].slice.call(document.querySelectorAll('.lzc')).forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('open');});});
+
+})();
+</script>
+</body>
+</html>

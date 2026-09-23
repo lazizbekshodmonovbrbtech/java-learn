@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vue.js nima</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+.idv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.idv>div{min-width:0;border:1px solid var(--border);border-radius:14px;padding:10px;background:var(--surface-2)}
+.idv h5{margin:0 0 8px;font-family:var(--font-mono);font-size:12.5px}
+.ui{background:#fff;color:#222;border-radius:12px;padding:12px;font-family:system-ui,sans-serif;font-size:13.5px;border:1px solid #ddd}
+.ui .hdr{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#666}
+.ui .cnt{background:#eee;border-radius:999px;padding:1px 8px;font-weight:700;color:#333;transition:background .3s}
+.ui .bal{font-size:24px;font-weight:800;margin:6px 0 2px;transition:background .3s;border-radius:6px}
+.ui .usd{font-size:12px;color:#777;transition:background .3s;border-radius:4px}
+.ui ul{list-style:none;margin:8px 0 0;padding:0;font-size:12.5px;max-height:120px;overflow-y:auto}
+.ui li{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee}
+.ui .flash{background:#FFE9A8!important}
+.ui .stale{background:#FFD6D0!important;outline:2px solid #C8372D}
+.dlog{font-family:var(--font-mono);font-size:11px;background:#10201A;color:#CFEFE2;border-radius:10px;padding:8px;margin-top:8px;min-height:92px;max-height:130px;overflow-y:auto;line-height:1.6}
+.dlog .d{color:#F5DC78}.dlog .e{color:#82D8B1}.dlog .x{color:#FF8A7A}
+.tb3{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+/* sfc */
+.sfc{font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px 0;line-height:1.8;overflow-x:auto;margin-top:10px}
+.sfc div{padding:0 12px;white-space:pre;cursor:pointer;border-left:4px solid transparent;transition:.2s}
+.sfc div.g1{border-left-color:#2C8F68}.sfc div.g2{border-left-color:#2E6FA8}.sfc div.g3{border-left-color:#A9660D}
+.sfc div.on{background:var(--accent-soft)}
+/* tree */
+.tree2{margin-top:10px;font-family:var(--font-mono);font-size:12px}
+.cp{border:2px solid var(--border-strong);border-radius:12px;padding:8px 10px 10px;margin-top:6px;background:var(--surface);cursor:pointer;transition:.25s}
+.cp>.nm{font-weight:700;display:block;margin-bottom:2px}
+.cp .row3{display:flex;gap:6px;flex-wrap:wrap}
+.cp .row3>.cp{flex:1;min-width:140px}
+.cp.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.cp.pg{border-style:dashed}
+@media (max-width:700px){.idv{grid-template-columns:1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 1/8</span><span>· Kurs: 81/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 81-modul · kirish</span>
+    <h1>Vue.js <span class="steam">nima</span>?</h1>
+    <p class="lead">Vue — foydalanuvchi interfeysini <b>holatdan</b> (state) hosil qiluvchi progressiv framework. Siz ma’lumotni o‘zgartirasiz — Vue DOM’ning kerakli joylarini o‘zi yangilaydi. 72-modulda qo‘lda DOM bilan ishlash qanchalik mashaqqatli ekanini ko‘rdik; bu yerda farqni yonma-yon his qilamiz. Trek oxirida Keycloak bilan himoyalangan, Spring API’ga ulangan internet-bank SPA’ni yig‘asiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Imperativ vs deklarativ</h2></div><p class="sec-sub">Bir xil "hisob kartochkasi" ikki usulda. Tugmalarni bosing va o‘ng pastdagi loglarni solishtiring. (O‘ng tomonda sahifa ichida yozilgan kichik reaktiv dvigatel ishlayapti — Vue’ning Proxy mexanizmi bilan bir xil g‘oya.)</p>
+    <div class="stage">
+      <div class="idv">
+        <div><h5>🛠 Qo‘lda DOM (imperativ)</h5><div class="ui" id="uiA"><div class="hdr"><span>Asosiy hisob</span><span class="cnt" id="aCnt">0 ta</span></div><div class="bal" id="aBal">0 so‘m</div><div class="usd" id="aUsd">≈ 0 USD</div><ul id="aList"></ul></div><div class="dlog" id="aLog"></div></div>
+        <div><h5>💚 Vue uslubi (deklarativ)</h5><div class="ui" id="uiB"><div class="hdr"><span>Asosiy hisob</span><span class="cnt" id="bCnt">0 ta</span></div><div class="bal" id="bBal">0 so‘m</div><div class="usd" id="bUsd">≈ 0 USD</div><ul id="bList"></ul></div><div class="dlog" id="bLog"></div></div>
+      </div>
+      <div class="tb3"><button class="btn primary" id="k1">➕ Kirim 500 000</button><button class="btn" id="k2">➖ Chiqim 120 000</button><button class="btn" id="k3">💱 Kurs 12 650 → 12 800</button><button class="btn" id="k0">↺</button></div>
+      <div class="explain" id="idEx">Tugmani bosing.</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Hisob.vue — o‘ng tomonning haqiqiy Vue kodi</span></div><pre class="code">&lt;<span class="k">script</span> <span class="k">setup</span> lang=<span class="st">"ts"</span>&gt;
+<span class="k">import</span> { ref, computed } <span class="k">from</span> <span class="st">"vue"</span>;
+
+<span class="k">const</span> tx = ref&lt;{ nomi: string; summa: number }[]&gt;([]);
+<span class="k">const</span> kurs = ref(<span class="nu">12650</span>);
+<span class="k">const</span> balans = computed(() =&gt; tx.value.reduce((s, t) =&gt; s + t.summa, <span class="nu">0</span>));
+<span class="k">const</span> usd = computed(() =&gt; (balans.value / kurs.value).toFixed(<span class="nu">2</span>));
+&lt;/<span class="k">script</span>&gt;
+
+&lt;<span class="k">template</span>&gt;
+  &lt;div <span class="k">class</span>=<span class="st">"hdr"</span>&gt;<span class="ty">Asosiy</span> hisob &lt;span <span class="k">class</span>=<span class="st">"cnt"</span>&gt;{{ tx.length }} ta&lt;/span&gt;&lt;/div&gt;
+  &lt;div <span class="k">class</span>=<span class="st">"bal"</span>&gt;{{ balans.toLocaleString(<span class="st">"ru-RU"</span>) }} so'm&lt;/div&gt;
+  &lt;div <span class="k">class</span>=<span class="st">"usd"</span>&gt;≈ {{ usd }} USD&lt;/div&gt;
+  &lt;ul&gt;&lt;li <span class="k">v-for</span>=<span class="st">"t in tx"</span> :key=<span class="st">"t.nomi"</span>&gt;{{ t.nomi }} — {{ t.summa }}&lt;/li&gt;&lt;/ul&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Single File Component (.vue) anatomiyasi</h2></div><p class="sec-sub">Qatorni bosing — u qaysi qismga tegishli va nima qilishini ko‘ring.</p>
+    <div class="stage"><div class="sfc" id="sfc"></div><div class="tap-note" id="sfcN">Qatorni bosing.</div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Internet-bank: komponentlar daraxti</h2></div><p class="sec-sub">SPA — komponentlar daraxti. Har biri o‘z holati, props (tepadan) va events (pastdan) bilan. Komponentni bosing.</p>
+    <div class="stage"><div class="tree2" id="tree"></div><div class="tap-note" id="trN">Komponentni bosing.</div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Loyiha yaratish</h2></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">terminal</span></div><pre class="code"><span class="k">npm</span> create vue<span class="k">@latest</span> internet-bank
+<span class="cm"># ✔ Add TypeScript? … Yes</span>
+<span class="cm"># ✔ Add Vue Router for Single Page Application development? … Yes</span>
+<span class="cm"># ✔ Add Pinia for state management? … Yes</span>
+<span class="cm"># ✔ Add Vitest for Unit Testing? … Yes</span>
+<span class="cm"># ✔ Add ESLint for code quality? … Yes</span>
+cd internet-bank &amp;&amp; <span class="k">npm</span> install &amp;&amp; <span class="k">npm</span> <span class="k">run</span> dev      <span class="cm"># http://localhost:5173</span></pre></div><div class="tbl-wrap"><table class="tbl"><tr><th>Papka / fayl</th><th>Vazifa</th><th>Spring analogi</th></tr><tr><td><code>src/main.ts</code></td><td>Ilovani yaratish, plugin’lar (router, pinia) ulash</td><td><code>@SpringBootApplication main()</code></td></tr><tr><td><code>src/App.vue</code></td><td>Ildiz komponent</td><td>—</td></tr><tr><td><code>src/views/</code></td><td>Sahifa komponentlari (route’ga bog‘langan)</td><td>Controller + view</td></tr><tr><td><code>src/components/</code></td><td>Qayta ishlatiladigan UI bo‘laklari</td><td>—</td></tr><tr><td><code>src/stores/</code></td><td>Pinia store’lar (global holat)</td><td>Singleton service (sessiya holati)</td></tr><tr><td><code>src/router/</code></td><td>URL → komponent</td><td><code>@RequestMapping</code></td></tr><tr><td><code>vite.config.ts</code></td><td>Build, dev server, proxy</td><td><code>pom.xml</code> + <code>application.yml</code></td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Vue, React, Angular</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th></th><th>Vue 3</th><th>React</th><th>Angular</th></tr><tr><td>Turi</td><td>Progressiv framework</td><td>UI kutubxona (+ ekotizim)</td><td>To‘liq framework</td></tr><tr><td>Shablon</td><td>HTML-ga yaqin template (+JSX mumkin)</td><td>JSX</td><td>HTML template + TypeScript</td></tr><tr><td>Reaktivlik</td><td>Proxy asosida, avtomatik bog‘liqlik kuzatuvi</td><td>Qayta render + hook’lar (useState)</td><td>Signals (yangi), zone.js (eski)</td></tr><tr><td>O‘rganish</td><td>Eng yumshoq</td><td>O‘rtacha</td><td>Tik (DI, RxJS…)</td></tr><tr><td>Holat</td><td>Pinia</td><td>Redux/Zustand/…</td><td>Service + Signals/NgRx</td></tr><tr><td>Java dasturchiga</td><td>Oson kirish</td><td>Ko‘p JS idiomalar</td><td>Spring’ga eng o‘xshash (DI, dekoratorlar)</td></tr></table></div><div class="callout tip"><div class="ct">💡 Nega bu kursda Vue</div>O‘zbekistondagi ko‘p bank va fintech jamoalari (ichki panellar, internet-bank) Vue’dan foydalanadi; kirish oson, TypeScript bilan yaxshi ishlaydi, Keycloak integratsiyasi oddiy. React’ga keyin o‘tish qiyin emas — g‘oyalar (komponent, props, holat) bir xil.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Vue nima va qanday muammoni hal qiladi?<span class="chev">›</span></summary><div class="iv-a">Deklarativ, komponentli UI framework: holat va shablon beriladi, DOM’ni sinxronlash (qaysi element qachon yangilanadi) Vue’ning ishi. Reaktivlik tizimi bog‘liqliklarni avtomatik kuzatadi, komponentlar kodni qayta ishlatish va izolyatsiya qilish imkonini beradi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Deklarativ va imperativ UI farqi?<span class="chev">›</span></summary><div class="iv-a">Imperativ — "qanday": DOM’ni qadamma-qadam o‘zgartirish buyruqlari (createElement, textContent). Deklarativ — "nima": UI holatdan qanday ko‘rinishi kerakligi tasvirlanadi, o‘tishni framework bajaradi. Imperativda holat va UI bir-biridan uzilib qolishi (stale UI) oson.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Virtual DOM nima? Vue uni qanday ishlatadi?<span class="chev">›</span></summary><div class="iv-a">DOM’ning yengil JS nusxasi: yangi render natijasi eskisi bilan solishtirilib (diff), faqat farqlar haqiqiy DOM’ga qo‘llanadi. Vue kompilyatori shablondagi statik qismlarni belgilaydi (static hoisting, patch flags) — diff tezroq. Vapor mode (tajribaviy) virtual DOM’siz to‘g‘ridan-to‘g‘ri yangilash yo‘nalishi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SFC nima?<span class="chev">›</span></summary><div class="iv-a">Single File Component: .vue fayl — template, script (setup), style (scoped) bir joyda. Vite plugin’i uni JS render funksiyasiga kompilyatsiya qiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Options API va Composition API?<span class="chev">›</span></summary><div class="iv-a">Options API — data, methods, computed, watch bo‘limlari (Vue 2 uslubi). Composition API — setup ichida ref/computed/watch funksiyalari, mantiqni composable’larga ajratish oson, TS bilan yaxshi. Yangi loyihalar — &lt;script setup&gt; + Composition API (85-modul).</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Imperativ variantda "tranzaksiyalar soni" nega eskirib qoldi?</div><button class="opt">Brauzer xatosi</button><button class="opt">Dasturchi har o‘zgarishda qaysi DOM’ni yangilashni o‘zi eslab qolishi kerak — unutgan</button><button class="opt">Vue kerak edi</button><div class="q-fb" data-ok="To‘g‘ri — holat va UI qo‘lda sinxronlanadi." data-no="Yo‘q. Qo‘lda sinxronlashda bitta joyni unutish oson."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Vue’da balansni yangilash uchun nima qilasiz?</div><button class="opt">document.querySelector(".bal").textContent = …</button><button class="opt">Holatni o‘zgartirasiz (tx.value.push(...)); computed va shablon o‘zi yangilanadi</button><button class="opt">Sahifani qayta yuklaysiz</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Vue’da DOM’ga qo‘lda tegilmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>&lt;style scoped&gt; nima qiladi?</div><button class="opt">Stil global bo‘ladi</button><button class="opt">Stil faqat shu komponent elementlariga tegadi (data-v-* atribut)</button><button class="opt">Stil o‘chadi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. scoped — izolyatsiya."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Vue kompilyatori shablonni nimaga aylantiradi?</div><button class="opt">HTML faylga</button><button class="opt">Render funksiyasiga (JS)</button><button class="opt">Java klassiga</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Render funksiyasiga."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Yangi Vue 3 loyiha uchun tavsiya etilgan uslub?</div><button class="opt">Options API + JS</button><button class="opt">&lt;script setup lang="ts"&gt; + Composition API</button><button class="opt">jQuery</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Composition API + TS."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Reaktivlik (flagship)</h3>
+      <p>ref, reactive, computed, watch — va Proxy ostida bog‘liqliklar qanday kuzatilishi animatsiyada.</p>
+      <div class="topics"><span class="topic-pill now">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="80-ts-suhbat-savollari.html"><span class="cl">← Oldingi dars</span><span class="ct">80 · TS suhbat savollari</span><span class="cs">🔷 TypeScript</span></a><a class="cn nx" href="82-reaktivlik.html"><span class="cl">Keyingi dars →</span><span class="ct">82 · Reaktivlik</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:92.0%"></i></div><span>81 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(81)<0)v.push(81);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','81');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(81)<0)D[t].push(81);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+window.MiniVue=(function(){
+  var active=null,targetMap=new WeakMap(),listeners=[];
+  function onEvent(f){listeners.push(f);}
+  function emit(t,d){listeners.forEach(function(f){f(t,d);});}
+  function track(t,k){if(!active)return;var m=targetMap.get(t);if(!m)targetMap.set(t,m=new Map());var s=m.get(k);if(!s)m.set(k,s=new Set());if(!s.has(active)){s.add(active);active.deps.push(s);emit('track',{key:k,effect:active.name});}}
+  function trigger(t,k){var m=targetMap.get(t);if(!m)return;var s=m.get(k);if(!s)return;emit('trigger',{key:k,effects:[...s].map(function(e){return e.name;})});[...s].forEach(function(e){e.scheduler?e.scheduler():e.run();});}
+  function reactive(o){return new Proxy(o,{get:function(t,k,r){var v=Reflect.get(t,k,r);if(typeof k!=='symbol')track(t,k);return v&&typeof v==='object'?reactive(v):v;},
+    set:function(t,k,v,r){var old=t[k];var ok=Reflect.set(t,k,v,r);if(old!==v||k==='length'){emit('set',{key:k,old:old,val:v});trigger(t,k);}return ok;}});}
+  function ref(v){var r={_v:v,get value(){track(r,'value');return this._v;},set value(n){var o=this._v;this._v=n;if(o!==n){emit('set',{key:'value',old:o,val:n});trigger(r,'value');}}};return r;}
+  function effect(fn,name){var e={name:name||'effect',deps:[],run:function(){e.deps.forEach(function(s){s.delete(e);});e.deps=[];var prev=active;active=e;try{return fn();}finally{active=prev;}}};e.run();return e;}
+  function computed(fn,name){var dirty=true,val,c={_name:name};var e={name:name||'computed',deps:[],run:function(){e.deps.forEach(function(s){s.delete(e);});e.deps=[];var prev=active;active=e;try{val=fn();}finally{active=prev;}dirty=false;return val;},scheduler:function(){if(!dirty){dirty=true;emit('dirty',{name:e.name});trigger(c,'value');}}};
+    Object.defineProperty(c,'value',{get:function(){track(c,'value');if(dirty)e.run();return val;}});return c;}
+  return {reactive:reactive,ref:ref,effect:effect,computed:computed,onEvent:onEvent};
+})();
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  function fmt(n){return n.toLocaleString('ru-RU');}
+  function flash(e){e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash');setTimeout(function(){e.classList.remove('flash');},700);}
+  function log(id,h){var l=el(id);l.insertAdjacentHTML('beforeend','<div>'+h+'</div>');l.scrollTop=l.scrollHeight;}
+  var NM=['Maosh','Korzinka','Uzum','P2P kirim','Payme','Kommunal'],n=0;
+  /* imperative */
+  var A={bal:0,cnt:0,kurs:12650};
+  function aAdd(s,nm){A.bal+=s;A.cnt++;
+    log('aLog','<span class="d">balEl.textContent</span> = "'+fmt(A.bal)+' so‘m"');el('aBal').textContent=fmt(A.bal)+' so‘m';flash(el('aBal'));
+    log('aLog','<span class="d">usdEl.textContent</span> = "≈ '+(A.bal/A.kurs).toFixed(2)+' USD"');el('aUsd').textContent='≈ '+(A.bal/A.kurs).toFixed(2)+' USD';flash(el('aUsd'));
+    log('aLog','<span class="d">li = createElement("li")</span>; list.append(li)');el('aList').insertAdjacentHTML('beforeend','<li><span>'+nm+'</span><span>'+(s>0?'+':'')+fmt(s)+'</span></li>');
+    log('aLog','<span class="x">// cntEl … unutildi!</span>');el('aCnt').classList.add('stale');}
+  /* declarative */
+  var MV=window.MiniVue,S=MV.reactive({tx:[],kurs:12650});
+  var bal=MV.computed(function(){return S.tx.reduce(function(a,t){return a+t.s;},0);},'balans');
+  var usd=MV.computed(function(){return (bal.value/S.kurs).toFixed(2);},'usd');
+  var ready=false;
+  MV.effect(function(){var c=S.tx.length;el('bCnt').textContent=c+' ta';if(ready){flash(el('bCnt'));log('bLog','<span class="e">↻ render</span> sarlavha: '+c+' ta');}},'cnt');
+  MV.effect(function(){var b=bal.value;el('bBal').textContent=fmt(b)+' so‘m';if(ready){flash(el('bBal'));log('bLog','<span class="e">↻ render</span> balans: '+fmt(b));}},'bal');
+  MV.effect(function(){var u=usd.value;el('bUsd').textContent='≈ '+u+' USD';if(ready){flash(el('bUsd'));log('bLog','<span class="e">↻ render</span> usd: '+u);}},'usd');
+  MV.effect(function(){var h=S.tx.map(function(t){return '<li><span>'+t.n+'</span><span>'+(t.s>0?'+':'')+fmt(t.s)+'</span></li>';}).join('');el('bList').innerHTML=h;if(ready)log('bLog','<span class="e">↻ render</span> ro‘yxat ('+S.tx.length+')');},'list');
+  ready=true;
+  el('k1').addEventListener('click',function(){var nm=NM[n++%NM.length];aAdd(500000,nm);log('bLog','<span class="d">tx.value.push</span>({ '+nm+', 500000 })');S.tx.push({n:nm,s:500000});
+    el('idEx').innerHTML='Chapda dasturchi <b>3 ta DOM joyini</b> qo‘lda yangiladi va to‘rtinchisini (sarlavhadagi son) <b>unutdi</b> — qizil. O‘ngda faqat <b>bitta</b> qator: holatga push. Vue qaysi joylar shu holatga bog‘liqligini biladi va hammasini yangiladi.';});
+  el('k2').addEventListener('click',function(){var nm=NM[n++%NM.length];aAdd(-120000,nm);log('bLog','<span class="d">tx.value.push</span>({ '+nm+', -120000 })');S.tx.push({n:nm,s:-120000});});
+  el('k3').addEventListener('click',function(){A.kurs=12800;log('aLog','<span class="x">// kurs o‘zgardi — usdEl’ni yangilash kerakligini kim eslaydi?</span>');el('aUsd').classList.add('stale');
+    log('bLog','<span class="d">kurs.value</span> = 12800');S.kurs=12800;el('idEx').innerHTML='Kurs o‘zgardi. O‘ngda Vue faqat <b>kursga bog‘liq</b> joyni (USD) qayta chizdi — balans, ro‘yxat, sarlavhaga tegmadi. Chapda — hech narsa yangilanmadi (qizil): kurs o‘zgarishi usd elementiga ta’sir qilishini alohida kodlash kerak edi.';});
+  el('k0').addEventListener('click',function(){A={bal:0,cnt:0,kurs:12650};['aBal','aUsd','aCnt'].forEach(function(i){el(i).classList.remove('stale');});el('aBal').textContent='0 so‘m';el('aUsd').textContent='≈ 0 USD';el('aCnt').textContent='0 ta';el('aList').innerHTML='';el('aLog').innerHTML='';el('bLog').innerHTML='';S.tx.splice(0,S.tx.length);S.kurs=12650;el('bLog').innerHTML='';});
+
+  /* SFC */
+  var SFC=[['<script setup lang="ts">','g1','<b>&lt;script setup&gt;</b> — komponent mantiqi. Bu yerda e’lon qilingan hamma narsa shablonga avtomatik ochiq. <code>lang="ts"</code> — TypeScript.'],
+    ['import { ref, computed } from "vue";','g1','Reaktivlik API’si (82-modul).'],['import KartaItem from "./KartaItem.vue";','g1','Boshqa komponentni import — shablonda <code>&lt;KartaItem&gt;</code> sifatida ishlatiladi.'],
+    ['const props = defineProps<{ mijozId: string }>();','g1','<b>Props</b> — ota komponentdan keladigan kirish (84-modul). TS tipi bilan.'],['const kartalar = ref<Karta[]>([]);','g1','Reaktiv holat.'],
+    ['const faollar = computed(() => kartalar.value.filter(k => k.faol));','g1','Hosila qiymat — kartalar o‘zgarsa avtomatik qayta hisoblanadi.'],['<\/script>','g1',''],['',''],
+    ['<template>','g2','<b>&lt;template&gt;</b> — HTML’ga o‘xshash shablon. Kompilyator uni render funksiyasiga aylantiradi.'],
+    ['  <h2>Kartalar ({{ faollar.length }})</h2>','g2','<code>{{ }}</code> — interpolyatsiya, avtomatik <b>escape</b> qilinadi (XSS’dan himoya, 72-modul).'],
+    ['  <KartaItem v-for="k in faollar" :key="k.id" :karta="k" @blokla="blokla" />','g2','<code>v-for</code> — ro‘yxat, <code>:key</code> — identifikator, <code>:karta</code> — prop berish, <code>@blokla</code> — hodisani tinglash (83–84-modullar).'],
+    ['</template>','g2',''],['',''],['<style scoped>','g3','<b>&lt;style scoped&gt;</b> — stil faqat shu komponentga. Vue elementlarga <code>data-v-7a3f</code> kabi atribut qo‘shadi va CSS’ni unga bog‘laydi.'],['h2 { color: #2C8F68; }','g3','Bu h2 boshqa komponentlardagi h2’ga ta’sir qilmaydi.'],['</style>','g3','']];
+  el('sfc').innerHTML=SFC.map(function(l,i){return '<div class="'+(l[1]||'')+'" data-i="'+i+'">'+(l[0]||' ').replace(/</g,'&lt;')+'</div>';}).join('');
+  el('sfc').addEventListener('click',function(e){var d=e.target.closest('div[data-i]');if(!d)return;var l=SFC[+d.dataset.i];if(!l[2])return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===d);});el('sfcN').innerHTML=l[2];});
+
+  /* tree */
+  var T={App:['App.vue','Ildiz: RouterView va layout. Keycloak init shu yerdan oldin (main.ts, 87-modul).'],Layout:['MainLayout.vue','Umumiy ramka: header, sidebar, kontent. Slot orqali sahifani qabul qiladi (84-modul).'],Header:['AppHeader.vue','Foydalanuvchi ismi (Pinia auth store’dan), til, chiqish tugmasi → emit("logout").'],Side:['SideMenu.vue','Menyu: rolga qarab (MIJOZ/KASSIR) elementlar ko‘rinadi. Joriy route’ni ajratib ko‘rsatadi.'],
+    View:['RouterView → HisoblarView.vue','Sahifa: /hisoblar. Ma’lumotni useHisoblar() composable orqali oladi (85-modul).'],Card:['HisobKarta.vue ×N','Props: hisob. Emit: tanlandi. O‘zi API chaqirmaydi — "dumb" komponent.'],Tx:['TranzaksiyaJadval.vue','Props: tx[]; ichida sahifalash, filtr. Katta ro‘yxat — virtual scroll.'],Modal:['P2pModal.vue','v-model bilan ochiladi/yopiladi. Forma validatsiyasi, Idempotency-Key bilan yuborish.']};
+  function cp(k,inner,cls){return '<div class="cp'+(cls?' '+cls:'')+'" data-k="'+k+'"><span class="nm">'+T[k][0]+'</span>'+(inner||'')+'</div>';}
+  el('tree').innerHTML=cp('App',cp('Layout','<div class="row3">'+cp('Header')+cp('Side')+'</div>'+cp('View','<div class="row3">'+cp('Card')+cp('Tx')+cp('Modal')+'</div>','pg')));
+  el('tree').addEventListener('click',function(e){var c=e.target.closest('.cp');if(!c)return;e.stopPropagation();[].forEach.call(this.querySelectorAll('.cp'),function(x){x.classList.toggle('on',x===c);});el('trN').innerHTML='<b>'+T[c.dataset.k][0]+'</b> — '+T[c.dataset.k][1];});
+})();
+
+</script>
+</body>
+</html>

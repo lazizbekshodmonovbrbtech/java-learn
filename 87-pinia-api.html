@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pinia va API qatlami</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+/* store */
+.ps2{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:12px;margin-top:10px;align-items:start}
+.ps2>div{min-width:0}
+.cmp{border:2px solid var(--border-strong);border-radius:12px;padding:8px 10px;background:var(--surface);margin-bottom:8px;transition:.3s;font-size:13px}
+.cmp small{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+.cmp b{font-family:var(--font-mono);font-size:15px}
+.cmp.fl{border-color:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+.cmp.rb{border-color:var(--coral);box-shadow:0 0 0 5px var(--coral-soft)}
+.store{border:2px solid #E6B400;border-radius:14px;background:var(--surface);overflow:hidden}
+.store .sh{background:#FFF4C9;color:#5C4500;font-family:var(--font-mono);font-size:12px;font-weight:700;padding:6px 10px}
+.store .sb{padding:8px 10px;font-family:var(--font-mono);font-size:12px;line-height:1.8}
+.store .sb .g{color:var(--ink-faint);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.store .kv{display:flex;justify-content:space-between;gap:6px;border-radius:6px;padding:0 4px;transition:background .3s}
+.store .kv.fl{background:var(--accent-soft)}.store .kv.rb{background:var(--coral-soft)}
+.store .kv.pend{background:repeating-linear-gradient(45deg,var(--amber-soft) 0 6px,transparent 6px 12px)}
+:root[data-theme="dark"] .store .sh{background:#4A3B06;color:#FFE9A3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .store .sh{background:#4A3B06;color:#FFE9A3}}
+.alog{font-family:var(--font-mono);font-size:11.5px;background:#10201A;color:#CFEFE2;border-radius:10px;padding:8px 10px;height:180px;overflow-y:auto;line-height:1.6}
+.alog .a{color:#F5DC78}.alog .ok{color:#82D8B1}.alog .er{color:#FF9D8A}.alog .m{color:#8DBBF0}
+/* refresh race */
+.rr{margin-top:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:10px;overflow-x:auto}
+.rr .in{min-width:640px}
+.rl{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;height:30px}
+.rl>b{font-family:var(--font-mono);font-size:11.5px;font-weight:600}
+.rl .trk2{position:relative;height:24px;border-bottom:1px dashed var(--border)}
+.rl.kc{margin-top:6px;border-top:2px solid var(--border);padding-top:4px;height:84px}.rl.kc .trk2{height:80px}.rl.kc .ev{height:14px;line-height:14px;font-size:9.5px}
+.ev{position:absolute;top:2px;height:20px;border-radius:5px;font-family:var(--font-mono);font-size:10px;line-height:20px;padding:0 5px;color:#fff;white-space:nowrap;animation:pop .25s;transform:translateX(-2px)}
+.ev.g{background:#2E6FA8}.ev.e{background:#C8372D}.ev.r{background:#8B5CF6}.ev.ok{background:#2C8F68}.ev.q{background:#94A3B8}.ev.x{background:#111;color:#FF9D8A}
+.nowl{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);opacity:.5;left:96px}
+.sc{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sc span{font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:9px;padding:4px 10px;background:var(--surface)}
+.sc b{font-size:15px}
+.sc .bad{border-color:var(--coral);color:var(--coral)}
+.sw2{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.sw2 label{display:inline-flex;gap:6px;align-items:center;font-family:var(--font-mono);font-size:12.5px;cursor:pointer}
+@media (max-width:760px){.ps2{grid-template-columns:1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 7/8</span><span>· Kurs: 87/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 87-modul · Pinia + API</span>
+    <h1><span class="steam">Pinia</span> va API qatlami: holat, token, xatolar</h1>
+    <p class="lead">Balans sarlavhada, kartalar sahifasida va o‘tkazma formasida ko‘rinadi. Props bilan uzatish — azob. <b>Pinia</b> — global, reaktiv, devtools’da kuzatiladigan do‘kon (store). Unga <b>axios</b> qatlami qo‘shiladi: har so‘rovga token qo‘yadi, 401 bo‘lsa tokenni yangilaydi va xatolarni bir joyda boshqaradi. Eng qiziq joyi — 5 ta so‘rov bir vaqtda 401 olganda nima bo‘ladi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Store: bitta manba, ko‘p o‘quvchi + optimistic update</h2></div><p class="sec-sub">O‘rtada — <code>useHisobStore</code>. Chap va o‘ngdagi komponentlar undan o‘qiydi. "O‘tkazma" action’ini bosing: balans <b>darhol</b> kamayadi (optimistic), server javobini kutmaydi. "Server xato qaytaradi"ni yoqib qayta sinang — rollback.</p>
+    <div class="stage"><div class="ps2">
+      <div><div class="cmp" id="cH"><small>&lt;AppHeader&gt;</small>Balans: <b id="vH"></b></div><div class="cmp" id="cK"><small>&lt;KartaWidget&gt;</small>UZCARD •• 4417: <b id="vK"></b></div></div>
+      <div class="store"><div class="sh">🍍 useHisobStore</div><div class="sb" id="sb"></div></div>
+      <div><div class="cmp" id="cF"><small>&lt;OtkazmaForma&gt;</small>Mavjud: <b id="vF"></b><br><span style="font-size:12px" id="vL"></span></div><div class="cmp" id="cT"><small>&lt;TarixRoyxati&gt;</small>amallar: <b id="vT"></b></div></div>
+    </div>
+    <div class="sw2"><label><input type="checkbox" id="pErr"> server xato qaytaradi (500)</label></div>
+    <div class="ctrls"><button class="btn primary" id="pGo">otkazmaQil(300 000)</button><button class="btn" id="pR">↺ $reset()</button></div>
+    <div class="alog" id="alog"></div>
+    <div class="explain" id="pEx">Komponentlar bir-biri haqida bilmaydi — hammasi store’ga obuna. Store o‘zgarsa, faqat o‘sha qiymatni o‘qiganlar yangilanadi (82-modul reaktivligi).</div></div>
+    <div class="grid2">
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">stores/hisob.ts (setup store)</span></div><pre class="code"><span class="k">export</span> <span class="k">const</span> useHisobStore = defineStore(<span class="st">'hisob'</span>, () =&gt; {
+  <span class="k">const</span> balans = ref(<span class="nu">0</span>)
+  <span class="k">const</span> tarix = ref&lt;<span class="ty">Amal</span>[]&gt;([])
+  <span class="k">const</span> limit = computed(() =&gt; <span class="ty">Math</span>.min(balans.value, <span class="nu">5_000_000</span>))   <span class="cm">// getter</span>
+
+  <span class="k">async</span> <span class="k">function</span> otkazmaQil(summa: <span class="k">number</span>, kimga: <span class="k">string</span>) {           <span class="cm">// action</span>
+    <span class="k">const</span> oldin = balans.value
+    balans.value -= summa                         <span class="cm">// ⚡ optimistic</span>
+    <span class="k">const</span> vaqtincha = { id: crypto.randomUUID(), summa, kimga, holat: <span class="st">'kutilmoqda'</span> }
+    tarix.value.unshift(vaqtincha)
+    <span class="k">try</span> {
+      <span class="k">const</span> res = <span class="k">await</span> api.post(<span class="st">'/transfers'</span>, { summa, kimga },
+        { headers: { <span class="st">'Idempotency-Key'</span>: vaqtincha.id } })
+      <span class="ty">Object</span>.assign(vaqtincha, res.data)          <span class="cm">// server tasdig'i</span>
+    } <span class="k">catch</span> (e) {
+      balans.value = oldin                         <span class="cm">// ↩ rollback</span>
+      tarix.value = tarix.value.filter(a =&gt; a !== vaqtincha)
+      <span class="k">throw</span> e
+    }
+  }
+  <span class="k">return</span> { balans, tarix, limit, otkazmaQil }
+})</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Komponentda</span></div><pre class="code">&lt;<span class="k">script</span> <span class="k">setup</span> lang=<span class="st">"ts"</span>&gt;
+<span class="k">const</span> hisob = useHisobStore()
+<span class="k">const</span> { balans, limit } = storeToRefs(hisob)   <span class="cm">// ✅ reaktiv</span>
+<span class="cm">// const { balans } = hisob                     // ❌ reaktivlik uziladi</span>
+<span class="k">const</span> { otkazmaQil } = hisob                    <span class="cm">// action — oddiy destructure</span>
+&lt;/<span class="k">script</span>&gt;
+
+&lt;<span class="k">template</span>&gt;
+  &lt;b&gt;{{ format(balans) }}&lt;/b&gt;
+  &lt;button <span class="k">@click</span>=<span class="st">"otkazmaQil(300_000, 'Aziz')"</span>&gt;<span class="ty">Yuborish</span>&lt;/button&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>5 ta so‘rov, 1 ta eskirgan token</h2></div><p class="sec-sub">Dashboard ochildi: 5 ta widget bir vaqtda API’ga so‘rov yubordi. Access token 1 soniya oldin tugagan. Keycloak refresh token <b>rotation</b> yoqilgan — har refresh token faqat <b>bir marta</b> ishlatiladi. Ikkala interceptor’ni solishtiring.</p>
+    <div class="stage">
+      <div class="seg2 ctrls" style="margin-top:0"><button class="btn primary" id="rNaive">▶ Oddiy interceptor</button><button class="btn" id="rSingle">▶ Single-flight refresh</button></div>
+      <div class="rr"><div class="in" id="rrIn"></div></div>
+      <div class="sc" id="rSc"></div>
+      <div class="explain" id="rEx">Tugmalardan birini bosing.</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">api/http.ts — single-flight refresh</span></div><pre class="code"><span class="k">export</span> <span class="k">const</span> api = axios.create({ baseURL: <span class="st">'/api'</span>, timeout: <span class="nu">15_000</span> })
+
+api.interceptors.request.use(cfg =&gt; {
+  cfg.headers.<span class="ty">Authorization</span> = <span class="st">`Bearer ${keycloak.token}`</span>
+  <span class="k">return</span> cfg
+})
+
+<span class="k">let</span> refreshing: <span class="ty">Promise</span>&lt;<span class="k">boolean</span>&gt; | <span class="k">null</span> = <span class="k">null</span>      <span class="cm">// ← bitta umumiy va'da</span>
+
+api.interceptors.response.use(r =&gt; r, <span class="k">async</span> (err) =&gt; {
+  <span class="k">const</span> cfg = err.config
+  <span class="k">if</span> (err.response?.status !== <span class="nu">401</span> || cfg._retry) <span class="k">return</span> <span class="ty">Promise</span>.reject(err)
+  cfg._retry = <span class="k">true</span>
+  refreshing ??= keycloak.updateToken(-<span class="nu">1</span>)          <span class="cm">// birinchisi boshlaydi, qolganlari kutadi</span>
+    .<span class="k">finally</span>(() =&gt; { refreshing = <span class="k">null</span> })
+  <span class="k">try</span> {
+    <span class="k">await</span> refreshing
+  } <span class="k">catch</span> {
+    keycloak.login()                                <span class="cm">// refresh ham o'tmadi → qayta login</span>
+    <span class="k">return</span> <span class="ty">Promise</span>.reject(err)
+  }
+  cfg.headers.<span class="ty">Authorization</span> = <span class="st">`Bearer ${keycloak.token}`</span>
+  <span class="k">return</span> api(cfg)                                   <span class="cm">// so'rovni qaytadan yuborish</span>
+})</pre></div>
+    <div class="callout info"><div class="ct">Markaziy xato boshqaruvi</div>Response interceptor’da: 401 → refresh; 403 → "ruxsat yo‘q" toast; 409/422 → forma xatolari (backend <code>ProblemDetail</code>, 25-modul); 5xx/tarmoq → "qayta urinib ko‘ring" va Sentry’ga log. Komponentlar faqat o‘z holatini bilsin — texnik xatolar bitta joyda.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Pinia nima uchun kerak? Vuex’dan farqi?<span class="chev">›</span></summary><div class="iv-a">Global holat uchun rasmiy kutubxona: state, getters, actions; devtools (time-travel, action log), SSR va HMR qo‘llovi. Vuex’dan farqi: mutations yo‘q (action’da to‘g‘ridan o‘zgartirish), to‘liq TypeScript tip chiqarish, modullar o‘rniga bir nechta mustaqil store, setup store (Composition API uslubida).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>storeToRefs nima uchun kerak?<span class="chev">›</span></summary><div class="iv-a">Store reactive obyekt — undan destructuring qilinsa state/getters reaktivligini yo‘qotadi. storeToRefs ularni ref’larga aylantiradi. Action’lar esa oddiy funksiya — ularni to‘g‘ridan destructure qilish mumkin.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Optimistic update nima va bankda qachon ishlatish mumkin?<span class="chev">›</span></summary><div class="iv-a">UI server javobini kutmasdan o‘zgaradi, xato bo‘lsa rollback. Tezkor his beradi. Bankda — ehtiyotkorlik bilan: "kutilmoqda" holatini ko‘rsatish, idempotency key bilan qayta yuborishdan himoya, yakuniy balansni baribir serverdan olish. Katta summali yoki qaytarib bo‘lmaydigan amallar uchun pessimistic (spinner + tasdiq) afzal.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Bir vaqtda bir necha so‘rov 401 olsa token refresh qanday bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Single-flight: birinchi 401 refresh’ni boshlaydi va promise’ni umumiy o‘zgaruvchida saqlaydi, qolganlari shu promise’ni kutadi, keyin hammasi yangi token bilan qayta yuboriladi. Aks holda refresh token rotation’da ikkinchi refresh invalid_grant oladi va foydalanuvchi tasodifan logout bo‘ladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Token’ni qayerda saqlash kerak — localStorage’dami?<span class="chev">›</span></summary><div class="iv-a">keycloak-js tokenni xotirada (JS o‘zgaruvchida) saqlaydi — XSS’da localStorage’dan o‘g‘irlash osonroq. Eng xavfsiz variant — BFF (backend-for-frontend) pattern: token server tomonda, brauzerda faqat HttpOnly, Secure, SameSite cookie.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Pinia va composable farqi?<span class="chev">›</span></summary><div class="iv-a">Composable har chaqiruvda yangi holat yaratadi (agar holat funksiya ichida bo‘lsa) — komponentga lokal. Pinia store — ilova bo‘ylab yagona instansiya (singleton), devtools, plugin (persist), SSR. Umumiy holat kerak bo‘lsa — store; qayta ishlatiladigan mantiq — composable.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>const { balans } = useHisobStore() — nima bo‘ladi?</div><button class="opt">Reaktiv</button><button class="opt">Reaktivlik yo‘qoladi — storeToRefs kerak</button><button class="opt">Xato</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Store reactive — destructuring uzadi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Optimistic update’da server 500 qaytardi. Nima qilinadi?</div><button class="opt">Hech narsa</button><button class="opt">Oldingi holatga rollback + xabar</button><button class="opt">Sahifani yangilash</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. UI haqiqatdan uzilib qoladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Refresh token rotation + 5 ta parallel refresh. Natija?</div><button class="opt">Hammasi ishlaydi</button><button class="opt">Birinchisi o‘tadi, qolganlari invalid_grant → logout xavfi</button><button class="opt">Keycloak ularni birlashtiradi</button><div class="q-fb" data-ok="To‘g‘ri — single-flight kerak." data-no="Yo‘q. Eski refresh token bir marta ishlaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>O‘tkazma so‘rovi timeout bo‘ldi, foydalanuvchi qayta bosdi. Ikki marta yechilmasligi uchun?</div><button class="opt">.once</button><button class="opt">Idempotency-Key header</button><button class="opt">v-if</button><div class="q-fb" data-ok="To‘g‘ri — server takrorni taniydi." data-no="Yo‘q. Himoya serverda bo‘lishi kerak."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Pinia’da getter qanday yoziladi (setup store)?</div><button class="opt">ref</button><button class="opt">computed</button><button class="opt">watch</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Getter — computed."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Build, test, deploy + suhbat</h3>
+      <p>Vite build ichida nima bor, Vitest + Vue Test Utils, Docker + nginx, va butun frontend bo‘yicha suhbat mashqi.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill now">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="86-vue-router.html"><span class="cl">← Oldingi dars</span><span class="ct">86 · Vue Router</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="88-build-test-deploy-suhbat.html"><span class="cl">Keyingi dars →</span><span class="ct">88 · Build, test, deploy + suhbat</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:98.9%"></i></div><span>87 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(87)<0)v.push(87);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','87');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(87)<0)D[t].push(87);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  function f(n){return n.toLocaleString('ru-RU');}
+  /* ---------- store ---------- */
+  var S,busy=false;
+  function init(){S={balans:2350000,tarix:3,user:'Otabek',kutilmoqda:0};}
+  function limit(){return Math.min(S.balans,5000000);}
+  function sb(fl,cls){el('sb').innerHTML='<div class="g">state</div><div class="kv" id="k_user"><span>user</span><span>"'+S.user+'"</span></div><div class="kv" id="k_balans"><span>balans</span><span>'+f(S.balans)+'</span></div><div class="kv" id="k_tarix"><span>tarix</span><span>['+S.tarix+' ta'+(S.kutilmoqda?', 1 kutilmoqda':'')+']</span></div><div class="g">getters</div><div class="kv" id="k_limit"><span>limit</span><span>'+f(limit())+'</span></div><div class="g">actions</div><div class="kv"><span>otkazmaQil()</span><span>async</span></div>';
+    (fl||[]).forEach(function(k){var n=el('k_'+k);if(n)n.classList.add(cls||'fl');});}
+  function comps(fl,cls){el('vH').textContent=f(S.balans);el('vK').textContent=f(S.balans);el('vF').textContent=f(S.balans);el('vL').textContent='limit: '+f(limit());el('vT').textContent=S.tarix+(S.kutilmoqda?' (1 ⏳)':'');
+    (fl||[]).forEach(function(i){var n=el(i);n.classList.remove('fl','rb');void n.offsetWidth;n.classList.add(cls||'fl');setTimeout(function(){n.classList.remove(cls||'fl');},800);});}
+  function alog(h){var l=el('alog');l.insertAdjacentHTML('beforeend','<div>'+h+'</div>');l.scrollTop=l.scrollHeight;}
+  function t(){var d=new Date();return d.toTimeString().slice(0,8);}
+  el('pGo').addEventListener('click',function(){if(busy)return;if(S.balans<300000){alog('<span class="er">yetarli mablag‘ yo‘q</span>');return;}busy=true;var err=el('pErr').checked,old=S.balans;
+    alog('<span class="m">'+t()+'</span> <span class="a">action</span> otkazmaQil(300 000, "Aziz")');
+    S.balans-=300000;S.tarix++;S.kutilmoqda=1;sb(['balans','tarix','limit']);el('k_tarix').classList.add('pend');comps(['cH','cK','cF','cT']);
+    alog('  ⚡ optimistic: balans '+f(old)+' → '+f(S.balans)+' (server javobini kutmasdan)');
+    alog('  → POST /api/transfers  Idempotency-Key: 7f3c…');
+    el('pEx').innerHTML='UI <b>darhol</b> yangilandi — 4 ta komponent bir vaqtda. Tarixda "kutilmoqda" (chiziqli) yozuv. Server javobi kutilmoqda…';
+    setTimeout(function(){
+      if(err){S.balans=old;S.tarix--;S.kutilmoqda=0;sb(['balans','tarix','limit'],'rb');comps(['cH','cK','cF','cT'],'rb');
+        alog('  <span class="er">← 500 Internal Server Error</span>');alog('  ↩ rollback: balans '+f(old)+' qaytarildi, vaqtinchalik yozuv o‘chirildi');alog('  toast: "O‘tkazma amalga oshmadi, pul yechilmadi"');
+        el('pEx').innerHTML='Server xato qaytardi → <b>rollback</b>: action oldingi qiymatni saqlab qo‘ygan edi, holat qaytarildi (qizil). Foydalanuvchiga aniq xabar: pul yechilmadi.';}
+      else{S.kutilmoqda=0;sb(['tarix']);comps(['cT']);alog('  <span class="ok">← 201 Created</span> {id: 98231, holat: "bajarildi"}');
+        el('pEx').innerHTML='Server tasdiqladi: vaqtinchalik yozuv haqiqiy ID bilan almashtirildi. Balans allaqachon to‘g‘ri edi — foydalanuvchi hech narsa kutmadi.';}
+      busy=false;},1500);});
+  el('pR').addEventListener('click',function(){if(busy)return;init();sb();comps();alog('<span class="m">'+t()+'</span> $reset()');});
+  init();sb();comps();alog('<span class="m">'+t()+'</span> store yaratildi (birinchi useHisobStore() chaqiruvida)');
+
+  /* ---------- refresh race ---------- */
+  var W=['Balans','Kartalar','Tarix','Kurs','Profil'],run=0,SC=18;// px per 100ms
+  function lanes(){el('rrIn').innerHTML=W.map(function(w,i){return '<div class="rl"><b>'+w+'</b><div class="trk2" id="tr'+i+'"></div></div>';}).join('')+'<div class="rl kc"><b>Keycloak</b><div class="trk2" id="trK"></div></div>';}
+  function ev(lane,ms,cls,txt){var d=document.createElement('div');d.className='ev '+cls;d.style.left=(ms/100*SC)+'px';d.textContent=txt;if(lane==='trK'){d.style.top=(cls==='x'?30:2+el(lane).children.length*15)+'px';}el(lane).appendChild(d);}
+  function score(o){el('rSc').innerHTML='<span>API so‘rovlar: <b>'+o.api+'</b></span><span>refresh chaqiruvlari: <b>'+o.ref+'</b></span><span class="'+(o.fail?'bad':'')+'">muvaffaqiyatsiz: <b>'+o.fail+'</b></span><span class="'+(o.logout?'bad':'')+'">natija: <b>'+(o.logout?'LOGOUT 😱':'hammasi ✓')+'</b></span>';}
+  function play(single){var id=++run;lanes();var o={api:0,ref:0,fail:0,logout:false};score(o);
+    el('rNaive').className='btn'+(single?'':' primary');el('rSingle').className='btn'+(single?' primary':'');
+    var T=[];function at(ms,fn){T.push(setTimeout(function(){if(id===run)fn();},ms*1.3));}
+    W.forEach(function(w,i){var s=i*40;at(s,function(){ev('tr'+i,s,'g','GET');o.api++;score(o);});at(s+300,function(){ev('tr'+i,s+300,'e','401');});});
+    if(!single){
+      W.forEach(function(w,i){var s=i*40+450;
+        at(s,function(){ev('tr'+i,s,'r','refresh');ev('trK',s,'r',i===0?'RT₁ ✓':'RT₁ ✗');o.ref++;score(o);});
+        if(i===0){at(s+500,function(){ev('tr'+i,s+500,'ok','retry 200');o.api++;score(o);});}
+        else at(s+400,function(){ev('tr'+i,s+400,'x','invalid_grant');o.fail++;score(o);});});
+      at(1500,function(){o.logout=true;score(o);ev('trK',1500,'x','sessiya bekor → login()');
+        el('rEx').innerHTML='Har widget <b>o‘zi</b> refresh qildi. Birinchisi RT₁ bilan yangi token (va yangi RT₂) oldi. Qolgan 4 tasi <b>eski RT₁</b> ni yubordi — rotation tufayli u allaqachon ishlatilgan → <code>invalid_grant</code>. Keycloak buni refresh token o‘g‘irlanishi deb hisoblab, sessiyani ham bekor qilishi mumkin → foydalanuvchi <b>kutilmaganda chiqib ketdi</b>. Bug faqat "sekin tarmoq + ko‘p widget" da chiqadi — eng yomon turdagi bug.';});
+    }else{
+      at(450,function(){ev('tr0',450,'r','refresh (1-chi)');ev('trK',450,'r','RT₁ ✓ → yangi token');o.ref++;score(o);});
+      W.forEach(function(w,i){if(i>0){var s=i*40+450;at(s,function(){ev('tr'+i,s,'q','⏸ kutadi');});}});
+      at(1000,function(){W.forEach(function(w,i){var s=1000+i*30;ev('tr'+i,s,'ok','retry 200');o.api++;});score(o);
+        el('rEx').innerHTML='Birinchi 401 refresh’ni boshladi va <b>promise’ni umumiy o‘zgaruvchiga</b> qo‘ydi. Qolgan 4 tasi yangi refresh boshlamadi — o‘sha promise’ni kutdi (kulrang). Refresh tugagach, hammasi yangi token bilan <b>qaytadan yuborildi</b>. Keycloak’ka 1 ta so‘rov, foydalanuvchi hech narsa sezmadi.';});
+    }
+    el('rEx').innerHTML='5 ta widget GET yubordi → hammasi 401 (token eskirgan)…';}
+  el('rNaive').addEventListener('click',function(){play(false);});
+  el('rSingle').addEventListener('click',function(){play(true);});
+  lanes();score({api:0,ref:0,fail:0,logout:false});
+})();
+
+</script>
+</body>
+</html>

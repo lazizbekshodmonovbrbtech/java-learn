@@ -1,0 +1,663 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Java qanday ishlaydi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA; --surface:#FFFFFF; --surface-2:#FBF8F1; --sunken:#F0ECE1;
+  --ink:#241F18; --ink-soft:#5C554A; --ink-faint:#8C8578;
+  --border:#E5DFD3; --border-strong:#D6CFC0;
+  --accent:#B5622A; --accent-ink:#8A491E; --accent-soft:#F3E6D7;
+  --purple:#534AB7; --purple-ink:#3C3489; --purple-soft:#ECEAF9;
+  --teal:#0F6E56; --teal-ink:#0A5443; --teal-soft:#DEF0EA;
+  --amber:#A9660D; --amber-soft:#F8ECD6;
+  --coral:#B4471F; --coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309; --surface:#211C13; --surface-2:#282116; --sunken:#1B160D;
+  --ink:#EDE7DA; --ink-soft:#B4AC9C; --ink-faint:#847C6C;
+  --border:#342C1D; --border-strong:#463C29;
+  --accent:#E28C48; --accent-ink:#F0A96A; --accent-soft:#33261A;
+  --purple:#A79FF0; --purple-ink:#BCB5F5; --purple-soft:#241F33;
+  --teal:#4FC29D; --teal-ink:#6FD1B2; --teal-soft:#14261F;
+  --amber:#E0A64B; --amber-soft:#2C2213;
+  --coral:#E38156; --coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309; --surface:#211C13; --surface-2:#282116; --sunken:#1B160D;
+  --ink:#EDE7DA; --ink-soft:#B4AC9C; --ink-faint:#847C6C;
+  --border:#342C1D; --border-strong:#463C29;
+  --accent:#E28C48; --accent-ink:#F0A96A; --accent-soft:#33261A;
+  --purple:#A79FF0; --purple-ink:#BCB5F5; --purple-soft:#241F33;
+  --teal:#4FC29D; --teal-ink:#6FD1B2; --teal-soft:#14261F;
+  --amber:#E0A64B; --amber-soft:#2C2213;
+  --coral:#E38156; --coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(38px,8vw,60px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}
+header.hero .lead{max-width:60ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.prose{max-width:68ch;margin-top:14px;color:var(--ink)}
+.prose p+p{margin-top:12px}
+.divider{height:1px;background:var(--border);border:0;margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{font-family:var(--font-body)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;align-items:flex-start;gap:8px;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+
+/* callouts */
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}
+.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}
+.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}
+.callout.iv .ct{color:var(--purple-ink)}
+.callout b{color:inherit}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+
+/* pipeline */
+.pipe-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px 20px;margin-top:22px}
+.stage-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;-webkit-overflow-scrolling:touch;padding:6px 2px 10px;margin-bottom:4px}
+.stages{display:flex;align-items:stretch;gap:0;min-width:720px}
+.stage{flex:1;min-width:118px;text-align:center;position:relative;padding:2px 6px}
+.stage .box{background:var(--surface-2);border:1.5px solid var(--border);border-radius:14px;padding:14px 8px 12px;transition:.35s cubic-bezier(.4,0,.2,1);height:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.stage .glyph{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--sunken);transition:.35s}
+.stage .glyph svg{width:23px;height:23px}
+.stage .st-title{font-weight:600;font-size:13.5px;font-family:var(--font-display)}
+.stage .st-tag{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.stage .arrow{position:absolute;top:34px;right:-8px;width:16px;height:16px;color:var(--border-strong);z-index:2}
+.stage:last-child .arrow{display:none}
+.stage.active .box{border-color:var(--acc);background:var(--acc-soft);transform:translateY(-4px);box-shadow:var(--shadow-lift)}
+.stage.active .glyph{background:var(--acc);color:#fff}
+.stage.active .glyph svg{stroke:#fff}
+.stage.active .st-tag{color:var(--acc-ink)}
+.stage.done .glyph{color:var(--acc)}
+.stage{--acc:var(--ink-faint);--acc-soft:var(--surface-2);--acc-ink:var(--ink-soft)}
+.stage[data-c="amber"]{--acc:var(--amber);--acc-soft:var(--amber-soft);--acc-ink:var(--amber)}
+.stage[data-c="purple"]{--acc:var(--purple);--acc-soft:var(--purple-soft);--acc-ink:var(--purple-ink)}
+.stage[data-c="teal"]{--acc:var(--teal);--acc-soft:var(--teal-soft);--acc-ink:var(--teal-ink)}
+.stage[data-c="accent"]{--acc:var(--accent);--acc-soft:var(--accent-soft);--acc-ink:var(--accent-ink)}
+.caption{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-top:6px;min-height:104px}
+.caption .cap-tag{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--accent-ink);margin-bottom:6px;display:block}
+.caption .cap-body{color:var(--ink);font-size:15.5px}
+.caption code{background:var(--sunken);padding:1px 6px;border-radius:6px;color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}
+button.ctl:active{transform:scale(.95)}
+button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.primary:hover{background:var(--accent-ink)}
+.dots{display:flex;gap:7px;margin-left:4px;flex-wrap:wrap}
+.dots .d{width:9px;height:9px;border-radius:50%;background:var(--border-strong);cursor:pointer;transition:.2s;border:0;padding:0}
+.dots .d.on{background:var(--accent);transform:scale(1.15)}
+
+/* compare toggle */
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);transition:.15s}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.cmp-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cmp-step{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-family:var(--font-mono);font-size:12.5px;text-align:center}
+.cmp-step .cs-s{font-size:10px;color:var(--ink-faint);display:block}
+.cmp-arr{color:var(--ink-faint)}
+.cmp-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-size:14.5px;min-height:52px}
+.cmp-note b{color:var(--accent-ink)}
+
+/* classloader phases */
+.cl-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.cl-phases{display:flex;flex-direction:column;gap:0}
+.clp{border:1.5px solid var(--border);border-radius:13px;padding:13px 16px;background:var(--surface-2);transition:.3s}
+.clp.active{border-color:var(--purple);background:var(--purple-soft);box-shadow:var(--shadow-lift)}
+.clp .clh{display:flex;align-items:center;gap:11px}
+.clp .cln{width:28px;height:28px;border-radius:8px;background:var(--sunken);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--ink-faint);flex-shrink:0}
+.clp.active .cln{background:var(--purple);color:#fff}
+.clp .clt{font-family:var(--font-display);font-weight:600;font-size:15px}
+.clp .clsub{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-left:auto}
+.clp .cld{font-size:13.5px;color:var(--ink-soft);margin-top:8px;display:none;line-height:1.55}
+.clp.active .cld{display:block}
+.cl-conn{height:12px;width:2px;background:var(--border-strong);margin:0 auto}
+
+/* code block */
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:14px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:14px;box-shadow:var(--shadow)}
+.anno .a-t{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--accent-ink);margin-bottom:4px}
+.anno .a-b{font-size:15px}
+.anno code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}
+
+/* run-anywhere */
+.woa{display:grid;grid-template-columns:1fr;gap:14px;margin-top:20px}
+.woa-top{background:var(--purple-soft);border:1px solid var(--border);border-radius:14px;padding:14px 18px;text-align:center;font-family:var(--font-mono);font-size:13.5px;color:var(--purple-ink);font-weight:500}
+.woa-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.woa-os{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 10px;text-align:center;box-shadow:var(--shadow)}
+.woa-os .os-name{font-weight:600;font-size:15px;margin-bottom:2px;font-family:var(--font-display)}
+.woa-os .os-jvm{font-family:var(--font-mono);font-size:11.5px;color:var(--teal-ink);background:var(--teal-soft);border-radius:6px;padding:2px 8px;display:inline-block;margin-top:6px}
+
+/* jdk nesting */
+.nest{margin-top:20px;border-radius:18px;padding:18px;position:relative}
+.nest-jdk{background:var(--accent-soft);border:1.5px solid var(--accent)}
+.nest-jre{background:var(--purple-soft);border:1.5px solid var(--purple);margin-top:14px}
+.nest-jvm{background:var(--teal-soft);border:1.5px solid var(--teal);margin-top:12px}
+.nest .lab{font-family:var(--font-display);font-weight:600;font-size:15px;margin-bottom:2px}
+.nest .lab .full{font-family:var(--font-mono);font-weight:400;font-size:11.5px;color:var(--ink-faint);margin-left:8px}
+.nest .desc{font-size:14px;color:var(--ink-soft)}
+.nest-jdk>.lab{color:var(--accent-ink)}
+.nest-jre>.lab{color:var(--purple-ink)}
+.nest-jvm>.lab{color:var(--teal-ink)}
+.tools-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tool-chip{font-family:var(--font-mono);font-size:11.5px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 8px;color:var(--ink-soft)}
+
+/* timeline */
+.tl-line{display:flex;gap:0;margin-top:18px;overflow-x:auto;padding-bottom:6px}
+.tl-node{flex:1;min-width:96px;text-align:center;position:relative;padding:0 6px}
+.tl-node .dotv{width:14px;height:14px;border-radius:50%;background:var(--accent);margin:0 auto 10px;position:relative;z-index:2;border:3px solid var(--bg)}
+.tl-node::before{content:"";position:absolute;top:5px;left:-50%;width:100%;height:2px;background:var(--border-strong);z-index:1}
+.tl-node:first-child::before{display:none}
+.tl-node .ver{font-family:var(--font-display);font-weight:700;font-size:16px}
+.tl-node .yr{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.tl-node .lts{font-family:var(--font-mono);font-size:10px;background:var(--teal-soft);color:var(--teal-ink);border-radius:5px;padding:1px 6px;display:inline-block;margin-top:4px}
+.dist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.dist{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 14px;box-shadow:var(--shadow)}
+.dist .dn{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:600}
+.dist .dd{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+
+/* run-it terminal */
+.term{background:#1B160D;border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;margin-top:16px;box-shadow:var(--shadow)}
+:root[data-theme="dark"] .term,:root:not([data-theme="light"]) .term{background:#0E0B05}
+.term-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.term-bar .tl{width:11px;height:11px;border-radius:50%}
+.term-bar .tt{font-family:var(--font-mono);font-size:11.5px;color:#B4AC9C;margin-left:4px}
+.term-body{padding:14px 16px;font-family:var(--font-mono);font-size:13px;line-height:1.85;color:#EDE7DA}
+.term-body .pr{color:#E28C48}
+.term-body .cmd{color:#EDE7DA}
+.term-body .out{color:#9FE1CB}
+.term-body .cmt{color:#847C6C}
+
+/* errors */
+.err-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.err-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.err-item .em{font-family:var(--font-mono);font-size:12.5px;color:var(--coral);font-weight:600;background:var(--coral-soft);border-radius:6px;padding:3px 8px;display:inline-block;margin-bottom:7px}
+.err-item .ex{font-size:14px;color:var(--ink)}
+.err-item .ex b{color:var(--accent-ink)}
+
+/* interview accordion */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}
+.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-family:var(--font-body);font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}
+.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+
+@media (max-width:560px){.woa-row{grid-template-columns:1fr}header.hero{padding-block:40px 26px}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B5622A"></span> Java asoslari · 1/7</span><span>· Kurs: 1/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish" title="Yorug'/qorong'u">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg>
+  </button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Java kursi · 1-modul · noldan</span>
+    <h1>Java <span class="steam">qanday</span> ishlaydi</h1>
+    <p class="lead">Kod yozgan lahzangizdan protsessor uni bajargunicha bo'lgan butun yo'l — kompilyator, bytecode, classloader, JIT va JVM. Bir marta chuqur tushunsangiz, butun Java dunyosi mantiqan joyiga tushadi.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Avval: dastur nima o'zi?</h2></div>
+    <p class="sec-sub">Siz yozgan kod — bu shunchaki matn fayli. Protsessor (CPU) esa faqat <b>mashina kodi</b>ni — nol va birlarni — tushunadi. Demak orada tarjimon kerak. Tillar bu tarjimani turlicha qiladi, va aynan shu farq Java'ning xarakterini belgilaydi.</p>
+
+    <div class="card">
+      <div class="seg" id="langSeg">
+        <button data-l="c" class="on">C (kompilyatsiya)</button>
+        <button data-l="py">Python (interpretatsiya)</button>
+        <button data-l="java">Java (ikkovi)</button>
+      </div>
+      <div class="cmp-flow" id="cmpFlow"></div>
+      <div class="cmp-note" id="cmpNote"></div>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zM9 21h6"/></svg>asosiy fikr</div>
+      Java <b>ikkala dunyodan</b> yaxshisini oladi: kod avval bir marta <b>bytecode</b>ga kompilyatsiya qilinadi (tekshiruv, xavfsizlik), keyin JVM uni har qanday platformada bajaradi. Shu sabab Java tez ham, ko'chma (portable) ham.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>To'liq yo'l: kod'dan protsessorgacha</h2></div>
+    <p class="sec-sub">Endi Java'ning to'liq quvuriga qaraymiz. Diqqat: bu yerda 6 bosqich bor — ko'pchilik faqat javac va JVM'ni biladi, lekin oradagi <b>classloader</b> va <b>JIT</b> aynan Java'ni tez qiladi. Diagramma o'zi aylanadi.</p>
+
+    <div class="pipe-card">
+      <div class="stage-scroll" id="stageScroll">
+        <div class="stages" id="stages">
+          <div class="stage" data-c="accent">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6H8z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg></div><div class="st-title">Siz yozasiz</div><div class="st-tag">Main.java</div></div>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="stage" data-c="amber">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1l2.1-2.1M17 7l2.1-2.1"/></svg></div><div class="st-title">Kompilyator</div><div class="st-tag">javac</div></div>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="stage" data-c="purple">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h1v6M12 9h.01M12 12h.01M12 15h.01M15 9h1v6"/></svg></div><div class="st-title">Bytecode</div><div class="st-tag">Main.class</div></div>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="stage" data-c="purple">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13a3 3 0 0 1 0 6h-1M4 8v7a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4M8 3v2M11 3v2M14 3v2"/></svg></div><div class="st-title">Classloader</div><div class="st-tag">JVM ichida</div></div>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="stage" data-c="teal">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div><div class="st-title">JIT kompilyator</div><div class="st-tag">issiq kod</div></div>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </div>
+          <div class="stage" data-c="teal">
+            <div class="box"><div class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3v2M14 3v2M10 19v2M14 19v2M3 10h2M3 14h2M19 10h2M19 14h2"/></svg></div><div class="st-title">Protsessor</div><div class="st-tag">CPU bajaradi</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption" aria-live="polite"><span class="cap-tag" id="capTag"></span><div class="cap-body" id="capBody"></div></div>
+
+      <div class="controls">
+        <button class="ctl" id="prevBtn" aria-label="Oldingi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-6-6 6-6M18 18l-6-6 6-6"/></svg></button>
+        <button class="ctl primary" id="playBtn"><svg id="playIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span id="playLbl">Pauza</span></button>
+        <button class="ctl" id="nextBtn" aria-label="Keyingi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 18l6-6-6-6M6 18l6-6-6-6"/></svg></button>
+        <div class="dots" id="dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Classloader — bytecode qanday yuklanadi</h2></div>
+    <p class="sec-sub">Siz <code>java Main</code> deganingizda JVM darhol bajarmaydi. Avval har bir <code>.class</code>ni uch bosqichda tayyorlaydi. Bu suhbatlarda tez-tez so'raladi. Har bosqichni bosing.</p>
+
+    <div class="cl-card">
+      <div class="cl-phases" id="clPhases">
+        <div class="clp" data-p="0"><div class="clh"><div class="cln">1</div><div class="clt">Loading (yuklash)</div><div class="clsub">.class → xotira</div></div><div class="cld"><code>.class</code> faylini topib (classpath'dan), o'qib, xotiraga oladi. Bu class haqidagi metama'lumot Method Area'da saqlanadi. Kim yuklaydi? — <b>ClassLoader</b>lar iyerarxiyasi: Bootstrap → Platform → Application.</div></div>
+        <div class="cl-conn"></div>
+        <div class="clp" data-p="1"><div class="clh"><div class="cln">2</div><div class="clt">Linking (bog'lash)</div><div class="clsub">verify · prepare · resolve</div></div><div class="cld">Uch qism: <b>Verify</b> — bytecode buzuq yoki xavfli emasligini tekshiradi (Java xavfsizligining asosi). <b>Prepare</b> — static maydonlarga standart qiymat beradi (0, null, false). <b>Resolve</b> — ramziy havolalarni (symbolic references) haqiqiy manzillarga aylantiradi.</div></div>
+        <div class="cl-conn"></div>
+        <div class="clp" data-p="2"><div class="clh"><div class="cln">3</div><div class="clt">Initialization (ishga tayyorlash)</div><div class="clsub">static bloklar ishlaydi</div></div><div class="cld">Endi <code>static</code> maydonlarga siz yozgan haqiqiy qiymatlar beriladi va <code>static { }</code> bloklar ishlaydi. Class faqat <b>birinchi marta kerak bo'lganda</b> initialize qilinadi — Java "dangasa" (lazy) ishlaydi, keraksiz class'larni yuklamaydi.</div></div>
+      </div>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3M9 3h6v4H9z"/></svg>suhbatda</div>
+      "<b>ClassNotFoundException</b> va <b>NoClassDefFoundError</b> farqi?" — birinchisi class'ni <b>yuklash</b> paytida topilmasa (ko'pincha reflection), ikkinchisi kompilyatsiyada bor edi-yu, ishga tushishda yo'qolsa. Ikkovi ham classpath muammosi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>JIT — nega Java "isiydi"</h2></div>
+    <div class="prose">
+      <p>Bu Java'ning eng nozik va eng ko'p savol tug'diradigan qismi. Boshida JVM bytecode'ni <b>interpretatsiya</b> qiladi — satrma-satr o'qib bajaradi. Bu tez ishga tushadi, lekin sekin ishlaydi.</p>
+      <p>JVM ishlash davomida qaysi kod <b>ko'p</b> ishlatilayotganini kuzatadi ("hot" kod). Shundaylarni <b>JIT (Just-In-Time) kompilyator</b> real vaqtda tezkor mashina kodiga aylantiradi va keshlaydi. Shuning uchun Java dasturi bir necha soniya "isigach" ancha tezlashadi — bu "warmup" deyiladi.</p>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">JIT bosqichlari</span></div>
+      <pre class="code"><span class="cm">// C2 (Server) — eng tez, chuqur optimizatsiya</span>
+       ▲   Tier 4
+       │   Tier 3  <span class="cm">// C1 (Client) — tez kompilyatsiya</span>
+tezlik │   Tier 1
+       │   Tier 0  <span class="cm">// Interpreter — darhol, lekin sekin</span>
+       └──────────────▶ kod necha marta chaqirildi</pre>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>oddiy qilib</div>
+      Interpreter — "hoziroq boshla". JIT — "ko'p ishlatilganini keyin tezlashtir". Shu sabab kichik skript sifatida Java sekinroq tuyuladi, lekin uzoq ishlaydigan serverda C++'ga yaqin tezlikda ishlaydi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>"Bir marta yoz, hamma joyda ishla"</h2></div>
+    <p class="sec-sub">Bytecode'ning sehri: <code>Main.class</code> faylini bir marta yaratasiz, u Windows'da ham, Mac'da ham, Linux'da ham o'zgarmasdan ishlaydi. Chunki har OS'ning o'z JVM'i bor — kodni emas, JVM'ni har platformaga moslashtirishgan.</p>
+    <div class="woa">
+      <div class="woa-top">bitta Main.class (bytecode)</div>
+      <div class="woa-row">
+        <div class="woa-os"><div class="os-name">Windows</div><span class="os-jvm">Windows JVM</span></div>
+        <div class="woa-os"><div class="os-name">macOS</div><span class="os-jvm">macOS JVM</span></div>
+        <div class="woa-os"><div class="os-name">Linux</div><span class="os-jvm">Linux JVM</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>JDK, JRE, JVM — matryoshka</h2></div>
+    <p class="sec-sub">Bu uch qisqartma boshda chalkashtiradi. Aslida ular bir-birining ichida.</p>
+    <div class="nest nest-jdk">
+      <div class="lab">JDK<span class="full">Java Development Kit — ishlab chiqish to'plami</span></div>
+      <div class="desc">Java kodi <b>yozish va kompilyatsiya</b> qilish uchun hamma narsa.</div>
+      <div class="tools-row"><span class="tool-chip">javac</span><span class="tool-chip">jar</span><span class="tool-chip">javadoc</span><span class="tool-chip">jshell</span><span class="tool-chip">debugger</span></div>
+      <div class="nest nest-jre">
+        <div class="lab">JRE<span class="full">Java Runtime Environment — ishga tushirish muhiti</span></div>
+        <div class="desc">Tayyor dasturni <b>faqat ishga tushirish</b> uchun. Standart kutubxonalar shu yerda.</div>
+        <div class="nest nest-jvm">
+          <div class="lab">JVM<span class="full">Java Virtual Machine — virtual mashina</span></div>
+          <div class="desc">Bytecode'ni o'qib, tekshirib, bajaradigan dvigatel. Classloader, JIT, xotira (Heap/Stack) va Garbage Collector — hammasi shu yerda.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>eslatma</div>
+      Java 11'dan boshlab alohida JRE tarqatilmaydi — siz JDK o'rnatasiz (ichida hammasi bor). Dastur <b>yozsangiz</b> — JDK kerak. Interview savoli: "JDK ⊃ JRE ⊃ JVM".
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Versiyalar va distributionlar</h2></div>
+    <p class="sec-sub">Java har 6 oyda yangilanadi, lekin amalda <b>LTS</b> (uzoq qo'llab-quvvatlanadigan) versiyalar tayanch. Ko'p loyihalar shularda turadi.</p>
+    <div class="tl-line">
+      <div class="tl-node"><div class="dotv"></div><div class="ver">8</div><div class="yr">2014</div><div class="lts">LTS</div></div>
+      <div class="tl-node"><div class="dotv"></div><div class="ver">11</div><div class="yr">2018</div><div class="lts">LTS</div></div>
+      <div class="tl-node"><div class="dotv"></div><div class="ver">17</div><div class="yr">2021</div><div class="lts">LTS</div></div>
+      <div class="tl-node"><div class="dotv"></div><div class="ver">21</div><div class="yr">2023</div><div class="lts">LTS</div></div>
+      <div class="tl-node"><div class="dotv"></div><div class="ver">25</div><div class="yr">2025</div><div class="lts">LTS</div></div>
+    </div>
+    <p class="prose" style="margin-top:18px">"Java" bitta emas — bir nechta kompaniya JDK tayyorlaydi. Kod bir xil, farq — litsenziya va qo'llab-quvvatlash. Yangi loyihaga odatda bepul <b>Temurin</b> yoki <b>OpenJDK</b> olinadi.</p>
+    <div class="dist-grid">
+      <div class="dist"><div class="dn">OpenJDK</div><div class="dd">rasmiy ochiq manba, bepul asos</div></div>
+      <div class="dist"><div class="dn">Eclipse Temurin</div><div class="dd">eng ommabop bepul, ishlab chiqarish uchun</div></div>
+      <div class="dist"><div class="dn">Oracle JDK</div><div class="dd">Oracle'niki, litsenziyaga e'tibor</div></div>
+      <div class="dist"><div class="dn">Amazon Corretto</div><div class="dd">AWS'niki, bepul, uzoq qo'llab-quvvatlash</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>classpath nima?</h2></div>
+    <div class="prose">
+      <p>JVM class'larni <b>qayerdan</b> qidirishini bilishi kerak. <code>classpath</code> — aynan shu "qidiruv yo'llari" ro'yxati: papkalar va <code>.jar</code> fayllar. Boshlovchilarni eng ko'p qiynaydigan xatolar (<code>ClassNotFoundException</code>) deyarli har doim noto'g'ri classpath'dan.</p>
+      <p>Yaxshi xabar: Maven yoki Gradle (2-modul) va IDE buni siz uchun avtomatik boshqaradi — qo'lda classpath yozish kamdan-kam kerak bo'ladi.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>Birinchi dasturni qismlab</h2></div>
+    <p class="sec-sub">Har Java dasturi shu ko'rinishdan boshlanadi. Rangli qismlarni bosing.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Main.java</span></div>
+      <pre class="code"><span class="tap" data-p="class"><span class="k">public class</span> <span class="ty">Main</span></span> {
+    <span class="tap" data-p="main"><span class="k">public static void</span> <span class="ty">main</span>(<span class="ty">String</span>[] args)</span> {
+        <span class="tap" data-p="print"><span class="ty">System</span>.out.println(<span class="st">"Salom, dunyo!"</span>)</span>;
+    }
+}</pre>
+    </div>
+    <div class="anno" id="anno"><div class="a-t" id="annoT"></div><div class="a-b" id="annoB"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">10</span><h2>Qanday ishga tushirasiz</h2></div>
+    <p class="sec-sub">Ikki yo'l bor. Ichini tushunish uchun terminal, kundalik ish uchun IDE.</p>
+    <div class="term">
+      <div class="term-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="tt">terminal</span></div>
+      <div class="term-body">
+<span class="pr">$</span> <span class="cmd">javac Main.java</span>   <span class="cmt"># kompilyatsiya → Main.class hosil bo'ladi</span><br>
+<span class="pr">$</span> <span class="cmd">java Main</span>          <span class="cmt"># JVM'da ishga tushirish</span><br>
+<span class="out">Salom, dunyo!</span><br><br>
+<span class="cmt"># Java 11+ da bitta faylni to'g'ridan ishga tushirsa ham bo'ladi:</span><br>
+<span class="pr">$</span> <span class="cmd">java Main.java</span>     <span class="cmt"># javac'siz</span>
+      </div>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>amalda</div>
+      Haqiqiy loyihada <b>IntelliJ IDEA</b> (yoki VS Code) ishlatasiz — u yozganingizni tekshiradi, avtomatik to'ldiradi, xatolarni ko'rsatadi va bir tugmada ishga tushiradi. Terminal buyruqlari esa "ich"ini tushunish uchun muhim.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">11</span><h2>Boshlovchilar eng ko'p qiladigan xatolar</h2></div>
+    <p class="sec-sub">Bularni oldindan bilsangiz — soatlab vaqt tejaysiz.</p>
+    <div class="err-list">
+      <div class="err-item"><span class="em">class nomi ≠ fayl nomi</span><div class="ex">Agar class <code>Main</code> bo'lsa, fayl <b>Main.java</b> bo'lishi shart (public class uchun). Aks holda kompilyatsiya xatosi.</div></div>
+      <div class="err-item"><span class="em">; unutish</span><div class="ex">Java'da deyarli har amal <code>;</code> bilan tugaydi. Eng ko'p uchraydigan sintaksis xatosi.</div></div>
+      <div class="err-item"><span class="em">main imzosi noto'g'ri</span><div class="ex"><code>public static void main(String[] args)</code> — aniq shunday. Bittasi ham xato bo'lsa JVM kirish nuqtasini topolmaydi.</div></div>
+      <div class="err-item"><span class="em">Katta-kichik harf</span><div class="ex">Java <b>case-sensitive</b>: <code>String</code> ≠ <code>string</code>, <code>Main</code> ≠ <code>main</code>. Kompilyator buni kechirmaydi.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">12</span><h2>Suhbat savollari</h2></div>
+    <p class="sec-sub">Bu modul bo'yicha eng ko'p so'raladigan savollar. Har birini ochib javobni ko'ring — o'z so'zingiz bilan aytishga harakat qiling.</p>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Java kompilyatsiyalanadimi yoki interpretatsiyalanadimi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ikkalasi ham. Avval <code>javac</code> bilan <b>bytecode</b>ga kompilyatsiya qilinadi, keyin JVM uni interpretatsiya qiladi va issiq qismlarini <b>JIT</b> bilan mashina kodiga kompilyatsiya qiladi. Shuning uchun "Java — kompilyatsiya + interpretatsiya" deb aytiladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Bytecode nima va nega kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Odam va mashina orasidagi oraliq til — platformaga bog'liq emas. Aynan u tufayli bitta <code>.class</code> hamma OS'da ishlaydi ("write once, run anywhere"). Uni har platformaning JVM'i bajaradi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JDK, JRE va JVM farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">JVM — bytecode'ni bajaradigan dvigatel. JRE = JVM + standart kutubxonalar (ishga tushirish uchun). JDK = JRE + ishlab chiqish vositalari (javac, debugger...). Bir-birining ichida: JDK ⊃ JRE ⊃ JVM.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JIT nima qiladi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ish davomida ko'p ishlatiladigan ("hot") bytecode'ni real vaqtda tezkor mashina kodiga kompilyatsiya qiladi va keshlaydi. Shu tufayli Java "isigach" tezlashadi. Interpretatsiya darhol boshlaydi, JIT keyin tezlashtiradi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Class yuklanishining bosqichlari?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Loading (topib xotiraga olish) → Linking (verify, prepare, resolve) → Initialization (static bloklar va qiymatlar). Class faqat birinchi marta kerak bo'lganda initialize qilinadi (lazy).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">13</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">1.</span>javac kompilyatori nima ishlab chiqaradi?</div>
+        <button class="opt">To'g'ridan-to'g'ri mashina kodi</button>
+        <button class="opt">Bytecode (.class fayl)</button>
+        <button class="opt">HTML sahifa</button>
+        <div class="q-fb" data-ok="Ha! javac .java'ni platformadan mustaqil bytecode'ga aylantiradi. Mashina kodiga aylantirishni keyin JVM (JIT) qiladi." data-no="Yo'q. javac oraliq bytecode'ni — .class faylni ishlab chiqaradi, mashina kodini emas."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">2.</span>JIT kompilyatorning vazifasi nima?</div>
+        <button class="opt">.java'ni .class'ga aylantirish</button>
+        <button class="opt">Class'larni xotiradan o'chirish</button>
+        <button class="opt">Ko'p ishlatiladigan bytecode'ni tez mashina kodiga aylantirish</button>
+        <div class="q-fb" data-ok="To'g'ri. JIT ish davomida 'hot' kodni tezkor mashina kodiga kompilyatsiya qiladi — shu sabab Java isigach tezlashadi." data-no="Yo'q. .java→.class ni javac qiladi. JIT esa ish davomida issiq kodni tez mashina kodiga aylantiradi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">3.</span>Bitta .class turli OS'larda ishlashining sababi?</div>
+        <button class="opt">Har OS'da o'z JVM'i bytecode'ni bajaradi</button>
+        <button class="opt">Java kodi har OS uchun qayta yoziladi</button>
+        <button class="opt">.class juda kichik bo'lgani uchun</button>
+        <div class="q-fb" data-ok="Aynan. Bytecode bir xil qoladi, uni har platformaga moslashgan JVM bajaradi." data-no="Yo'q. Kod qayta yozilmaydi — bytecode bir xil, faqat har OS'da alohida JVM bor."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Class yuklanishining to'g'ri tartibi?</div>
+        <button class="opt">Initialization → Linking → Loading</button>
+        <button class="opt">Loading → Linking → Initialization</button>
+        <button class="opt">Linking → Loading → Initialization</button>
+        <div class="q-fb" data-ok="To'g'ri. Avval yuklanadi (Loading), keyin bog'lanadi (Linking: verify/prepare/resolve), so'ng ishga tayyorlanadi (Initialization)." data-no="Yo'q. To'g'ri tartib: Loading → Linking → Initialization."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">5.</span>Dastur yozmoqchi bo'lsangiz nima o'rnatasiz?</div>
+        <button class="opt">Faqat JVM</button>
+        <button class="opt">Faqat JRE</button>
+        <button class="opt">JDK (ichida JRE va JVM bor)</button>
+        <div class="q-fb" data-ok="To'g'ri. Kod yozish/kompilyatsiya uchun JDK kerak — u ichida JRE va JVM'ni ham olib keladi." data-no="Yo'q. Yozish uchun JDK kerak (javac shu yerda). JRE faqat tayyor dasturni ishlatish uchun."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Muhitni sozlash: JDK, IDE, Maven/Gradle</h3>
+      <p>Endi qo'lni ishga solamiz: JDK o'rnatish, IDE, package va import nima, va nega har jiddiy loyiha Maven yoki Gradle ishlatadi. Real loyiha shu yerdan boshlanadi.</p>
+      <div class="topics">
+        <span class="topic-pill now">1 · Java qanday ishlaydi</span>
+        <span class="topic-pill">2 · Muhit &amp; Maven</span>
+        <span class="topic-pill">3 · Tiplar</span>
+        <span class="topic-pill">4 · String'lar</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><div class="empty">Bu — birinchi dars</div><a class="cn nx" href="02-muhit-sozlash-va-maven.html"><span class="cl">Keyingi dars →</span><span class="ct">02 · Muhit sozlash va Maven</span><span class="cs">☕ Java asoslari</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:1.1%"></i></div><span>1 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(1)<0)v.push(1);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','1');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(1)<0)D[t].push(1);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement, tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme'); if(t)return t; return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme', cur()==='dark'?'light':'dark');});
+
+  /* language compare */
+  var LANG={
+    c:{flow:[['Kod','.c'],['Kompilyator','gcc'],['Mashina kodi','.exe'],['CPU','bajaradi']],
+       note:'<b>C</b>: kod to\'g\'ridan-to\'g\'ri shu OS uchun mashina kodiga aylanadi. Juda tez, lekin <b>har OS uchun qayta kompilyatsiya</b> kerak — Windows .exe Linux\'da ishlamaydi.'},
+    py:{flow:[['Kod','.py'],['Interpretator','python'],['CPU','satrma-satr']],
+       note:'<b>Python</b>: kod har safar satrma-satr o\'qib bajariladi. Yozish oson, ko\'chma, lekin <b>sekinroq</b> va xatolar ko\'pincha faqat ishga tushganda chiqadi.'},
+    java:{flow:[['Kod','.java'],['javac','bytecode'],['JVM','har OS'],['CPU','JIT']],
+       note:'<b>Java</b>: bir marta bytecode\'ga kompilyatsiya (tekshiruv + xavfsizlik), keyin har OS\'ning JVM\'i bajaradi. <b>Ko\'chma ham, tez ham</b> — ikkovining yaxshisi.'}
+  };
+  var cmpFlow=document.getElementById('cmpFlow'),cmpNote=document.getElementById('cmpNote');
+  function showLang(l){
+    [].slice.call(document.querySelectorAll('#langSeg button')).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    var d=LANG[l];
+    cmpFlow.innerHTML=d.flow.map(function(s,i){
+      return '<div class="cmp-step">'+s[0]+'<span class="cs-s">'+s[1]+'</span></div>'+(i<d.flow.length-1?'<span class="cmp-arr">→</span>':'');
+    }).join('');
+    cmpNote.innerHTML=d.note;
+  }
+  [].slice.call(document.querySelectorAll('#langSeg button')).forEach(function(b){b.addEventListener('click',function(){showLang(b.getAttribute('data-l'));});});
+  showLang('c');
+
+  /* pipeline */
+  var steps=[
+    {tag:"1 · Main.java",html:"Siz odam o'qiy oladigan Java kodini yozasiz — oddiy matnli fayl. Protsessor uni hali tushunmaydi."},
+    {tag:"2 · javac",html:"<code>javac</code> kompilyatori kodni xatolarga tekshiradi. Xato bo'lsa shu yerda to'xtaydi. Toza bo'lsa keyingi bosqichga o'tkazadi."},
+    {tag:"3 · Main.class",html:"Natija — <code>.class</code> fayl, ichida <b>bytecode</b>. Odam uchun emas, JVM uchun. Hech qaysi OS'ga bog'liq emas."},
+    {tag:"4 · Classloader",html:"<code>java Main</code> deganingizda JVM'ning classloader'i <code>.class</code>ni topib, tekshirib (verify), xotiraga yuklaydi va ishga tayyorlaydi."},
+    {tag:"5 · JIT",html:"JVM bytecode'ni interpretatsiya qila boshlaydi. Ko'p ishlatiladigan qismlarni <b>JIT</b> tezkor mashina kodiga aylantiradi — dastur isiydi va tezlashadi."},
+    {tag:"6 · CPU",html:"Endi protsessor haqiqiy mashina kodini bajaradi. Dasturingiz to'liq ishga tushdi ✓"}
+  ];
+  var stages=[].slice.call(document.querySelectorAll('#stages .stage'));
+  var capTag=document.getElementById('capTag'), capBody=document.getElementById('capBody');
+  var dotsWrap=document.getElementById('dots'), scroll=document.getElementById('stageScroll');
+  var i=0, playing=true, timer=null;
+  stages.forEach(function(_,k){var b=document.createElement('button'); b.className='d'; b.setAttribute('aria-label',(k+1)+'-bosqich');
+    b.addEventListener('click',function(){go(k); pause();}); dotsWrap.appendChild(b);});
+  var dots=[].slice.call(dotsWrap.children);
+  function render(){
+    stages.forEach(function(s,k){s.classList.toggle('active',k===i); s.classList.toggle('done',k<i);});
+    dots.forEach(function(d,k){d.classList.toggle('on',k===i);});
+    capTag.innerHTML=steps[i].tag; capBody.innerHTML=steps[i].html;
+    var el=stages[i];
+    if(el && scroll.scrollWidth>scroll.clientWidth){var left=el.offsetLeft-(scroll.clientWidth-el.offsetWidth)/2; scroll.scrollTo({left:Math.max(0,left),behavior:'smooth'});}
+  }
+  function go(n){i=(n+steps.length)%steps.length; render(); if(playing)schedule();}
+  function schedule(){clearTimeout(timer); timer=setTimeout(function(){go(i+1);},3200);}
+  function play(){playing=true; setBtn(); schedule();}
+  function pause(){playing=false; setBtn(); clearTimeout(timer);}
+  function setBtn(){document.getElementById('playLbl').textContent=playing?'Pauza':'Davom';
+    document.getElementById('playIcon').innerHTML=playing?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>';}
+  document.getElementById('playBtn').addEventListener('click',function(){playing?pause():play();});
+  document.getElementById('nextBtn').addEventListener('click',function(){go(i+1); pause();});
+  document.getElementById('prevBtn').addEventListener('click',function(){go(i-1); pause();});
+  render(); setBtn(); schedule();
+
+  /* classloader accordion */
+  var clps=[].slice.call(document.querySelectorAll('.clp'));
+  clps.forEach(function(p){p.addEventListener('click',function(){clps.forEach(function(x){x.classList.toggle('active',x===p);});});});
+  clps[0].classList.add('active');
+
+  /* code anatomy */
+  var annoData={
+    "class":{t:"public class Main",b:"Har bir Java fayli kamida bitta <b>class</b>'dan iborat — kodni saqlaydigan \"quti\". Public class nomi fayl nomi bilan bir xil bo'lishi shart: <code>Main.java</code>."},
+    "main":{t:"public static void main(String[] args)",b:"Dastur aynan shu yerdan boshlanadi — JVM birinchi <code>main</code>'ni qidiradi. <b>static</b> — obyektsiz chaqiriladi; <b>void</b> — hech narsa qaytarmaydi; <b>String[] args</b> — buyruq qatoridan kelgan so'zlar."},
+    "print":{t:"System.out.println(\"...\")",b:"Ekranga matn chiqaradi va yangi qatorga o'tadi. <code>System.out</code> — standart chiqish (konsol). Satr <code>;</code> bilan tugaydi — unutish eng ko'p uchraydigan xato."}
+  };
+  var taps=[].slice.call(document.querySelectorAll('.tap'));
+  var annoT=document.getElementById('annoT'), annoB=document.getElementById('annoB');
+  function selectTap(el){taps.forEach(function(t){t.classList.remove('sel');}); el.classList.add('sel');
+    var d=annoData[el.getAttribute('data-p')]; annoT.textContent=d.t; annoB.innerHTML=d.b;}
+  taps.forEach(function(el){el.setAttribute('tabindex','0'); el.setAttribute('role','button');
+    el.addEventListener('click',function(){selectTap(el);});
+    el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault(); selectTap(el);}});});
+  if(taps[0])selectTap(taps[0]);
+
+  /* quiz */
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'); var opts=[].slice.call(q.querySelectorAll('.opt')); var fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return; q.dataset.done="1"; opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct; o.classList.add(ok?'correct':'wrong'); if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no'); fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

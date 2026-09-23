@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nega TypeScript</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF3F9;--surface:#FFFFFF;--surface-2:#F6F9FC;--sunken:#E6ECF5;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D7E0EC;--border-strong:#C0CDDF;
+  --accent:#3178C6;--accent-ink:#235A98;--accent-soft:#E0EBF8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C121A;--surface:#162030;--surface-2:#1B2638;--sunken:#111925;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#26344A;--border-strong:#35465F;
+  --accent:#6AA6EA;--accent-ink:#8DBBF0;--accent-soft:#16263D;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C121A;--surface:#162030;--surface-2:#1B2638;--sunken:#111925;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#26344A;--border-strong:#35465F;
+  --accent:#6AA6EA;--accent-ink:#8DBBF0;--accent-soft:#16263D;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.two>div{min-width:0}
+.two h5{margin:0 0 6px;font-family:var(--font-mono);font-size:12.5px}
+.rt{background:#141A24;color:#DDE6F2;border-radius:12px;padding:10px 12px;font-family:var(--font-mono);font-size:12px;min-height:150px;line-height:1.7}
+.rt div{animation:pop .3s}
+.rt .er{color:#FF8A7A}.rt .wr{color:#F2C46B}.rt .ok{color:#9BE3BE}.rt .tm{color:#7C8AA0}
+/* cost */
+.cost{display:flex;align-items:flex-end;gap:10px;height:190px;margin-top:14px;padding:0 4px;border-bottom:2px solid var(--border-strong)}
+.cb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.cb .bar3{width:100%;border-radius:8px 8px 0 0;background:var(--accent);transition:height .7s cubic-bezier(.2,.8,.2,1);position:relative}
+.cb .bar3 .bug{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:12px;white-space:nowrap;font-family:var(--font-mono)}
+.cb small{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);text-align:center}
+.cx{display:flex;gap:10px;margin-top:6px}
+.cx span{flex:1;text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+/* erasure */
+.era{font-family:var(--font-mono);font-size:13px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;line-height:1.9;margin-top:10px;overflow-x:auto;white-space:pre}
+.era .t{color:var(--accent-ink);background:var(--accent-soft);border-radius:4px;display:inline-block;max-width:400px;overflow:hidden;vertical-align:bottom;transition:max-width .7s ease,opacity .5s,padding .5s;padding:0 2px}
+.era.gone .t{max-width:0;opacity:0;padding:0}
+.era .e{color:var(--coral);background:var(--coral-soft);border-radius:4px;padding:0 2px}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#3178C6"></span> TypeScript · 1/6</span><span>· Kurs: 75/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>TypeScript · 75-modul · kirish</span>
+    <h1>Nega <span class="steam">TypeScript</span>?</h1>
+    <p class="lead">Java dasturchi uchun JavaScript’dagi eng og‘riqli narsa — kompilyator yo‘qligi: xato faqat ishlaganda, ko‘pincha production’da chiqadi. <b>TypeScript</b> — JS ustidagi tip qatlami: kod yozayotganingizda IDE xatoni qizil chiziq bilan ko‘rsatadi, build esa uni o‘tkazmaydi. Vue 3 ekotizimi deyarli to‘liq TS’da. Bu trek sizga u yerda o‘zingizni Java’dagidek ishonchli his qilishni o‘rgatadi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Bir xil kod: JS va TS</h2></div><p class="sec-sub">Chapda — oddiy JS: ishga tushiring va xatolar qachon chiqishini ko‘ring. O‘ngda — xuddi shu kod tiplar bilan: <code>tsc</code> ularni <b>ishga tushirishdan oldin</b> topadi.</p>
+    <div class="stage">
+      <div class="two">
+        <div><h5>🟨 komissiya.js</h5><pre class="code" style="background:var(--sunken);border:1px solid var(--border);border-radius:12px;font-size:12px;line-height:1.75;padding:10px">function komissiya(tolov) {
+  return tolov.summa * tolov.foiz / 100;
+}
+const t = { summa: "150000", foiz: 0.5,
+            qabulQiluvchi: null };
+const k = komissiya(t);
+console.log(k.toFixed(2));
+console.log(t.sumaa);
+console.log(t.qabulQiluvchi.ism);</pre>
+          <div class="ctrls"><button class="btn primary" id="jsRun">▶ node komissiya.js</button></div>
+          <div class="rt" id="rt"><span class="tm">$ — natija shu yerda</span></div></div>
+        <div><h5>🔷 komissiya.ts</h5><div class="tsv" id="ts1"><div class="bar"><span class="fn">📄 komissiya.ts</span><button class="btn primary" id="ts1Chk" style="padding:5px 12px;font-size:12px">▶ tsc --noEmit</button><span class="st" id="ts1St">tekshirilmagan</span></div><pre id="ts1Pre"></pre><div class="errs" id="ts1Errs"></div><div class="tip" id="ts1Tip">Tekshirish tugmasini bosing.</div></div></div>
+      </div>
+      <div class="explain" id="cmpEx">Ikkala tugmani ham bosing.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Xato qanchalik kech topilsa, shunchalik qimmat</h2></div><p class="sec-sub">Bir xil 10 ta xato. JS loyihada ular qayerda topiladi va TS’da qayerda? (Nisbiy narx — sanoat kuzatuvlariga asoslangan taxminiy ko‘rsatkich.)</p>
+    <div class="stage">
+      <div class="seg" id="cseg"><button class="on" data-m="js">JavaScript</button><button data-m="ts">TypeScript (strict)</button></div>
+      <div class="cost" id="cost"></div>
+      <div class="cx"><span>IDE (yozish)</span><span>build / CI</span><span>unit test</span><span>QA / staging</span><span>production</span></div>
+      <div class="explain" id="coEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Tiplar qayerga ketadi? Type erasure</h2></div><p class="sec-sub">TypeScript — <b>faqat kompilyatsiya vaqtidagi</b> tekshiruv. <code>tsc</code> (yoki Vite/esbuild) tiplarni o‘chirib, oddiy JS chiqaradi. Brauzer TypeScript’ni bilmaydi.</p>
+    <div class="stage">
+      <div class="era" id="era"></div>
+      <div class="ctrls"><button class="btn primary" id="eGo">⚙️ Kompilyatsiya (tiplarni o‘chirish)</button><button class="btn" id="eBack">↺</button></div>
+      <div class="explain" id="eEx">Sariq — faqat TypeScript’da mavjud qismlar.</div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Java bilan o‘xshashlik va farq</div>Java’da ham generics o‘chiriladi (type erasure: <code>List&lt;String&gt;</code> → <code>List</code>), lekin klasslar, <code>instanceof</code> va maydon tiplari runtime’da bor. TS’da <b>hech narsa</b> qolmaydi: <code>interface</code> runtime’da yo‘q, <code>x instanceof Tolov</code> interfeys bilan ishlamaydi. Backend’dan kelgan JSON TS aytganidek bo‘lishiga <b>kafolat yo‘q</b> — shuning uchun chegarada runtime validatsiya (zod, 79-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Loyiha va strict rejim</h2></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">terminal</span></div><pre class="code"><span class="k">npm</span> create vite<span class="k">@latest</span> internet-bank -- --template vue-ts
+cd internet-bank &amp;&amp; <span class="k">npm</span> install
+<span class="k">npx</span> vue-tsc --noEmit        <span class="cm"># faqat tip tekshiruvi (CI'da)</span>
+<span class="k">npm</span> <span class="k">run</span> dev                  <span class="cm"># Vite: TS'ni esbuild bilan tez "o'chiradi", tekshirmaydi!</span></pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">tsconfig.json</span></div><pre class="code">{
+  <span class="st">"compilerOptions"</span>: {
+    <span class="st">"target"</span>: <span class="st">"ES2022"</span>,
+    <span class="st">"module"</span>: <span class="st">"ESNext"</span>,
+    <span class="st">"moduleResolution"</span>: <span class="st">"Bundler"</span>,
+    <span class="st">"strict"</span>: <span class="k">true</span>,                        <span class="cm">// quyidagilarning hammasini yoqadi ↓</span>
+    <span class="st">"noUncheckedIndexedAccess"</span>: <span class="k">true</span>,      <span class="cm">// arr[i] → T | undefined (Java'da IndexOutOfBounds)</span>
+    <span class="st">"exactOptionalPropertyTypes"</span>: <span class="k">true</span>,
+    <span class="st">"noImplicitOverride"</span>: <span class="k">true</span>,
+    <span class="st">"verbatimModuleSyntax"</span>: <span class="k">true</span>,          <span class="cm">// import type majburiy</span>
+    <span class="st">"skipLibCheck"</span>: <span class="k">true</span>
+  }
+}</pre></div><div class="tbl-wrap"><table class="tbl"><tr><th>strict ichida</th><th>Nima qiladi</th><th>Java analogi</th></tr><tr><td><code>strictNullChecks</code></td><td><code>null</code>/<code>undefined</code> alohida tip — tekshirmasdan ishlatib bo‘lmaydi</td><td>NPE’ni kompilyator ushlasa edi… (Kotlin’dagi kabi)</td></tr><tr><td><code>noImplicitAny</code></td><td>Tip chiqarib bo‘lmasa — xato (jim <code>any</code> emas)</td><td>Har o‘zgaruvchining tipi bor</td></tr><tr><td><code>strictFunctionTypes</code></td><td>Funksiya parametrlari to‘g‘ri tekshiriladi (kontravariantlik)</td><td>PECS qoidasi</td></tr><tr><td><code>strictPropertyInitialization</code></td><td>Klass maydoni konstruktorda to‘ldirilishi shart</td><td>final maydon</td></tr><tr><td><code>useUnknownInCatchVariables</code></td><td><code>catch (e)</code> — <code>unknown</code>, tekshirmasdan ishlatib bo‘lmaydi</td><td>—</td></tr></table></div><div class="callout warn"><div class="ct">⚠️ Vite dev server tiplarni tekshirmaydi</div>Tezlik uchun Vite faqat tiplarni o‘chiradi. Xatolar IDE’da (Volar/vue-tsc) va CI’dagi <code>vue-tsc --noEmit</code>da ushlanadi. CI’da bu qadam bo‘lmasa — TS’ning yarim foydasi yo‘qoladi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Java va TypeScript tip tizimlari</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th></th><th>Java</th><th>TypeScript</th></tr><tr><td>Moslik</td><td><b>Nominal</b>: nomi bir xil bo‘lishi kerak (implements)</td><td><b>Strukturaviy</b>: shakli mos bo‘lsa yetadi (77-modul)</td></tr><tr><td>Runtime</td><td>Tiplar mavjud (reflection, instanceof)</td><td>Tiplar yo‘q (erasure)</td></tr><tr><td>null</td><td>Har havola null bo‘lishi mumkin</td><td>strict’da aniq: <code>string | null</code></td></tr><tr><td>Union</td><td>Yo‘q (sealed interface’lar yaqin)</td><td><code>"ACTIVE" | "BLOCKED"</code>, <code>Tolov | Xato</code></td></tr><tr><td>Chiqarish (inference)</td><td><code>var</code> (lokal)</td><td>Hamma joyda kuchli</td></tr><tr><td>Qochish yo‘li</td><td>Cast (runtime tekshiriladi)</td><td><code>as</code>, <code>any</code> — hech narsa tekshirilmaydi!</td></tr><tr><td>Kuchi</td><td>Soddalik, runtime kafolat</td><td>Ifodalilik: mapped, conditional, template literal tiplar</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>TypeScript nima va nima uchun kerak?<span class="chev">›</span></summary><div class="iv-a">JS’ning ustki to‘plami (superset) bo‘lgan tilga statik tiplar qo‘shadigan til va kompilyator. Xatolarni erta (IDE, build) topadi, refaktoring va avtoto‘ldirishni ishonchli qiladi, kodni hujjatlaydi. Natija — oddiy JS; runtime xulqni o‘zgartirmaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>TypeScript runtime’da tiplarni tekshiradimi?<span class="chev">›</span></summary><div class="iv-a">Yo‘q. Tiplar kompilyatsiyada o‘chiriladi. API javobi, localStorage, foydalanuvchi kiritishi kabi tashqi ma’lumotni runtime’da tekshirish uchun zod/valibot kabi validatorlar kerak.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>strict rejim nimalarni yoqadi?<span class="chev">›</span></summary><div class="iv-a">strictNullChecks, noImplicitAny, strictFunctionTypes, strictBindCallApply, strictPropertyInitialization, noImplicitThis, alwaysStrict, useUnknownInCatchVariables. Yangi loyihada — albatta yoqiq.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>any va unknown farqi?<span class="chev">›</span></summary><div class="iv-a">any — tekshiruvni butunlay o‘chiradi (har narsa mumkin, xato yuqumli tarqaladi). unknown — xavfsiz "noma’lum": ishlatishdan oldin tipni toraytirish (typeof, instanceof, validator) shart. Tashqi ma’lumot uchun unknown.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>TS’ni mavjud JS loyihaga qanday kiritasiz?<span class="chev">›</span></summary><div class="iv-a">Bosqichma-bosqich: allowJs + checkJs yoki JSDoc tiplar, fayllarni birma-bir .ts ga o‘tkazish, avval strict’siz, keyin flag’larni birin-ketin yoqish, API chegarasidagi tiplardan boshlash (DTO’lar — OpenAPI’dan generatsiya, 79-modul).</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Brauzer .ts faylni to‘g‘ridan-to‘g‘ri bajara oladimi?</div><button class="opt">Ha</button><button class="opt">Yo‘q — avval JS’ga kompilyatsiya qilinadi</button><button class="opt">Faqat Chrome’da</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Brauzer faqat JS’ni biladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>API {"summa": "150000"} qaytardi, TS’da summa: number deb e’lon qilingan. Nima bo‘ladi?</div><button class="opt">tsc xato beradi</button><button class="opt">Kompilyatsiya o‘tadi, runtime’da summa string bo‘lib qoladi</button><button class="opt">Brauzer xato beradi</button><div class="q-fb" data-ok="To‘g‘ri — shuning uchun chegarada validatsiya." data-no="Yo‘q. TS runtime’da hech narsani tekshirmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>strictNullChecks yoqiq. let ism: string = null;</div><button class="opt">Mumkin</button><button class="opt">Xato: null string’ga mos emas</button><button class="opt">Ogohlantirish</button><div class="q-fb" data-ok="To‘g‘ri — string | null kerak." data-no="Yo‘q. strict’da null alohida tip."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Vite dev server TS tip xatosini ko‘rsatadimi?</div><button class="opt">Ha, har doim</button><button class="opt">Yo‘q — faqat tiplarni o‘chiradi; tekshiruv IDE va vue-tsc’da</button><button class="opt">Faqat production’da</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Vite tekshirmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Tashqi ma’lumot uchun qaysi tip xavfsizroq?</div><button class="opt">any</button><button class="opt">unknown</button><button class="opt">object</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. unknown — toraytirishni majburlaydi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · TypeScript</span>
+      <h3>Asosiy tiplar va narrowing</h3>
+      <p>Primitivlar, massiv/tuple, union va literal tiplar, narrowing’ni animatsiyada — kompilyator tipni qanday toraytiradi.</p>
+      <div class="topics"><span class="topic-pill now">75 · Nega TS</span><span class="topic-pill">76 · Tiplar</span><span class="topic-pill">77 · Interface</span><span class="topic-pill">78 · Generics</span><span class="topic-pill">79 · Amaliyot</span><span class="topic-pill">80 · Suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="74-js-suhbat-savollari.html"><span class="cl">← Oldingi dars</span><span class="ct">74 · JS suhbat savollari</span><span class="cs">🟨 JavaScript</span></a><a class="cn nx" href="76-asosiy-tiplar-va-narrowing.html"><span class="cl">Keyingi dars →</span><span class="ct">76 · Asosiy tiplar va narrowing</span><span class="cs">🔷 TypeScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:85.2%"></i></div><span>75 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(75)<0)v.push(75);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','75');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(75)<0)D[t].push(75);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+window.mkTs=function(pid,src,errs,opts){opts=opts||{};var g=function(s){return document.getElementById(pid+s);};var root=document.getElementById(pid);
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var KWS=' const let var function return if else interface type class extends implements new import export from async await readonly keyof typeof in as satisfies never unknown any string number boolean void null undefined true false enum private public infer throw switch case default for of ';
+  function hl(s){var out='',re=/(\/\/.*$)|("[^"]*"|'[^']*'|`[^`]*`)|([A-Za-z_$][\w$]*)|([\s\S])/g,m;while((m=re.exec(s))){if(m[1])out+='<span class="cm">'+esc(m[1])+'</span>';else if(m[2])out+='<span class="st">'+esc(m[2])+'</span>';else if(m[3])out+=KWS.indexOf(' '+m[3]+' ')>=0?'<span class="k">'+m[3]+'</span>':(/^[A-Z]/.test(m[3])?'<span class="ty">'+m[3]+'</span>':m[3]);else out+=esc(m[4]);}return out;}
+  function render(src){var lines=src.split('\n');g('Pre').innerHTML=lines.map(function(l,i){var out='',re=/⟦(\w+)⟧([\s\S]*?)⟦\/⟧/g,last=0,m,has=false;
+      while((m=re.exec(l))){out+=hl(l.slice(last,m.index));out+='<span class="sq" data-e="'+m[1]+'">'+hl(m[2])+'</span>';last=re.lastIndex;has=true;}out+=hl(l.slice(last));
+      return '<span class="l'+(has?' el':'')+'" data-line="'+(i+1)+'"><span class="ln">'+(i+1)+'</span>'+out+'</span>';}).join('');}
+  var cur=src;render(cur);
+  function lineOf(id){var sq=root.querySelector('.sq[data-e="'+id+'"]');return sq?sq.closest('.l').dataset.line:'?';}
+  function check(){var ids=Object.keys(errs).filter(function(id){return root.querySelector('.sq[data-e="'+id+'"]');});root.classList.add('on');
+    g('Errs').innerHTML=ids.map(function(id){return '<div data-e="'+id+'"><span class="ic">✖</span><span class="lc">'+opts.file+':'+lineOf(id)+'</span><span>'+errs[id][0]+'</span></div>';}).join('');
+    var st=g('St');st.className='st '+(ids.length?'er':'ok');st.textContent=ids.length?ids.length+' ta xato':'✓ 0 xato';
+    g('Tip').innerHTML=ids.length?(opts.onErr||'Xatoni bosing — izoh va tuzatish ko‘rinadi.'):(opts.onOk||'Kompilyatsiya muvaffaqiyatli.');}
+  function pick(id){[].forEach.call(root.querySelectorAll('.hl'),function(x){x.classList.remove('hl');});[].forEach.call(root.querySelectorAll('[data-e="'+id+'"]'),function(x){x.classList.add('hl');});g('Tip').innerHTML='<b>'+errs[id][0]+'</b><br>'+errs[id][1];}
+  opts.file=opts.file||'app.ts';
+  g('Chk').addEventListener('click',check);
+  root.addEventListener('click',function(e){var t=e.target.closest('[data-e]');if(t&&root.classList.contains('on'))pick(t.dataset.e);});
+  return {set:function(s){cur=s;root.classList.remove('on');g('St').className='st';g('St').textContent='tekshirilmagan';g('Errs').innerHTML='';render(s);g('Tip').innerHTML='Tekshirish tugmasini bosing.';},check:check};
+};
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var ts=mkTs('ts1',"interface Mijoz { ism: string }\ninterface Tolov { summa: number; foiz: number; qabulQiluvchi: Mijoz | null }\n\nfunction komissiya(tolov: Tolov): number {\n  return tolov.summa * tolov.foiz / 100;\n}\nconst t: Tolov = { summa: ⟦a⟧\"150000\"⟦/⟧, foiz: 0.5,\n                   qabulQiluvchi: null };\nconst k = komissiya(t);\nconsole.log(k.toFixed(2));\nconsole.log(t.⟦c⟧sumaa⟦/⟧);\nconsole.log(⟦b⟧t.qabulQiluvchi⟦/⟧.ism);",
+   {a:['TS2322: Type \'string\' is not assignable to type \'number\'.','Backend yoki forma satr bergan. JS’da <code>"150000" * 0.5</code> jim aylanadi (750) — lekin <code>"150000" + 1000</code> "1500001000" bo‘lardi. Tuzatish: <code>Number(...)</code> yoki DTO’ni to‘g‘rilash.'],
+    c:['TS2551: Property \'sumaa\' does not exist on type \'Tolov\'. Did you mean \'summa\'?','Imlo xatosi. JS’da jim <code>undefined</code> — hisobotda bo‘sh katak, hech kim sezmaydi.'],
+    b:['TS18047: \'t.qabulQiluvchi\' is possibly \'null\'.','Null tekshiruvi yo‘q. Tuzatish: <code>t.qabulQiluvchi?.ism ?? "—"</code> yoki <code>if (t.qabulQiluvchi)</code> — narrowing (76-modul).']},
+   {file:'komissiya.ts',onErr:'<b>3 ta xato — hammasi kod ishga tushishidan oldin.</b> Xatoni bosing.'});
+  el('jsRun').addEventListener('click',function(){var rt=el('rt');rt.innerHTML='<div class="tm">$ node komissiya.js</div>';
+    var L=[['ok','750.00','"150000" * 0.5 — satr jim songa aylandi. Bu safar omad kulib boqdi.'],['wr','undefined','t.sumaa — imlo xatosi, xato yo‘q, shunchaki undefined.'],['er','TypeError: Cannot read properties of null (reading \'ism\')','Faqat shu qatorga yetganda yiqildi.'],['tm','    at komissiya.js:9:33','—'],['er','🔥 production, 03:14 — P2P chek sahifasi ishlamayapti','Tungi qo‘ng‘iroq.']];
+    L.forEach(function(l,i){setTimeout(function(){rt.insertAdjacentHTML('beforeend','<div class="'+l[0]+'">'+l[1]+'</div>');},400+i*600);});
+    setTimeout(function(){el('cmpEx').innerHTML='JS: 3 ta xatodan <b>bittasi</b> yiqilish bilan ko‘rindi — va faqat o‘sha qator bajarilganda (ehtimol, faqat qabul qiluvchisi yo‘q o‘tkazmalarda, production’da). Qolgan ikkitasi jim noto‘g‘ri natija. TS: uchalasi ham <b>yozish paytida</b> qizil chiziq bilan.';},3500);});
+
+  /* cost */
+  var D={js:[1,1,2,3,3],ts:[7,2,1,0,0]},COST=[1,5,10,50,500];
+  el('cost').innerHTML=COST.map(function(c,i){return '<div class="cb"><div class="bar3" id="cb'+i+'" style="height:4%"><span class="bug" id="bg'+i+'"></span></div><small>×'+c+'</small></div>';}).join('');
+  function cost(m){var a=D[m],tot=0;a.forEach(function(n,i){el('cb'+i).style.height=Math.max(3,n/7*85)+'%';el('cb'+i).style.background=i>=3?'var(--coral)':'var(--accent)';el('bg'+i).textContent=n?'🐞×'+n:'';tot+=n*COST[i];});
+    el('coEx').innerHTML=(m==='js'?'JS’da tip xatolarining ko‘pi test, QA va hatto production’da topiladi.':'TS strict’da tip bilan bog‘liq xatolarning aksariyati IDE’da yoki CI’da topiladi. Mantiqiy xatolar (noto‘g‘ri formula) — baribir testlar ishi.')+' Nisbiy umumiy narx: <b>'+tot+'</b> birlik.';}
+  el('cseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});cost(b.dataset.m);});setTimeout(function(){cost('js');},100);
+
+  /* erasure */
+  el('era').innerHTML='<span class="t">interface Karta { id: string; holat: "ACTIVE" | "BLOCKED" }\n</span>\nfunction blokla(k<span class="t">: Karta</span>)<span class="t">: Karta</span> {\n  return { ...k, holat: "BLOCKED" }<span class="t"> as const</span>;\n}\n\nconst kartalar<span class="t">: Map&lt;string, Karta&gt;</span> = new Map();\nlet oxirgi<span class="t">: Karta | undefined</span>;\n\n<span class="e">enum Rol { MIJOZ, KASSIR }</span>   // ⚠ enum o‘chirilmaydi — JS obyekt kodi hosil bo‘ladi';
+  el('eGo').addEventListener('click',function(){el('era').classList.add('gone');el('eEx').innerHTML='Tiplar <b>izsiz</b> o‘chdi — qolgan kod oddiy JS, brauzer uni bajaradi. Istisno — <code>enum</code> (qizil): u runtime obyektga aylanadi. Ko‘p jamoalar enum o‘rniga <code>as const</code> obyekt yoki union literal ishlatadi (76-modul); <code>erasableSyntaxOnly</code> flag’i (TS 5.8) buni majburlaydi.';});
+  el('eBack').addEventListener('click',function(){el('era').classList.remove('gone');el('eEx').innerHTML='Sariq — faqat TypeScript’da mavjud qismlar.';});
+})();
+
+</script>
+</body>
+</html>

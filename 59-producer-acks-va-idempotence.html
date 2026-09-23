@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kafka producer: acks, batching, idempotence</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F1F2F4;--surface:#FFFFFF;--surface-2:#F8F9FA;--sunken:#E8EBEF;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDE1E7;--border-strong:#C8CED7;
+  --accent:#334155;--accent-ink:#1E293B;--accent-soft:#E2E6EC;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.rep{display:grid;grid-template-columns:130px 1fr;gap:12px;margin-top:10px;align-items:center}
+.rep>div{min-width:0}
+.prod{border:2px solid var(--accent);border-radius:12px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:12px;background:var(--surface)}
+.prod .st{display:block;margin-top:6px;padding:3px 6px;border-radius:6px;font-size:11px;background:var(--sunken)}
+.prod .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.prod .st.bad{background:var(--coral-soft);color:var(--coral)}
+.bks{display:flex;flex-direction:column;gap:6px}
+.bk{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;border:1.5px solid var(--border);border-radius:10px;padding:6px 8px;background:var(--surface-2);transition:.3s}
+.bk.lead{border-color:var(--accent)}
+.bk.dead{border-color:var(--coral);background:var(--coral-soft);opacity:.6}
+.bk .nm{font-family:var(--font-mono);font-size:11.5px}
+.bk .nm b{display:block}
+.rlog{display:flex;gap:3px;flex-wrap:wrap;min-height:26px;align-items:center}
+.rlog i{font-style:normal;font-family:var(--font-mono);font-size:10.5px;padding:3px 6px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);animation:pop .3s}
+.rlog i.nw{border-color:var(--accent);background:var(--accent-soft)}
+.rlog i.lost{border-color:var(--coral);background:var(--coral-soft);text-decoration:line-through}
+.rlog i.dup{border-color:var(--amber);background:var(--amber-soft)}
+/* pipeline */
+.pipe{display:flex;align-items:stretch;gap:0;margin-top:10px;overflow-x:auto;padding-bottom:4px}
+.pst{flex:1;min-width:108px;border:1.5px solid var(--border);border-radius:10px;padding:8px;background:var(--surface-2);font-size:12px;transition:.3s;position:relative}
+.pst b{display:block;font-family:var(--font-mono);font-size:12px;margin-bottom:3px}
+.pst small{color:var(--ink-soft);font-size:11px;line-height:1.35;display:block}
+.pst.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.arr{flex:none;align-self:center;color:var(--ink-faint);padding:0 4px;font-size:16px}
+.thr{font-family:var(--font-mono);font-size:10px;color:var(--purple-ink);margin-top:4px}
+/* batching */
+.acc{display:grid;grid-template-columns:1fr 110px;gap:12px;align-items:center;margin-top:10px}
+.acc>div{min-width:0}
+.bq{display:flex;flex-direction:column;gap:6px}
+.bqr{display:grid;grid-template-columns:40px 1fr;gap:6px;align-items:center;font-family:var(--font-mono);font-size:11px}
+.bbox{height:30px;border:1.5px dashed var(--border-strong);border-radius:8px;position:relative;overflow:hidden;background:var(--surface)}
+.bbox .fillb{position:absolute;left:0;top:0;bottom:0;background:var(--accent-soft);border-right:2px solid var(--accent);transition:width .15s}
+.bbox .tm{position:absolute;right:6px;top:6px;font-size:10px;color:var(--ink-faint)}
+.bbox .dots{position:absolute;left:4px;top:8px;display:flex;gap:2px}
+.bbox .dots i{width:6px;height:12px;border-radius:2px;background:var(--accent);opacity:.8}
+.brk{border:2px solid var(--border-strong);border-radius:12px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);transition:.2s}
+.brk.flash{border-color:var(--teal);box-shadow:0 0 0 5px var(--teal-soft)}
+.rng{display:flex;flex-direction:column;gap:2px;margin:4px 0;font-size:13px}.rng input{accent-color:var(--accent)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.stat{border:1px solid var(--border);border-radius:10px;padding:6px 11px;font-family:var(--font-mono);font-size:12px;background:var(--surface-2)}
+.stat b{font-size:15px}
+@media (max-width:700px){.rep{grid-template-columns:1fr}.bk{grid-template-columns:1fr}.acc{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#334155"></span> Kafka · 3/8</span><span>· Kurs: 59/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Kafka · 59-modul · producer</span>
+    <h1>Producer: <span class="steam">acks</span>, batching, idempotence</h1>
+    <p class="lead"><code>producer.send()</code> — bir qator kod. Lekin uning ortida: serializatsiya, partition tanlash, batch yig‘ish, fon ip, retry va broker tasdig‘i bor. To‘lov hodisasi <b>yo‘qolmasligi</b> va <b>ikki marta yozilmasligi</b> — aynan shu sozlamalarga bog‘liq.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>send() ichida nima bo‘ladi?</h2></div><p class="sec-sub">Qadamlarni bosing — xabar qaysi bosqichda ekanini kuzating.</p>
+    <div class="stage">
+      <div class="pipe" id="pipe">
+        <div class="pst"><b>1. send()</b><small>ProducerRecord(topic, key, value). Metod darhol qaytadi — asinxron</small><div class="thr">ilova ipi</div></div><span class="arr">→</span>
+        <div class="pst"><b>2. Serializer</b><small>key/value → bayt (String, JSON, Avro)</small><div class="thr">ilova ipi</div></div><span class="arr">→</span>
+        <div class="pst"><b>3. Partitioner</b><small>murmur2(key) % N (58-modul)</small><div class="thr">ilova ipi</div></div><span class="arr">→</span>
+        <div class="pst"><b>4. Accumulator</b><small>har partition uchun batch; buffer.memory</small><div class="thr">xotira</div></div><span class="arr">→</span>
+        <div class="pst"><b>5. Sender</b><small>batch’larni broker bo‘yicha guruhlab yuboradi, retry</small><div class="thr">fon ip</div></div><span class="arr">→</span>
+        <div class="pst"><b>6. Broker</b><small>leader yozadi, follower’lar nusxalaydi → ack → callback</small><div class="thr">tarmoq</div></div>
+      </div>
+      <div class="ctrls"><button class="btn" id="ppPrev">◀</button><button class="btn primary" id="ppPlay">▶ Avto</button><button class="btn" id="ppNext">▶</button><div class="bar"><div id="ppBar"></div></div></div>
+      <div class="explain" id="ppEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>acks: "yozildi" deganda nimani tushunamiz?</h2></div><p class="sec-sub">Leader va ikki follower. Rejimni tanlang va qadamlarni o‘ting — oxirida leader yiqiladi. Xabar omon qoladimi?</p>
+    <div class="stage">
+      <div class="seg" id="aseg"><button data-a="0">acks=0</button><button data-a="1">acks=1</button><button class="on" data-a="all">acks=all (+ min.insync=2)</button></div>
+      <div class="rep"><div class="prod">💳 producer<span class="st" id="pst">—</span></div>
+        <div class="bks"><div class="bk lead" id="b1"><div class="nm"><b>broker-1</b><span id="r1">leader</span></div><div class="rlog" id="l1"></div></div>
+          <div class="bk" id="b2"><div class="nm"><b>broker-2</b><span id="r2">follower</span></div><div class="rlog" id="l2"></div></div>
+          <div class="bk" id="b3"><div class="nm"><b>broker-3</b><span id="r3">follower</span></div><div class="rlog" id="l3"></div></div></div></div>
+      <div class="ctrls"><button class="btn" id="akPrev">◀</button><button class="btn primary" id="akPlay">▶ Avto</button><button class="btn" id="akNext">▶</button><div class="bar"><div id="akBar"></div></div></div>
+      <div class="explain" id="akEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>acks</th><th>Producer kutadi</th><th>Yo‘qolish xavfi</th><th>Kechikish</th></tr><tr><td><code>0</code></td><td>Hech narsani (fire-and-forget)</td><td>Katta: tarmoq xatosi ham sezilmaydi</td><td>Eng past</td></tr><tr><td><code>1</code></td><td>Faqat leader yozganini</td><td>Leader follower’larga nusxalamasdan yiqilsa — yo‘qoladi</td><td>Past</td></tr><tr><td><code>all</code> (<code>-1</code>)</td><td>Barcha <b>ISR</b> replikalar yozganini</td><td>ISR ≥ min.insync.replicas bo‘lsa — yo‘qolmaydi</td><td>Biroz yuqoriroq</td></tr></table></div><div class="callout iv"><div class="ct">🎯 acks=all yolg‘iz yetarli emas</div>Agar ISR’da faqat leader qolgan bo‘lsa, acks=all = acks=1. Shuning uchun topic’da <code>min.insync.replicas=2</code> (RF=3 bilan): ISR 2 dan kam bo‘lsa broker yozuvni <code>NotEnoughReplicas</code> bilan rad etadi — xabar yo‘qolgandan ko‘ra, xato yaxshi. Kafka 3.0+ da default <code>acks=all</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Retry, dublikat va idempotent producer</h2></div><p class="sec-sub">Tarmoq tasodifan <b>ack’ni</b> yo‘qotdi (xabar yozilgan, lekin producer bilmaydi). Producer qayta yuboradi. Nima bo‘ladi?</p>
+    <div class="stage">
+      <div class="seg" id="iseg"><button data-i="0">idempotence=false</button><button class="on" data-i="1">idempotence=true</button><button data-i="2">Tartib: in.flight=5, idempotence=false</button></div>
+      <div class="rep" style="grid-template-columns:130px 1fr"><div class="prod">💳 producer<span class="st" id="ist">PID —</span></div>
+        <div class="bks"><div class="bk lead"><div class="nm"><b>partition 0</b><span>leader log</span></div><div class="rlog" id="il"></div></div></div></div>
+      <div class="ctrls"><button class="btn" id="idPrev">◀</button><button class="btn primary" id="idPlay">▶ Avto</button><button class="btn" id="idNext">▶</button><div class="bar"><div id="idBar"></div></div></div>
+      <div class="explain" id="idEx"></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Idempotent producer qanday ishlaydi</div>Broker har producer’ga <b>PID</b> beradi, producer har partition uchun har batch’ga ketma-ket <b>sequence number</b> qo‘yadi. Broker oxirgi 5 ta batch’ning seq’ini eslab qoladi: takror kelsa — yozmaydi, lekin ack qaytaradi; oraliq bo‘lsa — <code>OutOfOrderSequence</code>. Shuning uchun <code>max.in.flight.requests.per.connection ≤ 5</code> bilan ham tartib saqlanadi. Kafka 3.0+ da default yoqilgan. Diqqat: bu faqat <b>bitta producer sessiyasi</b> ichidagi retry’dan himoya — ilova o‘zi qayta yuborsa (restart), dublikat bo‘ladi → biznes kaliti bilan idempotent consumer (63-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Batching: linger.ms va batch.size</h2></div><p class="sec-sub">Xabarlar (soniyasiga ~2000, 3 partition) accumulator’ga tushadi. Batch to‘lganda <b>yoki</b> linger vaqti tugaganda yuboriladi. Sliderlarni o‘zgartirib, so‘rovlar soni va qo‘shimcha kechikishni kuzating.</p>
+    <div class="stage">
+      <div class="grid2" style="margin-top:0"><div class="rng"><span>linger.ms: <b id="lV">5</b> ms</span><input type="range" id="lR" min="0" max="100" value="5"></div><div class="rng"><span>batch.size: <b id="bV">16</b> KB (1 xabar ≈ 1 KB)</span><input type="range" id="bR" min="1" max="64" value="16"></div></div>
+      <div class="acc"><div class="bq" id="bq"></div><div class="brk" id="brk">🗄 broker<br><b id="brN">0</b> so‘rov</div></div>
+      <div class="stats"><span class="stat">So‘rov/s: <b id="sR">—</b></span><span class="stat">O‘rtacha batch: <b id="sB">—</b> xabar</span><span class="stat">Qo‘shimcha kechikish: <b id="sL">—</b> ms</span></div>
+      <div class="explain" id="bEx"></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 compression.type</div>Siqish batch darajasida bo‘ladi — batch katta bo‘lsa, JSON’da 3–5× tejaladi. <code>lz4</code> yoki <code>zstd</code> — yaxshi muvozanat. Broker siqilgan batch’ni ochmasdan saqlaydi, consumer ochadi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Kod va bank sozlamalari</h2></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">application.yml</span></div><pre class="code"><span class="ty">spring</span>:
+  <span class="ty">kafka</span>:
+    <span class="ty">bootstrap-servers</span>: <span class="ty">kafka-1</span>:<span class="nu">9092</span>,<span class="ty">kafka-2</span>:<span class="nu">9092</span>,<span class="ty">kafka-3</span>:<span class="nu">9092</span>
+    <span class="ty">producer</span>:
+      <span class="ty">acks</span>: all
+      <span class="ty">key-serializer</span>: org.apache.kafka.common.serialization.StringSerializer
+      <span class="ty">value-serializer</span>: org.springframework.kafka.support.serializer.JsonSerializer
+      <span class="ty">compression-type</span>: zstd
+      <span class="ty">properties</span>:
+        enable.<span class="ty">idempotence</span>: <span class="k">true</span>
+        linger.<span class="ty">ms</span>: <span class="nu">10</span>
+        batch.<span class="ty">size</span>: <span class="nu">65536</span>
+        delivery.timeout.<span class="ty">ms</span>: <span class="nu">120000</span>      <span class="cm"># retry'larning umumiy chegarasi</span>
+        max.in.flight.requests.per.<span class="ty">connection</span>: <span class="nu">5</span></pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">PaymentEventPublisher.java</span></div><pre class="code"><span class="k">@Service</span>
+<span class="k">@RequiredArgsConstructor</span>
+<span class="k">class</span> <span class="ty">PaymentEventPublisher</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="ty">KafkaTemplate</span>&lt;<span class="ty">String</span>, <span class="ty">PaymentEvent</span>&gt; kafka;
+
+    <span class="k">void</span> published(<span class="ty">Payment</span> p) {
+        <span class="k">var</span> ev = <span class="k">new</span> <span class="ty">PaymentEvent</span>(p.id(), p.accountNo(), p.amount(), <span class="ty">Instant</span>.now());
+        kafka.send(<span class="st">"tolovlar"</span>, p.accountNo(), ev)             <span class="cm">// kalit = hisob raqami → tartib</span>
+             .whenComplete((res, ex) -&gt; {
+                 <span class="k">if</span> (ex != <span class="k">null</span>) log.error(<span class="st">"Yuborilmadi: {}"</span>, p.id(), ex);    <span class="cm">// alert + Outbox'ga qaytish</span>
+                 <span class="k">else</span> log.debug(<span class="st">"offset {}"</span>, res.getRecordMetadata().offset());
+             });
+    }
+}
+<span class="cm">// ❌ kafka.send(...).get() har xabarda — sinxron, batching yo'qoladi, throughput 10-100x tushadi</span></pre></div><div class="callout warn"><div class="ct">⚠️ DB tranzaksiyasi + send = dual write</div>To‘lovni DB’ga commit qilib, keyin Kafka’ga yuborsangiz: commit bo‘ldi, send muvaffaqiyatsiz → hodisa yo‘q. Teskarisi: send bo‘ldi, commit rollback → soxta hodisa. Ishonchli yechim — <b>Transactional Outbox</b> (63-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>acks=0/1/all farqi va bankda qaysi?<span class="chev">›</span></summary><div class="iv-a">0 — javob kutilmaydi; 1 — leader yozdi; all — barcha ISR yozdi. Bankda acks=all + min.insync.replicas=2 + RF=3: bitta broker yo‘qolsa ham ma’lumot yo‘qolmaydi va yozish davom etadi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Idempotent producer nima va qanday ishlaydi?<span class="chev">›</span></summary><div class="iv-a">Retry tufayli dublikat va tartib buzilishining oldini oladi: PID + har partition uchun sequence number, broker takrorni tashlaydi. Kafka 3.0+ da default. Faqat bitta producer instance ichida ishlaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Producer’da tartib qachon buzilishi mumkin?<span class="chev">›</span></summary><div class="iv-a">Idempotence o‘chiq va max.in.flight > 1 bo‘lsa: 1-batch xato qaytaradi, 2-batch yoziladi, 1-batch retry’da keyin yoziladi. Yechim: idempotence yoqish (≤5 in-flight bilan ham tartib saqlanadi).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>linger.ms va batch.size nima uchun?<span class="chev">›</span></summary><div class="iv-a">Throughput va kechikish muvozanati: xabarlarni yig‘ib bitta so‘rovda yuborish tarmoq va diskni tejaydi, siqishni samarali qiladi; evaziga har xabar linger.ms gacha kutishi mumkin.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>send() qaytgan Future’ni get() qilish kerakmi?<span class="chev">›</span></summary><div class="iv-a">Odatda yo‘q — callback/whenComplete ishlating. Har xabarda get() producer’ni sinxron qiladi va batching’ni yo‘q qiladi. Faqat juda kam hollarda (masalan, test yoki kritik bitta xabar) ishlatiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Xabar yuborilmasa nima qilasiz?<span class="chev">›</span></summary><div class="iv-a">delivery.timeout.ms ichida producer o‘zi retry qiladi; baribir xato bo‘lsa — callback’da log/alert va qayta yuborish strategiyasi. Eng ishonchli — Outbox: hodisa DB tranzaksiyasi ichida outbox jadvaliga yoziladi, alohida jarayon Kafka’ga uzatadi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>acks=1. Leader yozdi, ack qaytardi va follower’lar nusxalamasdan yiqildi. Xabar?</div><button class="opt">Saqlanadi</button><button class="opt">Yo‘qoladi — yangi leader’da yo‘q</button><button class="opt">Producer qayta yuboradi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. acks=1 da bu yo‘qotish stsenariysi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>RF=3, min.insync.replicas=2, ikki broker o‘chiq. acks=all producer?</div><button class="opt">Yozadi</button><button class="opt">NotEnoughReplicas xato oladi</button><button class="opt">Kutadi va keyin yozadi</button><div class="q-fb" data-ok="To‘g‘ri — yo‘qotishdan ko‘ra rad etish." data-no="Yo‘q. ISR=1 &lt; 2 → rad etiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Idempotent producer nimadan himoya qiladi?</div><button class="opt">Ilova restart bo‘lib xabarni qayta yuborishidan</button><button class="opt">Producer’ning ichki retry’i tufayli dublikatdan</button><button class="opt">Consumer’ning ikki marta o‘qishidan</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Faqat bitta sessiya ichidagi retry dublikati."></div></div><div class="q" data-correct="0"><div class="q-txt"><span class="qn">4.</span>linger.ms=0 dan 20 ga oshirildi. Nima o‘zgaradi?</div><button class="opt">Throughput oshadi, kechikish biroz oshadi</button><button class="opt">Ikkalasi ham kamayadi</button><button class="opt">Hech narsa</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Kattaroq batch — kamroq so‘rov, lekin kutish."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Har xabarda kafkaTemplate.send(...).get(). Oqibati?</div><button class="opt">Tezroq</button><button class="opt">Sinxron yuborish — throughput keskin tushadi</button><button class="opt">Idempotence o‘chadi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. get() har xabarda kutadi — batching yo‘qoladi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Kafka</span>
+      <h3>Consumer group, rebalancing va yetkazish semantikasi</h3>
+      <p>Partition’lar consumer’lar orasida qanday bo‘linadi, pod qo‘shilsa yoki yiqilsa nima bo‘ladi va at-least-once / exactly-once.</p>
+      <div class="topics"><span class="topic-pill">57 · Nega Kafka</span><span class="topic-pill">58 · Partition</span><span class="topic-pill now">59 · Producer</span><span class="topic-pill">60 · Consumer</span><span class="topic-pill">61 · Replikatsiya</span><span class="topic-pill">62 · Spring Kafka</span><span class="topic-pill">63 · Pattern’lar</span><span class="topic-pill">64 · Operatsiya + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="58-topic-partition-offset.html"><span class="cl">← Oldingi dars</span><span class="ct">58 · Topic, partition, offset</span><span class="cs">📨 Kafka</span></a><a class="cn nx" href="60-consumer-group-va-rebalancing.html"><span class="cl">Keyingi dars →</span><span class="ct">60 · Consumer group va rebalancing</span><span class="cs">📨 Kafka</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:67.0%"></i></div><span>59 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(59)<0)v.push(59);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','59');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(59)<0)D[t].push(59);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  function reStep(ids){ids.forEach(function(id){var o=el(id),n=o.cloneNode(true);o.parentNode.replaceChild(n,o);});}
+  /* pipeline */
+  var PX=['<code>kafka.send("tolovlar", "20208…", event)</code> — ilova ipi <b>bloklanmaydi</b> (faqat buffer.memory to‘lsa max.block.ms kutadi). Metadata yo‘q bo‘lsa, avval broker’dan topic ma’lumotini oladi.','Serializer kalit va qiymatni baytlarga aylantiradi. JSON — oddiy, Avro/Protobuf + Schema Registry — ixcham va sxema nazorati bilan (63-modul).','Partitioner partition’ni tanlaydi: kalit bor → murmur2 % N.','Xabar shu partition’ning ochiq batch’iga qo‘shiladi. Batch to‘lganda (batch.size) yoki linger.ms o‘tganda "tayyor" bo‘ladi.','<b>Sender</b> fon ipi tayyor batch’larni leader broker bo‘yicha guruhlab bitta ProduceRequest qiladi. Xato bo‘lsa — retry (delivery.timeout.ms ichida).','Leader diskka (page cache) yozadi, follower’lar nusxalaydi, acks shartiga ko‘ra javob qaytadi → <b>callback</b> chaqiriladi (RecordMetadata: partition, offset).'];
+  var ps=el('pipe').querySelectorAll('.pst');
+  mkStepper('pp',6,function(i){[].forEach.call(ps,function(p,k){p.classList.toggle('on',k===i);});el('ppEx').innerHTML=PX[i];},2400);
+
+  /* acks */
+  var AK={'0':[['send m1','—',[['m1','nw'],[],[]],'Producer yubordi va <b>javob kutmadi</b>. Muvaffaqiyat deb hisobladi.','st ok','"OK" (taxmin)'],
+      ['leader yozdi','—',[['m1'],[],[]],'Leader yozdi. Follower’lar hali olmadi.','st ok','"OK"'],
+      ['💥 leader yiqildi','dead',[['m1','lost'],[],[]],'Leader o‘chdi, broker-2 yangi leader — unda m1 yo‘q. Producer esa hech narsani bilmaydi. <b>Jim yo‘qotish.</b>','st bad','"OK" edi, lekin yo‘q']],
+    '1':[['send m1','—',[['m1','nw'],[],[]],'Producer yubordi, <b>leader</b> javobini kutyapti.','st','kutyapti'],
+      ['leader yozdi → ack','—',[['m1'],[],[]],'Leader o‘z logiga yozib ack qaytardi. Producer: "yozildi". Follower’lar hali nusxalamagan (fetch har necha ms).','st ok','ack ✓'],
+      ['💥 leader yiqildi','dead',[['m1','lost'],[],[]],'Leader follower’lar nusxalamasdan yiqildi. Yangi leader’da m1 yo‘q. Producer ack olgan edi — <b>tasdiqlangan xabar yo‘qoldi</b>.','st bad','ack edi, yo‘qoldi']],
+    'all':[['send m1','—',[['m1','nw'],[],[]],'Producer yubordi, <b>barcha ISR</b> replikalarni kutadi.','st','kutyapti'],
+      ['follower’lar nusxaladi','—',[['m1'],['m1','nw'],['m1','nw']],'broker-2 va broker-3 fetch qilib m1 ni yozdi. High watermark siljidi.','st','kutyapti'],
+      ['ack','—',[['m1'],['m1'],['m1']],'Barcha ISR yozgach — ack. Endi m1 <b>committed</b>.','st ok','ack ✓'],
+      ['💥 leader yiqildi','dead',[['m1','lost'],['m1'],['m1']],'broker-2 yangi leader — unda m1 bor. <b>Hech narsa yo‘qolmadi.</b> (unclean.leader.election=false — ISR’dan tashqaridagi replika leader bo‘lolmaydi.)','st ok','saqlandi ✓']]};
+  var am='all',ak;
+  function mkA(){var S=AK[am];if(ak)ak.stop();ak=mkStepper('ak',S.length,function(i){var s=S[i];
+    [1,2,3].forEach(function(b){var L=s[2][b-1];el('l'+b).innerHTML=L.length?'<i class="'+(L[1]||'')+'">'+L[0]+'</i>':'';});
+    var dead=s[1]==='dead';el('b1').className='bk'+(dead?' dead':' lead');el('r1').textContent=dead?'💥 o‘chdi':'leader';el('b2').className='bk'+(dead?' lead':'');el('r2').textContent=dead?'yangi leader':'follower';
+    var p=el('pst');p.className=s[4];p.textContent=s[5];el('akEx').innerHTML=s[3];},2400);}
+  el('aseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});am=b.dataset.a;reStep(['akPrev','akPlay','akNext']);mkA();});mkA();
+
+  /* idempotence */
+  var ID=[[['send batch (seq 0): +150 000',[['A','nw']],'—'],['broker yozdi, ack yo‘lda yo‘qoldi 📡✕',[['A']],'timeout'],['retry: xuddi shu batch',[['A'],['A','dup']],'—'],['natija',[['A'],['A','dup']],'<b>Dublikat!</b> Mijoz hisobidan 150 000 ikki marta yechilgan deb ko‘rinadi. Consumer idempotent bo‘lmasa — haqiqatan ikki marta.']],
+    [['PID=7 oldi; send (PID 7, seq 0)',[['A·s0','nw']],'Producer ulanganda broker PID beradi.'],['broker yozdi, ack yo‘qoldi 📡✕',[['A·s0']],'—'],['retry (PID 7, seq 0)',[['A·s0']],'Broker: "PID 7 uchun seq 0 allaqachon bor" → <b>yozmaydi</b>, lekin ack qaytaradi.'],['natija',[['A·s0']],'Bitta nusxa ✓. Producer ham, broker ham xotirjam.']],
+    [['batch-1 (A) va batch-2 (B) parallel',[],'max.in.flight=5: ikki so‘rov bir vaqtda yo‘lda.'],['batch-1 xato (NotLeader), batch-2 yozildi',[['B','nw']],'—'],['batch-1 retry → yozildi',[['B'],['A','dup']],'—'],['natija',[['B'],['A','dup']],'<b>Tartib buzildi:</b> B (−300 000) A (+500 000) dan oldin. Idempotence yoqilsa broker seq tartibini tekshiradi va B ni A kelguncha qabul qilmaydi → tartib saqlanadi.']]];
+  var im=1,ist;
+  function mkI(){var S=ID[im];if(ist)ist.stop();ist=mkStepper('id',S.length,function(i){var s=S[i];el('il').innerHTML=s[1].map(function(x){return '<i class="'+(x[1]||'')+'">'+x[0]+'</i>';}).join('');
+    el('ist').textContent=im===1?'PID 7':'PID yo‘q';el('ist').className='st'+(i===S.length-1?(im===1?' ok':' bad'):'');el('idEx').innerHTML='<b>'+s[0]+'.</b> '+(s[2]==='—'?'':s[2]);},2400);}
+  el('iseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});im=+b.dataset.i;reStep(['idPrev','idPlay','idNext']);mkI();});mkI();
+
+  /* batching */
+  var P=3,B=[],reqs=[],sizes=[],waits=[],t=0,brN=0;
+  el('bq').innerHTML=[0,1,2].map(function(i){return '<div class="bqr"><span>P'+i+'</span><div class="bbox" id="bb'+i+'"><div class="fillb"></div><div class="dots"></div><span class="tm"></span></div></div>';}).join('');
+  function reset(){B=[0,1,2].map(function(){return {n:0,t0:null,first:[]};});}
+  reset();
+  function flush(i,why){var b=B[i];if(!b.n)return;brN++;reqs.push(t);sizes.push(b.n);b.first.forEach(function(ft){waits.push(t-ft);});B[i]={n:0,t0:null,first:[]};var br=el('brk');br.classList.add('flash');setTimeout(function(){br.classList.remove('flash');},150);el('brN').textContent=brN;}
+  setInterval(function(){var L=+el('lR').value,BS=+el('bR').value;
+    for(var s=0;s<20;s++){t+=1;for(var q=0;q<2;q++){var i=Math.floor(Math.random()*P),b=B[i];if(b.t0===null)b.t0=t;b.n++;b.first.push(t);if(b.n>=BS)flush(i,'full');}
+      B.forEach(function(b,i){if(b.n&&t-b.t0>=L)flush(i,'linger');});}
+    B.forEach(function(b,i){var bb=el('bb'+i);bb.querySelector('.fillb').style.width=Math.min(100,b.n/BS*100)+'%';bb.querySelector('.tm').textContent=b.n?(b.n+'/'+BS+' · '+(t-b.t0)+'ms'):'';});
+    reqs=reqs.filter(function(x){return x>t-2000;});if(sizes.length>60)sizes=sizes.slice(-60);if(waits.length>400)waits=waits.slice(-400);
+    el('sR').textContent=(reqs.length/2).toFixed(0);el('sB').textContent=sizes.length?(sizes.reduce(function(a,b){return a+b;},0)/sizes.length).toFixed(1):'—';el('sL').textContent=waits.length?(waits.reduce(function(a,b){return a+b;},0)/waits.length).toFixed(1):'—';},20);
+  function bx(){var L=+el('lR').value,BS=+el('bR').value;el('lV').textContent=L;el('bV').textContent=BS;sizes=[];waits=[];
+    el('bEx').innerHTML=L===0?'<b>linger.ms=0:</b> har bir xabar deyarli darhol alohida so‘rovda ketadi (Sender ipi band bo‘lgan paytda yig‘ilganlargina birga). Ko‘p so‘rov — broker va tarmoqqa yuk.':L>=50?'<b>Katta linger:</b> kam so‘rov, katta batch, yaxshi siqish — lekin har xabar o‘rtacha ~'+(L/2)+' ms kutadi. Analitika/log uchun yaxshi, OTP SMS uchun — yo‘q.':'Muvozanat: bir necha ms kutish evaziga so‘rovlar bir necha barobar kamaydi. Ko‘p bank servislari uchun 5–20 ms yaxshi.';}
+  ['lR','bR'].forEach(function(i){el(i).addEventListener('input',bx);});bx();
+})();
+
+</script>
+</body>
+</html>

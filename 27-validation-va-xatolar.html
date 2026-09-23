@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Validation va xato boshqaruvi</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0E7C7B;--teal-ink:#0A5A59;--teal-soft:#DBF0EF;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(30,36,26,.05),0 8px 24px rgba(30,36,26,.06);
+  --shadow-lift:0 2px 4px rgba(30,36,26,.08),0 16px 40px rgba(30,36,26,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* validator */
+.field{margin-bottom:14px}
+.field label{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);display:block;margin-bottom:5px}
+.field input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font-mono);font-size:14px;background:var(--surface-2);color:var(--ink);transition:.15s}
+.field input:focus{outline:none;border-color:var(--accent)}
+.field.ok input{border-color:var(--teal)}.field.err input{border-color:var(--coral)}
+.rules{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.rule{font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:6px;display:inline-flex;align-items:center;gap:5px;background:var(--sunken);color:var(--ink-faint);transition:.2s}
+.rule.pass{background:var(--teal-soft);color:var(--teal-ink)}.rule.fail{background:var(--coral-soft);color:var(--coral)}
+.rule .rd{width:6px;height:6px;border-radius:50%;background:currentColor}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.response{border-radius:14px;padding:14px;margin-top:6px;transition:.3s}
+.response.pass{background:var(--teal-soft);border:1.5px solid var(--teal)}.response.fail{background:var(--coral-soft);border:1.5px solid var(--coral)}
+.response .rstatus{font-family:var(--font-mono);font-size:13px;font-weight:700;margin-bottom:8px}
+.response.pass .rstatus{color:var(--teal-ink)}.response.fail .rstatus{color:var(--coral)}
+.response pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--ink);overflow-x:auto}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.presets button{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);border-radius:8px;padding:5px 10px;background:var(--surface);cursor:pointer;color:var(--ink-soft)}
+.presets button:hover{border-color:var(--accent);color:var(--accent-ink)}
+
+/* exception flow */
+.exf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.exl{display:flex;flex-direction:column;gap:6px}
+.exn{border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;background:var(--surface-2);font-family:var(--font-mono);font-size:12.5px;transition:.3s;position:relative}
+.exn small{display:block;color:var(--ink-faint);font-size:10.5px;font-family:var(--font-body)}
+.exn.act{border-color:var(--coral);background:var(--coral-soft);box-shadow:var(--shadow-lift)}
+.exn.pass{opacity:.45;text-decoration:line-through}
+.exn.hit{border-color:var(--teal);background:var(--teal-soft)}
+.exn .bomb{position:absolute;right:10px;top:8px;font-size:16px;opacity:0;transition:.3s}
+.exn.act .bomb{opacity:1}
+.exh h5{font-family:var(--font-mono);font-size:11px;margin:0 0 6px;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase}
+.excase{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.excase button{border:1.5px solid var(--border);background:var(--surface);border-radius:10px;padding:7px 11px;cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--ink)}
+.excase button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.pd{margin-top:12px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12px;line-height:1.6;white-space:pre-wrap;min-height:120px}
+.pd .st{color:var(--accent-ink)}
+
+/* layers table */
+.vl{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.vlr{display:grid;grid-template-columns:34px 1fr 1fr 70px;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:9px 12px;font-size:13px;box-shadow:var(--shadow)}
+.vlr .n{width:26px;height:26px;border-radius:7px;background:var(--accent-soft);color:var(--accent-ink);font-family:var(--font-mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.vlr .w{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.vlr .c{font-family:var(--font-mono);font-weight:700;text-align:right}
+.vlr .c.b4{color:var(--amber)}.vlr .c.b5{color:var(--coral)}
+@media (max-width:560px){.fgrid,.exf{grid-template-columns:1fr}.vlr{grid-template-columns:34px 1fr 60px}.vlr .w{display:none}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.an{color:var(--accent-ink);font-weight:500}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 4/9</span><span>· Kurs: 27/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 27-modul · noldan</span>
+    <h1>Validation va <span class="steam">xato boshqaruvi</span></h1>
+    <p class="lead">Tashqaridan kelgan ma'lumotga ishonmang. Lekin tekshirish — yarim ish. Ikkinchi yarmi: xato bo'lganda mijozga <b>bir xil, tushunarli, xavfsiz</b> javob qaytarish. Bu ikkalasini jonli ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Jonli validator: o'tkazma so'rovi</h2></div>
+    <p class="sec-sub">DTO maydonlariga cheklov annotatsiyalari, controller'da <code>@Valid</code> — Spring qolganini qiladi. Maydonlarni o'zgartiring yoki tayyor xatolarni bosing:</p>
+    <div class="demo">
+      <div class="presets" id="presets"><button data-p="ok">✓ to'g'ri</button><button data-p="acc">hisob 19 raqam</button><button data-p="neg">manfiy summa</button><button data="cur" data-p="cur">valyuta "so'm"</button><button data-p="same">bir xil hisob</button><button data-p="big">limit oshdi</button></div>
+      <div class="fgrid">
+        <div class="field" id="f-from"><label>fromAccount</label><input id="in-from" value="20208000123456789012" autocomplete="off"><div class="rules"><span class="rule" data-r="fnb"><span class="rd"></span>@NotBlank</span><span class="rule" data-r="fpat"><span class="rd"></span>@Pattern(\d{20})</span></div></div>
+        <div class="field" id="f-to"><label>toAccount</label><input id="in-to" value="20208000987654321098" autocomplete="off"><div class="rules"><span class="rule" data-r="tnb"><span class="rd"></span>@NotBlank</span><span class="rule" data-r="tpat"><span class="rd"></span>@Pattern(\d{20})</span></div></div>
+        <div class="field" id="f-amt"><label>amount</label><input id="in-amt" value="150000" autocomplete="off"><div class="rules"><span class="rule" data-r="pos"><span class="rd"></span>@Positive</span><span class="rule" data-r="max"><span class="rd"></span>@DecimalMax(50000000)</span><span class="rule" data-r="dig"><span class="rd"></span>@Digits(15,2)</span></div></div>
+        <div class="field" id="f-cur"><label>currency</label><input id="in-cur" value="UZS" autocomplete="off"><div class="rules"><span class="rule" data-r="cpat"><span class="rd"></span>@Pattern([A-Z]{3})</span></div></div>
+      </div>
+      <div class="rules" style="margin-bottom:10px"><span class="rule" data-r="diff"><span class="rd"></span>@AssertTrue farqliHisoblar (class-level)</span></div>
+      <div class="response" id="resp"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TransferRequest.java</span></div>
+      <pre class="code"><span class="k">public record</span> <span class="ty">TransferRequest</span>(
+    <span class="an">@NotBlank</span> <span class="an">@Pattern</span>(regexp = <span class="st">"\\d{20}"</span>, message = <span class="st">"hisob 20 raqam"</span>) <span class="ty">String</span> fromAccount,
+    <span class="an">@NotBlank</span> <span class="an">@Pattern</span>(regexp = <span class="st">"\\d{20}"</span>)                             <span class="ty">String</span> toAccount,
+    <span class="an">@NotNull</span> <span class="an">@Positive</span> <span class="an">@DecimalMax</span>(<span class="st">"50000000"</span>) <span class="an">@Digits</span>(integer = <span class="nu">15</span>, fraction = <span class="nu">2</span>) <span class="ty">BigDecimal</span> amount,
+    <span class="an">@NotNull</span> <span class="an">@Pattern</span>(regexp = <span class="st">"[A-Z]{3}"</span>)                                  <span class="ty">String</span> currency,
+    <span class="an">@Valid</span> <span class="ty">List</span>&lt;<span class="an">@NotBlank</span> String&gt; tags                                  <span class="cm">// ichki elementlar ham</span>
+) {
+    <span class="an">@AssertTrue</span>(message = <span class="st">"hisoblar bir xil bo'lmasin"</span>)          <span class="cm">// cross-field</span>
+    <span class="k">boolean</span> isFarqliHisoblar() { <span class="k">return</span> !fromAccount.equals(toAccount); }
+}
+<span class="cm">// Controller: create(@Valid @RequestBody TransferRequest req)</span>
+<span class="cm">// Xato → MethodArgumentNotValidException → advice → 400 + maydonlar ro'yxati</span></pre>
+    </div>
+    <div class="callout tip"><div class="ct">Ko'p ishlatiladigan annotatsiyalar</div><code>@NotNull</code> (null emas) · <code>@NotBlank</code> (String: null/bo'sh/bo'shliq emas) · <code>@NotEmpty</code> (kolleksiya bo'sh emas) · <code>@Size(min,max)</code> · <code>@Min/@Max</code> (int/long) · <code>@DecimalMin/@DecimalMax</code>, <code>@Positive</code>, <code>@Digits</code> (BigDecimal) · <code>@Pattern</code> · <code>@Email</code> · <code>@Past/@Future</code> · <code>@Valid</code> (ichki obyekt). Diqqat: <code>@NotBlank</code> BigDecimal'ga ishlamaydi — tipga mos tanlang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Exception sayohati: Service → Advice → JSON</h2></div>
+    <p class="sec-sub">Service exception tashladi. U controller orqali yuqoriga chiqadi, <code>@RestControllerAdvice</code> uni ushlab, <b>eng aniq</b> handler'ni tanlaydi. Exception turini tanlang:</p>
+    <div class="demo">
+      <div class="excase" id="excase"><button class="on" data-e="0">InsufficientFundsException</button><button data-e="1">NotFoundException</button><button data-e="2">MethodArgumentNotValidException</button><button data-e="3">DataIntegrityViolationException</button><button data-e="4">NullPointerException</button></div>
+      <div class="exf">
+        <div class="exl" id="exStack">
+          <div class="exh"><h5>Chaqiruv steki (pastdan yuqoriga)</h5></div>
+          <div class="exn" data-s="ctrl">TransferController.create()<small>controller — try/catch YO'Q</small><span class="bomb">💥</span></div>
+          <div class="exn" data-s="svc">TransferService.transfer()<small>throw new ...Exception()</small><span class="bomb">💥</span></div>
+          <div class="exn" data-s="repo">TransferRepository.save()<small>SQL constraint</small><span class="bomb">💥</span></div>
+        </div>
+        <div class="exl" id="exHandlers">
+          <div class="exh"><h5>@RestControllerAdvice — handler'lar (aniqdan umumiyga)</h5></div>
+          <div class="exn" data-h="0">@ExceptionHandler(InsufficientFundsException)<small>→ 422</small></div>
+          <div class="exn" data-h="1">@ExceptionHandler(NotFoundException)<small>→ 404</small></div>
+          <div class="exn" data-h="2">@ExceptionHandler(MethodArgumentNotValidException)<small>→ 400 + fieldErrors</small></div>
+          <div class="exn" data-h="3">@ExceptionHandler(DataIntegrityViolationException)<small>→ 409</small></div>
+          <div class="exn" data-h="4">@ExceptionHandler(Exception.class)<small>→ 500, traceId, log.error</small></div>
+        </div>
+      </div>
+      <div class="pd" id="pd"></div>
+      <div class="demo-note" id="exNote"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">GlobalExceptionHandler.java</span></div>
+      <pre class="code"><span class="an">@RestControllerAdvice</span>
+<span class="k">class</span> <span class="ty">GlobalExceptionHandler</span> {
+
+    <span class="an">@ExceptionHandler</span>(InsufficientFundsException.<span class="k">class</span>)
+    <span class="ty">ProblemDetail</span> funds(<span class="ty">InsufficientFundsException</span> e) {
+        <span class="k">var</span> pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
+        pd.setType(URI.create(<span class="st">"https://api.bank.uz/errors/insufficient-funds"</span>));
+        pd.setProperty(<span class="st">"balance"</span>, e.getBalance());       <span class="cm">// qo'shimcha maydon</span>
+        <span class="k">return</span> pd;                                        <span class="cm">// RFC 9457 application/problem+json</span>
+    }
+
+    <span class="an">@ExceptionHandler</span>(MethodArgumentNotValidException.<span class="k">class</span>)
+    <span class="ty">ProblemDetail</span> invalid(<span class="ty">MethodArgumentNotValidException</span> e) {
+        <span class="k">var</span> pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setProperty(<span class="st">"errors"</span>, e.getFieldErrors().stream()
+            .map(f -&gt; Map.of(<span class="st">"field"</span>, f.getField(), <span class="st">"message"</span>, f.getDefaultMessage())).toList());
+        <span class="k">return</span> pd;
+    }
+
+    <span class="an">@ExceptionHandler</span>(Exception.<span class="k">class</span>)                  <span class="cm">// oxirgi to'siq</span>
+    <span class="ty">ProblemDetail</span> other(<span class="ty">Exception</span> e, <span class="ty">HttpServletRequest</span> r) {
+        <span class="ty">String</span> traceId = MDC.get(<span class="st">"traceId"</span>);
+        log.error(<span class="st">"Unhandled [{}] {}"</span>, traceId, r.getRequestURI(), e);   <span class="cm">// stack trace — LOG'ga</span>
+        <span class="k">var</span> pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, <span class="st">"Ichki xato"</span>);
+        pd.setProperty(<span class="st">"traceId"</span>, traceId);              <span class="cm">// mijoz support'ga shu ID'ni aytadi</span>
+        <span class="k">return</span> pd;
+    }
+}
+<span class="cm">// Boot 3: spring.mvc.problemdetails.enabled=true — standart MVC xatolari ham ProblemDetail</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Validatsiya 4 qatlamda</h2></div>
+    <p class="sec-sub">Tekshiruv bitta joyda emas. Har qatlam o'zinikini tekshiradi va o'z status kodini beradi:</p>
+    <div class="vl">
+      <div class="vlr"><span class="n">1</span><div><b>Sintaksis</b> — Jackson<br><span class="w">JSON buzuq, amount:"abc", noma'lum enum</span></div><div class="w">HttpMessageNotReadableException</div><span class="c b4">400</span></div>
+      <div class="vlr"><span class="n">2</span><div><b>Format</b> — Bean Validation (@Valid)<br><span class="w">bo'sh, 19 raqam, manfiy, regex</span></div><div class="w">MethodArgumentNotValidException</div><span class="c b4">400</span></div>
+      <div class="vlr"><span class="n">3</span><div><b>Biznes</b> — Service<br><span class="w">balans yetmaydi, hisob bloklangan, limit, ish vaqti</span></div><div class="w">o'zingizning exception'laringiz</div><span class="c b4">422 / 409</span></div>
+      <div class="vlr"><span class="n">4</span><div><b>Baza</b> — constraint<br><span class="w">UNIQUE, FK, CHECK — oxirgi himoya (race condition'da ham)</span></div><div class="w">DataIntegrityViolationException</div><span class="c b4">409</span></div>
+    </div>
+    <div class="callout warn"><div class="ct">Qoida</div>Bean Validation'da <b>bazaga bormang</b> ("hisob mavjudmi?" — bu biznes qatlam). Bazadagi constraint'ni "validatsiya bor-ku" deb olib tashlamang — ikki parallel so'rov validatsiyadan o'tib, faqat UNIQUE to'xtatadi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Ilg'or: custom, guruh, metod validatsiyasi</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>Custom annotatsiya</h4><pre>@Target(FIELD) @Retention(RUNTIME)
+@Constraint(validatedBy = AccountValidator.class)
+@interface ValidAccount {
+  String message() default "hisob noto'g'ri";
+  Class&lt;?&gt;[] groups() default {};
+  Class&lt;? extends Payload&gt;[] payload() default {};
+}
+class AccountValidator implements
+    ConstraintValidator&lt;ValidAccount, String&gt; {
+  public boolean isValid(String v, ConstraintValidatorContext c) {
+    return v != null &amp;&amp; luhn(v);   // checksum
+  }
+}</pre><div class="why">Qayta ishlatiladigan qoida. Validator — Spring bean bo'la oladi (inject mumkin), lekin bazaga bormang.</div></div>
+      <div class="card"><h4>Guruhlar: yaratish vs yangilash</h4><pre>interface OnCreate {} interface OnUpdate {}
+record UserDto(
+  @Null(groups=OnCreate.class)
+  @NotNull(groups=OnUpdate.class) Long id,
+  @NotBlank String name) {}
+
+@PostMapping create(@Validated(OnCreate.class) @RequestBody UserDto d)
+@PutMapping  update(@Validated(OnUpdate.class) @RequestBody UserDto d)</pre><div class="why">Bir DTO, ikki qoida to'plami. <code>@Validated</code> (Spring) guruhni qo'llaydi, <code>@Valid</code> (Jakarta) — yo'q.</div></div>
+      <div class="card"><h4>Service metod validatsiyasi</h4><pre>@Service @Validated
+class TransferService {
+  void transfer(@Valid TransferRequest r,
+                @NotNull @Positive Long userId) {..}
+}
+// → ConstraintViolationException (advice'da 400)</pre><div class="why">Controller'dan tashqari kirish nuqtalari (Kafka listener, scheduler) uchun.</div></div>
+      <div class="card"><h4>Xabarlar va i18n</h4><pre># ValidationMessages.properties
+transfer.amount.max=Summa {value} dan oshmasin
+@DecimalMax(value="50000000",
+  message="{transfer.amount.max}")</pre><div class="why">Xabar kodda emas, faylda. Accept-Language bo'yicha uz/ru/en.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@Valid va @Validated farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><code>@Valid</code> — Jakarta Bean Validation standarti: obyektni va ichki (nested) obyektlarni tekshiradi, guruhlarni bilmaydi. <code>@Validated</code> — Spring'niki: validatsiya guruhlarini qo'llaydi (@Validated(OnCreate.class)) va klass darajasida qo'yilsa metod parametrlari validatsiyasini (AOP proxy orqali) yoqadi. Nested obyekt uchun @Valid, guruh/servis metodlari uchun @Validated.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Validatsiya xatosi qaysi exception? Qanday ushlanadi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@RequestBody + @Valid → MethodArgumentNotValidException (BindingResult bilan, fieldErrors). @RequestParam/@PathVariable yoki @Validated servis metodi → ConstraintViolationException. Form binding → BindException. @RestControllerAdvice'da @ExceptionHandler bilan ushlab, maydon → xabar ro'yxatini 400 bilan qaytarasiz. Boot 3'da ResponseEntityExceptionHandler'ni extend qilib ProblemDetail olish mumkin.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@ControllerAdvice va @RestControllerAdvice?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ikkalasi global exception handler, @ModelAttribute, @InitBinder uchun. @RestControllerAdvice = @ControllerAdvice + @ResponseBody — javob JSON'ga seriyalanadi (view emas). basePackages/annotations bilan qamrovni cheklash mumkin. Handler tanlash: exception tipiga eng yaqin (aniq) metod g'olib; bir nechta advice bo'lsa @Order.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ProblemDetail (RFC 7807/9457) nima?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Xato javobining standart formati: type (URI, xato turi hujjati), title, status, detail, instance + o'zingizning maydonlaringiz. Content-Type: application/problem+json. Spring 6 / Boot 3'da ProblemDetail klassi va spring.mvc.problemdetails.enabled. Foyda: mobil/frontend bitta parser, hujjatlashtirish oson.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Biznes validatsiya qayerda bo'lishi kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Service qatlamida: 'balans yetarlimi', 'hisob bloklanganmi', 'limit' — bazaga murojaat va tranzaksiya kerak. Bean Validation faqat sintaktik/format (null, uzunlik, regex) — bazaga bormaydi va tez. Baza constraint'lari — oxirgi himoya, ayniqsa race condition uchun (UNIQUE).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>500 xatosida mijozga nima qaytarasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Umumiy xabar + traceId (yoki correlation id). Stack trace, klass nomlari, SQL — hech qachon (xavfsizlik, ichki tuzilma sizadi). Log'ga to'liq stack trace traceId bilan. Boot default'da server.error.include-stacktrace=never. Monitoring (Sentry/ELK) traceId bo'yicha topadi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Custom validator qanday yoziladi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Annotatsiya (@Constraint(validatedBy=...), message/groups/payload majburiy atributlari) + ConstraintValidator<Annotatsiya, Tip> implementatsiyasi (isValid). Validator Spring bean bo'la oladi — dependency inject qilinadi. Class-level (cross-field) uchun @Target(TYPE) va obyekt qabul qiluvchi validator, yoki oddiy @AssertTrue metod.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>null keldi — @NotNull, @NotEmpty, @NotBlank qaysi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@NotNull — faqat null emas ("" o'tadi). @NotEmpty — null emas va size>0 (String, Collection, Map, array; "  " o'tadi). @NotBlank — faqat String: null emas, trim()dan keyin bo'sh emas. Odatda String uchun @NotBlank, kolleksiya uchun @NotEmpty, boshqa obyekt uchun @NotNull.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>@Valid qo'yilgan DTO'da xato bo'lsa controller metodi tanasi ishlaydimi?</div><button class="opt">Ha, keyin xato</button><button class="opt">Yo'q — argument resolver bosqichida exception</button><button class="opt">Ha, BindingResult null bo'ladi</button><button class="opt">Faqat @Validated bilan yo'q</button><div class="q-fb" data-ok="To'g'ri. Metod umuman chaqirilmaydi (agar BindingResult parametri bo'lmasa)." data-no="Yo'q. MethodArgumentNotValidException metod chaqirilishidan oldin tashlanadi."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Balans yetarli emas. Qaysi qatlam va status?</div><button class="opt">Bean Validation, 400</button><button class="opt">Service, 422 (yoki 400)</button><button class="opt">Baza, 500</button><button class="opt">Controller, 403</button><div class="q-fb" data-ok="To'g'ri. Biznes qoida — Service; semantik xato — 422." data-no="Service qatlami. Bean Validation bazaga bormaydi. 422 Unprocessable Entity (jamoa 400 ni ham tanlashi mumkin)."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>@NotBlank ni BigDecimal maydoniga qo'ysak?</div><button class="opt">Ishlaydi</button><button class="opt">UnexpectedTypeException — String uchun</button><button class="opt">null o'tadi</button><button class="opt">0 ni rad etadi</button><div class="q-fb" data-ok="To'g'ri. @NotBlank faqat CharSequence. BigDecimal uchun @NotNull + @Positive." data-no="@NotBlank faqat String uchun — runtime'da 'No validator could be found' xatosi. @NotNull @Positive ishlating."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>@ExceptionHandler(Exception.class) va @ExceptionHandler(NotFoundException.class) ikkalasi bor. NotFoundException tashlandi. Qaysi ishlaydi?</div><button class="opt">Exception.class — birinchi yozilgan</button><button class="opt">NotFoundException — eng aniq tip</button><button class="opt">Ikkalasi</button><button class="opt">Tasodifiy</button><div class="q-fb" data-ok="To'g'ri. Spring exception ierarxiyasida eng yaqinini tanlaydi." data-no="Eng aniq (specific) handler g'olib — NotFoundException. Tartib ahamiyatsiz."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Prod'da 500 javobida stack trace ko'rinsa nima qilish kerak?</div><button class="opt">Normal</button><button class="opt">server.error.include-stacktrace=never + umumiy xabar + traceId</button><button class="opt">Faqat log darajasini o'zgartirish</button><button class="opt">Exception'ni yutish (catch va hech narsa)</button><div class="q-fb" data-ok="To'g'ri. Ichki tuzilma sizmasin; traceId bilan log'dan topiladi." data-no="Stack trace mijozga chiqmasin — xavfsizlik. Boot default never; custom handler'da ham faqat umumiy xabar + traceId."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Spring</span>
+      <h3>Spring Data JPA</h3>
+      <p>Entity, repository, metod nomidan so'rov, JPQL, Hibernate qanday SQL yaratadi — jonli "metod nomi → SQL" tarjimon va entity holatlari (new/managed/detached) animatsiyasi.</p>
+      <div class="topics"><span class="topic-pill">26 · REST</span><span class="topic-pill now">27 · Validation</span><span class="topic-pill">28 · Spring Data JPA</span><span class="topic-pill">29 · Bog'lanishlar & N+1</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="26-rest-api-chuqur.html"><span class="cl">← Oldingi dars</span><span class="ct">26 · REST API chuqur</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="28-spring-data-jpa.html"><span class="cl">Keyingi dars →</span><span class="ct">28 · Spring Data JPA</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:30.7%"></i></div><span>27 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(27)<0)v.push(27);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','27');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(27)<0)D[t].push(27);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* validator */
+  var I={from:document.getElementById('in-from'),to:document.getElementById('in-to'),amt:document.getElementById('in-amt'),cur:document.getElementById('in-cur')};
+  var F={from:document.getElementById('f-from'),to:document.getElementById('f-to'),amt:document.getElementById('f-amt'),cur:document.getElementById('f-cur')};
+  function rule(r,ok){var el=document.querySelector('[data-r="'+r+'"]');el.classList.toggle('pass',ok);el.classList.toggle('fail',!ok);}
+  function validate(){var e=[];var f=I.from.value,t=I.to.value,a=I.amt.value,c=I.cur.value;
+    var fnb=f.trim().length>0,fpat=/^\d{20}$/.test(f);rule('fnb',fnb);rule('fpat',fpat);F.from.className='field '+(fnb&&fpat?'ok':'err');if(!fnb)e.push(['fromAccount','bo\'sh bo\'lmasin']);else if(!fpat)e.push(['fromAccount','hisob 20 raqam']);
+    var tnb=t.trim().length>0,tpat=/^\d{20}$/.test(t);rule('tnb',tnb);rule('tpat',tpat);F.to.className='field '+(tnb&&tpat?'ok':'err');if(!tnb)e.push(['toAccount','bo\'sh bo\'lmasin']);else if(!tpat)e.push(['toAccount','must match "\\d{20}"']);
+    var num=parseFloat(a);var pos=!isNaN(num)&&num>0,max=!isNaN(num)&&num<=50000000,dig=/^\d{1,15}(\.\d{1,2})?$/.test(a);rule('pos',pos);rule('max',max);rule('dig',dig);F.amt.className='field '+(pos&&max&&dig?'ok':'err');if(!pos)e.push(['amount','must be greater than 0']);if(!max)e.push(['amount','must be less than or equal to 50000000']);if(!dig)e.push(['amount','numeric value out of bounds (<15 digits>.<2 digits>)']);
+    var cpat=/^[A-Z]{3}$/.test(c);rule('cpat',cpat);F.cur.className='field '+(cpat?'ok':'err');if(!cpat)e.push(['currency','must match "[A-Z]{3}"']);
+    var diff=f!==t;rule('diff',diff);if(!diff)e.push(['farqliHisoblar','hisoblar bir xil bo\'lmasin']);
+    var resp=document.getElementById('resp');
+    if(!e.length){resp.className='response pass';resp.innerHTML='<div class="rstatus">201 Created ✓ — validatsiya o\'tdi, Service\'ga yetdi</div><pre>{"id":"7f3a…","status":"COMPLETED","amount":'+num+',"currency":"'+c+'"}</pre>';}
+    else{resp.className='response fail';resp.innerHTML='<div class="rstatus">400 Bad Request ✗ — Service chaqirilmadi</div><pre>{\n  "type": "about:blank",\n  "title": "Bad Request",\n  "status": 400,\n  "instance": "/api/v1/transfers",\n  "errors": [\n'+e.map(function(x){return '    {"field": "'+x[0]+'", "message": "'+x[1]+'"}';}).join(',\n')+'\n  ]\n}</pre>';}}
+  Object.keys(I).forEach(function(k){I[k].addEventListener('input',validate);});
+  var PRE={ok:['20208000123456789012','20208000987654321098','150000','UZS'],acc:['2020800012345678901','20208000987654321098','150000','UZS'],neg:['20208000123456789012','20208000987654321098','-500','UZS'],cur:['20208000123456789012','20208000987654321098','150000','so\'m'],same:['20208000123456789012','20208000123456789012','150000','UZS'],big:['20208000123456789012','20208000987654321098','99000000','UZS']};
+  [].slice.call(document.querySelectorAll('#presets button')).forEach(function(b){b.addEventListener('click',function(){var p=PRE[b.dataset.p];I.from.value=p[0];I.to.value=p[1];I.amt.value=p[2];I.cur.value=p[3];validate();});});
+  validate();
+
+  /* exception flow */
+  var EX=[
+    {src:'svc',h:0,note:'Service <b>InsufficientFundsException</b> tashladi (biznes qoida). Controller ushlamaydi → DispatcherServlet → HandlerExceptionResolver → advice. Eng aniq handler topildi: 422.',pd:'HTTP/1.1 422 Unprocessable Entity\nContent-Type: application/problem+json\n\n{\n  "type": "https://api.bank.uz/errors/insufficient-funds",\n  "title": "Unprocessable Entity",\n  "status": 422,\n  "detail": "Balans yetarli emas: 120 000 < 150 000",\n  "instance": "/api/v1/transfers",\n  "balance": 120000\n}'},
+    {src:'svc',h:1,note:'<b>NotFoundException</b> — repo.findById(...).orElseThrow(() -> new NotFoundException(id)). 404. Bo\'sh 200 emas!',pd:'HTTP/1.1 404 Not Found\nContent-Type: application/problem+json\n\n{\n  "type": "about:blank",\n  "title": "Not Found",\n  "status": 404,\n  "detail": "Transfer 7f3a topilmadi",\n  "instance": "/api/v1/transfers/7f3a"\n}'},
+    {src:'ctrl',h:2,note:'<b>MethodArgumentNotValidException</b> — @Valid controller argumentida yiqildi, metod tanasi umuman ishlamadi. Maydon xatolari ro\'yxati bilan 400.',pd:'HTTP/1.1 400 Bad Request\nContent-Type: application/problem+json\n\n{\n  "title": "Bad Request",\n  "status": 400,\n  "errors": [\n    {"field": "amount", "message": "must be greater than 0"},\n    {"field": "currency", "message": "must match \\"[A-Z]{3}\\""}\n  ]\n}'},
+    {src:'repo',h:3,note:'<b>DataIntegrityViolationException</b> — bazadagi UNIQUE(idempotency_key) buzildi (parallel so\'rov). @Repository uni Spring exception\'iga tarjima qildi. 409.',pd:'HTTP/1.1 409 Conflict\nContent-Type: application/problem+json\n\n{\n  "title": "Conflict",\n  "status": 409,\n  "detail": "Bu so\'rov allaqachon bajarilmoqda",\n  "instance": "/api/v1/transfers"\n}'},
+    {src:'svc',h:4,note:'<b>NullPointerException</b> — bizning bug. Aniq handler yo\'q → <b>Exception.class</b> ushladi. Stack trace mijozga EMAS — log\'ga, traceId bilan. Mijoz support\'ga traceId aytadi, siz log\'dan topasiz.',pd:'HTTP/1.1 500 Internal Server Error\nContent-Type: application/problem+json\n\n{\n  "title": "Internal Server Error",\n  "status": 500,\n  "detail": "Ichki xato",\n  "traceId": "a91c-4f02"\n}\n\n// log: ERROR Unhandled [a91c-4f02] /api/v1/transfers\n// java.lang.NullPointerException: Cannot invoke "getManzil()" because "user" is null\n//   at TransferService.transfer(TransferService.java:42)'}
+  ];
+  var exT=[];
+  function runEx(i){exT.forEach(clearTimeout);exT=[];var e=EX[i];var st=[].slice.call(document.querySelectorAll('#exStack .exn')),hs=[].slice.call(document.querySelectorAll('#exHandlers .exn'));st.forEach(function(s){s.className='exn';});hs.forEach(function(h){h.className='exn';});document.getElementById('pd').textContent='';document.getElementById('exNote').innerHTML='';
+    var order={repo:['repo','svc','ctrl'],svc:['svc','ctrl'],ctrl:['ctrl']}[e.src];
+    order.forEach(function(k,j){exT.push(setTimeout(function(){st.forEach(function(s){s.classList.toggle('act',s.dataset.s===k);});},j*600));});
+    var base=order.length*600;
+    for(var h=0;h<=e.h;h++){(function(h){exT.push(setTimeout(function(){hs.forEach(function(x,k){x.classList.toggle('pass',k<h);x.classList.toggle('act',k===h&&h!==e.h);x.classList.toggle('hit',k===h&&h===e.h);});},base+h*450));})(h);}
+    exT.push(setTimeout(function(){document.getElementById('pd').textContent=e.pd;document.getElementById('exNote').innerHTML=e.note;},base+(e.h+1)*450));}
+  [].slice.call(document.querySelectorAll('#excase button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#excase button')).forEach(function(x){x.classList.toggle('on',x===b);});runEx(+b.dataset.e);});});
+  runEx(0);
+
+})();
+</script>
+</body>
+</html>

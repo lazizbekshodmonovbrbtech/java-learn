@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redis: atomiklik, lock va rate limiter</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F7F1F0;--surface:#FFFFFF;--surface-2:#FCF8F7;--sunken:#F2E8E6;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#EADCD9;--border-strong:#DAC5C1;
+  --accent:#C8372D;--accent-ink:#9A2820;--accent-soft:#F8E3E0;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.two{display:grid;grid-template-columns:1fr 1fr 160px;gap:10px;margin-top:10px}
+.two>div{min-width:0}
+.lane2{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--surface-2);display:flex;flex-direction:column;gap:5px}
+.lane2 h5{margin:0 0 4px;font-family:var(--font-mono);font-size:12px}
+.ev2{font-family:var(--font-mono);font-size:11.5px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);opacity:.2;transition:.3s;min-height:31px}
+.ev2.on{opacity:1;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ev2.done{opacity:1}.ev2.bad{border-color:var(--coral);background:var(--coral-soft)}.ev2.good{border-color:var(--teal);background:var(--teal-soft)}
+.ev2.blank{visibility:hidden}
+.sbox{border:2px solid var(--border-strong);border-radius:12px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:12px;background:var(--surface);transition:.3s;margin-bottom:8px}
+.sbox b{display:block;font-size:22px;font-family:var(--font-display)}
+.sbox.bad{border-color:var(--coral);background:var(--coral-soft)}.sbox.good{border-color:var(--teal);background:var(--teal-soft)}
+.lockv{border:2px dashed var(--border-strong);border-radius:12px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:11.5px;transition:.3s;margin-bottom:8px;min-height:74px}
+.lockv.a{border-style:solid;border-color:#2E6FA8;background:#2E6FA81a}.lockv.b{border-style:solid;border-color:#A9660D;background:var(--amber-soft)}
+.lockv b{display:block;font-size:13px}
+.ttlbar{height:6px;border-radius:3px;background:var(--sunken);overflow:hidden;margin-top:6px}
+.ttlbar>div{height:100%;background:var(--amber);transition:width .5s}
+/* bucket */
+.bk{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center;margin-top:8px}
+.bk>div{min-width:0}
+.bucket{position:relative;width:160px;height:200px;margin:0 auto;border:3px solid var(--ink-soft);border-top:0;border-radius:0 0 24px 24px;display:flex;flex-wrap:wrap-reverse;align-content:flex-start;justify-content:center;gap:4px;padding:8px}
+.tok{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F7C66B,#C8372D);animation:pop .3s}
+.drip{position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);white-space:nowrap}
+.reqs{display:flex;gap:4px;flex-wrap:wrap;min-height:40px;align-content:flex-start}
+.rq{font-family:var(--font-mono);font-size:11px;padding:4px 7px;border-radius:7px;animation:pop .3s}
+.rq.ok{background:var(--teal-soft);color:var(--teal-ink);border:1px solid var(--teal)}
+.rq.no{background:var(--coral-soft);color:var(--coral);border:1px solid var(--coral)}
+.rng{display:flex;flex-direction:column;gap:2px;margin:6px 0;font-size:13px}
+.rng input{accent-color:var(--accent)}
+/* windows */
+.tl{position:relative;height:120px;margin-top:14px;border-bottom:2px solid var(--border-strong)}
+.tl .win{position:absolute;top:0;bottom:0;border-left:1.5px dashed var(--border-strong)}
+.tl .win span{position:absolute;top:2px;left:4px;font-family:var(--font-mono);font-size:10px;color:var(--ink-faint)}
+.tl .m{position:absolute;bottom:6px;width:10px;height:10px;border-radius:50%;transform:translateX(-50%);transition:background .3s;animation:pop .3s both}
+.tl .m.ok{background:var(--teal)}.tl .m.no{background:var(--coral)}
+.tl .sl{position:absolute;bottom:0;height:70px;border:2px solid var(--purple);border-radius:8px;background:var(--purple-soft);opacity:.6;transition:left .1s}
+.tlx{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);margin-top:3px}
+.alg{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:700px){.two{grid-template-columns:1fr 1fr}.two .st{grid-column:1/-1;display:flex;gap:8px}.two .st>div{flex:1}.bk{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#C8372D"></span> Redis · 5/7</span><span>· Kurs: 54/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Redis · 54-modul · atomiklik</span>
+    <h1>Atomiklik, lock va <span class="steam">rate limiter</span></h1>
+    <p class="lead">Redis bitta ipda ishlaydi — har bitta buyruq atomik. Lekin ikki buyruq orasida boshqa pod’ning buyrug‘i bajarilishi mumkin. Bu modulda "o‘qib-hisoblab-yozish" nega buziladi, uni MULTI, WATCH va Lua bilan qanday tuzatish, taqsimlangan lock’ning nozik tomonlari (GC pauza, fencing token, Redlock bahsi) va bankdagi API limitlari uchun token bucket’ni ko‘ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Yo‘qolgan yangilanish: GET + SET atomik emas</h2></div><p class="sec-sub">Ikki pod bir vaqtda kunlik limitni oshiryapti. Har bir buyruq atomik, lekin <b>ular orasidagi bo‘shliq</b> — yo‘q.</p>
+    <div class="stage">
+      <div class="seg" id="lsg"><button class="on" data-v="0">GET + SET (xato)</button><button data-v="1">INCRBY (to‘g‘ri)</button></div>
+      <div class="two"><div class="lane2"><h5>Pod A: +200 000</h5><div id="la"></div></div><div class="lane2"><h5>Pod B: +300 000</h5><div id="lb"></div></div><div class="st"><div class="sbox" id="lv">Redis: spent<b>0</b></div></div></div>
+      <div class="ctrls"><button class="btn" id="luPrev">◀</button><button class="btn primary" id="luPlay">▶ Avto</button><button class="btn" id="luNext">▶</button><div class="bar"><div id="luBar"></div></div></div>
+      <div class="explain" id="luEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Vosita</th><th>Qanday</th><th>Qachon</th></tr><tr><td>Bitta buyruq</td><td><code>INCRBY</code>, <code>HINCRBY</code>, <code>SET NX</code>, <code>GETDEL</code>, <code>LMOVE</code></td><td>Imkon bo‘lsa — har doim birinchi tanlov</td></tr><tr><td><code>MULTI … EXEC</code></td><td>Buyruqlar navbatga yig‘iladi va bir blokda bajariladi. <b>Rollback yo‘q</b>: bittasi xato bersa, qolganlari baribir bajariladi. Ichida oldingi natijani o‘qib bo‘lmaydi</td><td>Bir nechta mustaqil yozuvni birga yuborish</td></tr><tr><td><code>WATCH</code> + <code>MULTI</code></td><td>Optimistik lock: kuzatilgan kalit EXEC’gacha o‘zgarsa — EXEC <code>nil</code> qaytaradi, qaytadan urinasiz</td><td>Kam to‘qnashuvli read-modify-write</td></tr><tr><td>Lua (<code>EVAL</code>) / Functions</td><td>Skript butunligicha atomik bajariladi, ichida shartlar va o‘qish bor</td><td>Murakkab mantiq: limit tekshirish, lock ochish, token bucket</td></tr><tr><td>Pipeline</td><td>Faqat tarmoq optimizatsiyasi (bitta RTT). <b>Atomik emas</b></td><td>Ko‘p buyruqni tez yuborish</td></tr></table></div><div class="callout warn"><div class="ct">⚠️ Lua ham bitta ip</div>Skript bajarilayotganda boshqa hech narsa bajarilmaydi. Uzun sikl — butun Redis to‘xtaydi (<code>busy-reply-threshold</code>, default 5 s dan keyin <code>BUSY</code> xatolar). Skriptlarni qisqa tuting, ichida KEYS/SCAN qilmang. Cluster’da skript ishlatadigan barcha kalitlar bitta slot’da bo‘lishi kerak — <code>{u42}</code> hash tag.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Distributed lock: to‘g‘ri va noto‘g‘ri</h2></div><p class="sec-sub">Tungi foiz hisoblash job’i 3 ta pod’da ishlaydi, lekin faqat bittasi bajarishi kerak. Stsenariyni tanlang va qadamlarni o‘ting.</p>
+    <div class="stage">
+      <div class="seg" id="ksg"><button class="on" data-v="0">1. Oddiy lock</button><button data-v="1">2. Token’siz DEL (xato)</button><button data-v="2">3. GC pauza</button><button data-v="3">4. Fencing token</button></div>
+      <div class="two"><div class="lane2"><h5>🟦 Pod A</h5><div id="ka"></div></div><div class="lane2"><h5>🟧 Pod B</h5><div id="kb"></div></div><div class="st"><div class="lockv" id="kl">lock:eod<b>bo‘sh</b></div><div class="sbox" id="kd">DB<b>—</b></div></div></div>
+      <div class="ctrls"><button class="btn" id="lkPrev">◀</button><button class="btn primary" id="lkPlay">▶ Avto</button><button class="btn" id="lkNext">▶</button><div class="bar"><div id="lkBar"></div></div></div>
+      <div class="explain" id="lkEx"></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">lock (redis-cli)</span></div><pre class="code"><span class="k">SET</span> lock:eod-interest a7f3-uuid <span class="k">NX</span> <span class="k">PX</span> <span class="nu">30000</span>     <span class="cm"># faqat yo'q bo'lsa, 30 s TTL, unikal token</span>
+OK                                               <span class="cm"># lock olindi  (nil → band)</span>
+
+-- unlock.lua: faqat O<span class="st">'Z lock'</span>ingni o<span class="st">'chir (atomik tekshir-va-o'</span>chir)
+if redis.call(<span class="st">"GET"</span>, <span class="k">KEYS</span>[<span class="nu">1</span>]) == ARGV[<span class="nu">1</span>] then
+    return redis.call(<span class="st">"DEL"</span>, <span class="k">KEYS</span>[<span class="nu">1</span>])
+else
+    return <span class="nu">0</span>
+end</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">EodJob.java (Redisson)</span></div><pre class="code"><span class="ty">RLock</span> lock = redisson.getLock(<span class="st">"lock:eod-interest"</span>);
+<span class="k">if</span> (lock.tryLock(<span class="nu">0</span>, <span class="ty">TimeUnit</span>.SECONDS)) {          <span class="cm">// leaseTime berilmasa — watchdog TTL'ni har 10 s uzaytiradi</span>
+    <span class="k">try</span> {
+        interestService.accrueAll(<span class="ty">LocalDate</span>.now());
+    } <span class="k">finally</span> {
+        <span class="k">if</span> (lock.isHeldByCurrentThread()) lock.unlock();
+    }
+}
+<span class="cm">// @Scheduled job'lar uchun oddiyroq: ShedLock (@SchedulerLock, JDBC yoki Redis provider)</span></pre></div><div class="callout iv"><div class="ct">🎯 Suhbat: Redlock bahsi</div>Redis muallifi antirez <b>Redlock</b>ni taklif qildi: 5 ta mustaqil master, lock ko‘pchilikda (≥3) olinsa — olingan. Martin Kleppmann tanqidi: lock TTL’ga (vaqtga) tayanadi; GC pauza, tarmoq kechikishi yoki soat sakrashi tufayli ikki mijoz o‘zini egasi deb o‘ylashi mumkin — <b>fencing token</b>siz to‘g‘rilik kafolati yo‘q. Xulosa: lock <b>samaradorlik</b> uchun (ikki marta bajarilsa ham zarar kichik) — Redis yetarli. <b>To‘g‘rilik</b> uchun (pul!) — resursning o‘zi tekshirishi kerak: DB’da unikal constraint, versiya/fencing, <code>SELECT … FOR UPDATE</code> yoki PG advisory lock.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Token bucket: API limitining yuragi</h2></div><p class="sec-sub">Chelakka soniyasiga <b>r</b> ta token tomadi, sig‘imi <b>b</b>. Har so‘rov bitta token oladi; token yo‘q — <code>429 Too Many Requests</code>. Portlash (burst) b gacha ruxsat, o‘rtacha tezlik — r.</p>
+    <div class="stage">
+      <div class="bk">
+        <div><div class="bucket" id="bucket"><span class="drip" id="drip">💧 +2/s</span></div></div>
+        <div>
+          <div class="rng"><span>To‘ldirish tezligi r: <b id="rV">2</b> token/s</span><input type="range" id="rR" min="1" max="10" value="2"></div>
+          <div class="rng"><span>Sig‘im b: <b id="bV">5</b></span><input type="range" id="rB" min="1" max="12" value="5"></div>
+          <div class="ctrls"><button class="btn primary" id="b1">📨 1 so‘rov</button><button class="btn" id="b10">💥 10 ta birdan</button><button class="btn" id="bAuto">🤖 Bot: 5/s</button></div>
+          <div class="reqs" id="reqs"></div>
+        </div>
+      </div>
+      <div class="explain" id="bEx">So‘rov yuboring.</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">token_bucket.lua</span></div><pre class="code">-- <span class="k">KEYS</span>[<span class="nu">1</span>] = rl:{api-key}   ARGV: rate, capacity, now_ms, cost
+local b = redis.call(<span class="st">"HMGET"</span>, <span class="k">KEYS</span>[<span class="nu">1</span>], <span class="st">"tokens"</span>, <span class="st">"ts"</span>)
+local rate, cap, now, cost = tonumber(ARGV[<span class="nu">1</span>]), tonumber(ARGV[<span class="nu">2</span>]), tonumber(ARGV[<span class="nu">3</span>]), tonumber(ARGV[<span class="nu">4</span>])
+local tokens = tonumber(b[<span class="nu">1</span>]) or cap
+local ts     = tonumber(b[<span class="nu">2</span>]) or now
+tokens = math.min(cap, tokens + (now - ts) / <span class="nu">1000</span> * rate)     -- o'tgan vaqt uchun <span class="st">"tomgan"</span> tokenlar
+local allowed = tokens &gt;= cost
+if allowed then tokens = tokens - cost end
+redis.call(<span class="st">"HSET"</span>, <span class="k">KEYS</span>[<span class="nu">1</span>], <span class="st">"tokens"</span>, tokens, <span class="st">"ts"</span>, now)
+redis.call(<span class="st">"PEXPIRE"</span>, <span class="k">KEYS</span>[<span class="nu">1</span>], math.ceil(cap / rate * <span class="nu">1000</span>) * <span class="nu">2</span>)
+return { allowed and <span class="nu">1</span> or <span class="nu">0</span>, tostring(tokens) }</pre></div><div class="callout tip"><div class="ct">💡 Vaqtni kim beradi?</div><code>now</code>ni ilova yuborsa, pod’lar soati farq qilishi mumkin. Redis 5+ da skript ichida <code>redis.call("TIME")</code> ishlatish mumkin (effects replication). Tayyor yechimlar: Bucket4j (Redis/Lettuce backend), Resilience4j RateLimiter (faqat lokal), Spring Cloud Gateway <code>RedisRateLimiter</code> (aynan token bucket + Lua).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Algoritmlarni solishtirish: chegara portlashi</h2></div><p class="sec-sub">Limit — <b>5 so‘rov / 1 s</b>. Bot 0.9 s va 1.1 s oralig‘ida 10 ta so‘rov yuboradi (oyna chegarasida). Algoritmni tanlang.</p>
+    <div class="stage">
+      <div class="seg alg" id="alg"><button class="on" data-a="fixed">Fixed window (INCR)</button><button data-a="slog">Sliding log (ZSET)</button><button data-a="bucket">Token bucket</button></div>
+      <div class="tl" id="tl"></div><div class="tlx"><span>0 s</span><span>0.5</span><span>1.0</span><span>1.5</span><span>2.0 s</span></div>
+      <div class="ctrls"><button class="btn primary" id="aGo">▶ Ijro</button></div>
+      <div class="explain" id="aEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Algoritm</th><th>Redis’da</th><th>Aniqlik</th><th>Xotira</th></tr><tr><td>Fixed window</td><td><code>INCR rl:u42:{daqiqa}</code> + <code>EXPIRE</code></td><td>Chegarada 2× portlash mumkin</td><td>1 kalit</td></tr><tr><td>Sliding log</td><td><code>ZADD</code> vaqt tamg‘asi, <code>ZREMRANGEBYSCORE</code> eski, <code>ZCARD</code></td><td>Aniq</td><td>Har so‘rovga element — ko‘p</td></tr><tr><td>Sliding window counter</td><td>Joriy + oldingi oyna, vaznli</td><td>Taxminiy, yaxshi</td><td>2 kalit</td></tr><tr><td>Token bucket</td><td>Hash (tokens, ts) + Lua</td><td>Portlashni boshqaradi, o‘rtacha tezlik aniq</td><td>1 hash</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Redis’da atomiklik qanday ta’minlanadi?<span class="chev">›</span></summary><div class="iv-a">Har bir buyruq bitta ipda bajarilgani uchun atomik. Bir nechta buyruq uchun: MULTI/EXEC (blok, lekin rollback yo‘q), WATCH (optimistik CAS), Lua skript yoki Redis Functions (to‘liq atomik mantiq). Pipeline atomik emas — faqat RTT tejaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>MULTI/EXEC relyatsion tranzaksiyadan nimasi bilan farq qiladi?<span class="chev">›</span></summary><div class="iv-a">Izolyatsiya bor (blok orasiga boshqa buyruq kirmaydi), lekin rollback yo‘q: runtime xato bergan buyruqdan keyingilari baribir bajariladi. Blok ichida o‘qilgan qiymat asosida qaror qilib bo‘lmaydi — buning uchun WATCH yoki Lua.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Redis’da distributed lock’ni qanday to‘g‘ri qilasiz?<span class="chev">›</span></summary><div class="iv-a">SET key <unikal-token> NX PX <ttl>; ochishda Lua bilan "GET == token bo‘lsa DEL". TTL — egasi o‘lsa lock abadiy qolmasligi uchun; token — boshqaning lock’ini o‘chirmaslik uchun. Uzun ish bo‘lsa — TTL’ni uzaytirish (Redisson watchdog). To‘g‘rilik muhim bo‘lsa — fencing token yoki DB darajasidagi kafolat.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Fencing token nima?<span class="chev">›</span></summary><div class="iv-a">Har lock olishda monoton o‘suvchi raqam (masalan INCR lock:eod:ver). Resurs (DB) oxirgi ko‘rgan tokendan kichik token bilan kelgan yozuvni rad etadi. Shunda GC pauzadan "uyg‘ongan" eski ega hech narsa buzolmaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Rate limiter qanday loyihalaysiz?<span class="chev">›</span></summary><div class="iv-a">Talab: kim bo‘yicha (API kalit, user, IP), qanday limit (o‘rtacha + portlash), qayerda (gateway). Algoritm: token bucket (Lua, atomik) yoki sliding window. Javobda 429 + Retry-After, X-RateLimit-* sarlavhalar. Redis ishlamasa — fail-open yoki fail-closed qarori (to‘lov API uchun odatda closed, o‘qish uchun open).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Fixed window’ning muammosi?<span class="chev">›</span></summary><div class="iv-a">Oyna chegarasida limit ikki barobar o‘tishi mumkin: 0.9 s da 5, 1.1 s da yana 5 — 0.2 s ichida 10 so‘rov. Sliding window yoki token bucket buni tuzatadi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Ikki pod "GET balance; SET balance = x+100" qilyapti. Nima bo‘lishi mumkin?</div><button class="opt">Hammasi joyida — Redis bitta ipli</button><button class="opt">Yo‘qolgan yangilanish</button><button class="opt">Deadlock</button><div class="q-fb" data-ok="To‘g‘ri — buyruqlar orasiga boshqa pod kiradi." data-no="Yo‘q. Har buyruq atomik, ketma-ketlik esa yo‘q."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>MULTI ichidagi 2-buyruq WRONGTYPE xato berdi. 3-buyruq?</div><button class="opt">Bajarilmaydi, hammasi rollback</button><button class="opt">Baribir bajariladi</button><button class="opt">Redis to‘xtaydi</button><div class="q-fb" data-ok="To‘g‘ri — Redis’da rollback yo‘q." data-no="Yo‘q. EXEC’dagi runtime xato qolganlarini to‘xtatmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Lock’ni ochishda nega shunchaki DEL emas?</div><button class="opt">DEL sekin</button><button class="opt">Lock TTL bilan o‘tib, boshqa pod olgan bo‘lishi mumkin — uniki o‘chib ketadi</button><button class="opt">DEL atomik emas</button><div class="q-fb" data-ok="To‘g‘ri — token bilan tekshirib o‘chirish kerak." data-no="Yo‘q. Boshqaning lock’ini o‘chirib yuborish xavfi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Token bucket: r=2/s, b=5. Bot 1 soniyada 10 ta so‘rov yubordi (chelak to‘la edi). Nechtasi o‘tadi?</div><button class="opt">2</button><button class="opt">~7 (5 zaxira + ~2 yangi)</button><button class="opt">10</button><div class="q-fb" data-ok="To‘g‘ri — portlash b gacha, keyin r tezlikda." data-no="Yo‘q. Avval 5 zaxira token, keyin soniyasiga 2 ta."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Pul o‘tkazmasi ikki marta bajarilmasligi uchun eng ishonchli?</div><button class="opt">Redis lock</button><button class="opt">DB’da idempotency_key UNIQUE constraint</button><button class="opt">Redlock 5 node</button><div class="q-fb" data-ok="To‘g‘ri — kafolat resursning o‘zida." data-no="Yo‘q. To‘g‘rilik uchun DB darajasidagi kafolat kerak."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Redis</span>
+      <h3>Persistence va yuqori mavjudlik</h3>
+      <p>RDB va AOF, replikatsiya, Sentinel failover, Cluster slot’lari — animatsiyada.</p>
+      <div class="topics"><span class="topic-pill">50 · Nega tez</span><span class="topic-pill">51 · Tuzilmalar</span><span class="topic-pill">52 · TTL va xotira</span><span class="topic-pill">53 · Keshlash</span><span class="topic-pill now">54 · Lock va limit</span><span class="topic-pill">55 · Persistence/HA</span><span class="topic-pill">56 · Streams + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="53-keshlash-patternlari.html"><span class="cl">← Oldingi dars</span><span class="ct">53 · Keshlash pattern&#x27;lari</span><span class="cs">⚡ Redis</span></a><a class="cn nx" href="55-persistence-va-ha.html"><span class="cl">Keyingi dars →</span><span class="ct">55 · Persistence va HA</span><span class="cs">⚡ Redis</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:61.4%"></i></div><span>54 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(54)<0)v.push(54);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','54');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(54)<0)D[t].push(54);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  function lanes(la,lb,S){la.innerHTML=S.map(function(s){return '<div class="ev2'+(s[0]==='a'?'':' blank')+'">'+s[1]+'</div>';}).join('');lb.innerHTML=S.map(function(s){return '<div class="ev2'+(s[0]==='b'?'':' blank')+'">'+s[1]+'</div>';}).join('');}
+  function mark(la,lb,S,i){[la,lb].forEach(function(L){[].forEach.call(L.children,function(d,k){var bl=d.className.indexOf('blank')>=0;d.className='ev2'+(bl?' blank':'')+(k===i?' on':k<i?' done':'')+(k<=i&&S[k][3]?' '+S[k][3]:'');});});}
+  function reStep(ids){ids.forEach(function(id){var o=document.getElementById(id),n=o.cloneNode(true);o.parentNode.replaceChild(n,o);});}
+  /* lost update */
+  var LU=[[['a','GET spent → 0','A o‘qidi: 0.',0],['b','GET spent → 0','B ham o‘qidi: 0 (A hali yozmadi).',0],['a','SET spent 200000','A: 0 + 200 000.',200000],['b','SET spent 300000','B: 0 + 300 000 — A ning yozuvini <b>bosib ketdi</b>.',300000,'bad'],['a','—','Natija 300 000, kutilgan 500 000. <b>200 000 so‘m "yo‘qoldi"</b> — kunlik limit chetlab o‘tildi.',300000,'bad']],
+    [['a','INCRBY spent 200000 → 200000','Bitta buyruq: o‘qish+qo‘shish+yozish Redis ichida, bo‘linmas.',200000,'good'],['b','INCRBY spent 300000 → 500000','B navbatda kutdi va A natijasiga qo‘shdi.',500000,'good'],['a','—','Natija <b>500 000</b> ✓. Limitni tekshirish ham kerak bo‘lsa (≤ 5 mln) — Lua skript.',500000,'good']]];
+  var lv=0,la=document.getElementById('la'),lb=document.getElementById('lb'),lst;
+  function mkLU(){var S=LU[lv];lanes(la,lb,S);if(lst)lst.stop();lst=mkStepper('lu',S.length,function(i){mark(la,lb,S,i);var b=document.getElementById('lv');b.innerHTML='Redis: spent<b>'+S[i][3].toLocaleString('ru-RU')+'</b>';b.className='sbox'+(S[i][4]?' '+S[i][4]:'');document.getElementById('luEx').innerHTML=S[i][2];},2000);}
+  document.getElementById('lsg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});lv=+b.dataset.v;reStep(['luPrev','luPlay','luNext']);mkLU();});mkLU();
+
+  /* locks: [who,text,explain,lockOwner(a/b/-),ttl%,db,cls] */
+  var LK=[
+   [['a','SET lock NX PX 30000 → OK','A lock oldi. Token = "A-uuid".','a',100,'—','good'],['b','SET lock NX PX 30000 → (nil)','B uchun lock band — B job’ni o‘tkazib yuboradi.','a',80,'—'],['a','foiz hisoblash… (8 s)','A ishlayapti.','a',50,'hisoblanmoqda'],['a','EVAL unlock.lua A-uuid → 1','A o‘z tokenini tekshirib lock’ni ochdi.','-',0,'✓ 1 marta','good']],
+   [['a','SET lock A-uuid NX PX 30000 → OK','A lock oldi.','a',100,'—'],['a','… uzoq ish (35 s) …','A ish TTL’dan uzoq cho‘zildi.','a',5,'hisoblanmoqda'],['b','SET lock B-uuid NX PX 30000 → OK','TTL tugadi → lock o‘chdi → B oldi.','b',100,'hisoblanmoqda'],['a','DEL lock → 1','A ishini tugatib <b>token tekshirmasdan</b> DEL qildi — bu <b>B ning lock’i</b>!','-',0,'hisoblanmoqda','bad'],['b','… C pod ham lock oladi …','Lock bo‘sh — uchinchi pod ham boshlaydi. Endi B va C parallel. Yechim: unlock faqat Lua bilan token tekshirib.','-',0,'2× bajarildi','bad']],
+   [['a','SET lock A NX PX 10000 → OK','A lock oldi (10 s).','a',100,'—'],['a','⏸ GC pauza 15 s (stop-the-world)','A muzladi — u buni bilmaydi ham.','a',30,'—'],['b','SET lock B NX PX 10000 → OK','A ning TTL’i tugadi, B lock oldi va hisoblashni boshladi.','b',100,'B yozyapti'],['a','▶ uyg‘ondi → UPDATE accounts …','A "men hali egasiman" deb o‘ylab DB’ga yozdi. <b>Ikki yozuvchi</b> — foiz ikki marta hisoblandi.','b',60,'2× foiz!','bad'],['a','—','Watchdog ham yordam bermaydi: pauza paytida A ning o‘zi ham muzlagan. Yechim — <b>fencing token</b> (4-stsenariy).','b',60,'2× foiz!','bad']],
+   [['a','SET lock … → OK, INCR lock:ver → 33','A lock va <b>token 33</b> oldi.','a',100,'max_token=32'],['a','⏸ GC pauza','A muzladi.','a',20,'max_token=32'],['b','lock → OK, INCR lock:ver → 34','B token 34 oldi.','b',100,'max_token=32'],['b','UPDATE … WHERE max_token < 34 → 1 qator','DB yozuvni qabul qildi va max_token=34 ni saqladi.','b',80,'max_token=34','good'],['a','UPDATE … WHERE max_token < 33 → 0 qator','A uyg‘ondi, lekin DB <b>eski token</b>ni rad etdi. Kafolat Redis’da emas — <b>resursda</b>.','b',70,'rad etildi ✓','good']]];
+  var kv=0,ka=document.getElementById('ka'),kb=document.getElementById('kb'),kst;
+  function mkLK(){var S=LK[kv];lanes(ka,kb,S);if(kst)kst.stop();kst=mkStepper('lk',S.length,function(i){var s=S[i];mark(ka,kb,S,i);var l=document.getElementById('kl');l.className='lockv'+(s[3]!=='-'?' '+s[3]:'');
+      l.innerHTML='lock:eod<b>'+(s[3]==='a'?'🟦 A egasi':s[3]==='b'?'🟧 B egasi':'bo‘sh')+'</b><div class="ttlbar"><div style="width:'+s[4]+'%"></div></div>';
+      var d=document.getElementById('kd');d.innerHTML='DB<b style="font-size:14px">'+s[5]+'</b>';d.className='sbox'+(s[6]?' '+s[6]:'');document.getElementById('lkEx').innerHTML=s[2];},2300);}
+  document.getElementById('ksg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});kv=+b.dataset.v;reStep(['lkPrev','lkPlay','lkNext']);mkLK();});mkLK();
+
+  /* bucket */
+  var R=2,B=5,tokens=5,last=performance.now(),bucket=document.getElementById('bucket'),reqs=document.getElementById('reqs'),bEx=document.getElementById('bEx'),ok=0,no=0,bot=null;
+  function refill(){var now=performance.now();tokens=Math.min(B,tokens+(now-last)/1000*R);last=now;}
+  function drawB(){var n=Math.floor(tokens+1e-9);var cur=bucket.querySelectorAll('.tok').length;
+    if(cur!==n){[].forEach.call(bucket.querySelectorAll('.tok'),function(t){t.remove();});for(var i=0;i<n;i++){var t=document.createElement('span');t.className='tok';bucket.appendChild(t);}}
+    document.getElementById('drip').textContent='💧 +'+R+'/s · '+(Math.floor(tokens*10)/10).toFixed(1)+'/'+B;}
+  setInterval(function(){refill();drawB();},100);
+  function hit(){refill();var r=document.createElement('span');if(tokens>=1){tokens-=1;ok++;r.className='rq ok';r.textContent='200';}else{no++;r.className='rq no';r.textContent='429';}
+    reqs.appendChild(r);while(reqs.children.length>40)reqs.removeChild(reqs.firstChild);drawB();
+    bEx.innerHTML='O‘tdi: <b>'+ok+'</b>, rad etildi (429): <b>'+no+'</b>. '+(no?'Token tugadi — keyingisi '+(1/R).toFixed(2)+' s dan keyin tomadi. Mijoz <code>Retry-After</code> sarlavhasini ko‘radi.':'Chelakda token bor — so‘rovlar o‘tyapti.');}
+  document.getElementById('b1').addEventListener('click',hit);
+  document.getElementById('b10').addEventListener('click',function(){for(var i=0;i<10;i++)hit();bEx.innerHTML+=' <b>Portlash:</b> birinchi '+B+' tagacha zaxiradan o‘tdi, qolgani 429.';});
+  document.getElementById('bAuto').addEventListener('click',function(){if(bot){clearInterval(bot);bot=null;this.textContent='🤖 Bot: 5/s';}else{bot=setInterval(hit,200);this.textContent='⏸ Botni to‘xtat';}});
+  document.getElementById('rR').addEventListener('input',function(){R=+this.value;document.getElementById('rV').textContent=R;});
+  document.getElementById('rB').addEventListener('input',function(){B=+this.value;tokens=Math.min(tokens,B);document.getElementById('bV').textContent=B;});
+  drawB();
+
+  /* windows */
+  var tl=document.getElementById('tl'),alg='fixed',T=[0.1,0.3,0.92,0.94,0.96,0.97,0.99,1.01,1.03,1.04,1.06,1.08,1.5,1.7,1.9];
+  function decide(){var res=[];
+    if(alg==='fixed'){var c={};T.forEach(function(t){var w=Math.floor(t);c[w]=(c[w]||0)+1;res.push(c[w]<=5);});}
+    if(alg==='slog'){var log=[];T.forEach(function(t){log=log.filter(function(x){return x>t-1;});var okk=log.length<5;if(okk)log.push(t);res.push(okk);});}
+    if(alg==='bucket'){var tk=5,lt=0;T.forEach(function(t){tk=Math.min(5,tk+(t-lt)*5);lt=t;var okk=tk>=1;if(okk)tk-=1;res.push(okk);});}
+    return res;}
+  var EX={fixed:'<b>Fixed window:</b> 0.9–1.0 s oralig‘ida 5 ta ("0-oyna" limiti hali tugamagan edi, oldin 2 ta bor edi — 3 tasi o‘tdi), 1.0–1.1 s da yangi oyna — yana 5 ta. Chegara atrofida <b>0.2 s ichida 8 ta</b> o‘tdi — limit 5 edi.',slog:'<b>Sliding log:</b> har so‘rovda oxirgi 1 s ichidagi so‘rovlar aniq sanaladi (binafsha oyna). 0.2 s ichida faqat limitgacha o‘tadi. Aniq, lekin har so‘rov ZSET’da element — ko‘p xotira.',bucket:'<b>Token bucket</b> (r=5/s, b=5): portlashda zaxira 5 token sarflanadi, keyin tokenlar 0.2 s da bittadan tomadi. O‘rtacha tezlik aniq 5/s, qisqa portlash b bilan cheklangan.'};
+  function run(){tl.innerHTML='';for(var w=0;w<=2;w++){var d=document.createElement('div');d.className='win';d.style.left=(w/2*100)+'%';d.innerHTML=alg==='fixed'?'<span>oyna '+w+'</span>':'';tl.appendChild(d);}
+    var sl=null;if(alg==='slog'){sl=document.createElement('div');sl.className='sl';sl.style.width='50%';tl.appendChild(sl);}
+    var res=decide();T.forEach(function(t,i){setTimeout(function(){var m=document.createElement('span');m.className='m '+(res[i]?'ok':'no');m.style.left=(t/2*100)+'%';m.style.bottom=(6+(i%4)*14)+'px';tl.appendChild(m);if(sl)sl.style.left=Math.max(0,(t-1)/2*100)+'%';},i*180);});
+    var n=res.filter(function(x,i){return x&&T[i]>=0.9&&T[i]<=1.1;}).length;
+    setTimeout(function(){document.getElementById('aEx').innerHTML=EX[alg]+' <br>0.9–1.1 s oralig‘ida o‘tgan: <b>'+n+'</b> ta.';},T.length*180);}
+  document.getElementById('alg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});alg=b.dataset.a;run();});
+  document.getElementById('aGo').addEventListener('click',run);run();
+})();
+
+</script>
+</body>
+</html>

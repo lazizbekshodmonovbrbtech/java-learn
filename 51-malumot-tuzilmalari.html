@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redis ma'lumot tuzilmalari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F7F1F0;--surface:#FFFFFF;--surface-2:#FCF8F7;--sunken:#F2E8E6;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#EADCD9;--border-strong:#DAC5C1;
+  --accent:#C8372D;--accent-ink:#9A2820;--accent-soft:#F8E3E0;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170E0D;--surface:#231716;--surface-2:#2B1C1A;--sunken:#1C1211;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3B2725;--border-strong:#4F3431;
+  --accent:#F0766B;--accent-ink:#F59A91;--accent-soft:#3A1C19;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.lab{display:grid;grid-template-columns:1.05fr 1fr;gap:12px;margin-top:12px;align-items:start}
+.lab>div{min-width:0}
+.term{background:#15110F;color:#EDE3DF;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:12.5px;height:380px;display:flex;flex-direction:column}
+.term .out{flex:1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.term .out .c{color:#F59A91}.term .out .e{color:#FF8A7A}.term .out .n{color:#9AA3A8}.term .out .ok{color:#8FD9B4}.term .out .w{color:#F2C46B}
+.term .inl{display:flex;gap:6px;align-items:center;border-top:1px solid #34292499;padding-top:8px;margin-top:6px}
+.term .inl span{color:#F59A91;white-space:nowrap}
+.term input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;font-family:var(--font-mono);font-size:13px}
+.ks{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;padding-right:2px}
+.kc{border:1.5px solid var(--border);border-radius:12px;background:var(--surface);padding:9px 10px;transition:border-color .3s,box-shadow .3s}
+.kc.touch{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.kc.bye{animation:bye .6s forwards}
+@keyframes bye{to{opacity:0;transform:scale(.9)}}
+.kh{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;margin-bottom:6px}
+.kh b{font-weight:600;word-break:break-all}
+.ty2{font-size:10px;padding:1px 6px;border-radius:5px;color:#fff;text-transform:uppercase;letter-spacing:.04em}
+.ty2.string{background:#C8372D}.ty2.hash{background:#2E6FA8}.ty2.list{background:#A9660D}.ty2.set{background:#0F6E56}.ty2.zset{background:#6A4BB0}
+.enc{font-size:10px;padding:1px 6px;border-radius:5px;border:1px dashed var(--border-strong);color:var(--ink-soft)}
+.enc.flip{animation:pulse 1.2s 2}
+.ttl{font-size:10px;padding:1px 6px;border-radius:5px;background:var(--amber-soft);color:var(--amber)}
+.sv{font-family:var(--font-mono);font-size:13px;background:var(--sunken);border-radius:8px;padding:6px 9px;display:inline-block;max-width:100%;word-break:break-all}
+.hv{display:grid;grid-template-columns:auto 1fr;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.hv span{padding:3px 8px;border-bottom:1px solid var(--border)}
+.hv span:nth-child(odd){background:var(--surface-2);color:var(--ink-soft)}
+.hv span:nth-last-child(-n+2){border-bottom:0}
+.lv{display:flex;gap:4px;overflow-x:auto;align-items:flex-end;padding-bottom:2px}
+.lv div{flex:none;text-align:center}
+.lv i{display:block;font-style:normal;font-size:9.5px;color:var(--ink-faint);font-family:var(--font-mono)}
+.lv span{display:block;border:1.5px solid #A9660D;background:var(--amber-soft);border-radius:7px;padding:4px 7px;font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
+.lv span.end{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);align-self:center;border:0;background:none;padding:0 2px}
+.stv{display:flex;flex-wrap:wrap;gap:5px}
+.stv span{border:1.5px solid var(--teal);background:var(--teal-soft);border-radius:999px;padding:3px 10px;font-family:var(--font-mono);font-size:11.5px}
+.zv{display:flex;flex-direction:column;gap:3px;font-family:var(--font-mono);font-size:11.5px}
+.zv div{display:grid;grid-template-columns:22px 60px 1fr 60px;gap:6px;align-items:center}
+.zv .bar2{height:12px;border-radius:4px;background:var(--purple);opacity:.75;transition:width .5s}
+.zv .sc{text-align:right;color:var(--ink-soft)}
+.fresh{animation:pop .45s cubic-bezier(.2,.9,.3,1.3)}
+.miss{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.mstep{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mstep button{font-family:var(--font-mono);font-size:11.5px;text-align:left}
+.mstep button.did{border-color:var(--teal);background:var(--teal-soft)}
+.empty2{color:var(--ink-faint);font-size:13px;text-align:center;padding:30px 8px;border:1.5px dashed var(--border);border-radius:12px}
+/* game */
+.game{display:flex;flex-direction:column;gap:10px}
+.scn{font-size:15px;padding:14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border);min-height:60px}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.pick button.right{background:var(--teal-soft);border-color:var(--teal)}
+.pick button.wrong{background:var(--coral-soft);border-color:var(--coral)}
+.score2{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+@media (max-width:760px){.lab{grid-template-columns:1fr}.term{height:300px}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#C8372D"></span> Redis · 2/7</span><span>· Kurs: 51/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Redis · 51-modul · tuzilmalar</span>
+    <h1>Ma’lumot <span class="steam">tuzilmalari</span></h1>
+    <p class="lead">Redis — shunchaki "kalit → satr" emas. Har bir kalit ortida tayyor tuzilma turadi: hash, ro‘yxat, to‘plam, tartiblangan to‘plam. To‘g‘ri tuzilmani tanlash — Redis bilan ishlashning 80%i. Quyida haqiqiy <code>redis-cli</code>ga o‘xshash simulyator bor: buyruq yozing yoki missiyalarni bosing va xotirada nima bo‘layotganini ko‘ring.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Redis laboratoriyasi</h2></div><p class="sec-sub">Chapda terminal, o‘ngda xotira (keyspace). Missiyani tanlang va buyruqlarni ketma-ket bosing — yoki o‘zingiz yozing (<code>HELP</code>). ↑ — oldingi buyruq.</p>
+    <div class="stage">
+      <div class="seg" id="mseg"><button class="on" data-m="0">String</button><button data-m="1">Hash</button><button data-m="2">List</button><button data-m="3">Set</button><button data-m="4">Sorted Set</button></div>
+      <div class="miss" id="miss"></div>
+      <div class="lab">
+        <div class="term"><div class="out" id="out"></div><div class="inl"><span>127.0.0.1:6379&gt;</span><input id="cin" autocomplete="off" spellcheck="false" aria-label="Redis buyrug‘i"></div></div>
+        <div class="ks" id="ks"></div>
+      </div>
+      <div class="explain" id="mEx">Missiyadagi birinchi buyruqni bosing.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Beshta asosiy tuzilma — qisqa xarita</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Tuzilma</th><th>Ichida nima</th><th>Bank misoli</th><th>Asosiy buyruqlar</th></tr><tr><td><b>String</b></td><td>Bayt ketma-ketligi (≤512 MB): matn, son, JSON, rasm</td><td>Kurs, OTP, hisoblagich, JSON kesh</td><td><code>SET GET INCR MGET</code></td></tr><tr><td><b>Hash</b></td><td>Maydon → qiymat (kichik obyekt)</td><td>Karta holati, foydalanuvchi profili</td><td><code>HSET HGET HINCRBY HDEL</code></td></tr><tr><td><b>List</b></td><td>Ikki tomonlama ro‘yxat (tartib saqlanadi)</td><td>Oxirgi 10 tranzaksiya, oddiy navbat</td><td><code>LPUSH RPOP LRANGE LTRIM BLPOP</code></td></tr><tr><td><b>Set</b></td><td>Takrorlanmas elementlar, tartibsiz</td><td>Qurilmalar, qora ro‘yxat, teglar</td><td><code>SADD SISMEMBER SINTER</code></td></tr><tr><td><b>Sorted Set</b></td><td>Takrorlanmas element + ball (score), ball bo‘yicha tartiblangan</td><td>Reyting, vaqt oynasi, ustuvor navbat</td><td><code>ZADD ZINCRBY ZRANGE ZRANK</code></td></tr></table></div>
+    <div class="callout tip"><div class="ct">💡 String yoki Hash? (obyektni saqlash)</div>Profilni JSON string qilib saqlasangiz (<code>SET user:42 {...}</code>) — bitta maydonni o‘zgartirish uchun butun JSON’ni o‘qib-yozasiz, parallel yozuvlar bir-birini bosib ketadi. Hash’da (<code>HSET user:42 status BLOCKED</code>) har maydon alohida va atomik o‘zgaradi, <code>HINCRBY</code> bilan sanash ham mumkin. Lekin Redis 7.4 gacha TTL faqat butun kalitga qo‘yilardi; 7.4+ da <code>HEXPIRE</code> bilan maydonga ham qo‘yish mumkin.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Ichki kodlash (encoding): kichik — ixcham, katta — tez</h2></div><p class="sec-sub">Redis bir tuzilmani ikki xil saqlaydi. Kichik bo‘lsa — <b>listpack</b> (ketma-ket baytlar, juda tejamkor, lekin qidirish O(N)). Chegara oshsa — avtomatik <b>hashtable/skiplist</b>ga o‘tadi (ko‘proq xotira, lekin O(1)/O(log N)). Laboratoriyada Sorted Set missiyasidagi "+200 a’zo" tugmasini bosib, <code>listpack → skiplist</code> o‘tishini ko‘ring.</p><div class="tbl-wrap"><table class="tbl"><tr><th>Tuzilma</th><th>Kichik holatda</th><th>Katta holatda</th><th>Chegara (default)</th></tr><tr><td>String</td><td><code>int</code> / <code>embstr</code></td><td><code>raw</code></td><td>son bo‘lsa int; ≤44 bayt embstr</td></tr><tr><td>Hash</td><td><code>listpack</code></td><td><code>hashtable</code></td><td>128 maydon yoki 64 baytdan uzun qiymat</td></tr><tr><td>List</td><td><code>listpack</code></td><td><code>quicklist</code> (listpack’lar zanjiri)</td><td>~8 KB</td></tr><tr><td>Set</td><td><code>intset</code> / <code>listpack</code></td><td><code>hashtable</code></td><td>512 butun son / 128 element</td></tr><tr><td>Sorted Set</td><td><code>listpack</code></td><td><code>skiplist</code> + hashtable</td><td>128 element yoki 64 bayt</td></tr></table></div><div class="callout iv"><div class="ct">🎯 Suhbat: Sorted Set qanday ishlaydi?</div>Katta ZSet ikki tuzilmadan iborat: <b>hashtable</b> (element → ball, <code>ZSCORE</code> O(1)) va <b>skiplist</b> (ball bo‘yicha tartib, <code>ZADD/ZRANK/ZRANGE</code> O(log N)). Skiplist — bir necha qavatli bog‘langan ro‘yxat: yuqori qavatlar "ekspress poyezd", pastkisi — hamma bekatlar. Balanslangan daraxtdan soddaroq, oralig‘ bo‘yicha o‘qish qulay.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Murakkablik va tuzoq buyruqlar</h2></div><p class="sec-sub">Bitta ip — bitta sekin buyruq hammani to‘xtatadi (50-modul). Shuning uchun har buyruqning Big-O’sini bilish shart.</p><div class="tbl-wrap"><table class="tbl"><tr><th>Buyruq</th><th>Murakkablik</th><th>Xavf</th></tr><tr><td><code>GET SET INCR HGET SADD SISMEMBER LPUSH</code></td><td>O(1)</td><td>—</td></tr><tr><td><code>ZADD ZINCRBY ZRANK ZREM</code></td><td>O(log N)</td><td>—</td></tr><tr><td><code>LRANGE 0 9</code>, <code>ZRANGE 0 9</code></td><td>O(log N + M)</td><td>M kichik bo‘lsa xavfsiz</td></tr><tr><td><code>HGETALL</code>, <code>SMEMBERS</code>, <code>LRANGE 0 -1</code></td><td>O(N)</td><td>Katta kalitda serverni bloklaydi → <code>HSCAN/SSCAN</code></td></tr><tr><td><code>LINDEX</code> o‘rtada, <code>LREM</code></td><td>O(N)</td><td>List — massiv emas</td></tr><tr><td><code>SINTER</code> katta to‘plamlar</td><td>O(N·M)</td><td>Kichigini birinchi bering</td></tr><tr><td><code>DEL</code> 1 mln elementli kalit</td><td>O(N)</td><td><code>UNLINK</code> — fon ipida o‘chiradi</td></tr><tr><td><code>KEYS *</code></td><td>O(N) barcha kalitlar</td><td>Production’da taqiq → <code>SCAN</code></td></tr></table></div><div class="callout warn"><div class="ct">⚠️ "Big key" muammosi</div>Bitta kalitda millionlab element (masalan, barcha mijozlar bitta hash’da) — xotira notekis taqsimlanadi (Cluster’da bitta shard to‘ladi), o‘chirish va ko‘chirish serverni muzlatadi. Aniqlash: <code>redis-cli --bigkeys</code> / <code>--memkeys</code>. Yechim: bo‘laklash (<code>user:{id%1000}</code>) yoki boshqa model.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>O‘yin: qaysi tuzilma?</h2></div><p class="sec-sub">Vaziyatni o‘qing va eng mos tuzilmani tanlang.</p>
+    <div class="stage"><div class="game">
+      <div class="scn" id="scn"></div>
+      <div class="pick" id="pick"><button class="btn" data-a="string">String</button><button class="btn" data-a="hash">Hash</button><button class="btn" data-a="list">List</button><button class="btn" data-a="set">Set</button><button class="btn" data-a="zset">Sorted Set</button><button class="btn" data-a="other">Maxsus (Bitmap/HLL/Geo)</button></div>
+      <div class="explain" id="gEx">Javobni tanlang.</div>
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="gNext">Keyingi vaziyat →</button><span class="score2" id="gScore"></span></div>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Maxsus tuzilmalar</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>🟩 Bitmap</h4><p>String ustida bitlar. <code>SETBIT login:2026-09-23 42 1</code> — 42-foydalanuvchi bugun kirdi. 10 mln foydalanuvchi = 1.2 MB. <code>BITCOUNT</code> — kunlik faollar.</p></div>
+      <div class="card"><h4>🔢 HyperLogLog</h4><p>Taxminiy noyob sanoq: 12 KB’da milliardlab element, ~0.81% xato. <code>PFADD visitors:app u42</code>, <code>PFCOUNT</code>. Aniq son kerak bo‘lmagan statistika uchun.</p></div>
+      <div class="card"><h4>📍 Geo</h4><p>Sorted Set ustida koordinatalar. <code>GEOADD atm 69.24 41.31 atm:17</code>, <code>GEOSEARCH atm FROMLONLAT … BYRADIUS 2 km ASC</code> — eng yaqin bankomatlar.</p></div>
+      <div class="card"><h4>{ } JSON va Streams</h4><p>Redis 8’da JSON, Search, Time series modullari tarkibda. <b>Streams</b> — hodisalar jurnali, consumer group bilan (56-modul).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Java’dan ishlatish (ko‘rinishi)</h2></div><p class="sec-sub">Spring Data Redis’da har tuzilma uchun alohida "ops" bor. To‘liq konfiguratsiya — 56-modulda.</p><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">CardCacheService.java</span></div><pre class="code"><span class="k">@Service</span>
+<span class="k">@RequiredArgsConstructor</span>
+<span class="k">class</span> <span class="ty">CardCacheService</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="ty">StringRedisTemplate</span> redis;
+
+    <span class="k">void</span> block(<span class="k">long</span> cardId) {
+        redis.opsForHash().put(<span class="st">"card:"</span> + cardId, <span class="st">"status"</span>, <span class="st">"BLOCKED"</span>);      <span class="cm">// HSET</span>
+    }
+    <span class="k">void</span> pushTx(<span class="k">long</span> userId, <span class="ty">String</span> tx) {
+        <span class="ty">String</span> key = <span class="st">"tx:last:"</span> + userId;
+        redis.opsForList().leftPush(key, tx);                                 <span class="cm">// LPUSH</span>
+        redis.opsForList().trim(key, <span class="nu">0</span>, <span class="nu">9</span>);                                   <span class="cm">// LTRIM 0 9</span>
+    }
+    <span class="ty">Set</span>&lt;<span class="ty">String</span>&gt; topCashback(<span class="ty">String</span> month) {
+        <span class="k">return</span> redis.opsForZSet().reverseRange(<span class="st">"cashback:"</span> + month, <span class="nu">0</span>, <span class="nu">9</span>);  <span class="cm">// ZREVRANGE</span>
+    }
+}</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Redis’dagi asosiy ma’lumot tuzilmalarini va ularning qo‘llanishini ayting.<span class="chev">›</span></summary><div class="iv-a">String (kesh, hisoblagich, lock), Hash (obyekt maydonlari), List (navbat, oxirgi N ta), Set (noyob to‘plam, kesishma), Sorted Set (reyting, vaqt bo‘yicha oyna, ustuvor navbat). Qo‘shimcha: Bitmap, HyperLogLog, Geo, Streams, JSON.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Obyektni String (JSON) yoki Hash’da saqlashning farqi?<span class="chev">›</span></summary><div class="iv-a">Hash’da maydonlar alohida o‘qiladi/o‘zgaradi (HGET, HSET, HINCRBY) — qisman yangilash atomik, tarmoq trafik kam. JSON string’da butun obyekt o‘qib-yoziladi, ichki struktura saqlanadi, serializatsiya oddiy. Kichik hash’lar listpack’da juda ixcham. Ichma-ich murakkab obyekt bo‘lsa — JSON (yoki RedisJSON).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Sorted Set ichki tuzilishi va murakkabligi?<span class="chev">›</span></summary><div class="iv-a">Kichik — listpack. Katta — skiplist + hashtable. ZADD/ZREM/ZRANK — O(log N), ZSCORE — O(1), ZRANGE — O(log N + M).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>List’ni navbat sifatida qanday ishlatasiz va cheklovlari?<span class="chev">›</span></summary><div class="iv-a">Producer LPUSH, consumer BRPOP (bloklovchi). Kamchiligi: element olingach, consumer yiqilsa xabar yo‘qoladi (LMOVE bilan "processing" ro‘yxatga ko‘chirish kerak), ack yo‘q, bir nechta consumer group yo‘q. Ishonchli navbat uchun — Streams yoki Kafka.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>HGETALL nega xavfli bo‘lishi mumkin?<span class="chev">›</span></summary><div class="iv-a">O(N): katta hash’da serverni bloklaydi va ko‘p trafik yaratadi. Kerakli maydonlarni HMGET bilan oling yoki HSCAN bilan bo‘laklab o‘qing.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Kunlik noyob foydalanuvchilarni qanday sanaysiz?<span class="chev">›</span></summary><div class="iv-a">Aniq kerak bo‘lsa — Set (xotira ko‘p) yoki Bitmap (ID’lar zich butun son bo‘lsa, juda tejamkor). Taxminiy bo‘lsa — HyperLogLog (12 KB, ~0.81% xato).</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Karta uchun faqat status maydonini o‘zgartirish kerak. Eng mos tuzilma?</div><button class="opt">String (JSON)</button><button class="opt">Hash</button><button class="opt">List</button><div class="q-fb" data-ok="To‘g‘ri — HSET card:42 status BLOCKED." data-no="Yo‘q. Hash maydonni alohida o‘zgartiradi."></div></div><div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>"card:42" hash bo‘lsa, GET card:42 nima qaytaradi?</div><button class="opt">(nil)</button><button class="opt">Barcha maydonlar</button><button class="opt">WRONGTYPE xatosi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Har tuzilmaning o‘z buyruqlari bor — WRONGTYPE."></div></div><div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span>Oxirgi 10 ta tranzaksiyani saqlash uchun?</div><button class="opt">LPUSH + LTRIM 0 9</button><button class="opt">SADD</button><button class="opt">ZADD score=0</button><div class="q-fb" data-ok="To‘g‘ri — capped list." data-no="Yo‘q. LPUSH + LTRIM — standart pattern."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Reytingda foydalanuvchining o‘rni (rank) qaysi buyruq bilan olinadi?</div><button class="opt">ZSCORE</button><button class="opt">ZREVRANK</button><button class="opt">ZCARD</button><div class="q-fb" data-ok="To‘g‘ri — kattadan kichikka tartibda o‘rin." data-no="Yo‘q. ZSCORE — ball, ZREVRANK — o‘rin."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>1 mln elementli kalitni serverni to‘xtatmasdan o‘chirish?</div><button class="opt">DEL</button><button class="opt">UNLINK</button><button class="opt">FLUSHALL</button><div class="q-fb" data-ok="To‘g‘ri — xotirani fon ipida bo‘shatadi." data-no="Yo‘q. DEL katta kalitda bloklaydi; UNLINK asinxron."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Redis</span>
+      <h3>TTL, xotira va eviction</h3>
+      <p>Kalitlar qanday o‘ladi, xotira to‘lsa Redis kimni chiqarib yuboradi: LRU va LFU animatsiyada.</p>
+      <div class="topics"><span class="topic-pill">50 · Nega tez</span><span class="topic-pill now">51 · Tuzilmalar</span><span class="topic-pill">52 · TTL va xotira</span><span class="topic-pill">53 · Keshlash</span><span class="topic-pill">54 · Lock va limit</span><span class="topic-pill">55 · Persistence/HA</span><span class="topic-pill">56 · Streams + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="50-redis-nima-va-nega-tez.html"><span class="cl">← Oldingi dars</span><span class="ct">50 · Redis nima va nega tez</span><span class="cs">⚡ Redis</span></a><a class="cn nx" href="52-ttl-xotira-va-eviction.html"><span class="cl">Keyingi dars →</span><span class="ct">52 · TTL, xotira va eviction</span><span class="cs">⚡ Redis</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:58.0%"></i></div><span>51 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(51)<0)v.push(51);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','51');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(51)<0)D[t].push(51);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var db={},order=[],fresh={},touched=null,hist=[],hp=0;
+  var out=document.getElementById('out'),cin=document.getElementById('cin'),ks=document.getElementById('ks');
+  function now(){return Date.now();}
+  function E(m){var e=new Error(m);e.redis=true;return e;}
+  var WT='WRONGTYPE Operation against a key holding the wrong kind of value';
+  function live(k){var e=db[k];if(e&&e.exp&&e.exp<=now()){delete db[k];return null;}return e||null;}
+  function get(k,t){var e=live(k);if(e&&t&&e.t!==t)throw E(WT);return e;}
+  function mk(k,t,v){var e=get(k,t);if(!e){e=db[k]={t:t,v:v,exp:null};}touch(k);return e;}
+  function touch(k){touched=k;var i=order.indexOf(k);if(i>=0)order.splice(i,1);order.unshift(k);}
+  function isInt(s){return /^-?\d+$/.test(s)&&Math.abs(+s)<9007199254740991;}
+  function num(s){if(s==='+inf')return Infinity;if(s==='-inf')return -Infinity;var n=Number(s);if(s===''||isNaN(n))throw E('ERR value is not a valid float');return n;}
+  function zsorted(v){return Object.keys(v).sort(function(a,b){return v[a]-v[b]||(a<b?-1:a>b?1:0);});}
+  function blen(s){return new TextEncoder().encode(s).length;}
+  function enc(e){var v=e.v;
+    if(e.t==='string')return isInt(v)?'int':blen(v)<=44?'embstr':'raw';
+    if(e.t==='hash'){var ks=Object.keys(v);return ks.length>128||ks.some(function(k){return blen(v[k])>64||blen(k)>64;})?'hashtable':'listpack';}
+    if(e.t==='list')return v.join('').length>8192||v.length>128?'quicklist':'listpack';
+    if(e.t==='set'){if(v.every(isInt)&&v.length<=512)return 'intset';return v.length>128?'hashtable':'listpack';}
+    if(e.t==='zset'){var m=Object.keys(v);return m.length>128||m.some(function(x){return blen(x)>64;})?'skiplist':'listpack';}}
+  function R(){return {};}
+  function range(len,a,b){a=+a;b=+b;if(a<0)a=len+a;if(b<0)b=len+b;if(a<0)a=0;if(b>=len)b=len-1;return [a,b];}
+  function arr(x){return {arr:x};}
+  var C={
+    PING:function(){return {st:'PONG'};},
+    HELP:function(){return {help:true};},
+    SET:function(a){if(a.length<3)throw E('ERR wrong number of arguments for \'set\' command');var k=a[1],v=a[2],o=a.slice(3).map(function(x){return x.toUpperCase();}),ex=null;
+      var nx=o.indexOf('NX')>=0,xx=o.indexOf('XX')>=0,i=o.indexOf('EX'),p=o.indexOf('PX');
+      if(i>=0)ex=now()+(+a[3+i+1])*1000;if(p>=0)ex=now()+(+a[3+p+1]);
+      var cur=live(k);if(nx&&cur)return {nil:1};if(xx&&!cur)return {nil:1};
+      db[k]={t:'string',v:v,exp:ex};touch(k);fresh[k]=['*'];return {st:'OK'};},
+    GET:function(a){var e=get(a[1],'string');return e?{bulk:e.v}:{nil:1};},
+    MGET:function(a){return arr(a.slice(1).map(function(k){var e=live(k);return e&&e.t==='string'?{bulk:e.v}:{nil:1};}));},
+    INCRBY:function(a,by){var e=get(a[1],'string');var n=e?e.v:'0';if(!isInt(n))throw E('ERR value is not an integer or out of range');n=String(+n+(by===undefined?+a[2]:by));if(e)e.v=n;else db[a[1]]={t:'string',v:n,exp:null};touch(a[1]);fresh[a[1]]=['*'];return {int:+n};},
+    INCR:function(a){return C.INCRBY(a,1);},DECR:function(a){return C.INCRBY(a,-1);},
+    DEL:function(a){var n=0;a.slice(1).forEach(function(k){if(live(k)){delete db[k];n++;}});return {int:n};},
+    UNLINK:function(a){return C.DEL(a);},
+    EXISTS:function(a){return {int:a.slice(1).filter(function(k){return live(k);}).length};},
+    TYPE:function(a){var e=live(a[1]);return {st:e?e.t:'none'};},
+    EXPIRE:function(a){var e=live(a[1]);if(!e)return {int:0};e.exp=now()+(+a[2])*1000;touch(a[1]);return {int:1};},
+    PERSIST:function(a){var e=live(a[1]);if(!e||!e.exp)return {int:0};e.exp=null;return {int:1};},
+    TTL:function(a){var e=live(a[1]);if(!e)return {int:-2};if(!e.exp)return {int:-1};return {int:Math.ceil((e.exp-now())/1000)};},
+    OBJECT:function(a){if((a[1]||'').toUpperCase()!=='ENCODING')throw E('ERR only OBJECT ENCODING is simulated');var e=live(a[2]);return e?{bulk:enc(e)}:{nil:1};},
+    KEYS:function(a){var re=new RegExp('^'+(a[1]||'*').replace(/[.+^${}()|[\]\\]/g,'\\$&').replace(/\*/g,'.*').replace(/\?/g,'.')+'$');return Object.assign(arr(Object.keys(db).filter(function(k){return live(k)&&re.test(k);}).map(function(k){return {bulk:k};})),{warn:'KEYS — O(N). Production’da SCAN ishlating!'});},
+    SCAN:function(a){var m=a.indexOf('MATCH')>=0?a[a.indexOf('MATCH')+1]:'*';var r=C.KEYS(['KEYS',m]);return arr([{bulk:'0'},arr(r.arr)]);},
+    FLUSHALL:function(){db={};order=[];return {st:'OK'};},
+    HSET:function(a){if(a.length<4||a.length%2)throw E('ERR wrong number of arguments for \'hset\' command');var e=mk(a[1],'hash',{}),n=0;fresh[a[1]]=[];
+      for(var i=2;i<a.length;i+=2){if(!(a[i] in e.v))n++;e.v[a[i]]=a[i+1];fresh[a[1]].push(a[i]);}return {int:n};},
+    HGET:function(a){var e=get(a[1],'hash');return e&&(a[2] in e.v)?{bulk:e.v[a[2]]}:{nil:1};},
+    HMGET:function(a){var e=get(a[1],'hash');return arr(a.slice(2).map(function(f){return e&&(f in e.v)?{bulk:e.v[f]}:{nil:1};}));},
+    HGETALL:function(a){var e=get(a[1],'hash');var r=[];if(e)Object.keys(e.v).forEach(function(f){r.push({bulk:f},{bulk:e.v[f]});});return arr(r);},
+    HDEL:function(a){var e=get(a[1],'hash'),n=0;if(e){a.slice(2).forEach(function(f){if(f in e.v){delete e.v[f];n++;}});if(!Object.keys(e.v).length)delete db[a[1]];}return {int:n};},
+    HINCRBY:function(a){var e=mk(a[1],'hash',{});var c=e.v[a[2]]||'0';if(!isInt(c))throw E('ERR hash value is not an integer');e.v[a[2]]=String(+c+(+a[3]));fresh[a[1]]=[a[2]];return {int:+e.v[a[2]]};},
+    HLEN:function(a){var e=get(a[1],'hash');return {int:e?Object.keys(e.v).length:0};},
+    LPUSH:function(a,right){var e=mk(a[1],'list',[]);fresh[a[1]]=[];a.slice(2).forEach(function(x){if(right)e.v.push(x);else e.v.unshift(x);fresh[a[1]].push(x);});return {int:e.v.length};},
+    RPUSH:function(a){return C.LPUSH(a,true);},
+    LPOP:function(a,right){var e=get(a[1],'list');if(!e)return {nil:1};var x=right?e.v.pop():e.v.shift();if(!e.v.length)delete db[a[1]];touch(a[1]);return {bulk:x};},
+    RPOP:function(a){return C.LPOP(a,true);},
+    LLEN:function(a){var e=get(a[1],'list');return {int:e?e.v.length:0};},
+    LRANGE:function(a){var e=get(a[1],'list');if(!e)return arr([]);var r=range(e.v.length,a[2],a[3]);return arr(e.v.slice(r[0],r[1]+1).map(function(x){return {bulk:x};}));},
+    LTRIM:function(a){var e=get(a[1],'list');if(!e)return {st:'OK'};var r=range(e.v.length,a[2],a[3]);e.v=e.v.slice(r[0],r[1]+1);touch(a[1]);return {st:'OK'};},
+    SADD:function(a){var e=mk(a[1],'set',[]),n=0;fresh[a[1]]=[];a.slice(2).forEach(function(x){if(e.v.indexOf(x)<0){e.v.push(x);n++;fresh[a[1]].push(x);}});return {int:n};},
+    SREM:function(a){var e=get(a[1],'set'),n=0;if(e){a.slice(2).forEach(function(x){var i=e.v.indexOf(x);if(i>=0){e.v.splice(i,1);n++;}});if(!e.v.length)delete db[a[1]];}return {int:n};},
+    SMEMBERS:function(a){var e=get(a[1],'set');return arr((e?e.v:[]).map(function(x){return {bulk:x};}));},
+    SISMEMBER:function(a){var e=get(a[1],'set');return {int:e&&e.v.indexOf(a[2])>=0?1:0};},
+    SCARD:function(a){var e=get(a[1],'set');return {int:e?e.v.length:0};},
+    SINTER:function(a){var sets=a.slice(1).map(function(k){var e=get(k,'set');return e?e.v:[];});var r=sets[0].filter(function(x){return sets.every(function(s){return s.indexOf(x)>=0;});});a.slice(1).forEach(function(k){if(db[k])fresh[k]=r.slice();});return arr(r.map(function(x){return {bulk:x};}));},
+    SUNION:function(a){var r=[];a.slice(1).forEach(function(k){var e=get(k,'set');(e?e.v:[]).forEach(function(x){if(r.indexOf(x)<0)r.push(x);});});return arr(r.map(function(x){return {bulk:x};}));},
+    ZADD:function(a){if(a.length<4||a.length%2)throw E('ERR syntax error');var e=mk(a[1],'zset',{}),n=0;fresh[a[1]]=[];for(var i=2;i<a.length;i+=2){var s=num(a[i]);if(!(a[i+1] in e.v))n++;e.v[a[i+1]]=s;fresh[a[1]].push(a[i+1]);}return {int:n};},
+    ZINCRBY:function(a){var e=mk(a[1],'zset',{});e.v[a[3]]=(e.v[a[3]]||0)+num(a[2]);fresh[a[1]]=[a[3]];return {bulk:String(e.v[a[3]])};},
+    ZSCORE:function(a){var e=get(a[1],'zset');return e&&(a[2] in e.v)?{bulk:String(e.v[a[2]])}:{nil:1};},
+    ZCARD:function(a){var e=get(a[1],'zset');return {int:e?Object.keys(e.v).length:0};},
+    ZREM:function(a){var e=get(a[1],'zset'),n=0;if(e)a.slice(2).forEach(function(m){if(m in e.v){delete e.v[m];n++;}});return {int:n};},
+    ZRANK:function(a,rev){var e=get(a[1],'zset');if(!e||!(a[2] in e.v))return {nil:1};var s=zsorted(e.v);if(rev)s.reverse();fresh[a[1]]=[a[2]];return {int:s.indexOf(a[2])};},
+    ZREVRANK:function(a){return C.ZRANK(a,true);},
+    ZRANGE:function(a,rev){var e=get(a[1],'zset');var up=a.map(function(x){return String(x).toUpperCase();});if(up.indexOf('REV')>=0)rev=true;var ws=up.indexOf('WITHSCORES')>=0;if(!e)return arr([]);var s=zsorted(e.v);if(rev)s.reverse();var r=range(s.length,a[2],a[3]);var res=[];s.slice(r[0],r[1]+1).forEach(function(m){res.push({bulk:m});if(ws)res.push({bulk:String(e.v[m])});});fresh[a[1]]=s.slice(r[0],r[1]+1);return arr(res);},
+    ZREVRANGE:function(a){return C.ZRANGE(a,true);},
+    ZRANGEBYSCORE:function(a){var e=get(a[1],'zset');if(!e)return arr([]);var lo=num(a[2]),hi=num(a[3]);var s=zsorted(e.v).filter(function(m){return e.v[m]>=lo&&e.v[m]<=hi;});fresh[a[1]]=s;var ws=a.map(function(x){return String(x).toUpperCase();}).indexOf('WITHSCORES')>=0;var res=[];s.forEach(function(m){res.push({bulk:m});if(ws)res.push({bulk:String(e.v[m])});});return arr(res);}
+  };
+  function tok(s){var r=[],m,re=/"((?:\\.|[^"])*)"|'([^']*)'|(\S+)/g;while((m=re.exec(s)))r.push(m[1]!==undefined?m[1]:m[2]!==undefined?m[2]:m[3]);return r;}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function fmt(r,ind){ind=ind||'';
+    if(r.st!==undefined)return '<span class="ok">'+esc(r.st)+'</span>';
+    if(r.int!==undefined)return '<span class="n">(integer)</span> '+r.int;
+    if(r.nil)return '<span class="n">(nil)</span>';
+    if(r.bulk!==undefined)return '"'+esc(r.bulk)+'"';
+    if(r.arr){if(!r.arr.length)return '<span class="n">(empty array)</span>';var w=String(r.arr.length).length;return r.arr.map(function(x,i){var n=String(i+1);while(n.length<w)n=' '+n;return (i?ind:'')+n+') '+fmt(x,ind+'   ');}).join('\n');}
+    return '';}
+  function print(h){out.insertAdjacentHTML('beforeend',h+'\n');out.scrollTop=out.scrollHeight;}
+  function exec(line,silent){line=line.trim();if(!line)return;var a=tok(line),c=(a[0]||'').toUpperCase();fresh={};touched=null;
+    if(!silent)print('<span class="c">127.0.0.1:6379&gt; '+esc(line)+'</span>');
+    var r;try{if(!C[c])throw E('ERR unknown command \''+esc(a[0])+'\' (simulyatorda: '+Object.keys(C).length+' ta buyruq, HELP)');r=C[c](a);}
+    catch(e){if(!e.redis)throw e;if(!silent)print('<span class="e">(error) '+esc(e.message)+'</span>');draw();return {err:e.message};}
+    if(r.help){print('<span class="n">Buyruqlar: '+Object.keys(C).filter(function(k){return k!=='HELP';}).join(' ')+'</span>');return r;}
+    if(!silent){print(fmt(r));if(r.warn)print('<span class="w">⚠ '+r.warn+'</span>');}
+    if(!touched&&a[1]&&db[a[1]])touch(a[1]);draw();return r;}
+  var prevEnc={};
+  function draw(){var keys=order.filter(function(k){return live(k);});
+    Object.keys(db).forEach(function(k){if(keys.indexOf(k)<0&&live(k))keys.push(k);});
+    if(!keys.length){ks.innerHTML='<div class="empty2">Xotira bo‘sh. Buyruq yuboring — kalitlar shu yerda paydo bo‘ladi.</div>';return;}
+    ks.innerHTML=keys.map(function(k){var e=db[k],f=fresh[k]||[],en=enc(e),flip=prevEnc[k]&&prevEnc[k]!==en;prevEnc[k]=en;
+      var h='<div class="kc'+(k===touched?' touch':'')+'" data-k="'+esc(k)+'"><div class="kh"><b>'+esc(k)+'</b><span class="ty2 '+e.t+'">'+e.t+'</span><span class="enc'+(flip?' flip':'')+'">'+en+'</span>'+(e.exp?'<span class="ttl" data-exp="'+e.exp+'">TTL '+Math.ceil((e.exp-now())/1000)+'s</span>':'')+'</div>';
+      if(e.t==='string')h+='<span class="sv'+(f.length?' fresh':'')+'">'+esc(e.v)+'</span>';
+      if(e.t==='hash')h+='<div class="hv">'+Object.keys(e.v).map(function(x){var fr=f.indexOf(x)>=0?' class="fresh"':'';return '<span'+fr+'>'+esc(x)+'</span><span'+fr+'>'+esc(e.v[x])+'</span>';}).join('')+'</div>';
+      if(e.t==='list')h+='<div class="lv"><span class="end">L→</span>'+e.v.map(function(x,i){return '<div'+(f.indexOf(x)>=0?' class="fresh"':'')+'><span>'+esc(x)+'</span><i>'+i+'</i></div>';}).join('')+'<span class="end">←R</span></div>';
+      if(e.t==='set')h+='<div class="stv">'+e.v.map(function(x){return '<span'+(f.indexOf(x)>=0?' class="fresh"':'')+'>'+esc(x)+'</span>';}).join('')+'</div>';
+      if(e.t==='zset'){var s=zsorted(e.v).reverse(),mx=Math.max.apply(null,s.map(function(m){return Math.abs(e.v[m]);}).concat([1]));var show=s.slice(0,8);
+        h+='<div class="zv">'+show.map(function(m,i){return '<div'+(f.indexOf(m)>=0?' class="fresh"':'')+'><span>#'+i+'</span><span>'+esc(m)+'</span><span class="bar2" style="width:'+(Math.abs(e.v[m])/mx*100)+'%"></span><span class="sc">'+e.v[m]+'</span></div>';}).join('')+(s.length>8?'<div style="grid-template-columns:1fr;color:var(--ink-faint)">… yana '+(s.length-8)+' ta (ZREVRANK bilan ko‘ring)</div>':'')+'</div>';}
+      return h+'</div>';}).join('');}
+  setInterval(function(){var ch=false;Object.keys(db).forEach(function(k){var e=db[k];if(e.exp&&e.exp<=now()){ch=true;var el=ks.querySelector('[data-k="'+k.replace(/"/g,'')+'"]');if(el)el.classList.add('bye');print('<span class="w">⌛ '+esc(k)+' — TTL tugadi, kalit o‘chirildi</span>');delete db[k];}});
+    [].forEach.call(ks.querySelectorAll('.ttl'),function(t){t.textContent='TTL '+Math.max(0,Math.ceil((+t.dataset.exp-now())/1000))+'s';});
+    if(ch)setTimeout(draw,600);},1000);
+  cin.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=cin.value;if(v.trim()){hist.push(v);hp=hist.length;}exec(v);cin.value='';}
+    if(e.key==='ArrowUp'&&hp>0){hp--;cin.value=hist[hp];e.preventDefault();}if(e.key==='ArrowDown'){if(hp<hist.length-1){hp++;cin.value=hist[hp];}else{hp=hist.length;cin.value='';}}});
+
+  var MS=[
+   [['SET kurs:USD 12650','String — eng oddiy tuzilma: kalit → qiymat. Qiymat binary-safe, 512 MB gacha. Kodlash: <b>int</b> (son sifatida saqlanadi).'],
+    ['INCR tx:count:2026-09-23','<b>INCR</b> — atomik hisoblagich. Kalit yo‘q edi → 0 deb olindi → 1. 1000 pod bir vaqtda INCR qilsa ham birorta ham yo‘qolmaydi (bitta ip).'],
+    ['INCRBY tx:sum:2026-09-23 150000','Kunlik summa. Pul uchun butun son (tiyin) ishlating — float emas.'],
+    ['SET otp:998901234567 4821 EX 30 NX','OTP: <b>EX 30</b> — 30 soniya yashaydi (o‘ng panelda TTL sanog‘ini kuzating), <b>NX</b> — faqat yo‘q bo‘lsa yoziladi (qayta so‘rov eski kodni bosib ketmaydi).'],
+    ['SET otp:998901234567 9999 EX 30 NX','Yana yuborildi — <b>(nil)</b>: NX tufayli yozilmadi. Kod o‘zgarmadi.'],
+    ['GET otp:998901234567','Kodni tekshirish. 30 soniyadan keyin GET <b>(nil)</b> qaytaradi — TTL o‘zi tozaladi.'],
+    ['OBJECT ENCODING kurs:USD','Ichki kodlash: <b>int</b>. "12650.50" bo‘lsa — embstr bo‘lardi.']],
+   [['HSET card:42 holder Otabek status ACTIVE limit 5000000','Hash — kichik obyekt. Bitta buyruqda 3 maydon. Javob — yangi qo‘shilgan maydonlar soni.'],
+    ['HGET card:42 status','Faqat bitta maydon o‘qiladi — butun obyekt emas.'],
+    ['HINCRBY card:42 spent 250000','Maydonni atomik oshirish — kunlik sarf. Maydon yo‘q edi → 0 dan boshladi.'],
+    ['HSET card:42 status BLOCKED','Bitta maydonni yangilash. Boshqa maydonlarga tegilmaydi — parallel yangilanishlar to‘qnashmaydi.'],
+    ['GET card:42','<b>WRONGTYPE!</b> card:42 — hash, GET esa faqat string uchun. Har tuzilmaning o‘z buyruqlari bor.'],
+    ['HGETALL card:42','Barcha maydonlar. Kichik hash’da muammo yo‘q, 100 ming maydonli hash’da — O(N), xavfli.'],
+    ['OBJECT ENCODING card:42','<b>listpack</b> — maydonlar ketma-ket baytlarda, juda ixcham.']],
+   [['LPUSH tx:last:u42 "+5000000 maosh"','List — tartiblangan ro‘yxat. <b>LPUSH</b> chap (bosh) tomonga qo‘shadi.'],
+    ['LPUSH tx:last:u42 "-45000 Korzinka" "-12000 Yandex"','Ikki element: har biri boshiga — oxirgisi eng yangi bo‘lib tepada turadi.'],
+    ['LPUSH tx:last:u42 "-80000 Uzum" "+200000 P2P" "-9000 Payme"','Endi 6 ta.'],
+    ['LTRIM tx:last:u42 0 4','<b>Capped list</b>: faqat 0..4 (oxirgi 5 ta) qoladi — eng eskisi tushib qoldi. LPUSH + LTRIM = "oxirgi N ta" pattern.'],
+    ['LRANGE tx:last:u42 0 2','Oxirgi 3 ta tranzaksiya — ilova bosh sahifasi uchun.'],
+    ['RPUSH sms:queue "998901234567:kod 4821" "998935551122:karta bloklandi"','Navbat: producer o‘ngdan qo‘shadi…'],
+    ['LPOP sms:queue','…consumer chapdan oladi (FIFO). Haqiqiy worker <b>BLPOP</b> bilan kutadi. Lekin consumer yiqilsa xabar yo‘qoladi — ishonchli navbat uchun Streams.']],
+   [['SADD device:u42 iphone15 macbook','Set — takrorlanmas elementlar. Foydalanuvchining qurilmalari.'],
+    ['SADD device:u42 iphone15','<b>(integer) 0</b> — allaqachon bor, qo‘shilmadi. Takrorni tekshirish shart emas.'],
+    ['SADD device:u77 android macbook','Boshqa foydalanuvchi.'],
+    ['SINTER device:u42 device:u77','<b>Kesishma:</b> ikki mijoz bitta macbook’dan kiryapti — fraud tizimi uchun signal.'],
+    ['SADD card:blacklist 8600111122223333 9860444455556666','Qora ro‘yxat.'],
+    ['SISMEMBER card:blacklist 8600111122223333','O(1) tekshiruv: 1 — bor. To‘lov oldidan millisekunddan kam vaqtda.'],
+    ['OBJECT ENCODING card:blacklist','Faqat butun sonlar → <b>intset</b> (tartiblangan butun sonlar massivi, juda ixcham).']],
+   [['ZADD cashback:2026-09 15000 u42 32000 u77 8000 u13 21000 u5','Sorted Set — har elementga ball. Avtomatik tartiblanadi.'],
+    ['ZINCRBY cashback:2026-09 20000 u42','u42 yangi xarid qildi: +20000. O(log N) — o‘rni darhol yangilandi (u42 birinchi o‘ringa chiqdi).'],
+    ['ZREVRANGE cashback:2026-09 0 2 WITHSCORES','Top-3 (kattadan kichikka).'],
+    ['ZREVRANK cashback:2026-09 u13','u13 o‘rni: 0 dan sanaladi. "Siz 4-o‘rindasiz" deyish uchun.'],
+    ['ZRANGEBYSCORE cashback:2026-09 20000 +inf','Ball oralig‘i bo‘yicha: 20 000 dan ko‘p keshbek olganlar. Vaqt tamg‘asi ball bo‘lsa — "oxirgi 1 daqiqa" oynasi (54-modul).'],
+    ['+200','<b>+200 a’zo</b> qo‘shildi → 128 dan oshdi → kodlash <b>listpack → skiplist</b>ga o‘tdi (badge’ni kuzating). Endi ZADD/ZRANK O(log N).'],
+    ['OBJECT ENCODING cashback:2026-09','skiplist.']]];
+  var mi=0,miss=document.getElementById('miss'),mEx=document.getElementById('mEx');
+  function drawM(){miss.innerHTML='<div class="mstep">'+MS[mi].map(function(s,i){return '<button class="btn" data-i="'+i+'">'+(i+1)+'. '+esc(s[0]==='+200'?'+200 a’zo qo‘shish':s[0])+'</button>';}).join('')+'</div>';}
+  miss.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var s=MS[mi][+b.dataset.i];b.classList.add('did');
+    if(s[0]==='+200'){var a=['ZADD','cashback:2026-09'];for(var i=0;i<200;i++){a.push(String(Math.floor(Math.random()*9000)+100),'u'+(1000+i));}
+      print('<span class="c">127.0.0.1:6379&gt; ZADD cashback:2026-09 … (200 juft, pipeline)</span>');var r=C.ZADD(a);fresh={};touch('cashback:2026-09');print(fmt(r));draw();}
+    else exec(s[0]);mEx.innerHTML=s[1];});
+  document.getElementById('mseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});mi=+b.dataset.m;drawM();mEx.innerHTML='Missiyadagi birinchi buyruqni bosing.';});
+  drawM();draw();print('<span class="n"># Redis simulyatori. HELP — buyruqlar ro‘yxati.</span>');
+
+  /* game */
+  var G=[['Har bir API kalit uchun joriy daqiqadagi so‘rovlar sonini sanash.','string','String + INCR + EXPIRE: <code>INCR rl:key:1405</code>. Oddiy atomik hisoblagich.'],
+    ['Mijoz profili: ism, telefon, til, status — status tez-tez alohida o‘zgaradi.','hash','Hash: har maydon alohida HSET/HGET.'],
+    ['Ilovada "oxirgi 20 ta bildirishnoma" ko‘rsatiladi.','list','List: LPUSH + LTRIM 0 19, LRANGE 0 19.'],
+    ['Bu IP manzil bloklanganmi? (100 ming IP)','set','Set: SISMEMBER — O(1).'],
+    ['Oy bo‘yicha eng ko‘p P2P o‘tkazma qilgan 10 mijoz.','zset','Sorted Set: ZINCRBY, ZREVRANGE 0 9.'],
+    ['Oxirgi 60 soniyadagi urinishlarni aniq sanash (sirpanuvchi oyna).','zset','Sorted Set: ball = vaqt tamg‘asi. ZREMRANGEBYSCORE eski, ZCARD — soni (54-modul).'],
+    ['Ilovani bugun nechta noyob foydalanuvchi ochdi (taxminiy son yetarli, 5 mln foydalanuvchi).','other','HyperLogLog: 12 KB, ~0.81% xato. Aniq kerak bo‘lsa — Bitmap.'],
+    ['Foydalanuvchiga 3 km radiusdagi bankomatlar.','other','Geo: GEOADD + GEOSEARCH BYRADIUS.'],
+    ['Valyuta kurslari JSON’ini 60 soniya keshlash.','string','String: SET kurs:all "{...}" EX 60 — butun obyekt birga o‘qiladi va birga yangilanadi.'],
+    ['Ikki mijozning umumiy qurilmalarini topish.','set','Set: SINTER.']];
+  var gi=0,sc=0,tot=0,ans=false;G.sort(function(){return Math.random()-.5;});
+  function gShow(){ans=false;document.getElementById('scn').textContent=G[gi%G.length][0];[].forEach.call(document.querySelectorAll('#pick button'),function(b){b.className='btn';b.disabled=false;});document.getElementById('gEx').textContent='Javobni tanlang.';}
+  document.getElementById('pick').addEventListener('click',function(e){var b=e.target.closest('button');if(!b||ans)return;ans=true;tot++;var g=G[gi%G.length],ok=b.dataset.a===g[1];if(ok)sc++;
+    b.classList.add(ok?'right':'wrong');if(!ok)document.querySelector('#pick [data-a="'+g[1]+'"]').classList.add('right');
+    document.getElementById('gEx').innerHTML=(ok?'✅ ':'❌ ')+g[2];document.getElementById('gScore').textContent='Hisob: '+sc+' / '+tot;});
+  document.getElementById('gNext').addEventListener('click',function(){gi++;gShow();});gShow();
+})();
+
+</script>
+</body>
+</html>

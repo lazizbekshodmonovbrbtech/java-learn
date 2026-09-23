@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kafka: topic, partition, offset</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F1F2F4;--surface:#FFFFFF;--surface-2:#F8F9FA;--sunken:#E8EBEF;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDE1E7;--border-strong:#C8CED7;
+  --accent:#334155;--accent-ink:#1E293B;--accent-soft:#E2E6EC;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.kin{width:100%;font-family:var(--font-mono);font-size:14px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink)}
+.calc{font-family:var(--font-mono);font-size:12.5px;margin-top:10px;line-height:2;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:10px 12px;word-break:break-all}
+.calc b{color:var(--accent-ink)}
+.parts{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.pl{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
+.pl .pn{font-family:var(--font-mono);font-size:12px;font-weight:700;text-align:center;border-radius:8px;padding:6px 0;background:var(--accent);color:#fff}
+.pl .pn.hot{box-shadow:0 0 0 4px var(--accent-soft)}
+.lane{display:flex;gap:3px;min-height:36px;padding:3px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);overflow-x:auto}
+.msg{flex:none;min-width:44px;border-radius:7px;padding:3px 5px;font-family:var(--font-mono);font-size:10px;text-align:center;color:#fff;animation:drop .4s cubic-bezier(.2,.9,.3,1.2)}
+.msg b{display:block;font-size:11px}
+.msg small{opacity:.8}
+@keyframes drop{from{transform:translateY(-14px) scale(.7);opacity:0}to{transform:none;opacity:1}}
+.keys{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.keys button{font-family:var(--font-mono);font-size:12px}
+.keys .kd{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+/* order */
+.ord{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.ord>div{min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.ord h5{margin:0 0 8px;font-family:var(--font-mono);font-size:12.5px}
+.steps{display:flex;flex-direction:column;gap:4px;font-family:var(--font-mono);font-size:11.5px}
+.steps div{padding:5px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface);opacity:.25;transition:.3s}
+.steps div.on{opacity:1}
+.steps div.bad{border-color:var(--coral);background:var(--coral-soft);opacity:1}
+.steps div.good{border-color:var(--teal);background:var(--teal-soft);opacity:1}
+.bal{margin-top:8px;font-family:var(--font-mono);font-size:13px}
+.bal b.bad{color:var(--coral)}
+/* remap */
+.rm{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:10px}
+.rk{border:1.5px solid var(--border);border-radius:10px;padding:7px 9px;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);transition:.4s}
+.rk.mv{border-color:var(--coral);background:var(--coral-soft)}
+.rk.st{border-color:var(--teal);background:var(--teal-soft)}
+.rk b{font-size:13px}
+/* segments */
+.segs{display:flex;gap:4px;margin-top:12px;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.sg{flex:none;width:118px;border:1.5px solid var(--border-strong);border-radius:10px;padding:7px;font-family:var(--font-mono);font-size:10.5px;background:var(--surface);transition:.4s}
+.sg b{display:block;font-size:11.5px;margin-bottom:3px}
+.sg.act{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sg.gone{opacity:.15;transform:scale(.9)}
+.sg .fl{color:var(--ink-faint)}
+.fill{height:6px;border-radius:3px;background:var(--sunken);overflow:hidden;margin-top:5px}.fill div{height:100%;background:var(--accent);transition:width .3s}
+.rng{display:flex;flex-direction:column;gap:2px;margin:6px 0;font-size:13px}.rng input{accent-color:var(--accent)}
+.out{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--accent-ink)}
+@media (max-width:700px){.ord{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#334155"></span> Kafka · 2/8</span><span>· Kurs: 58/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Kafka · 58-modul · partition</span>
+    <h1>Topic, <span class="steam">partition</span>, offset</h1>
+    <p class="lead">Topic — bu bitta jurnal emas, balki bir nechta mustaqil jurnallar (partition’lar) to‘plami. Partition — Kafka’dagi <b>tartib</b>, <b>parallellik</b> va <b>masshtab</b> birligi. Bu modulning asosiy savoli: "Xabarim qaysi partition’ga tushadi va bu nimaga ta’sir qiladi?"</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Kalit → partition: haqiqiy hisob</h2></div><p class="sec-sub">Kafka Java producer’i kalitni <b>murmur2</b> bilan xeshlaydi va partition’lar soniga bo‘ladi. Quyidagi hisoblagich Kafka’ning aynan o‘sha algoritmi (test vektorlari bilan tekshirilgan). Hisob raqamini kiriting.</p>
+    <div class="stage">
+      <input class="kin" id="kin" value="20208000100012345" aria-label="Kalit">
+      <div class="toggle-row" style="justify-content:flex-start;margin:10px 0 0"><span class="tog-lbl">Partition’lar soni:</span><div class="seg" id="np"><button data-n="3">3</button><button class="on" data-n="6">6</button><button data-n="12">12</button></div></div>
+      <div class="calc" id="calc"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Xabarlar oqimi: kalit bo‘yicha taqsimot</h2></div><p class="sec-sub">To‘rtta mijozning to‘lovlari keladi. Rang — hisob (kalit). Bir xil kalit har doim <b>bir xil partition</b>ga tushadi va u yerda tartib saqlanadi. "Kalitsiz" rejimini ham sinang.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="sRun">▶ Oqim</button><button class="btn" id="sNull">Kalit: <b id="sNullS">bor</b></button><button class="btn" id="sReset">↺</button></div>
+      <div class="keys" id="keys"></div>
+      <div class="parts" id="parts"></div>
+      <div class="explain" id="sEx"></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Kalitsiz xabarlar: sticky partitioner</div>Kalit <code>null</code> bo‘lsa, Kafka 2.4+ xabarlarni tasodifiy emas, <b>batch bo‘yicha</b> taqsimlaydi: batch to‘lguncha bitta partition’ga yozadi, keyin boshqasiga o‘tadi (3.3+ da broker yuklamasini ham hisobga oladi). Natija — kattaroq batch, kamroq so‘rov, lekin <b>tartib kafolati yo‘q</b>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Nega kalit muhim: tartib</h2></div><p class="sec-sub">Hisobga ketma-ket 3 hodisa: <b>+500 000 kirim → −300 000 to‘lov → −150 000 to‘lov</b>. Iste’molchi balansni hisoblab, manfiy bo‘lsa rad etadi.</p>
+    <div class="stage">
+      <div class="ord">
+        <div><h5>🔑 key = hisob raqami (bitta partition)</h5><div class="steps" id="oA"></div><div class="bal" id="bA"></div></div>
+        <div><h5>🎲 key = null (turli partition’lar, 2 consumer)</h5><div class="steps" id="oB"></div><div class="bal" id="bB"></div></div>
+      </div>
+      <div class="ctrls"><button class="btn" id="orPrev">◀</button><button class="btn primary" id="orPlay">▶ Avto</button><button class="btn" id="orNext">▶</button><div class="bar"><div id="orBar"></div></div></div>
+      <div class="explain" id="orEx"></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Suhbat: Kafka tartibni kafolatlaydimi?</div><b>Faqat bitta partition ichida.</b> Topic bo‘ylab global tartib yo‘q. Shuning uchun tartib muhim bo‘lgan obyekt (hisob, karta, buyurtma) ID’si kalit qilinadi. Global tartib kerak bo‘lsa — 1 partition (parallellik yo‘q). Yana bir shart: producer’da retry bo‘lsa tartib buzilmasligi uchun <code>enable.idempotence=true</code> (59-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Partition sonini oshirish xavfi</h2></div><p class="sec-sub">Kafka partition sonini <b>oshirishga</b> ruxsat beradi (kamaytirishga — yo‘q). Lekin <code>hash % N</code> formulasi o‘zgaradi — kalitlarning ko‘pi boshqa partition’ga "ko‘chadi".</p>
+    <div class="stage">
+      <div class="toggle-row" style="justify-content:flex-start"><span class="tog-lbl">Oldin: 6</span><div class="seg" id="rmN"><button class="on" data-n="6">6 (o‘zgarmagan)</button><button data-n="8">→ 8</button><button data-n="12">→ 12</button></div></div>
+      <div class="rm" id="rm"></div>
+      <div class="explain" id="rmEx"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠️ Amaliy qoida</div>Partition sonini boshidanoq zaxira bilan tanlang (kutilgan yuk × 2–3). Oshirish kerak bo‘lsa: eski partition’lardagi barcha xabarlar iste’mol qilinguncha kuting yoki yangi topic yarating va migratsiya qiling. Kalit bo‘yicha holat saqlaydigan (stateful) iste’molchilar uchun bu ayniqsa xavfli.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Nechta partition kerak? Kalkulyator</h2></div>
+    <div class="stage"><div class="grid2" style="margin-top:0">
+      <div>
+        <div class="rng"><span>Kutilgan yuk: <b id="cT">5 000</b> xabar/s</span><input type="range" id="rT" min="100" max="100000" step="100" value="5000"></div>
+        <div class="rng"><span>Bitta consumer tezligi: <b id="cC">500</b> xabar/s (DB’ga yozish bilan)</span><input type="range" id="rC" min="50" max="5000" step="50" value="500"></div>
+        <div class="rng"><span>O‘sish zaxirasi: <b id="cG">×2</b></span><input type="range" id="rG" min="1" max="4" step="0.5" value="2"></div>
+      </div>
+      <div class="card"><div style="font-size:12px;color:var(--ink-faint)">Tavsiya etilgan partition soni</div><div class="out" id="cOut">—</div><p id="cTip"></p></div>
+    </div></div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Ko‘p partition —</th><th>Kam partition —</th></tr><tr><td>+ ko‘proq parallel consumer</td><td>+ kam resurs, tez failover</td></tr><tr><td>− ko‘p fayl, xotira, leader saylovi uzoqroq</td><td>− consumer’lar soni cheklangan (partition ≤ consumer foydali)</td></tr><tr><td>− end-to-end kechikish biroz oshadi (kichik batch)</td><td>− issiq kalit bitta partition’ni to‘ldiradi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Diskda partition: segmentlar va retention</h2></div><p class="sec-sub">Har partition — papka, ichida segment fayllar. Yozish faqat <b>faol segment</b>ga. Retention eski segmentlarni butunligicha o‘chiradi.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="gW">✍️ Yozish (+200 xabar)</button><button class="btn" id="gR">🗑 Retention tekshiruvi</button><button class="btn" id="gX">↺</button></div>
+      <div class="segs" id="segs"></div>
+      <div class="explain" id="gEx">Papka: <code>/var/kafka/data/tolovlar-0/</code></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">terminal</span></div><pre class="code"><span class="k">kafka-topics</span>.sh --bootstrap-server kafka:<span class="nu">9092</span> --create --topic tolovlar \
+    --partitions <span class="nu">12</span> --replication-factor <span class="nu">3</span> \
+    --config retention.ms=<span class="nu">604800000</span> \
+    --config segment.bytes=<span class="nu">1073741824</span> \
+    --config min.insync.replicas=<span class="nu">2</span>
+<span class="cm"># retention.ms = 7 kun, segment.bytes = 1 GB</span>
+
+<span class="k">kafka-topics</span>.sh --bootstrap-server kafka:<span class="nu">9092</span> --describe --topic tolovlar
+<span class="cm"># Topic: tolovlar  PartitionCount: 12  ReplicationFactor: 3</span>
+<span class="cm">#   Partition: 0  Leader: 2  Replicas: 2,3,1  Isr: 2,3,1</span>
+
+kafka-get-offsets.sh --bootstrap-server kafka:<span class="nu">9092</span> --topic tolovlar      <span class="cm"># har partition oxirgi offset</span></pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Partition nima va nima uchun kerak?<span class="chev">›</span></summary><div class="iv-a">Topic’ning mustaqil, tartiblangan, append-only bo‘lagi. U parallellik birligi (bir group’da bitta partition’ni bitta consumer o‘qiydi), masshtab birligi (partition’lar broker’larga tarqaladi) va tartib birligi (tartib faqat partition ichida).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Xabar qaysi partition’ga tushishini nima belgilaydi?<span class="chev">›</span></summary><div class="iv-a">Producer: aniq partition ko‘rsatilgan bo‘lsa — o‘sha; kalit bor bo‘lsa — murmur2(key) % partitions; kalit null bo‘lsa — sticky partitioner. O‘zingizning Partitioner’ingizni ham yozish mumkin.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Hisob bo‘yicha hodisalar tartibini qanday kafolatlaysiz?<span class="chev">›</span></summary><div class="iv-a">Hisob ID’sini kalit qilish (bitta partition), producer’da idempotence (retry tartibni buzmasligi uchun), consumer’da partition ichida ketma-ket qayta ishlash (bir partition’ni parallel thread’larga bo‘lmaslik yoki kalit bo‘yicha bo‘lish).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Partition sonini oshirsa nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Yangi xabarlar uchun hash % N o‘zgaradi — bir kalitning eski xabarlari bir partition’da, yangilari boshqasida; o‘tish davrida tartib buziladi, kalit bo‘yicha lokal holat noto‘g‘ri bo‘ladi. Kamaytirib bo‘lmaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Offset nima va u qayerda saqlanadi?<span class="chev">›</span></summary><div class="iv-a">Partition ichidagi xabarning ketma-ket raqami. Consumer group’ning commit qilgan offset’i ichki __consumer_offsets topic’ida saqlanadi (compacted). Commit qilinadigan qiymat — keyingi o‘qiladigan xabar offset’i.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Retention qanday ishlaydi?<span class="chev">›</span></summary><div class="iv-a">cleanup.policy=delete: segment butunligicha retention.ms yoki retention.bytes oshganda o‘chiriladi (faol segment o‘chirilmaydi). compact: har kalitning oxirgi qiymati qoladi (63-modul).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Issiq kalit (hot key) muammosi?<span class="chev">›</span></summary><div class="iv-a">Bitta kalitga juda ko‘p xabar (masalan, katta merchant) — bitta partition va bitta consumer to‘lib ketadi, qolganlari bo‘sh. Yechim: kalitga qo‘shimcha bo‘lak (merchantId + hash(txId) % 4) — agar bu kalit ichida tartib talab qilinmasa.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Kafka tartibni qayerda kafolatlaydi?</div><button class="opt">Butun topic’da</button><button class="opt">Faqat bitta partition ichida</button><button class="opt">Consumer group ichida</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Faqat partition ichida."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Bir xil kalitli ikki xabar (partition soni o‘zgarmagan). Qayerga tushadi?</div><button class="opt">Tasodifiy</button><button class="opt">Bir xil partition’ga</button><button class="opt">Round-robin</button><div class="q-fb" data-ok="To‘g‘ri — murmur2 deterministik." data-no="Yo‘q. Bir xil kalit → bir xil partition."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>12 partition, bitta group’da 20 consumer. Nechtasi ishlaydi?</div><button class="opt">20</button><button class="opt">12, qolgan 8 tasi bo‘sh turadi</button><button class="opt">6</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Partition’dan ko‘p consumer bo‘sh qoladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Partition sonini 6 dan 4 ga kamaytirish mumkinmi?</div><button class="opt">Ha, --alter bilan</button><button class="opt">Yo‘q — faqat oshirish mumkin</button><button class="opt">Faqat bo‘sh topic’da</button><div class="q-fb" data-ok="To‘g‘ri — yangi topic yaratish kerak." data-no="Yo‘q. Kafka kamaytirishga ruxsat bermaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Consumer offset 100 ni commit qildi. Bu nimani bildiradi?</div><button class="opt">100-xabar qayta ishlanmoqda</button><button class="opt">0–99 qayta ishlandi, keyingisi 100</button><button class="opt">100 ta xabar qoldi</button><div class="q-fb" data-ok="To‘g‘ri — keyingi o‘qiladigan offset." data-no="Yo‘q. Commit — keyingi offset."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Kafka</span>
+      <h3>Producer: acks, batching, idempotence</h3>
+      <p>Xabar yo‘qolmasligi va takrorlanmasligi uchun producer qanday sozlanadi — ack’lar, retry, batch va idempotent producer animatsiyada.</p>
+      <div class="topics"><span class="topic-pill">57 · Nega Kafka</span><span class="topic-pill now">58 · Partition</span><span class="topic-pill">59 · Producer</span><span class="topic-pill">60 · Consumer</span><span class="topic-pill">61 · Replikatsiya</span><span class="topic-pill">62 · Spring Kafka</span><span class="topic-pill">63 · Pattern’lar</span><span class="topic-pill">64 · Operatsiya + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="57-nega-kafka.html"><span class="cl">← Oldingi dars</span><span class="ct">57 · Nega Kafka</span><span class="cs">📨 Kafka</span></a><a class="cn nx" href="59-producer-acks-va-idempotence.html"><span class="cl">Keyingi dars →</span><span class="ct">59 · Producer: acks va idempotence</span><span class="cs">📨 Kafka</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:65.9%"></i></div><span>58 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(58)<0)v.push(58);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','58');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(58)<0)D[t].push(58);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  function murmur2(s){var d=new TextEncoder().encode(s),len=d.length,m=0x5bd1e995,h=(0x9747b28c^len)|0,n4=len>>2;
+    for(var i=0;i<n4;i++){var j=i*4;var k=(d[j])|(d[j+1]<<8)|(d[j+2]<<16)|(d[j+3]<<24);k=Math.imul(k,m);k^=k>>>24;k=Math.imul(k,m);h=Math.imul(h,m);h^=k;}
+    var b=len&~3;switch(len%4){case 3:h^=d[b+2]<<16;case 2:h^=d[b+1]<<8;case 1:h^=d[b];h=Math.imul(h,m);}
+    h^=h>>>13;h=Math.imul(h,m);h^=h>>>15;return h|0;}
+  function part(k,n){return (murmur2(k)&0x7fffffff)%n;}
+  /* calc */
+  var N=6;
+  function calc(){var k=el('kin').value,h=murmur2(k),p=(h&0x7fffffff)%N;
+    el('calc').innerHTML='murmur2("'+k.replace(/</g,'&lt;')+'") = <b>'+h+'</b><br>toPositive = '+h+' &amp; 0x7fffffff = <b>'+(h&0x7fffffff)+'</b><br>'+(h&0x7fffffff)+' % '+N+' = <b style="font-size:16px">partition '+p+'</b>';}
+  el('kin').addEventListener('input',calc);
+  el('np').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});N=+b.dataset.n;calc();});calc();
+
+  /* stream */
+  var K=[['20208000100000001','#C8372D','Otabek'],['20208000100000002','#2E6FA8','Dilnoza'],['20208000100000003','#2C8F68','Sardor'],['20208000100000004','#A9660D','Malika']];
+  var P=4,nul=false,seq={},timer=null,sticky=0,inBatch=0;
+  el('keys').innerHTML=K.map(function(k){return '<span class="btn" style="cursor:default"><span class="kd" style="background:'+k[1]+'"></span>'+k[2]+' → P'+part(k[0],P)+'</span>';}).join('');
+  function initP(){el('parts').innerHTML='';for(var i=0;i<P;i++)el('parts').insertAdjacentHTML('beforeend','<div class="pl"><div class="pn" id="pn'+i+'">P'+i+'</div><div class="lane" id="ln'+i+'"></div></div>');seq={};}
+  function send(){var k=K[Math.floor(Math.random()*K.length)];seq[k[0]]=(seq[k[0]]||0)+1;var p;
+    if(nul){if(inBatch>=4){sticky=(sticky+1+Math.floor(Math.random()*(P-1)))%P;inBatch=0;}inBatch++;p=sticky;}else p=part(k[0],P);
+    var ln=el('ln'+p),m=document.createElement('div');m.className='msg';m.style.background=k[1];m.innerHTML='<b>'+k[2][0]+'#'+seq[k[0]]+'</b><small>off '+ln.children.length+'</small>';ln.appendChild(m);ln.scrollLeft=ln.scrollWidth;
+    var pn=el('pn'+p);pn.classList.add('hot');setTimeout(function(){pn.classList.remove('hot');},300);}
+  function sx(){el('sEx').innerHTML=nul?'<b>Kalitsiz:</b> xabarlar 4 tadan batch bo‘lib bitta partition’ga, keyin boshqasiga tushyapti. Otabekning #1, #2, #3 xabarlari turli partition’larda — ularni turli consumer’lar turli tezlikda o‘qiydi, <b>tartib kafolati yo‘q</b>.':'Har mijoz o‘z partition’iga tushyapti (murmur2). Har lane ichida Otabek#1, #2, #3… <b>ketma-ket</b>. Ikki mijoz bir partition’ga tushishi mumkin — bu normal (4 kalit, 4 partition, lekin xesh tasodifiyga yaqin).';}
+  el('sRun').addEventListener('click',function(){if(timer){clearInterval(timer);timer=null;this.textContent='▶ Oqim';}else{timer=setInterval(send,450);this.textContent='⏸ Oqim';}sx();});
+  el('sNull').addEventListener('click',function(){nul=!nul;el('sNullS').textContent=nul?'null':'bor';initP();sx();});sx();
+  el('sReset').addEventListener('click',initP);initP();
+
+  /* order */
+  var A=[['kirim +500 000 → P2 (consumer-1)','500 000','good'],['to‘lov −300 000 → P2 (consumer-1)','200 000','good'],['to‘lov −150 000 → P2 (consumer-1)','50 000 ✓','good']];
+  var B=[['kirim +500 000 → P0 (consumer-1, sekin: DB lock)',null],['to‘lov −300 000 → P1 (consumer-2) — birinchi yetib keldi!','−300 000 ✗ RAD ETILDI','bad'],['to‘lov −150 000 → P1 (consumer-2)','−150 000 ✗ RAD ETILDI','bad'],['… kirim nihoyat qayta ishlandi','500 000 — lekin ikki to‘lov rad etilgan','bad']];
+  el('oA').innerHTML=A.map(function(a){return '<div>'+a[0]+'</div>';}).join('');el('oB').innerHTML=B.map(function(a){return '<div>'+a[0]+'</div>';}).join('');
+  var OX=['Hodisa 1 keldi.','Hodisa 2.','Hodisa 3.','Natija.'];
+  mkStepper('or',4,function(i){[].forEach.call(el('oA').children,function(d,k){d.className=k<=i?'on '+A[k][2]:'';});
+    [].forEach.call(el('oB').children,function(d,k){d.className=k<=i?'on'+(B[k][2]?' '+B[k][2]:''):'';});
+    el('bA').innerHTML='Balans: <b>'+A[Math.min(i,2)][1]+'</b>';var bb=B[i][1];el('bB').innerHTML='Balans: <b class="'+(i>0?'bad':'')+'">'+(bb||'0 (hali kirim yo‘q)')+'</b>';
+    el('orEx').innerHTML=i<3?OX[i]+' Chapda hammasi bitta partition’da — bitta consumer ketma-ket o‘qiydi. O‘ngda kalit yo‘q — hodisalar turli partition’larga tushdi va turli consumer’lar ularni <b>poyga</b> tarzida qayta ishlayapti.':'<b>Xulosa:</b> kalitsiz xabarlar bilan mijozning to‘lovlari noto‘g‘ri rad etildi. Tartib muhim obyekt ID’si — <b>albatta kalit</b>.';},2400);
+
+  /* remap */
+  var RK=['2020800010001','2020800010002','2020800010003','2020800010004','2020800010005','2020800010006','2020800010007','2020800010008','2020800010009','2020800010010','2020800010011','2020800010012'];
+  function drawRm(n){var mv=0;el('rm').innerHTML=RK.map(function(k){var a=part(k,6),b=part(k,n),m=a!==b;if(m)mv++;return '<div class="rk'+(n===6?'':m?' mv':' st')+'">…'+k.slice(-4)+'<br>P'+a+(n===6?'':' → <b>P'+b+'</b>')+'</div>';}).join('');
+    el('rmEx').innerHTML=n===6?'12 ta hisob, 6 partition. Endi partition sonini oshiring.':'<b>'+mv+' / 12</b> kalit boshqa partition’ga ko‘chdi (qizil). Ularning eski xabarlari hali eski partition’da o‘qilmagan bo‘lishi mumkin, yangilari esa yangi partition’da — boshqa consumer ularni <b>oldinroq</b> qayta ishlashi mumkin → tartib buziladi.'+(n===12?' 6→12 da ham yarmiga yaqini ko‘chadi (faqat hash%12 &lt; 6 bo‘lganlari joyida qoladi).':'');}
+  el('rmN').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});drawRm(+b.dataset.n);});drawRm(6);
+
+  /* calc partitions */
+  function pc(){var t=+el('rT').value,c=+el('rC').value,g=+el('rG').value;el('cT').textContent=t.toLocaleString('ru-RU');el('cC').textContent=c;el('cG').textContent='×'+g;
+    var need=Math.ceil(t/c),rec=Math.ceil(need*g);var nice=[3,6,12,24,36,48,64,96,128,192,256].find(function(x){return x>=rec;})||rec;
+    el('cOut').textContent=nice;el('cTip').innerHTML='Hozir kerak: '+t+' / '+c+' = <b>'+need+'</b> ta parallel consumer. Zaxira bilan '+rec+' → yaxlit <b>'+nice+'</b> (ko‘p bo‘luvchili son — consumer’lar teng bo‘linadi). Consumer’ni tezlashtirish (batch insert) ko‘pincha partition qo‘shishdan arzonroq.';}
+  ['rT','rC','rG'].forEach(function(i){el(i).addEventListener('input',pc);});pc();
+
+  /* segments */
+  var S,off;
+  function initS(){S=[{b:0,n:0}];off=0;drawS();el('gEx').innerHTML='Papka: <code>/var/kafka/data/tolovlar-0/</code>. Segment nomi — undagi birinchi offset (20 xonali).';}
+  function pad(n){var s=String(n);while(s.length<8)s='0'+s;return '…'+s;}
+  function drawS(){el('segs').innerHTML=S.map(function(s,i){var a=i===S.length-1&&!s.gone;return '<div class="sg'+(a?' act':'')+(s.gone?' gone':'')+'"><b>'+pad(s.b)+'</b><span class="fl">.log .index<br>.timeindex</span><br>'+s.n+' xabar'+(a?' ✍️':' 🔒')+'<div class="fill"><div style="width:'+(s.n/600*100)+'%"></div></div></div>';}).join('');}
+  el('gW').addEventListener('click',function(){var c=S[S.length-1],left=200;while(left>0){var r=Math.min(left,600-c.n);c.n+=r;off+=r;left-=r;if(c.n>=600){c={b:off,n:0};S.push(c);}}drawS();
+    el('gEx').innerHTML='Faol segment <code>segment.bytes</code>ga (bu yerda 600 xabar) yetsa — yopiladi (🔒, endi o‘zgarmaydi) va yangi segment ochiladi. Offset bo‘yicha qidirish: fayl nomidan segment topiladi, <code>.index</code> dan fayldagi pozitsiya.';});
+  el('gR').addEventListener('click',function(){var closed=S.filter(function(s,i){return !s.gone&&i<S.length-1;});if(!closed.length){el('gEx').innerHTML='O‘chiriladigan yopiq segment yo‘q — <b>faol segment hech qachon o‘chirilmaydi</b>.';return;}
+    closed[0].gone=true;drawS();el('gEx').innerHTML='Retention: eng eski segmentdagi <b>eng yangi</b> xabar ham 7 kundan eski bo‘lgach, segment <b>butunligicha</b> o‘chirildi. Kafka alohida xabarni o‘chirmaydi — shuning uchun xabarlar retention’dan biroz uzoqroq yashashi mumkin.';});
+  el('gX').addEventListener('click',initS);initS();
+})();
+
+</script>
+</body>
+</html>

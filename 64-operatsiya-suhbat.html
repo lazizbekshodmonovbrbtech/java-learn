@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kafka operatsiya va suhbat</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F1F2F4;--surface:#FFFFFF;--surface-2:#F8F9FA;--sunken:#E8EBEF;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDE1E7;--border-strong:#C8CED7;
+  --accent:#334155;--accent-ink:#1E293B;--accent-soft:#E2E6EC;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.tile{border:1.5px solid var(--border);border-radius:12px;padding:9px 10px;background:var(--surface);transition:.35s}
+.tile .n{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+.tile .v{font-family:var(--font-display);font-size:22px;font-weight:700}
+.tile .sp{height:26px;display:flex;align-items:flex-end;gap:1px;margin-top:4px}
+.tile .sp i{flex:1;background:var(--accent);opacity:.5;border-radius:1px;transition:height .3s}
+.tile.warn{border-color:var(--amber);background:var(--amber-soft)}.tile.warn .v{color:var(--amber)}
+.tile.bad{border-color:var(--coral);background:var(--coral-soft)}.tile.bad .v{color:var(--coral)}
+.tile.bad .sp i{background:var(--coral)}
+.diag{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.diag button.right{background:var(--teal-soft);border-color:var(--teal)}.diag button.wrong{background:var(--coral-soft);border-color:var(--coral)}
+.score2{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+/* checklist */
+.chk{display:flex;flex-direction:column;gap:5px;margin-top:12px}
+.ci{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--border);border-radius:10px;padding:8px 11px;background:var(--surface-2);cursor:pointer;font-size:13px;transition:.15s}
+.ci input{margin-top:3px;accent-color:var(--teal)}
+.ci small{display:block;color:var(--ink-soft);font-size:12px}
+.ci.done{border-color:var(--teal);background:var(--teal-soft)}
+.ci .cat{font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--border);margin-left:6px}
+.scoreb{display:flex;align-items:center;gap:12px;margin-top:10px}
+.scoreb .big{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--accent-ink)}
+.scoreb .meter{flex:1;height:10px;border-radius:5px;background:var(--sunken);overflow:hidden}
+.scoreb .meter>div{height:100%;background:var(--teal);transition:width .3s}
+/* design */
+.dsg{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.dsg div{border:1.5px solid var(--border);border-radius:10px;padding:8px 11px;font-size:13.5px;background:var(--surface);opacity:.25;transition:.3s}
+.dsg div.on{opacity:1;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.dsg div.done{opacity:1}
+.dsg b{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);margin-right:6px}
+@media (max-width:700px){.dash{grid-template-columns:1fr 1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#334155"></span> Kafka · 8/8</span><span>· Kurs: 64/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Kafka · 64-modul · operatsiya + yakun</span>
+    <h1>Operatsiya, xavfsizlik va <span class="steam">suhbat</span></h1>
+    <p class="lead">Kafka’ni ishga tushirish — oson; uni tunda uyg‘otmaydigan holatda ushlab turish — boshqa hunar. Bu yakuniy modulda: qaysi metrikalarni kuzatish, dashboard’dan muammoni o‘qish o‘yini, xavfsizlik (TLS, SASL, ACL), Connect va Streams haqida qisqacha, production chek-listi va Kafka trekining yakuniy suhbat savollari.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>O‘yin: dashboard’dan tashxis qo‘ying</h2></div><p class="sec-sub">Grafana’da Kafka dashboard’i. Metrikalar anomal holatni ko‘rsatyapti. Nima bo‘lganini toping.</p>
+    <div class="stage">
+      <div class="dash" id="dash"></div>
+      <div class="diag" id="diag"></div>
+      <div class="explain" id="dEx">Metrikalarni o‘qing va sababni tanlang.</div>
+      <div class="ctrls"><button class="btn primary" id="dNext">Keyingi hodisa →</button><span class="score2" id="dScore"></span></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Metrika</th><th>Nima uchun</th><th>Alert</th></tr><tr><td><code>UnderReplicatedPartitions</code></td><td>Follower’lar orqada/broker o‘chgan</td><td>&gt; 0 bir necha daqiqa</td></tr><tr><td><code>OfflinePartitionsCount</code></td><td>Leader’siz partition — o‘qish/yozish yo‘q</td><td>&gt; 0 darhol (critical)</td></tr><tr><td><code>UnderMinIsrPartitionCount</code></td><td>acks=all yozuvlar rad etilmoqda</td><td>&gt; 0</td></tr><tr><td>Consumer lag (records / vaqt)</td><td>Consumer ulgurmayapti</td><td>SLO bo‘yicha (masalan, SMS lag &gt; 30 s)</td></tr><tr><td><code>RequestHandlerAvgIdlePercent</code></td><td>Broker CPU/ip bandligi</td><td>&lt; 0.3</td></tr><tr><td>Disk band, <code>LogFlushRateAndTimeMs</code></td><td>Retention yetarlimi, disk sekinmi</td><td>&gt; 80%</td></tr><tr><td>Producer <code>record-error-rate</code>, <code>request-latency</code></td><td>Yuborish muammolari</td><td>—</td></tr><tr><td><code>IsrShrinksPerSec</code> / <code>IsrExpandsPerSec</code></td><td>ISR "tebranishi" — tarmoq/disk muammosi</td><td>tez-tez o‘zgarsa</td></tr></table></div><div class="callout tip"><div class="ct">💡 Vositalar</div>JMX → Prometheus (JMX exporter) → Grafana; consumer lag uchun <b>Burrow</b> yoki <b>kafka-lag-exporter</b>; Kubernetes’da <b>Strimzi</b> operator metrikalar, TLS, foydalanuvchilar va topic’larni CRD bilan boshqaradi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Xavfsizlik: TLS, SASL va ACL</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Qatlam</th><th>Nima</th><th>Bankda</th></tr><tr><td>Shifrlash</td><td><code>SSL</code>/<code>SASL_SSL</code> listener — TLS</td><td>Barcha listener’lar, broker aro ham</td></tr><tr><td>Autentifikatsiya</td><td>SASL/SCRAM-SHA-512, mTLS yoki <b>SASL/OAUTHBEARER</b> (OIDC)</td><td>Keycloak’dan client_credentials token (46-modul!)</td></tr><tr><td>Avtorizatsiya</td><td>ACL: principal + resurs (topic, group, cluster) + operatsiya</td><td>Har servis faqat o‘z topic’lariga; <code>allow.everyone.if.no.acl.found=false</code></td></tr><tr><td>Audit</td><td>Autorizer log’lari, admin amallar</td><td>SIEM’ga</td></tr><tr><td>Ma’lumot</td><td>Payload’da PAN, parol yo‘q; kerak bo‘lsa — maydon darajasida shifrlash/tokenizatsiya</td><td>PCI DSS talabi</td></tr></table></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">terminal — ACL</span></div><pre class="code"><span class="cm"># sms-service faqat "tolovlar"ni o'qiy oladi va o'z group'idan foydalanadi</span>
+kafka-acls.sh --bootstrap-server kafka:<span class="nu">9093</span> --command-config admin.properties \
+  --add --allow-principal User:sms-service \
+  --operation Read --operation Describe --topic tolovlar
+
+kafka-acls.sh --bootstrap-server kafka:<span class="nu">9093</span> --command-config admin.properties \
+  --add --allow-principal User:sms-service --operation Read --group sms-service</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">application.yml — SASL/OAUTHBEARER (Keycloak)</span></div><pre class="code">spring.kafka.<span class="ty">properties</span>:
+  security.<span class="ty">protocol</span>: SASL_SSL
+  sasl.<span class="ty">mechanism</span>: OAUTHBEARER
+  sasl.oauthbearer.token.endpoint.<span class="ty">url</span>: <span class="ty">https</span>:<span class="cm">//auth.bank.uz/realms/bank/protocol/openid-connect/token</span>
+  sasl.login.callback.handler.<span class="ty">class</span>: org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginCallbackHandler
+  sasl.jaas.<span class="ty">config</span>: &gt;
+    org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required
+    clientId=<span class="st">"sms-service"</span> clientSecret=<span class="st">"${KAFKA_CLIENT_SECRET}"</span>;</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Ekotizim: Connect va Streams</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>🔌 Kafka Connect</h4><p>Kod yozmasdan tashqi tizimlar bilan integratsiya: <b>source</b> (Debezium PG CDC, JDBC) va <b>sink</b> (JDBC, Elasticsearch, S3). Connector’lar alohida Connect cluster’da, offset’lar va konfiguratsiya Kafka topic’larida. Outbox relay (63-modul) — aynan Debezium connector.</p></div>
+      <div class="card"><h4>🌊 Kafka Streams</h4><p>Java kutubxonasi (alohida cluster emas): topic’lardan o‘qib, filter/map/join/agregat qilib, topic’ga yozadi. Holat lokal RocksDB’da, zaxirasi changelog topic’da. <code>exactly_once_v2</code>. Fraud qoidalari, real vaqt agregatlari uchun.</p></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">FraudTopology.java — Kafka Streams</span></div><pre class="code">builder.stream(<span class="st">"tolovlar"</span>, <span class="ty">Consumed</span>.with(<span class="ty">Serdes</span>.<span class="ty">String</span>(), paymentSerde))    <span class="cm">// kalit = karta raqami</span>
+    .groupByKey()
+    .windowedBy(<span class="ty">TimeWindows</span>.ofSizeWithNoGrace(<span class="ty">Duration</span>.ofMinutes(<span class="nu">1</span>)))
+    .count()                                                                   <span class="cm">// 1 daqiqadagi to'lovlar soni</span>
+    .toStream()
+    .filter((card, cnt) -&gt; cnt &gt;= <span class="nu">5</span>)                                           <span class="cm">// 1 daqiqada 5+ to'lov — shubhali</span>
+    .map((w, cnt) -&gt; <span class="ty">KeyValue</span>.pair(w.key(), <span class="k">new</span> <span class="ty">FraudAlert</span>(w.key(), cnt)))
+    .to(<span class="st">"fraud-alertlar"</span>, <span class="ty">Produced</span>.with(<span class="ty">Serdes</span>.<span class="ty">String</span>(), alertSerde));</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Production chek-listi</h2></div><p class="sec-sub">Loyihangiz uchun belgilang — qancha tayyor?</p>
+    <div class="stage">
+      <div class="scoreb"><span class="big" id="ckN">0%</span><div class="meter"><div id="ckB" style="width:0"></div></div></div>
+      <div class="chk" id="chk"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Tizim dizayni savoli: "To‘lov hodisalari platformasi"</h2></div><p class="sec-sub">Suhbatda: "Kuniga 20 mln to‘lov. Har to‘lovdan keyin SMS, keshbek, fraud tekshiruvi va buxgalteriya yozuvi kerak. Loyihalang." Javob tuzilmasini qadamma-qadam ko‘ring.</p>
+    <div class="stage">
+      <div class="dsg" id="dsg"></div>
+      <div class="ctrls"><button class="btn" id="dsPrev">◀</button><button class="btn primary" id="dsPlay">▶ Avto</button><button class="btn" id="dsNext">▶</button><div class="bar"><div id="dsBar"></div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Kafka trek: yakuniy suhbat savollari</h2></div><p class="sec-sub">57–64-modullardan eng ko‘p so‘raladiganlar. Avval o‘zingiz javob bering.</p><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Kafka va RabbitMQ farqi?<span class="chev">›</span></summary><div class="iv-a">Kafka — taqsimlangan log: xabar o‘qilgach qoladi, consumer offset’ni o‘zi boshqaradi, replay, juda yuqori throughput, tartib partition ichida. RabbitMQ — broker navbatlari: xabar ack’dan keyin o‘chadi, boy marshrutlash (exchange), per-message TTL/priority, vazifa navbatlari uchun qulay.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Partition, offset, consumer group — bir jumlada har biri.<span class="chev">›</span></summary><div class="iv-a">Partition — topic’ning tartiblangan, append-only bo‘lagi (tartib va parallellik birligi). Offset — partition ichidagi xabar raqami. Consumer group — partition’larni a’zolar orasida bo‘lishadigan mantiqiy o‘quvchi, o‘z offset’lariga ega.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Xabar yo‘qolmasligini qanday kafolatlaysiz (producer → broker → consumer)?<span class="chev">›</span></summary><div class="iv-a">Producer: acks=all, idempotence, retries + delivery.timeout, callback’da xatoni qayta ishlash yoki Outbox. Broker: RF=3, min.insync=2, unclean election o‘chiq, rack awareness. Consumer: auto commit o‘chiq, qayta ishlashdan keyin commit, DLT, idempotent qayta ishlash.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Dublikatlar qayerdan keladi va qanday himoyalanasiz?<span class="chev">›</span></summary><div class="iv-a">Producer retry (idempotent producer yopadi), ilova qayta yuborishi yoki Outbox relay (at-least-once), consumer commit’dan oldin yiqilishi/rebalance. Himoya — idempotent consumer (event_id bo‘yicha dedup bitta DB tranzaksiyasida).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Tartibni qanday kafolatlaysiz?<span class="chev">›</span></summary><div class="iv-a">Tartib muhim obyekt ID’si kalit bo‘ladi (bitta partition), idempotent producer (retry tartibni buzmaydi), consumer partition’ni ketma-ket qayta ishlaydi, blocking retry (non-blocking tartibni buzadi), partition sonini o‘zgartirmaslik.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Rebalance muammolari va ularni kamaytirish?<span class="chev">›</span></summary><div class="iv-a">Eager’da butun group to‘xtaydi, sekin consumer max.poll.interval’dan oshib sikl hosil qiladi. Yechimlar: CooperativeStickyAssignor yoki KIP-848, static membership, max.poll.records ni kamaytirish, qayta ishlashni tezlashtirish, graceful shutdown.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Exactly-once Kafka’da qanday ishlaydi va chegarasi?<span class="chev">›</span></summary><div class="iv-a">Idempotent + transaksional producer; read-process-write’da chiqish xabarlari va consumer offset’lari bitta tranzaksiyada; consumer read_committed. Faqat Kafka ichida; tashqi DB/API bilan — idempotentlik.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Consumer lag o‘sayotganini qanday aniqlaysiz va hal qilasiz?<span class="chev">›</span></summary><div class="iv-a">kafka-consumer-groups --describe, lag exporter + alert. Bitta partition’da bo‘lsa — hot key yoki zaharli xabar; hammasida — throughput yetmaydi: consumer’ni tezlashtirish, pod qo‘shish (partition sonigacha), batch listener, partition qo‘shish (ehtiyotkorlik bilan).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ISR, HW, min.insync.replicas — ular qanday bog‘liq?<span class="chev">›</span></summary><div class="iv-a">ISR — sinxron replikalar; HW — ISR’dagi minimal LEO, consumer faqat HW gacha ko‘radi; min.insync — acks=all yozuvi uchun ISR’ning minimal hajmi. RF=3/min.insync=2 — bitta broker yo‘qotishga chidamli.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Outbox pattern va nima uchun kerak?<span class="chev">›</span></summary><div class="iv-a">DB o‘zgarishi va hodisani atomik qilish uchun: hodisa biznes yozuvi bilan bitta tranzaksiyada outbox jadvaliga, relay (Debezium/poller) Kafka’ga uzatadi. At-least-once — consumer idempotent.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Saga nima?<span class="chev">›</span></summary><div class="iv-a">Servislar aro jarayon lokal tranzaksiyalar ketma-ketligi sifatida; xato bo‘lsa kompensatsiya tranzaksiyalari. Choreography (hodisalar) yoki orchestration (koordinator). Izolyatsiya yo‘q — PENDING/HOLD holatlari.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Retention va compaction farqi?<span class="chev">›</span></summary><div class="iv-a">Retention (delete) — vaqt/hajm bo‘yicha eski segmentlarni o‘chiradi. Compaction — kalit bo‘yicha oxirgi qiymatni saqlaydi, tombstone bilan o‘chiradi; holat topic’lari uchun.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Schema evolyutsiyasini qanday boshqarasiz?<span class="chev">›</span></summary><div class="iv-a">Schema Registry + Avro/Protobuf, moslik rejimi (odatda BACKWARD), yangi maydonlar default bilan, maydonni o‘chirish/tipni o‘zgartirish bosqichma-bosqich, CI’da moslik tekshiruvi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Kafka’da xavfsizlik?<span class="chev">›</span></summary><div class="iv-a">TLS (SASL_SSL), autentifikatsiya (SCRAM, mTLS yoki OAUTHBEARER/OIDC), ACL (servis faqat o‘z topic’i va group’iga), sezgir ma’lumotni payload’ga qo‘ymaslik yoki shifrlash, audit.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Kafka qachon to‘g‘ri tanlov emas?<span class="chev">›</span></summary><div class="iv-a">Kichik tizim va past hajm, so‘rov-javob, per-message priority/TTL/delay kerak bo‘lsa, operatsion resurs yo‘q bo‘lsa. Shunda RabbitMQ, Redis Streams yoki oddiy DB navbat (SKIP LOCKED) yetadi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>OfflinePartitionsCount = 3. Bu nimani bildiradi?</div><button class="opt">3 ta consumer o‘chgan</button><button class="opt">3 ta partition’ning leader’i yo‘q — o‘qish/yozish to‘xtagan</button><button class="opt">3 ta topic o‘chirilgan</button><div class="q-fb" data-ok="To‘g‘ri — critical alert." data-no="Yo‘q. Leader’siz partition’lar."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>UnderReplicatedPartitions bir necha daqiqa > 0, lag normal. Birinchi tekshiruv?</div><button class="opt">Consumer kodi</button><button class="opt">Broker’lar holati: biri o‘chganmi, disk/tarmoq sekinmi</button><button class="opt">Producer sozlamasi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Follower’lar orqada — broker darajasidagi muammo."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>sms-service boshqa servisning "kartalar" topic’ini o‘qiy olmasligi kerak. Qanday?</div><button class="opt">Topic nomini yashirish</button><button class="opt">ACL: faqat kerakli topic/group’ga Read, allow.everyone.if.no.acl.found=false</button><button class="opt">Firewall</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. ACL bilan."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>"1 daqiqada 5 dan ortiq to‘lov" qoidasini real vaqtda tekshirish uchun eng mos vosita?</div><button class="opt">Kafka Connect</button><button class="opt">Kafka Streams (windowed count)</button><button class="opt">Schema Registry</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Oynali agregatsiya — Streams."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Bank uchun eng to‘g‘ri kombinatsiya?</div><button class="opt">acks=1, RF=2</button><button class="opt">acks=all, RF=3, min.insync=2, idempotence, unclean=false</button><button class="opt">acks=0, RF=1</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Chidamlilik uchun acks=all + RF=3 + min.insync=2."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi trek · JavaScript</span>
+      <h3>JS qanday ishlaydi</h3>
+      <p>Backend dasturchi uchun JavaScript: brauzer va V8, bitta ip va event loop. 65-moduldan boshlaymiz.</p>
+      <div class="topics"><span class="topic-pill">57 · Nega Kafka</span><span class="topic-pill">58 · Partition</span><span class="topic-pill">59 · Producer</span><span class="topic-pill">60 · Consumer</span><span class="topic-pill">61 · Replikatsiya</span><span class="topic-pill">62 · Spring Kafka</span><span class="topic-pill">63 · Pattern’lar</span><span class="topic-pill now">64 · Operatsiya + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="63-patternlar-outbox-saga.html"><span class="cl">← Oldingi dars</span><span class="ct">63 · Pattern&#x27;lar: Outbox, Saga</span><span class="cs">📨 Kafka</span></a><a class="cn nx" href="65-js-qanday-ishlaydi.html"><span class="cl">Keyingi dars →</span><span class="ct">65 · JS qanday ishlaydi</span><span class="cs">🟨 JavaScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:72.7%"></i></div><span>64 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(64)<0)v.push(64);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','64');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(64)<0)D[t].push(64);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var T=['Producer msg/s','Consumer lag (sms)','Under-replicated','Offline partitions','ISR shrink/min','Disk band','Broker idle %','Producer xato/s'];
+  var N=[[12000,40,0,0,0,55,70,0],['ok','ok','ok','ok','ok','ok','ok','ok']];
+  var CASES=[
+   {v:[12000,184000,0,0,0,55,70,0],s:['','bad','','','','','',''],tr:1,a:'lag',ex:'Faqat bitta group’ning lag’i o‘smoqda, broker’lar sog‘lom, producer normal. Demak muammo <b>consumer tomonida</b>: sms-service sekinlashgan (SMS provayder javobi sekin, DB lock) yoki pod’lar yiqilib rebalance siklida. Qadam: consumer log’lari, max.poll.interval, provayder latency.'},
+   {v:[11800,60,48,0,6,54,64,0],s:['','','bad','','warn','','',''],tr:2,a:'broker',ex:'Under-replicated &gt; 0 va ISR qisqarishlari bor, lekin offline yo‘q — bitta broker o‘chgan yoki follower’lar ulgurmayapti. Replikalar orqada, lekin yozish davom etmoqda (min.insync qondirilgan). Qadam: qaysi broker ISR’dan chiqqan, uning disk/tarmog‘i/GC.'},
+   {v:[0,40,120,12,0,55,65,3400],s:['bad','','bad','bad','','','','bad'],tr:3,a:'offline',ex:'<b>Offline partition’lar</b> va producer xatolari: ba’zi partition’larda leader yo‘q (ISR’dagi hamma broker o‘chgan, unclean election o‘chiq). Yozish to‘xtadi. Critical: broker’larni tiklash; unclean election’ni yoqish — faqat ma’lumot yo‘qotishga rozi bo‘linsa.'},
+   {v:[12100,50,0,0,0,97,40,900],s:['','','','','','bad','warn','bad'],tr:5,a:'disk',ex:'Disk 97% — retention noto‘g‘ri (juda uzoq yoki trafik o‘sgan), broker log segmentlarini yoza olmay qoladi va yiqiladi. Qadam: retention’ni vaqtincha kamaytirish, disk qo‘shish, tiered storage (KIP-405).'},
+   {v:[48000,30,0,0,0,58,8,0],s:['warn','','','','','','bad',''],tr:6,a:'cpu',ex:'Yuk 4× oshgan va broker request handler’lari deyarli band (idle 8%). Kechikish o‘sadi. Qadam: producer’larda batching/siqishni tekshirish (kichik batch’lar — ko‘p so‘rov), broker qo‘shish va partition’larni qayta taqsimlash, num.io.threads/num.network.threads.'}];
+  var OPTS=[['lag','Consumer sekin / lag'],['broker','Broker o‘chgan / replikatsiya orqada'],['offline','Partition’lar offline'],['disk','Disk to‘lmoqda'],['cpu','Broker CPU/yuk cho‘qqisi']];
+  var ci=0,sc=0,tot=0,ans=false,hist={};
+  function spark(k,val,bad){if(!N[0][k]&&!val){var f='';for(var z=0;z<14;z++)f+='<i style="height:4%"></i>';return f;}var base=N[0][k]||0.001;var arr=[];for(var i=0;i<14;i++){var f=i<9?base*(0.9+Math.random()*0.2):val*(0.8+Math.random()*0.3)*(i-8)/5+base*(1-(i-8)/5);arr.push(Math.max(0,f));}var mx=Math.max.apply(null,arr.concat([1]));return arr.map(function(x){return '<i style="height:'+Math.max(4,x/mx*100)+'%"></i>';}).join('');}
+  function fmt(k,v){return k===5||k===6?v+'%':v>=1000?(v/1000).toFixed(1)+'k':String(v);}
+  function show(){var c=CASES[ci%CASES.length];ans=false;
+    el('dash').innerHTML=T.map(function(t,k){return '<div class="tile '+(c.s[k]||'')+'"><div class="n">'+t+'</div><div class="v">'+fmt(k,c.v[k])+'</div><div class="sp">'+spark(k,c.v[k],c.s[k])+'</div></div>';}).join('');
+    el('diag').innerHTML=OPTS.map(function(o){return '<button class="btn" data-a="'+o[0]+'">'+o[1]+'</button>';}).join('');el('dEx').innerHTML='Hodisa #'+(ci%CASES.length+1)+'. Metrikalarni o‘qing va sababni tanlang.';}
+  el('diag').addEventListener('click',function(e){var b=e.target.closest('button');if(!b||ans)return;ans=true;tot++;var c=CASES[ci%CASES.length],ok=b.dataset.a===c.a;if(ok)sc++;b.classList.add(ok?'right':'wrong');if(!ok)el('diag').querySelector('[data-a="'+c.a+'"]').classList.add('right');
+    el('dEx').innerHTML=(ok?'✅ ':'❌ ')+c.ex;el('dScore').textContent='Hisob: '+sc+' / '+tot;});
+  el('dNext').addEventListener('click',function(){ci++;show();});show();
+
+  /* checklist */
+  var CK=[['RF=3, min.insync.replicas=2, unclean.leader.election=false','Broker','Bitta broker yo‘qolsa ham ma’lumot va yozish saqlanadi'],['broker.rack — replikalar turli DC/rack’da','Broker','Serverxona uzilishiga chidamlilik'],['auto.create.topics.enable=false; topic’lar kod/IaC orqali','Broker','Tasodifiy topic’lar va noto‘g‘ri partition soni yo‘q'],
+    ['Producer: acks=all, idempotence, zstd/lz4, linger 5–20 ms','Producer','Chidamlilik va throughput'],['DB + hodisa → Transactional Outbox','Producer','Dual write yo‘q'],['Kalit strategiyasi hujjatlangan (tartib talablari)','Dizayn','Hisob/karta bo‘yicha tartib'],
+    ['Consumer idempotent (processed_events / UNIQUE)','Consumer','Dublikatlar zararsiz'],['DefaultErrorHandler + backoff + DLT; DLT monitoringi va replay jarayoni','Consumer','Zaharli xabar oqimni to‘xtatmaydi va yo‘qolmaydi'],['ErrorHandlingDeserializer','Consumer','Noto‘g‘ri JSON sikl yaratmaydi'],['CooperativeSticky / KIP-848, graceful shutdown','Consumer','Qisqa rebalance’lar'],
+    ['Schema Registry + BACKWARD moslik, CI tekshiruvi','Sxema','Buzuvchi o‘zgarishlar deploy’dan oldin ushlanadi'],
+    ['SASL_SSL + ACL (har servis o‘z topic’i), sirlar Vault’da','Xavfsizlik','PCI DSS, eng kam huquq'],['PAN/shaxsiy ma’lumot payload’da yo‘q yoki shifrlangan','Xavfsizlik','Log va topic’lar orqali sizib chiqmaydi'],
+    ['Lag, URP, offline, disk alert’lari; runbook’lar','Monitoring','Tunda nima qilish aniq'],['Testcontainers integratsion testlar (DLT, dublikat)','Test','Xato stsenariylari sinovdan o‘tgan']];
+  var chk=el('chk');chk.innerHTML=CK.map(function(c,i){return '<label class="ci"><input type="checkbox" data-i="'+i+'"><div>'+c[0]+'<span class="cat">'+c[1]+'</span><small>'+c[2]+'</small></div></label>';}).join('');
+  chk.addEventListener('change',function(e){e.target.closest('.ci').classList.toggle('done',e.target.checked);var n=chk.querySelectorAll('input:checked').length,p=Math.round(n/CK.length*100);el('ckN').textContent=p+'%';el('ckB').style.width=p+'%';});
+
+  /* design */
+  var DS=[['1. Talablar','20 mln/kun ≈ 230/s o‘rtacha, cho‘qqi ~2 000/s. Kechikish: SMS &lt; 5 s, fraud &lt; 1 s. Yo‘qotish — 0, dublikat — zararsiz bo‘lishi kerak. Saqlash 7 kun + audit uzoqroq.'],
+    ['2. Manba','payment-service to‘lovni PG’ga yozadi + <b>Outbox</b> (bitta tranzaksiya). Debezium → topic <code>payments.completed</code>.'],
+    ['3. Topic dizayni','Kalit = hisob raqami (tartib). Partition: cho‘qqi 2 000/s ÷ eng sekin consumer (~200/s) × 2 zaxira ≈ <b>24</b>. RF=3, min.insync=2, retention 7 kun. Avro + Schema Registry.'],
+    ['4. Iste’molchilar','Alohida group’lar: <code>sms</code>, <code>cashback</code>, <code>fraud</code> (Kafka Streams, oynali qoidalar), <code>ledger</code> (buxgalteriya, blocking retry — tartib muhim). Har biri idempotent.'],
+    ['5. Xatolar','SMS/push — non-blocking retry + DLT; ledger — blocking retry + DLT + alert; ErrorHandlingDeserializer; DLT replay vositasi.'],
+    ['6. Uzoq saqlash','Audit/analitika uchun Connect S3/ClickHouse sink yoki tiered storage.'],
+    ['7. Operatsiya','3 AZ’da 3–6 broker, KRaft 3 controller, Strimzi; lag/URP/offline alert’lari; SASL_SSL + ACL; yuk testi va chaos test (broker o‘chirish).'],
+    ['8. Trade-off’larni ayting','Eventual consistency (SMS bir necha soniya keyin), dublikatlar — idempotentlik bilan, tartib faqat hisob ichida, operatsion murakkablik — managed Kafka yoki Strimzi.']];
+  el('dsg').innerHTML=DS.map(function(d){return '<div><b>'+d[0]+'</b>'+d[1]+'</div>';}).join('');
+  mkStepper('ds',DS.length,function(i){[].forEach.call(el('dsg').children,function(d,k){d.className=k===i?'on':k<i?'done':'';});},3200);
+})();
+
+</script>
+</body>
+</html>

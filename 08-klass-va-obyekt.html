@@ -1,0 +1,402 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Klass va obyekt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:14px;box-shadow:var(--shadow)}
+.anno .a-t{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--accent-ink);margin-bottom:4px}.anno .a-b{font-size:15px}
+.anno code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}
+
+/* factory */
+.factory{display:grid;grid-template-columns:1fr;gap:16px;margin-top:20px}
+.blueprint{background:var(--purple-soft);border:1.5px dashed var(--purple);border-radius:16px;padding:18px}
+.blueprint .bl-tag{font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:var(--purple-ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.blueprint pre{margin:0;font-family:var(--font-mono);font-size:13px;line-height:1.85;color:var(--ink);overflow-x:auto}
+.spawn-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spawn-btn{background:var(--accent);color:#fff;border:0;border-radius:11px;padding:11px 18px;font-weight:500;font-size:14.5px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);transition:.15s}
+.spawn-btn:hover{background:var(--accent-ink)}.spawn-btn:active{transform:scale(.97)}.spawn-btn svg{width:16px;height:16px}
+.clr-btn{background:var(--surface);border:1px solid var(--border-strong);border-radius:11px;padding:11px 14px;cursor:pointer;color:var(--ink-soft);font-size:13.5px;font-family:var(--font-mono)}
+.heap-zone{background:var(--sunken);border:1px solid var(--border);border-radius:16px;padding:16px;min-height:150px}
+.heap-tag{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.obj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
+.obj{background:var(--surface);border:1.5px solid var(--teal);border-radius:13px;padding:13px 14px;box-shadow:var(--shadow);animation:pop .35s cubic-bezier(.34,1.4,.5,1)}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.obj .oh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.obj .oaddr{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+.obj .orusum{font-family:var(--font-display);font-weight:600;font-size:15px}
+.obj .ofield{font-family:var(--font-mono);font-size:12.5px;display:flex;justify-content:space-between;padding:3px 0;color:var(--ink-soft)}
+.obj .ofield .fv{color:var(--teal-ink);font-weight:600}
+.obj .speed-btn{margin-top:9px;width:100%;background:var(--teal-soft);border:1px solid var(--teal);color:var(--teal-ink);border-radius:8px;padding:6px;font-size:12px;cursor:pointer;font-family:var(--font-mono)}
+.obj .speed-btn:active{transform:scale(.97)}
+.empty-heap{color:var(--ink-faint);font-size:13.5px;font-style:italic;padding:14px 4px}
+.factory-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-size:14.5px}
+.factory-note b{color:var(--accent-ink)}
+
+/* static vs instance */
+.si-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.si-class{border:1.5px solid var(--amber);border-radius:14px;padding:14px 16px;background:var(--amber-soft);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.si-class .scl{font-family:var(--font-mono);font-size:12px;color:var(--amber);font-weight:600}
+.si-static{font-family:var(--font-mono);font-size:14px;color:var(--amber);background:var(--surface);border:1.5px solid var(--amber);border-radius:9px;padding:8px 14px}
+.si-static b{font-size:20px}
+.si-objs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;min-height:70px}
+.si-obj{background:var(--teal-soft);border:1.5px solid var(--teal);border-radius:11px;padding:11px 12px;animation:pop .35s cubic-bezier(.34,1.4,.5,1)}
+.si-obj .son{font-family:var(--font-mono);font-size:11px;color:var(--teal-ink);opacity:.8}
+.si-obj .sov{font-family:var(--font-mono);font-size:15px;font-weight:600;color:var(--teal-ink)}
+.si-empty{color:var(--ink-faint);font-size:13px;font-style:italic;font-family:var(--font-body)}
+.si-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.si-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:12px;font-size:14px;min-height:44px}
+.si-note b{color:var(--accent-ink)}.si-note .am{color:var(--amber)}.si-note .tl2{color:var(--teal-ink)}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#9A5B2E"></span> OOP · 1/6</span><span>· Kurs: 8/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>OOP · 8-modul · noldan</span>
+    <h1>Klass va <span class="steam">obyekt</span></h1>
+    <p class="lead">Java butunlay obyektlarga qurilgan. Class — bu chizma (uy loyihasi). Obyekt — o'sha chizma bo'yicha qurilgan real uy. Bitta chizmadan minglab uy chiqadi, har biri mustaqil.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Class — holat + xatti-harakat</h2></div>
+    <p class="sec-sub">Class ikki narsani birlashtiradi: <b>maydonlar</b> (fields — "qanaqa") va <b>metodlar</b> (behavior — "nima qila oladi"). Rangli qismlarni bosing.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Mashina.java</span></div>
+      <pre class="code"><span class="k">public class</span> <span class="ty">Mashina</span> {
+    <span class="tap" data-p="field"><span class="ty">String</span> rusum;
+    <span class="ty">int</span> tezlik;</span>
+
+    <span class="tap" data-p="ctor"><span class="ty">Mashina</span>(<span class="ty">String</span> r) {   <span class="cm">// konstruktor</span>
+        <span class="k">this</span>.rusum = r;
+        <span class="k">this</span>.tezlik = <span class="nu">0</span>;
+    }</span>
+
+    <span class="tap" data-p="method"><span class="k">void</span> tezlashtir() {
+        tezlik = tezlik + <span class="nu">10</span>;
+    }</span>
+}</pre>
+    </div>
+    <div class="anno" id="anno"><div class="a-t" id="annoT"></div><div class="a-b" id="annoB"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Obyekt fabrikasi — new</h2></div>
+    <p class="sec-sub"><code>new Mashina("...")</code> chizmadan real obyekt yaratadi va uni Heap'ga joylaydi. Tugmani bosing — har bosishda yangi, <b>mustaqil</b> mashina paydo bo'ladi. Birini tezlashtiring — boshqasi o'zgarmaydi.</p>
+    <div class="factory">
+      <div class="blueprint">
+        <div class="bl-tag"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>class Mashina — chizma (bitta)</div>
+        <pre>class Mashina { String rusum; int tezlik = 0; }</pre>
+      </div>
+      <div class="spawn-bar">
+        <button class="spawn-btn" id="spawn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>new Mashina(...)</button>
+        <button class="clr-btn" id="clr">tozalash</button>
+      </div>
+      <div class="heap-zone">
+        <div class="heap-tag"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Heap — obyektlar (ko'p, mustaqil)</div>
+        <div class="obj-grid" id="objs"><div class="empty-heap">Hali obyekt yo'q. Tugmani bosing ↑</div></div>
+      </div>
+      <div class="factory-note" id="facNote">Bitta <b>class</b>dan cheksiz <b>obyekt</b> yasash mumkin. Har biri Heap'da alohida joy va o'z maydon qiymatlariga ega.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>this — "aynan shu obyekt"</h2></div>
+    <p class="sec-sub">Konstruktor ichida <code>this.rusum</code> yozdik. <code>this</code> — "hozir yaratilayotgan aynan shu obyekt". Parametr <code>r</code> bilan maydon <code>rusum</code>ni ajratish uchun kerak (ular bir xil nomli bo'lsa). Har obyektning o'z <code>this</code>'i bor.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">This.java</span></div>
+      <pre class="code"><span class="ty">Mashina</span>(<span class="ty">String</span> rusum) {
+    <span class="k">this</span>.rusum = rusum;  <span class="cm">// this.rusum = maydon, rusum = parametr</span>
+}
+<span class="cm">// this bo'lmasa: rusum = rusum; — parametr o'ziga o'zini bergan bo'lardi (xato mantiq)</span></pre>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>konstruktor zanjiri</div>
+      Bitta konstruktor boshqasini <code>this(...)</code> orqali chaqirishi mumkin (constructor chaining) — takrorni kamaytiradi. Masalan <code>Mashina()</code> ichida <code>this("Noma'lum")</code>.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>static vs instance maydon — jonli farq</h2></div>
+    <p class="sec-sub">Bu suhbatda tez-tez so'raladi. <b>instance</b> maydon — har obyektda alohida nusxa. <b>static</b> maydon — <b>butun class uchun bitta</b>, hamma obyektlar bo'lishadi. Obyekt yarating va farqni ko'ring: har birining o'z <code>id</code>'si bor, lekin <code>count</code> hammaga umumiy.</p>
+
+    <div class="si-card">
+      <div class="si-class">
+        <span class="scl">class Hisoblagich (static — umumiy)</span>
+        <span class="si-static">static count = <b id="siCount">0</b></span>
+      </div>
+      <div class="si-objs" id="siObjs"><span class="si-empty">Hali obyekt yo'q ↓</span></div>
+      <div class="si-btns">
+        <button class="spawn-btn" id="siSpawn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>new Hisoblagich()</button>
+        <button class="clr-btn" id="siClr">tozalash</button>
+      </div>
+      <div class="si-note" id="siNote">Har <code>new</code> da: obyekt o'z <span class="tl2">id</span>'sini oladi (alohida), va <span class="am">static count</span> bittaga oshadi (umumiy). Yaratib ko'ring.</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Hisoblagich.java</span></div>
+      <pre class="code"><span class="k">class</span> <span class="ty">Hisoblagich</span> {
+    <span class="k">static</span> <span class="ty">int</span> count = <span class="nu">0</span>;  <span class="cm">// UMUMIY — class'ga tegishli</span>
+    <span class="ty">int</span> id;                <span class="cm">// ALOHIDA — har obyektga tegishli</span>
+
+    <span class="ty">Hisoblagich</span>() {
+        count++;            <span class="cm">// umumiy hisob oshadi</span>
+        id = count;         <span class="cm">// bu obyekt o'z raqamini oladi</span>
+    }
+}</pre>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>suhbatda</div>
+      "static maydon qayerda saqlanadi?" — obyektda emas, <b>class darajasida</b> (Metaspace/Method Area). Shuning uchun obyektsiz ham mavjud va hamma obyektlar bir nusxani bo'lishadi. <code>Hisoblagich.count</code> deb class orqali kirasiz.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Encapsulation — himoyalash (kirish)</h2></div>
+    <p class="sec-sub">Maydonlarni <code>private</code> qilib, faqat metodlar orqali o'zgartirishga ruxsat berish. Bu keyingi modulda chuqur ochiladi — hozircha g'oya: metod ichida <b>tekshirish</b> qo'yasiz, ochiq maydonga esa har qanday qiymat kelishi mumkin.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Hisob.java</span></div>
+      <pre class="code"><span class="k">private</span> <span class="ty">int</span> balans;         <span class="cm">// tashqaridan to'g'ridan o'zgartirib bo'lmaydi</span>
+
+<span class="k">public void</span> yech(<span class="ty">int</span> s) {
+    <span class="k">if</span> (s &lt;= balans)          <span class="cm">// qoida shu yerda himoyalanadi</span>
+        balans -= s;
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Class va obyekt farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Class — ta'rif/chizma (bir marta yoziladi). Obyekt — <code>new</code> bilan undan yasalgan real nusxa (istagancha). Class xotira egallamaydi, obyekt Heap'da joy oladi. Class — retsept, obyekt — pishirilgan taom.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>static va instance maydon farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>instance</b> — har obyektda alohida nusxa (har mashinaning o'z tezligi). <b>static</b> — butun class uchun bitta, hamma obyektlar bo'lishadi (umumiy hisoblagich). static class orqali chaqiriladi, instance obyekt orqali.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Konstruktor nima va default konstruktor?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Konstruktor — obyekt yaratilganda ishga tushadigan maxsus metod (nomi class bilan bir xil, return tipi yo'q). Agar hech qanday konstruktor yozmasangiz, Java bo'sh <b>default konstruktor</b> qo'shadi. Lekin bitta konstruktor yozsangiz, default yo'qoladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>this nima uchun kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Joriy obyektga ishora qiladi. Asosan parametr va maydon bir xil nomli bo'lganda ularni ajratish uchun (<code>this.rusum = rusum</code>), yoki bir konstruktordan boshqasini chaqirish uchun (<code>this(...)</code>).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">1.</span>Bir class'dan 3 obyekt yaratsangiz, instance maydonlari?</div>
+        <button class="opt">Uchalasida umumiy, bir xil</button>
+        <button class="opt">Har birida alohida va mustaqil</button>
+        <button class="opt">Faqat birinchisida</button>
+        <div class="q-fb" data-ok="To'g'ri. Har obyekt Heap'da o'z joyini oladi — instance maydonlari mustaqil. static bo'lsagina umumiy bo'lardi." data-no="Yo'q. instance maydonlar har obyektda alohida. Faqat static maydon umumiy bo'ladi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">2.</span>static maydon nechta nusxada mavjud bo'ladi?</div>
+        <button class="opt">Bitta — butun class uchun</button>
+        <button class="opt">Har obyektda bittadan</button>
+        <button class="opt">Umuman saqlanmaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. static maydon class darajasida bitta nusxada — hamma obyektlar bir xilini bo'lishadi." data-no="Yo'q. static maydon butun class uchun bitta nusxada bo'ladi (obyektlar bo'lishadi)."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">3.</span>Konstruktorning return tipi qanday?</div>
+        <button class="opt">void</button>
+        <button class="opt">o'zi qaytaradigan tip</button>
+        <button class="opt">Yo'q — konstruktorda return tipi bo'lmaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. Konstruktorda return tipi yozilmaydi (void ham emas). Nomi class bilan bir xil bo'ladi." data-no="Yo'q. Konstruktorda umuman return tipi yozilmaydi — void ham emas."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Hech qanday konstruktor yozmasangiz nima bo'ladi?</div>
+        <button class="opt">Class ishlamaydi</button>
+        <button class="opt">Java bo'sh default konstruktor qo'shadi</button>
+        <button class="opt">Xato beradi</button>
+        <div class="q-fb" data-ok="To'g'ri. Java avtomatik bo'sh (parametrsiz) default konstruktor qo'shadi. Lekin o'zingiz bitta yozsangiz, default yo'qoladi." data-no="Yo'q. Java avtomatik bo'sh default konstruktor beradi (agar siz hech biri yozmasangiz)."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Encapsulation va access modifiers</h3>
+      <p>private, public, protected, default — kim nimaga kira oladi. getter/setter, immutable class va nega maydonlarni yashirish yaxshi dizayn. Bank hisobi misolida ko'ramiz.</p>
+      <div class="topics">
+        <span class="topic-pill">7 · Metodlar</span>
+        <span class="topic-pill now">8 · Klass &amp; obyekt</span>
+        <span class="topic-pill">9 · Encapsulation</span>
+        <span class="topic-pill">10 · Meros</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="07-metodlar.html"><span class="cl">← Oldingi dars</span><span class="ct">07 · Metodlar</span><span class="cs">☕ Java asoslari</span></a><a class="cn nx" href="09-encapsulation.html"><span class="cl">Keyingi dars →</span><span class="ct">09 · Encapsulation</span><span class="cs">🧱 OOP</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:9.1%"></i></div><span>8 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(8)<0)v.push(8);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','8');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(8)<0)D[t].push(8);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  var A={
+    field:{t:"maydonlar (fields)",b:"Obyektning <b>holati</b> — u qanaqa. <code>rusum</code> va <code>tezlik</code>. Har obyekt bu maydonlarning o'z nusxasini oladi (instance)."},
+    ctor:{t:"konstruktor",b:"Obyekt yaratilganda ishga tushadigan maxsus metod. Nomi class bilan bir xil, return tipi yo'q. <code>new Mashina(\"BMW\")</code> deganda shu ishlaydi."},
+    method:{t:"metod (behavior)",b:"Obyekt <b>nima qila oladi</b>. <code>tezlashtir()</code> shu obyektning tezligini oshiradi — faqat o'ziniki."}
+  };
+  var taps=[].slice.call(document.querySelectorAll('.tap')),annoT=document.getElementById('annoT'),annoB=document.getElementById('annoB');
+  function selTap(el){taps.forEach(function(t){t.classList.remove('sel');});el.classList.add('sel');var d=A[el.getAttribute('data-p')];annoT.textContent=d.t;annoB.innerHTML=d.b;}
+  taps.forEach(function(el){el.setAttribute('tabindex','0');el.setAttribute('role','button');el.addEventListener('click',function(){selTap(el);});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selTap(el);}});});
+  selTap(taps[0]);
+
+  /* factory */
+  var NAMES=['Nexia','Cobalt','Malibu','Tracker','Onix','Damas','Spark','Captiva','Lacetti','Gentra'];
+  var objs=document.getElementById('objs');var count=0;
+  function addr(){return '0x'+(0x5000+count*0x111).toString(16).toUpperCase();}
+  function spawn(){
+    if(count===0)objs.innerHTML='';
+    var name=NAMES[count%NAMES.length];count++;
+    var el=document.createElement('div');el.className='obj';
+    el.innerHTML='<div class="oh"><span class="orusum">'+name+'</span><span class="oaddr">'+addr()+'</span></div>'
+      +'<div class="ofield"><span>rusum</span><span class="fv">"'+name+'"</span></div>'
+      +'<div class="ofield"><span>tezlik</span><span class="fv sp">0</span></div>'
+      +'<button class="speed-btn">tezlashtir() +10</button>';
+    var sp=el.querySelector('.sp'),btn=el.querySelector('.speed-btn');
+    btn.addEventListener('click',function(){sp.textContent=(+sp.textContent)+10;});
+    objs.appendChild(el);
+  }
+  document.getElementById('spawn').addEventListener('click',spawn);
+  document.getElementById('clr').addEventListener('click',function(){count=0;objs.innerHTML='<div class="empty-heap">Hali obyekt yo\'q. Tugmani bosing ↑</div>';});
+  spawn();spawn();
+
+  /* static vs instance */
+  var siObjs=document.getElementById('siObjs'),siCount=document.getElementById('siCount'),siNote=document.getElementById('siNote');
+  var sc=0;
+  function siSpawn(){
+    if(sc===0)siObjs.innerHTML='';
+    sc++;siCount.textContent=sc;
+    var el=document.createElement('div');el.className='si-obj';
+    el.innerHTML='<div class="son">obyekt #'+sc+'</div><div class="sov">id = '+sc+'</div>';
+    siObjs.appendChild(el);
+    siNote.innerHTML='Yangi obyekt o\'z <span class="tl2">id = '+sc+'</span> ni oldi (alohida). Shu bilan birga <span class="am">static count = '+sc+'</span> — u bitta, hamma obyektlar bo\'lishadi. Har obyekt id\'si har xil, count esa umumiy.';
+  }
+  document.getElementById('siSpawn').addEventListener('click',siSpawn);
+  document.getElementById('siClr').addEventListener('click',function(){sc=0;siCount.textContent='0';siObjs.innerHTML='<span class="si-empty">Hali obyekt yo\'q ↓</span>';siNote.innerHTML='Har <code>new</code> da: obyekt o\'z <span class="tl2">id</span>\'sini oladi (alohida), va <span class="am">static count</span> bittaga oshadi (umumiy). Yaratib ko\'ring.';});
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

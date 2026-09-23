@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spring Data JPA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0E7C7B;--teal-ink:#0A5A59;--teal-soft:#DBF0EF;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(30,36,26,.05),0 8px 24px rgba(30,36,26,.06);
+  --shadow-lift:0 2px 4px rgba(30,36,26,.08),0 16px 40px rgba(30,36,26,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+:root{--blue:#2166A8;--blue-soft:#E3EEF7;--blue-ink:#184D7F}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){--blue:#5B9BD8;--blue-soft:#15243A;--blue-ink:#7DB3E8}}
+:root[data-theme="dark"]{--blue:#5B9BD8;--blue-soft:#15243A;--blue-ink:#7DB3E8}
+/* orm */
+.orm{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;margin-top:16px}
+.orm-side{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.orm-side .oh{font-family:var(--font-mono);font-size:12px;font-weight:600;margin-bottom:8px}
+.orm-side.obj .oh{color:var(--accent-ink)}.orm-side.tbl .oh{color:var(--blue-ink)}
+.frow{border:1.5px solid var(--border);border-radius:9px;padding:7px 10px;margin-bottom:6px;font-family:var(--font-mono);font-size:12px;cursor:pointer;transition:.15s;display:flex;justify-content:space-between;gap:8px}
+.frow:hover{border-color:var(--border-strong)}.frow.sel{border-color:var(--accent);background:var(--accent-soft)}
+.orm-side.tbl .frow.sel{border-color:var(--blue);background:var(--blue-soft)}
+.frow .ftype{color:var(--ink-faint);font-size:11px}
+.orm-mid{padding-top:40px;color:var(--ink-faint);font-family:var(--font-mono);font-size:11px;text-align:center}
+
+/* translator */
+.trin{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.trin input{flex:1;min-width:240px;font-family:var(--font-mono);font-size:13.5px;padding:10px 12px;border:1.5px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--ink)}
+.trin input:focus{outline:none;border-color:var(--accent)}
+.ex{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ex button{font-family:var(--font-mono);font-size:11px;border:1px solid var(--border);border-radius:7px;padding:4px 9px;background:var(--surface);cursor:pointer;color:var(--ink-soft)}
+.ex button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.tok{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px;min-height:28px}
+.tok span{font-family:var(--font-mono);font-size:11.5px;border-radius:6px;padding:3px 8px;animation:pop .25s}
+.tok .tp{background:var(--accent-soft);color:var(--accent-ink)}.tok .tf{background:var(--blue-soft);color:var(--blue-ink)}.tok .to{background:var(--purple-soft);color:var(--purple-ink)}.tok .tc{background:var(--amber-soft);color:var(--amber)}.tok .te{background:var(--coral-soft);color:var(--coral)}
+.sqlout{margin-top:10px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:13px;line-height:1.7;white-space:pre-wrap;min-height:60px}
+.sqlout .kw{color:var(--purple-ink);font-weight:600}.sqlout.err{color:var(--coral)}
+
+/* persistence context */
+.pc{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:10px;margin-top:14px;align-items:start}
+.pcc{background:var(--surface-2);border:1.5px solid var(--border);border-radius:13px;padding:11px;min-height:150px;transition:.3s}
+.pcc h5{font-family:var(--font-mono);font-size:11px;margin:0 0 8px;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase}
+.pcc.ctx{border-style:dashed;border-color:var(--accent)}
+.pcc.on{box-shadow:var(--shadow-lift);border-color:var(--accent)}
+.ent{border:1.5px solid var(--purple);background:var(--purple-soft);color:var(--purple-ink);border-radius:9px;padding:7px 9px;font-family:var(--font-mono);font-size:11.5px;transition:.35s;margin-bottom:6px}
+.ent.dirty{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
+.ent.det{border-color:var(--border-strong);background:var(--sunken);color:var(--ink-faint);border-style:dashed}
+.ent small{display:block;font-size:10px;opacity:.8}
+.dbrow{font-family:var(--font-mono);font-size:11.5px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:5px 8px;margin-bottom:5px}
+.dbrow.new{border-color:var(--teal);color:var(--teal-ink)}
+.sqllog{margin-top:10px;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.8;min-height:60px;color:var(--blue-ink)}
+.codeln{font-family:var(--font-mono);font-size:12px;padding:4px 9px;border-radius:7px;border-left:3px solid transparent;color:var(--ink-soft);transition:.25s}
+.codeln.cur{background:var(--accent-soft);border-left-color:var(--accent);color:var(--ink)}
+.codeln.done{opacity:.55}
+.codecol{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;margin-top:12px}
+@media (max-width:560px){.orm{grid-template-columns:1fr}.orm-mid{padding:0}.pc{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.an{color:var(--accent-ink);font-weight:500}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 5/9</span><span>· Kurs: 28/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 28-modul · noldan</span>
+    <h1>Spring Data <span class="steam">JPA</span></h1>
+    <p class="lead">Java obyektlari va baza jadvallari — ikki xil dunyo. JPA (Hibernate) ularni tarjima qiladi. Lekin "sehr" ostida nima bo'ladi? Bu modulda metod nomidan SQL yaratadigan jonli tarjimon va Hibernate'ning "persistence context"ini ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Entity ↔ jadval: mapping</h2></div>
+    <p class="sec-sub">ORM (Object-Relational Mapping): klass = jadval, obyekt = qator, maydon = ustun. Maydonni bosing — annotatsiya va ustunni ko'ring.</p>
+    <div class="orm">
+      <div class="orm-side obj"><div class="oh">@Entity Transfer (Java)</div>
+        <div class="frow" data-m="id"><span>@Id Long id</span><span class="ftype">@GeneratedValue</span></div>
+        <div class="frow" data-m="amt"><span>BigDecimal amount</span><span class="ftype">@Column(precision=19,scale=2)</span></div>
+        <div class="frow" data-m="st"><span>Status status</span><span class="ftype">@Enumerated(STRING)</span></div>
+        <div class="frow" data-m="from"><span>Account from</span><span class="ftype">@ManyToOne</span></div>
+        <div class="frow" data-m="cr"><span>Instant createdAt</span><span class="ftype">@CreationTimestamp</span></div>
+        <div class="frow" data-m="ver"><span>Long version</span><span class="ftype">@Version</span></div>
+      </div>
+      <div class="orm-mid">Hibernate<br>⇄</div>
+      <div class="orm-side tbl"><div class="oh">transfer (PostgreSQL)</div>
+        <div class="frow" data-m="id"><span>id</span><span class="ftype">bigint PK</span></div>
+        <div class="frow" data-m="amt"><span>amount</span><span class="ftype">numeric(19,2)</span></div>
+        <div class="frow" data-m="st"><span>status</span><span class="ftype">varchar</span></div>
+        <div class="frow" data-m="from"><span>from_account_id</span><span class="ftype">bigint FK</span></div>
+        <div class="frow" data-m="cr"><span>created_at</span><span class="ftype">timestamptz</span></div>
+        <div class="frow" data-m="ver"><span>version</span><span class="ftype">bigint</span></div>
+      </div>
+    </div>
+    <div class="demo-note" id="ormNote">Maydonni bosing.</div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Transfer.java</span></div>
+      <pre class="code"><span class="an">@Entity</span> <span class="an">@Table</span>(name = <span class="st">"transfer"</span>, indexes = <span class="an">@Index</span>(columnList = <span class="st">"status, created_at"</span>))
+<span class="an">@Getter @Setter @NoArgsConstructor</span>(access = PROTECTED)   <span class="cm">// JPA'ga no-arg ctor kerak; @Data EMAS</span>
+<span class="k">public class</span> <span class="ty">Transfer</span> {
+    <span class="an">@Id</span> <span class="an">@GeneratedValue</span>(strategy = GenerationType.SEQUENCE, generator = <span class="st">"transfer_seq"</span>)
+    <span class="an">@SequenceGenerator</span>(name = <span class="st">"transfer_seq"</span>, allocationSize = <span class="nu">50</span>)   <span class="cm">// batch insert uchun</span>
+    <span class="k">private</span> <span class="ty">Long</span> id;
+
+    <span class="an">@Column</span>(nullable = <span class="k">false</span>, precision = <span class="nu">19</span>, scale = <span class="nu">2</span>) <span class="k">private</span> <span class="ty">BigDecimal</span> amount;
+    <span class="an">@Enumerated</span>(EnumType.STRING) <span class="k">private</span> <span class="ty">Status</span> status;         <span class="cm">// ORDINAL emas — enum tartibi o'zgarsa buziladi</span>
+    <span class="an">@ManyToOne</span>(fetch = FetchType.LAZY) <span class="an">@JoinColumn</span>(name = <span class="st">"from_account_id"</span>) <span class="k">private</span> <span class="ty">Account</span> from;
+    <span class="an">@CreationTimestamp</span> <span class="k">private</span> <span class="ty">Instant</span> createdAt;
+    <span class="an">@Version</span> <span class="k">private</span> <span class="ty">Long</span> version;                               <span class="cm">// optimistic lock</span>
+
+    <span class="an">@Override</span> <span class="k">public boolean</span> equals(<span class="ty">Object</span> o) {                <span class="cm">// id bo'yicha, id null bo'lsa — false</span>
+        <span class="k">return</span> o <span class="k">instanceof</span> Transfer t &amp;&amp; id != <span class="k">null</span> &amp;&amp; id.equals(t.id); }
+    <span class="an">@Override</span> <span class="k">public int</span> hashCode() { <span class="k">return</span> getClass().hashCode(); }  <span class="cm">// doimiy — Set'da ishlashi uchun</span>
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Metod nomi → SQL: jonli tarjimon</h2></div>
+    <p class="sec-sub">Spring Data metod nomini <b>parse</b> qiladi: <code>findBy</code> + maydon + operator + <code>And/Or</code> + <code>OrderBy</code>. Yozib ko'ring — tokenlar va SQL darhol chiqadi.</p>
+    <div class="demo">
+      <div class="trin"><input id="mIn" value="findByStatusAndAmountGreaterThanOrderByCreatedAtDesc" spellcheck="false" aria-label="metod nomi"></div>
+      <div class="ex" id="mEx"></div>
+      <div class="tok" id="mTok"></div>
+      <div class="sqlout" id="mSql"></div>
+      <div class="demo-note" id="mNote"></div>
+    </div>
+    <div class="callout warn"><div class="ct">Qachon metod nomi yetmaydi</div>Nom 60+ belgi bo'lsa yoki JOIN/GROUP BY/subquery kerak bo'lsa — <code>@Query</code> (JPQL yoki nativeQuery). Dinamik filtrlar (ixtiyoriy 5 ta parametr) — <code>Specification</code> / Criteria API / QueryDSL. Faqat bir nechta ustun kerak — <b>projection</b> (interface yoki record) — butun entity yuklamang.</div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TransferRepository.java</span></div>
+      <pre class="code"><span class="k">interface</span> <span class="ty">TransferRepository</span> <span class="k">extends</span> <span class="ty">JpaRepository</span>&lt;Transfer, Long&gt;, <span class="ty">JpaSpecificationExecutor</span>&lt;Transfer&gt; {
+
+    <span class="ty">Page</span>&lt;Transfer&gt; findByStatus(<span class="ty">Status</span> s, <span class="ty">Pageable</span> p);                 <span class="cm">// derived + sahifalash</span>
+    <span class="ty">Optional</span>&lt;Transfer&gt; findByIdempotencyKey(<span class="ty">String</span> key);              <span class="cm">// Optional — topilmasa bo'sh</span>
+    <span class="k">boolean</span> existsByFromAccountIdAndStatus(<span class="ty">Long</span> accId, <span class="ty">Status</span> s);     <span class="cm">// SELECT 1 ... LIMIT 1 — count emas</span>
+
+    <span class="an">@Query</span>(<span class="st">"""
+        select new uz.bank.dto.DailyTotal(t.from.id, sum(t.amount))
+        from Transfer t
+        where t.createdAt &gt;= :from and t.status = 'COMPLETED'
+        group by t.from.id
+        """</span>)                                                          <span class="cm">// JPQL: entity va maydon nomlari, jadval emas</span>
+    <span class="ty">List</span>&lt;DailyTotal&gt; dailyTotals(<span class="an">@Param</span>(<span class="st">"from"</span>) <span class="ty">Instant</span> from);
+
+    <span class="an">@Query</span>(value = <span class="st">"select * from transfer where amount &gt; :a and created_at &gt; now() - interval '1 day'"</span>,
+           nativeQuery = <span class="k">true</span>)                                          <span class="cm">// Postgres'ga xos sintaksis kerak bo'lsa</span>
+    <span class="ty">List</span>&lt;Transfer&gt; bigToday(<span class="an">@Param</span>(<span class="st">"a"</span>) <span class="ty">BigDecimal</span> a);
+
+    <span class="an">@Modifying</span> <span class="an">@Query</span>(<span class="st">"update Transfer t set t.status = 'EXPIRED' where t.status = 'PENDING' and t.createdAt &lt; :b"</span>)
+    <span class="k">int</span> expire(<span class="an">@Param</span>(<span class="st">"b"</span>) <span class="ty">Instant</span> before);                             <span class="cm">// bulk — persistence context'ni chetlab o'tadi!</span>
+
+    <span class="k">interface</span> <span class="ty">TransferSummary</span> { <span class="ty">Long</span> getId(); <span class="ty">BigDecimal</span> getAmount(); }  <span class="cm">// projection</span>
+    <span class="ty">List</span>&lt;TransferSummary&gt; findByStatusOrderByCreatedAtDesc(<span class="ty">Status</span> s);
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Persistence context: Hibernate'ning "ish stoli"</h2></div>
+    <p class="sec-sub">Suhbatning eng chuqur savoli. Tranzaksiya ichida yuklangan entity'lar <b>persistence context</b>'da (1-darajali kesh) turadi. Siz maydonni o'zgartirasiz — <code>save()</code> chaqirmaysiz — commit'da Hibernate o'zi UPDATE yozadi (<b>dirty checking</b>). Kuzating:</p>
+    <div class="demo">
+      <div class="codecol" id="pcCode">
+        <div class="codeln">@Transactional void tasdiqla(Long id) {</div>
+        <div class="codeln">&nbsp;&nbsp;Transfer t = repo.findById(id).orElseThrow();</div>
+        <div class="codeln">&nbsp;&nbsp;Transfer t2 = repo.findById(id).orElseThrow();  // yana?</div>
+        <div class="codeln">&nbsp;&nbsp;t.setStatus(COMPLETED);   // save() YO'Q</div>
+        <div class="codeln">&nbsp;&nbsp;Transfer n = new Transfer(...); repo.save(n);</div>
+        <div class="codeln">}  // commit → flush</div>
+        <div class="codeln">t.setStatus(FAILED);   // tranzaksiyadan tashqarida</div>
+      </div>
+      <div class="pc">
+        <div class="pcc" id="pcApp"><h5>Sizning kodingiz</h5><div id="pcVars"></div></div>
+        <div class="pcc ctx" id="pcCtx"><h5>Persistence context (tx ichida)</h5><div id="pcEnts"></div></div>
+        <div class="pcc" id="pcDb"><h5>PostgreSQL</h5><div id="pcRows"></div></div>
+      </div>
+      <div class="sqllog" id="pcSql">-- SQL log</div>
+      <div class="demo-note" id="pcNote"></div>
+      <div class="controls"><button class="ctl" id="pcPrev">‹</button><button class="ctl primary" id="pcPlay">⏸ Pauza</button><button class="ctl" id="pcNext">›</button><div class="prog"><div class="bar" id="pcBar"></div></div></div>
+    </div>
+    <div class="callout iv"><div class="ct">Suhbatda so'raladi</div><b>Entity holatlari:</b> <b>transient/new</b> (new qilingan, context'da yo'q) → <code>persist/save</code> → <b>managed</b> (context kuzatadi, dirty checking ishlaydi) → tx tugadi → <b>detached</b> (o'zgarish bazaga bormaydi; <code>merge</code> bilan qaytariladi) → <code>remove</code> → <b>removed</b>. <code>save()</code> — id null bo'lsa persist, aks holda merge (SELECT + UPDATE).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Amaliy qoidalar</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>ID strategiyasi</h4><pre>IDENTITY — Postgres serial/identity; har INSERT
+  darhol ketadi (batch YO'Q)
+SEQUENCE + allocationSize=50 — Hibernate
+  50 ta ID oldindan oladi, batch INSERT ✓
+UUID — tarqoq tizimlar; v7 (vaqt tartibli) indeks uchun yaxshi</pre><div class="why">Ko'p yozuvli bank tizimi — SEQUENCE.</div></div>
+      <div class="card"><h4>Sxema: ddl-auto emas, migratsiya</h4><pre>spring.jpa.hibernate.ddl-auto: validate  # prod
+# create/update — faqat o'yinchoq loyihada
+Flyway: V3__add_transfer_index.sql
+Liquibase: changelog.yaml</pre><div class="why">Sxema o'zgarishi — kod bilan birga versiyalanadi, review qilinadi.</div></div>
+      <div class="card"><h4>open-in-view: false</h4><pre>spring.jpa.open-in-view: false</pre><div class="why">Default true — DB ulanish butun HTTP so'rov davomida band, lazy yuklash view'da sodir bo'ladi (N+1 yashirinadi). O'chiring, lazy'ni service'da hal qiling (29-modul).</div></div>
+      <div class="card"><h4>SQL'ni ko'ring</h4><pre>spring.jpa.show-sql: true            # dev
+logging.level.org.hibernate.SQL: DEBUG
+logging.level.org.hibernate.orm.jdbc.bind: TRACE  # parametrlar
+# yoki datasource-proxy / p6spy</pre><div class="why">Hibernate nima qilayotganini bilmasdan JPA yozish — ko'r haydash.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JPA, Hibernate, Spring Data JPA farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>JPA</b> — spetsifikatsiya (interfeyslar/annotatsiyalar: @Entity, EntityManager, JPQL). <b>Hibernate</b> — JPA'ning eng mashhur implementatsiyasi (+ o'z kengaytmalari). <b>Spring Data JPA</b> — Hibernate/JPA ustidagi qatlam: Repository abstraksiyasi, metod nomidan so'rov, sahifalash, auditing — boilerplate'ni yo'qotadi. JDBC — eng past qatlam, hammasi u orqali.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Persistence context nima? 1-darajali kesh?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">EntityManager'ga bog'langan, tranzaksiya davomida yashaydigan managed entity'lar to'plami. Vazifalari: identity (bir tx'da bir ID = bir obyekt), 1-darajali kesh (takror findById SQL ketmaydi), dirty checking (flush'da snapshot bilan solishtirib UPDATE), write-behind (SQL'ni flush'gacha kechiktirib batch qilish). 2-darajali kesh — SessionFactory darajasida, tx'lar orasida (Ehcache/Redis), alohida yoqiladi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Entity holatlari: transient, managed, detached, removed?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Transient</b> — new, context bilmaydi. <b>Managed</b> — persist/find'dan keyin, context kuzatadi, o'zgarish flush'da bazaga boradi. <b>Detached</b> — context yopildi (tx tugadi) yoki detach/clear; o'zgarish bazaga bormaydi, merge() bilan managed nusxa olinadi. <b>Removed</b> — remove() chaqirilgan, flush'da DELETE. save(): id null → persist, aks holda merge.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Dirty checking nima? save() chaqirish shartmi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Flush vaqtida Hibernate har managed entity'ni yuklangan snapshot bilan solishtiradi, farq bo'lsa UPDATE yaratadi. Shuning uchun @Transactional ichida findById → setX() yetarli, save() no-op. Kamchilik: ko'p entity'da flush qimmat (hammasi tekshiriladi); readOnly=true tranzaksiyada snapshot saqlanmaydi — tezroq.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>IDENTITY va SEQUENCE farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">IDENTITY — baza ID beradi, Hibernate ID'ni bilish uchun INSERT'ni darhol bajarishga majbur → JDBC batch ishlamaydi. SEQUENCE — Hibernate sequence'dan ID oladi (allocationSize=50 bilan 50 ta bir so'rovda), INSERT flush'gacha kechiktiriladi → batch mumkin (hibernate.jdbc.batch_size). PostgreSQL'da SEQUENCE tavsiya. UUID — global unikal, lekin random UUID B-tree indeksni parchalaydi (v7 yaxshiroq).</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JPQL va native query farqi? Qachon qaysi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">JPQL — entity va maydon nomlari bilan, baza-mustaqil, natija entity/DTO (select new). Native — xom SQL, Postgres'ga xos funksiyalar (jsonb, window, CTE, interval) uchun; natija mapping qo'lda (interface projection yoki @SqlResultSetMapping). Default JPQL/derived; murakkab hisobot/optimallashtirish — native.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@Modifying so'rovdan keyin nega eski ma'lumot ko'rinadi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Bulk UPDATE/DELETE bazaga to'g'ridan-to'g'ri ketadi, persistence context'dagi entity'lar yangilanmaydi — keyin findById eski (keshdagi) holatni qaytaradi. Yechim: @Modifying(clearAutomatically = true, flushAutomatically = true) yoki bulk'dan keyin entity'larni qayta yuklamaslik.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Entity'da equals/hashCode qanday yoziladi? Nega @Data yomon?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Lombok @Data hamma maydon bo'yicha equals/hashCode + toString yaratadi: lazy bog'lanishlar yuklanadi (LazyInitializationException / N+1), bidirectional'da cheksiz rekursiya, hashCode id saqlangach o'zgaradi (Set buziladi). To'g'ri: equals — id bo'yicha (id null bo'lsa false, instanceof bilan proxy'ni hisobga olib), hashCode — doimiy (getClass().hashCode()) yoki biznes kalit (UUID) bo'yicha.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ddl-auto=update prod'da nega xavfli?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ustun o'chirmaydi, nom o'zgarishini yangi ustun deb tushunadi (ma'lumot yo'qoladi), tip o'zgartirmaydi, indeks/constraint'larni to'liq boshqarmaydi, o'zgarishlar review'siz va qaytarib bo'lmaydi. Prod: validate (sxema mos kelmasa startup xatosi) + Flyway/Liquibase versiyalangan migratsiyalar.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>open-in-view nima, nega o'chirish kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">OSIV (Open Session In View): Hibernate sessiyasi butun HTTP so'rov davomida ochiq — controller/serializatsiyada lazy yuklash ishlaydi. Zarari: DB ulanish so'rov oxirigacha band (pool tugaydi), N+1 view'da yashirin, tranzaksiya chegarasi noaniq. spring.jpa.open-in-view=false; kerakli ma'lumotni service'da JOIN FETCH/DTO bilan yuklang.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>@Transactional ichida t.setStatus(COMPLETED) qildingiz, save() chaqirmadingiz. Bazaga yoziladimi?</div><button class="opt">Yo'q, save() shart</button><button class="opt">Ha — dirty checking commit'da UPDATE yaratadi</button><button class="opt">Faqat flush() chaqirsa</button><button class="opt">Exception</button><div class="q-fb" data-ok="To'g'ri. Managed entity o'zgarishi flush'da avtomatik UPDATE." data-no="Ha. Managed entity — Hibernate kuzatadi, commit'da o'zi UPDATE yozadi. save() no-op."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Bir tranzaksiyada findById(7) ni ikki marta chaqirdingiz. Nechta SELECT?</div><button class="opt">2</button><button class="opt">1 — ikkinchisi 1-darajali keshdan</button><button class="opt">0</button><button class="opt">3</button><div class="q-fb" data-ok="To'g'ri. Persistence context identity map." data-no="1 ta. Ikkinchisi context'dan qaytadi, hatto t == t2 (bir xil obyekt)."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>@Enumerated default (ORDINAL) bilan enum'ga o'rtaga yangi qiymat qo'shdingiz. Oqibat?</div><button class="opt">Hech narsa</button><button class="opt">Bazadagi raqamlar boshqa qiymatga mos kelib qoladi — ma'lumot 'buziladi'</button><button class="opt">Migration avtomatik</button><button class="opt">Startup xatosi</button><div class="q-fb" data-ok="To'g'ri. Shuning uchun doim EnumType.STRING." data-no="ORDINAL — enum indeksini saqlaydi. Tartib o'zgarsa 1 = eski COMPLETED endi PENDING bo'lib qoladi. STRING ishlating."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Ko'p qator INSERT qilishda batch ishlamayapti. Ehtimoliy sabab?</div><button class="opt">Postgres batch qo'llamaydi</button><button class="opt">GenerationType.IDENTITY — har INSERT darhol ketadi</button><button class="opt">@Transactional yo'q</button><button class="opt">BigDecimal ishlatilgan</button><div class="q-fb" data-ok="To'g'ri. SEQUENCE + allocationSize + hibernate.jdbc.batch_size kerak." data-no="IDENTITY strategiyasi Hibernate'ni INSERT'ni kechiktirishga qo'ymaydi. SEQUENCE'ga o'ting."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Tranzaksiya tugagach entity'ni o'zgartirdingiz. Nima bo'ladi?</div><button class="opt">Bazaga yoziladi</button><button class="opt">Hech narsa — entity detached</button><button class="opt">LazyInitializationException</button><button class="opt">Avtomatik yangi tranzaksiya</button><div class="q-fb" data-ok="To'g'ri. Detached entity kuzatilmaydi. Yozish uchun merge/save yoki tx ichida qiling." data-no="Detached — context yopilgan, o'zgarish hech qayerga bormaydi. Klassik 'nega saqlanmadi' bug'i."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">6.</span>Metod nomi findByNarx yozdingiz, Transfer'da narx maydoni yo'q. Qachon bilasiz?</div><button class="opt">Birinchi chaqiruvda runtime'da</button><button class="opt">Ilova ishga tushganda — startup xatosi</button><button class="opt">Hech qachon, null qaytaradi</button><button class="opt">Kompilyatsiyada</button><div class="q-fb" data-ok="To'g'ri. Spring Data repository'larni startup'da tekshiradi — fail-fast." data-no="Startup'da PropertyReferenceException — ilova ko'tarilmaydi. Prod'ga yetmaydi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Spring</span>
+      <h3>JPA bog'lanishlar va N+1</h3>
+      <p>@OneToMany, @ManyToOne, LAZY vs EAGER, va JPA'ning eng mashhur muammosi — N+1 so'rov. 1 so'rov o'rniga 101 ta ketishini jonli ko'rasiz va JOIN FETCH / EntityGraph bilan tuzatasiz.</p>
+      <div class="topics"><span class="topic-pill">27 · Validation</span><span class="topic-pill now">28 · Spring Data JPA</span><span class="topic-pill">29 · Bog'lanishlar & N+1</span><span class="topic-pill">30 · @Transactional</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="27-validation-va-xatolar.html"><span class="cl">← Oldingi dars</span><span class="ct">27 · Validation va xatolar</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="29-jpa-boglanishlar-va-n-1.html"><span class="cl">Keyingi dars →</span><span class="ct">29 · JPA bog&#x27;lanishlar va N+1</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:31.8%"></i></div><span>28 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(28)<0)v.push(28);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','28');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(28)<0)D[t].push(28);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* orm */
+  var ON={id:'<b>@Id @GeneratedValue</b> → bigint PRIMARY KEY. SEQUENCE strategiyasi — Hibernate ID\'ni oldindan oladi (batch uchun). Long ishlating (long emas) — null = "hali saqlanmagan".',amt:'<b>@Column(precision=19, scale=2)</b> → numeric(19,2). Pul uchun doim BigDecimal + numeric. double/float — hech qachon (3-modul).',st:'<b>@Enumerated(STRING)</b> → varchar "COMPLETED". ORDINAL (default!) 0,1,2 saqlaydi — enum\'ga yangi qiymat o\'rtaga qo\'shsangiz hamma ma\'lumot buziladi.',from:'<b>@ManyToOne @JoinColumn(from_account_id)</b> → bigint FOREIGN KEY. Ko\'p o\'tkazma → bitta hisob. LAZY qiling! (29-modul)',cr:'<b>@CreationTimestamp</b> (Hibernate) yoki <b>@CreatedDate</b> (Spring Data auditing) → timestamptz. Instant tipi, UTC (20-modul).',ver:'<b>@Version</b> → bigint. Har UPDATE\'da +1 va WHERE version=? — ikki parallel yangilash: ikkinchisi OptimisticLockException (409). Bank uchun muhim.'};
+  [].slice.call(document.querySelectorAll('.frow')).forEach(function(r){r.addEventListener('click',function(){var m=r.dataset.m;[].slice.call(document.querySelectorAll('.frow')).forEach(function(x){x.classList.toggle('sel',x.dataset.m===m);});document.getElementById('ormNote').innerHTML=ON[m];});});
+
+  /* translator */
+  var FIELDS={Status:'status',Amount:'amount',CreatedAt:'created_at',Id:'id',IdempotencyKey:'idempotency_key',Currency:'currency',FromAccountId:'from_account_id',FromAccount:'from_account_id',Version:'version'};
+  var OPS=[['GreaterThanEqual','>= ?'],['LessThanEqual','<= ?'],['GreaterThan','> ?'],['LessThan','< ?'],['Between','BETWEEN ? AND ?'],['StartingWith',"LIKE ? || '%'"],['EndingWith',"LIKE '%' || ?"],['Containing',"LIKE '%' || ? || '%'"],['NotIn','NOT IN (?)'],['In','IN (?)'],['IsNotNull','IS NOT NULL'],['NotNull','IS NOT NULL'],['IsNull','IS NULL'],['Like','LIKE ?'],['IsTrue','= true'],['True','= true'],['IsFalse','= false'],['False','= false'],['Not','<> ?'],['After','> ?'],['Before','< ?'],['IgnoreCase','= ? (lower)']];
+  function parseMethod(s){
+    var toks=[],m=s.match(/^(find|read|get|query|count|exists|delete|remove)(Distinct)?(Top\d+|First\d*)?By(.*)$/);
+    if(!m)throw 'prefiks topilmadi: find/count/exists/deleteBy... bilan boshlanishi kerak';
+    var verb=m[1],distinct=!!m[2],limit=m[3],rest=m[4];toks.push(['tp',verb+(distinct?'Distinct':'')+(limit||'')+'By']);
+    var order=null;var oi=rest.indexOf('OrderBy');if(oi>=0){order=rest.slice(oi+7);rest=rest.slice(0,oi);}
+    var conds=[];if(rest.length){var parts=rest.split(/(And|Or)/);for(var i=0;i<parts.length;i++){var p=parts[i];if(p==='And'||p==='Or'){toks.push(['to',p]);conds.push(p.toUpperCase());continue;}
+      var op='= ?',opn=null;for(var k=0;k<OPS.length;k++){if(p.endsWith(OPS[k][0])&&p.length>OPS[k][0].length){opn=OPS[k][0];op=OPS[k][1];p=p.slice(0,-opn.length);break;}}
+      var col=FIELDS[p];if(!col)throw 'maydon topilmadi: "'+p+'" (Transfer\'da: '+Object.keys(FIELDS).slice(0,7).join(', ')+')';
+      toks.push(['tf',p]);if(opn)toks.push(['tc',opn]);conds.push(col+' '+op);}}
+    var ob=null;if(order!==null){var dir='ASC';if(order.endsWith('Desc')){dir='DESC';order=order.slice(0,-4);}else if(order.endsWith('Asc')){order=order.slice(0,-3);}var oc=FIELDS[order];if(!oc)throw 'OrderBy maydoni topilmadi: "'+order+'"';toks.push(['to','OrderBy']);toks.push(['tf',order]);toks.push(['tc',dir]);ob=oc+' '+dir;}
+    var sel=verb==='count'?'SELECT count(*)':verb==='exists'?'SELECT 1':(verb==='delete'||verb==='remove')?'DELETE':'SELECT '+(distinct?'DISTINCT ':'')+'t.*';
+    var sql=sel+' FROM transfer t'+(conds.length?'\nWHERE '+conds.join(' '):'')+(ob?'\nORDER BY '+ob:'');
+    if(verb==='exists')sql+='\nLIMIT 1';if(limit){var n=limit.replace(/\D/g,'')||'1';sql+='\nLIMIT '+n;}
+    var ret=verb==='count'?'long':verb==='exists'?'boolean':(verb==='delete'||verb==='remove')?'void / long':(limit&&(limit.replace(/\D/g,'')||'1')==='1')?'Optional<Transfer>':'List<Transfer> (yoki Page)';
+    return {toks:toks,sql:sql,ret:ret,verb:verb,delete:verb==='delete'||verb==='remove'};
+  }
+  var mIn=document.getElementById('mIn');
+  function runM(){try{var r=parseMethod(mIn.value.trim());document.getElementById('mTok').innerHTML=r.toks.map(function(t){return '<span class="'+t[0]+'">'+t[1]+'</span>';}).join('');document.getElementById('mSql').className='sqlout';document.getElementById('mSql').innerHTML=r.sql.replace(/\b(SELECT|FROM|WHERE|AND|OR|ORDER BY|DESC|ASC|LIMIT|DELETE|BETWEEN|LIKE|IN|IS|NOT|NULL|DISTINCT)\b/g,'<span class="kw">$1</span>');document.getElementById('mNote').innerHTML='Qaytish tipi: <b>'+r.ret+'</b>. '+(r.delete?'<b>deleteBy</b> — avval SELECT qilib, har entity\'ni alohida o\'chiradi (lifecycle uchun). Ko\'p qator — @Modifying @Query tezroq. ':'')+(r.verb==='exists'?'existsBy — count(*) emas, LIMIT 1 — katta jadvalda ancha tez. ':'')+'Parametrlar soni = ? soni, tartib metod nomi tartibida.';}
+    catch(e){document.getElementById('mTok').innerHTML='<span class="te">xato</span>';document.getElementById('mSql').className='sqlout err';document.getElementById('mSql').textContent='Startup xatosi (ilova ishga tushmaydi!): '+e;document.getElementById('mNote').innerHTML='Spring Data metod nomlarini <b>ilova ishga tushganda</b> tekshiradi — xato bo\'lsa PropertyReferenceException, deploy yiqiladi. Bu yaxshi: prod\'da emas, darhol bilasiz.';}}
+  mIn.addEventListener('input',runM);
+  document.getElementById('mEx').innerHTML=['findByStatus','findByStatusAndAmountGreaterThanOrderByCreatedAtDesc','findTop5ByStatusOrderByAmountDesc','existsByIdempotencyKey','countByFromAccountIdAndCreatedAtAfter','findByAmountBetweenAndCurrencyIn','deleteByStatusAndCreatedAtBefore','findByNarx'].map(function(x){return '<button data-x="'+x+'">'+x+'</button>';}).join('');
+  [].slice.call(document.querySelectorAll('#mEx button')).forEach(function(b){b.addEventListener('click',function(){mIn.value=b.dataset.x;runM();});});
+  runM();
+
+  /* persistence context */
+  var PS=[
+    {ln:0,vars:[],ents:[],rows:[['id=7 status=PENDING','']],sql:'BEGIN',note:'@Transactional metod boshlandi → tranzaksiya ochildi, <b>bo\'sh persistence context</b> yaratildi.'},
+    {ln:1,vars:['t → Transfer#7'],ents:[['Transfer#7 status=PENDING','managed · snapshot saqlandi','']],rows:[['id=7 status=PENDING','']],sql:'BEGIN\nSELECT ... FROM transfer WHERE id=7',note:'findById → context\'da yo\'q → SQL SELECT. Entity <b>managed</b> bo\'ldi; Hibernate uning asl nusxasini (snapshot) eslab qoldi.'},
+    {ln:2,vars:['t → Transfer#7','t2 → Transfer#7 (o\'sha obyekt!)'],ents:[['Transfer#7 status=PENDING','managed','']],rows:[['id=7 status=PENDING','']],sql:'BEGIN\nSELECT ... WHERE id=7\n-- 2-findById: SQL YO\'Q (1-darajali kesh)',note:'Ikkinchi findById — <b>SQL ketmadi</b>: context\'da bor. <code>t == t2</code> — true. Bitta tranzaksiyada bitta ID = bitta obyekt (identity guarantee).'},
+    {ln:3,vars:['t → Transfer#7','t2 → Transfer#7'],ents:[['Transfer#7 status=COMPLETED','managed · DIRTY (snapshot\'dan farq)','dirty']],rows:[['id=7 status=PENDING','']],sql:'BEGIN\nSELECT ... WHERE id=7\n-- setStatus: hali SQL yo\'q',note:'Maydon o\'zgardi. <b>Hali UPDATE yo\'q</b> — Hibernate faqat obyektni o\'zgartirdi. save() chaqirish shart emas — u managed entity uchun hech narsa qilmaydi (no-op).'},
+    {ln:4,vars:['t → Transfer#7','n → Transfer#? → #8'],ents:[['Transfer#7 status=COMPLETED','dirty','dirty'],['Transfer#8 (yangi)','managed · SEQUENCE\'dan id=8','']],rows:[['id=7 status=PENDING','']],sql:'BEGIN\nSELECT ... WHERE id=7\nSELECT nextval(\'transfer_seq\')  -- faqat ID\n-- INSERT hali yo\'q (SEQUENCE bo\'lgani uchun)',note:'save(new) → persist → <b>transient → managed</b>. SEQUENCE strategiyasida faqat ID olinadi, INSERT flush\'gacha kechiktiriladi (IDENTITY bo\'lsa INSERT darhol ketardi).'},
+    {ln:5,vars:[],ents:[],rows:[['id=7 status=COMPLETED','new'],['id=8 ...','new']],sql:'BEGIN\nSELECT ... WHERE id=7\nSELECT nextval(...)\nUPDATE transfer SET status=\'COMPLETED\', version=version+1 WHERE id=7 AND version=3\nINSERT INTO transfer (id, ...) VALUES (8, ...)\nCOMMIT',note:'<b>Commit → flush → dirty checking</b>: Hibernate har managed entity\'ni snapshot bilan solishtirdi — #7 o\'zgargan → UPDATE; #8 yangi → INSERT. Keyin context yopildi, entity\'lar <b>detached</b>.'},
+    {ln:6,vars:['t → Transfer#7 (detached)'],ents:[],rows:[['id=7 status=COMPLETED','']],sql:'-- context yopiq. setStatus(FAILED): hech qanday SQL',note:'Tranzaksiya tashqarisida o\'zgarish <b>bazaga bormaydi</b> — entity detached, hech kim kuzatmaydi. Klassik bug: "nega saqlanmadi?". Yechim: @Transactional ichida qiling yoki repo.save(t) (merge).'}
+  ];
+  var pi=0,pp=true,pt=null;
+  function prender(){var s=PS[pi];[].slice.call(document.querySelectorAll('#pcCode .codeln')).forEach(function(l,i){l.classList.toggle('cur',i===s.ln);l.classList.toggle('done',i<s.ln);});
+    document.getElementById('pcVars').innerHTML=s.vars.map(function(v){return '<div class="ent'+(v.indexOf('detached')>=0?' det':'')+'">'+v+'</div>';}).join('')||'<span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)">—</span>';
+    document.getElementById('pcEnts').innerHTML=s.ents.map(function(e){return '<div class="ent '+e[2]+'">'+e[0]+'<small>'+e[1]+'</small></div>';}).join('')||'<span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)">bo\'sh</span>';
+    document.getElementById('pcRows').innerHTML=s.rows.map(function(r){return '<div class="dbrow '+r[1]+'">'+r[0]+'</div>';}).join('');
+    document.getElementById('pcCtx').classList.toggle('on',s.ents.length>0);document.getElementById('pcSql').textContent=s.sql;document.getElementById('pcNote').innerHTML=s.note;document.getElementById('pcBar').style.width=(pi/(PS.length-1)*100)+'%';}
+  function pgo(n){pi=(n+PS.length)%PS.length;prender();if(pp)psch();}function psch(){clearTimeout(pt);pt=setTimeout(function(){pgo(pi+1);},3200);}
+  document.getElementById('pcPlay').addEventListener('click',function(){pp=!pp;this.textContent=pp?'⏸ Pauza':'▶ Davom';if(pp)psch();else clearTimeout(pt);});
+  document.getElementById('pcNext').addEventListener('click',function(){pp=false;document.getElementById('pcPlay').textContent='▶ Davom';clearTimeout(pt);pgo(pi+1);});
+  document.getElementById('pcPrev').addEventListener('click',function(){pp=false;document.getElementById('pcPlay').textContent='▶ Davom';clearTimeout(pt);pgo(pi-1);});
+  prender();psch();
+
+})();
+</script>
+</body>
+</html>

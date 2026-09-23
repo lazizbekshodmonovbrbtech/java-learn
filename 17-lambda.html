@@ -1,0 +1,335 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Lambda va funksional interfeyslar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(32px,6.5vw,52px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+/* shrink stepper */
+.shrink-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.shrink-code{background:var(--sunken);border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;min-height:150px;white-space:pre;overflow-x:auto;color:var(--ink);transition:.3s}
+.shrink-code .fade{color:var(--ink-faint);text-decoration:line-through;opacity:.5}
+.shrink-code .hl{background:var(--accent-soft);border-radius:4px;padding:0 3px;color:var(--accent-ink);font-weight:600}
+.shrink-cap{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;min-height:60px;font-size:14.5px}
+.shrink-cap b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.lines-badge{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+/* FI tester */
+.fi-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.fi-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;justify-content:center}
+.fi-btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--ink);transition:.15s}
+.fi-btn.on{background:var(--purple);border-color:var(--purple);color:#fff}
+.fi-sig{font-family:var(--font-mono);font-size:13px;background:var(--purple-soft);border:1px solid var(--purple);border-radius:10px;padding:10px 14px;color:var(--purple-ink);text-align:center;margin-bottom:14px}
+.fi-code{font-family:var(--font-mono);font-size:13.5px;background:var(--sunken);border-radius:10px;padding:12px 14px;margin-bottom:14px;color:var(--ink);text-align:center}
+.fi-test{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.fi-test label{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.fi-test input{width:120px;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font-mono);font-size:13.5px;background:var(--surface-2);color:var(--ink)}
+.fi-test button{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 16px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px}
+.fi-out{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-family:var(--font-mono);font-size:14px;text-align:center;min-height:46px;color:var(--ink)}
+.fi-out b{color:var(--accent-ink)}
+.fi-desc{font-size:13.5px;color:var(--ink-soft);text-align:center;margin-top:10px}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#8A6A1E"></span> Java Core · 4/7</span><span>· Kurs: 17/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Core · 17-modul · noldan</span>
+    <h1>Lambda va <span class="steam">funksional</span> interfeyslar</h1>
+    <p class="lead">Java 8'ning inqilobi: kodni <b>qiymat sifatida</b> uzatish. Ilgari "bir marta ishlatiladigan xatti-harakat" uchun butun class yozilardi — endi bitta qator. Stream API (18-modul) shunga quriladi.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Anonymous class'dan lambda'ga — qadam-baqadam</h2></div>
+    <p class="sec-sub">Lambda sehr emas — u anonymous class'ning qisqa yozuvi. Kompilyator ortiqcha narsalarni o'zi "topib oladi". Har qadamda nima olib tashlanishini kuzating.</p>
+    <div class="shrink-card">
+      <div class="shrink-code" id="shrinkCode"></div>
+      <div class="shrink-cap" id="shrinkCap"></div>
+      <div class="controls">
+        <button class="ctl" id="sprev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="ctl primary" id="snext"><span>Keyingi qadam</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <div class="prog"><div class="bar" id="sbar"></div></div>
+        <span class="lines-badge" id="linesBadge"></span>
+      </div>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>lambda ishlashi uchun shart</div>
+      Lambda faqat <b>functional interface</b>ga tayinlanadi — aynan <b>bitta</b> abstract metodi bo'lgan interfeys. Shunda kompilyator qaysi metodni amalga oshirayotganingizni bilib oladi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Tayyor funksional interfeyslar — sinab ko'ring</h2></div>
+    <p class="sec-sub">Java <code>java.util.function</code>da ko'p ishlatiladiganlarini tayyor beradi. Har biri "qancha kirish, qanday chiqish" bilan farq qiladi. Birini tanlang, qiymat kiriting, natijani ko'ring.</p>
+    <div class="fi-card">
+      <div class="fi-btns" id="fiBtns">
+        <button class="fi-btn on" data-f="pred">Predicate</button>
+        <button class="fi-btn" data-f="func">Function</button>
+        <button class="fi-btn" data-f="cons">Consumer</button>
+        <button class="fi-btn" data-f="supp">Supplier</button>
+      </div>
+      <div class="fi-sig" id="fiSig"></div>
+      <div class="fi-code" id="fiCode"></div>
+      <div class="fi-test" id="fiTest">
+        <label>kirish:</label>
+        <input type="text" id="fiIn" value="42">
+        <button id="fiRun">bajar</button>
+      </div>
+      <div class="fi-out" id="fiOut">Natija shu yerda</div>
+      <div class="fi-desc" id="fiDesc"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Method reference — yanada qisqa</h2></div>
+    <p class="sec-sub">Lambda faqat mavjud metodni chaqirsa, uni <code>::</code> bilan yanada qisqartirsa bo'ladi.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">MethodRef.java</span></div>
+      <pre class="code"><span class="cm">// lambda → method reference</span>
+s -&gt; System.out.println(s)     →   <span class="ty">System</span>.out::println
+s -&gt; s.toUpperCase()           →   <span class="ty">String</span>::toUpperCase
+x -&gt; <span class="k">new</span> <span class="ty">User</span>(x)               →   <span class="ty">User</span>::<span class="k">new</span>
+
+<span class="cm">// amalda:</span>
+ismlar.forEach(<span class="ty">System</span>.out::println);
+ismlar.stream().map(<span class="ty">String</span>::toUpperCase);</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>O'z funksional interfeysingiz</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Custom.java</span></div>
+      <pre class="code"><span class="cm">@FunctionalInterface</span>   <span class="cm">// kompilyator: faqat 1 abstract metod bo'lsin</span>
+<span class="k">interface</span> <span class="ty">Hisoblagich</span> {
+    <span class="ty">int</span> hisobla(<span class="ty">int</span> a, <span class="ty">int</span> b);
+}
+
+<span class="ty">Hisoblagich</span> qoshish = (a, b) -&gt; a + b;
+<span class="ty">Hisoblagich</span> kopaytir = (a, b) -&gt; a * b;
+qoshish.hisobla(<span class="nu">3</span>, <span class="nu">4</span>);    <span class="cm">// 7</span>
+kopaytir.hisobla(<span class="nu">3</span>, <span class="nu">4</span>);  <span class="cm">// 12 — bir interfeys, turli xatti-harakat</span></pre>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>effectively final</div>
+      Lambda tashqi lokal o'zgaruvchini ishlatsa, u <b>o'zgarmas</b> (final yoki effectively final) bo'lishi shart. <code>int n = 5; Runnable r = () -&gt; print(n); n = 6;</code> — xato! Sabab: lambda o'zgaruvchining nusxasini oladi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Lambda nima va nega kerak?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Nomsiz funksiya — xatti-harakatni qiymat sifatida uzatish usuli. Anonymous class'ning qisqa yozuvi. Foydasi: kamroq shablon kod, o'qish oson, Stream/kolleksiya API'lar bilan tabiiy ishlaydi. Faqat functional interface'ga tayinlanadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Functional interface nima?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Aynan <b>bitta</b> abstract metodi bo'lgan interfeys (default/static metodlar sanalmaydi). <code>@FunctionalInterface</code> annotatsiyasi kompilyatorni tekshirishga majburlaydi. Misollar: Runnable, Comparator, Predicate, Function.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Predicate, Function, Consumer, Supplier farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Predicate&lt;T&gt;</b>: T → boolean (filtr). <b>Function&lt;T,R&gt;</b>: T → R (o'zgartirish). <b>Consumer&lt;T&gt;</b>: T → hech narsa (iste'mol, masalan print). <b>Supplier&lt;T&gt;</b>: hech narsa → T (ishlab chiqarish). Kirish/chiqish shakliga qarab tanlanadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Lambda va anonymous class farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Lambda qisqaroq, alohida .class fayl yaratmaydi (invokedynamic orqali), <code>this</code> tashqi class'ga ishora qiladi (anonymous'da o'ziga). Anonymous class bir necha metodli interfeys/abstract class uchun ham ishlaydi, lambda — faqat functional interface.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">1.</span>Lambda qaysi interfeysga tayinlanadi?</div>
+        <button class="opt">Istalgan interfeysga</button><button class="opt">Faqat bitta abstract metodli (functional) interfeysga</button><button class="opt">Faqat abstract class'ga</button>
+        <div class="q-fb" data-ok="To'g'ri. Functional interface — aynan bitta abstract metod. Shunda kompilyator qaysi metodni amalga oshirayotganini biladi." data-no="Yo'q. Lambda faqat functional interface'ga (bitta abstract metod) tayinlanadi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">2.</span>Ro'yxatni filtrlash uchun qaysi interfeys?</div>
+        <button class="opt">Predicate (T → boolean)</button><button class="opt">Supplier</button><button class="opt">Consumer</button>
+        <div class="q-fb" data-ok="To'g'ri. Predicate qiymat olib boolean qaytaradi — filtrlash uchun ideal." data-no="Yo'q. Filtrlash — Predicate (T → boolean)."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">3.</span><code>s -&gt; s.toUpperCase()</code> ning method reference ko'rinishi?</div>
+        <button class="opt">String.toUpperCase()</button><button class="opt">s::toUpperCase</button><button class="opt">String::toUpperCase</button>
+        <div class="q-fb" data-ok="To'g'ri. Class nomi :: metod nomi — String::toUpperCase." data-no="Yo'q. To'g'risi String::toUpperCase (Class::metod)."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Lambda ichida ishlatilgan tashqi lokal o'zgaruvchi?</div>
+        <button class="opt">Istalgancha o'zgarishi mumkin</button><button class="opt">final yoki effectively final bo'lishi shart</button><button class="opt">Ishlatib bo'lmaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. Lambda o'zgaruvchi nusxasini oladi — shuning uchun u o'zgarmas bo'lishi kerak." data-no="Yo'q. Tashqi lokal o'zgaruvchi final yoki effectively final bo'lishi shart."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>Stream API chuqur</h3>
+      <p>Lambda'lar bilan qurollangan holda — ma'lumot oqimi: filter → map → sorted → collect. Elementlarning quvur bo'ylab o'tishi jonli animatsiya, lazy evaluation, collectors va groupingBy.</p>
+      <div class="topics">
+        <span class="topic-pill">16 · Exceptions</span>
+        <span class="topic-pill now">17 · Lambda</span>
+        <span class="topic-pill">18 · Stream API</span>
+        <span class="topic-pill">19 · Optional</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="16-exceptions-chuqur.html"><span class="cl">← Oldingi dars</span><span class="ct">16 · Exceptions chuqur</span><span class="cs">⚙️ Java Core</span></a><a class="cn nx" href="18-stream-api.html"><span class="cl">Keyingi dars →</span><span class="ct">18 · Stream API</span><span class="cs">⚙️ Java Core</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:19.3%"></i></div><span>17 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(17)<0)v.push(17);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','17');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(17)<0)D[t].push(17);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* shrink stepper */
+  var STEPS=[
+    {code:'<span class="hl">Comparator&lt;String&gt; c = new Comparator&lt;String&gt;() {</span>\n    <span class="hl">@Override</span>\n    <span class="hl">public int compare</span>(String a, String b) {\n        return a.length() - b.length();\n    }\n<span class="hl">};</span>',cap:'<b>Boshlang\'ich — anonymous class.</b> Bitta metodni amalga oshirish uchun 6 qator: class nomi, @Override, metod imzosi, qavslar. Ko\'p shablon.',lines:6},
+    {code:'Comparator&lt;String&gt; c = <span class="fade">new Comparator&lt;String&gt;() {</span>\n    <span class="fade">@Override</span>\n    <span class="fade">public int compare</span>(String a, String b) <span class="hl">-&gt;</span> {\n        return a.length() - b.length();\n    }\n<span class="fade">};</span>',cap:'<b>1-qadam:</b> Comparator functional interface (bitta metod: compare). Kompilyator class nomi, @Override va metod nomini <b>o\'zi biladi</b> — olib tashlaymiz, o\'rniga <code>-&gt;</code>.',lines:3},
+    {code:'Comparator&lt;String&gt; c = (<span class="fade">String</span> a, <span class="fade">String</span> b) -&gt; {\n    return a.length() - b.length();\n};',cap:'<b>2-qadam:</b> Parametr tiplari (String) ham interfeysdan ma\'lum — <b>olib tashlaymiz</b>. Kompilyator tipni o\'zi aniqlaydi (type inference).',lines:3},
+    {code:'Comparator&lt;String&gt; c = (a, b) -&gt; <span class="fade">{ return</span> a.length() - b.length()<span class="fade">; }</span>;',cap:'<b>3-qadam:</b> Tana bitta ifoda bo\'lsa — <code>{ }</code> va <code>return</code> ham kerak emas. Ifoda natijasi avtomatik qaytadi.',lines:1},
+    {code:'Comparator&lt;String&gt; c = (a, b) -&gt; a.length() - b.length();',cap:'<b>Natija — lambda.</b> 6 qator → 1 qator. Ma\'no o\'zgarmadi: "ikki String olib, uzunlik farqini qaytar". Bu kompilyator uchun ham, odam uchun ham aniqroq.',lines:1}
+  ];
+  var si=0;var shrinkCode=document.getElementById('shrinkCode'),shrinkCap=document.getElementById('shrinkCap'),sbar=document.getElementById('sbar'),linesBadge=document.getElementById('linesBadge');
+  function srender(){var s=STEPS[si];shrinkCode.innerHTML=s.code;shrinkCap.innerHTML=s.cap;sbar.style.width=((si/(STEPS.length-1))*100)+'%';linesBadge.textContent=s.lines+' qator';
+    document.querySelector('#snext span').textContent=si===STEPS.length-1?'Boshidan':'Keyingi qadam';}
+  document.getElementById('snext').addEventListener('click',function(){si=(si+1)%STEPS.length;srender();});
+  document.getElementById('sprev').addEventListener('click',function(){si=(si-1+STEPS.length)%STEPS.length;srender();});
+  srender();
+
+  /* FI tester */
+  var FI={
+    pred:{sig:'Predicate&lt;Integer&gt; : Integer → boolean',code:'Predicate&lt;Integer&gt; juft = n -&gt; n % 2 == 0;',desc:'Filtrlash uchun: qiymat olib ha/yo\'q qaytaradi. Stream.filter() shuni ishlatadi.',input:true,run:function(v){var n=parseInt(v,10);if(isNaN(n))return 'son kiriting';return 'juft.test('+n+') → <b>'+(n%2===0)+'</b>';}},
+    func:{sig:'Function&lt;Integer, Integer&gt; : Integer → Integer',code:'Function&lt;Integer,Integer&gt; kvadrat = n -&gt; n * n;',desc:'O\'zgartirish uchun: bir qiymat olib boshqasini qaytaradi. Stream.map() shuni ishlatadi.',input:true,run:function(v){var n=parseInt(v,10);if(isNaN(n))return 'son kiriting';return 'kvadrat.apply('+n+') → <b>'+(n*n)+'</b>';}},
+    cons:{sig:'Consumer&lt;String&gt; : String → (hech narsa)',code:'Consumer&lt;String&gt; chopEt = s -&gt; System.out.println(s);',desc:'Iste\'mol qilish uchun: qiymat oladi, hech narsa qaytarmaydi (yon ta\'sir). forEach() shuni ishlatadi.',input:true,run:function(v){return 'chopEt.accept("'+v+'") → konsolga: <b>'+v+'</b> (qaytmaydi)';}},
+    supp:{sig:'Supplier&lt;Double&gt; : (hech narsa) → Double',code:'Supplier&lt;Double&gt; tasodif = () -&gt; Math.random();',desc:'Ishlab chiqarish uchun: kirish yo\'q, qiymat qaytaradi. Lazy yaratish, default qiymatlar uchun.',input:false,run:function(){return 'tasodif.get() → <b>'+Math.random().toFixed(4)+'</b> (har safar yangi)';}}
+  };
+  var fiKey='pred';
+  var fiSig=document.getElementById('fiSig'),fiCode=document.getElementById('fiCode'),fiDesc=document.getElementById('fiDesc'),fiOut=document.getElementById('fiOut'),fiIn=document.getElementById('fiIn'),fiTest=document.getElementById('fiTest');
+  function showFi(k){fiKey=k;[].slice.call(document.querySelectorAll('#fiBtns .fi-btn')).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===k);});
+    var f=FI[k];fiSig.innerHTML=f.sig;fiCode.innerHTML=f.code;fiDesc.textContent=f.desc;fiOut.innerHTML='Natija shu yerda';
+    fiIn.style.display=f.input?'':'none';fiTest.querySelector('label').style.display=f.input?'':'none';}
+  [].slice.call(document.querySelectorAll('#fiBtns .fi-btn')).forEach(function(b){b.addEventListener('click',function(){showFi(b.getAttribute('data-f'));});});
+  document.getElementById('fiRun').addEventListener('click',function(){fiOut.innerHTML=FI[fiKey].run(fiIn.value);});
+  showFi('pred');
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

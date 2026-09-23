@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vue Router va Keycloak guard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+.rt{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;margin-top:10px}
+.rt>div{min-width:0}
+/* mini browser */
+.brw{border:2px solid var(--border-strong);border-radius:14px;overflow:hidden;background:var(--surface)}
+.brw .bbar{display:flex;gap:6px;align-items:center;padding:7px 8px;background:var(--surface-2);border-bottom:1px solid var(--border);border-radius:0}
+.brw .bbar button{font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:7px;width:28px;height:26px;cursor:pointer;flex:none}
+.url{flex:1;min-width:0;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:4px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .3s}
+.url.ch{background:var(--accent-soft)}
+.url.kc{background:#FDECEC;color:#8A1C1C}
+.nav{display:flex;gap:4px;flex-wrap:wrap;padding:7px 8px;border-bottom:1px solid var(--border)}
+.nav a{font-size:12px;padding:4px 8px;border-radius:7px;color:var(--ink);text-decoration:none;border:1px solid transparent;cursor:pointer}
+.nav a.act{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.view{min-height:170px;padding:14px;position:relative;transition:opacity .25s}
+.view.fade{opacity:.15}
+.view h4{margin:0 0 6px;font-size:16px}
+.view .mut{color:var(--ink-faint);font-size:12.5px}
+.crd{display:inline-block;border-radius:10px;padding:10px 12px;color:#fff;font-family:var(--font-mono);font-size:12px;margin:4px 6px 0 0;cursor:pointer;background:linear-gradient(135deg,#2C8F68,#1F6B4E)}
+.crd.b{background:linear-gradient(135deg,#2E6FA8,#1D4E7A)}
+.kcv{background:#F3F4F6;margin:-14px;padding:18px;min-height:170px;text-align:center;color:#222}
+.kcv .kcbox{background:#fff;border-radius:10px;padding:14px;max-width:240px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.1);text-align:left}
+.kcv .kcbox input{width:100%;box-sizing:border-box;margin:4px 0 8px;padding:5px 7px;border:1px solid #ccc;border-radius:6px;font-size:12px}
+.kcv .kcbox button{width:100%;background:#C8372D;color:#fff;border:0;border-radius:6px;padding:7px;cursor:pointer;font-weight:600}
+.kcv small{display:block;color:#666;font-size:10.5px;margin-bottom:6px;font-family:var(--font-mono)}
+/* pipeline */
+.pipe{display:flex;flex-direction:column;gap:5px}
+.ps{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;border:1.5px solid var(--border);border-radius:10px;padding:6px 8px;background:var(--surface-2);transition:.3s;font-size:12.5px}
+.ps .dot{width:20px;height:20px;border-radius:50%;background:var(--sunken);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--font-mono);color:var(--ink-faint)}
+.ps b{font-family:var(--font-mono);font-size:12px}
+.ps .d{display:block;color:var(--ink-soft);font-size:11.5px;margin-top:1px;min-height:15px}
+.ps.run{border-color:var(--accent);background:var(--accent-soft)}
+.ps.run .dot{background:var(--accent);color:#fff}
+.ps.ok .dot{background:var(--teal);color:#fff}
+.ps.stop{border-color:var(--coral);background:var(--coral-soft)}
+.ps.stop .dot{background:var(--coral);color:#fff}
+.ps.skip{opacity:.4}
+.dl{height:5px;border-radius:3px;background:var(--sunken);margin-top:4px;overflow:hidden}
+.dl i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s}
+.sw{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.sw label{display:inline-flex;gap:6px;align-items:center;font-family:var(--font-mono);font-size:12.5px;cursor:pointer}
+/* routes table */
+.rtab{margin-top:10px;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.rtab div{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;padding:4px 8px;border-bottom:1px solid var(--border);transition:background .3s}
+.rtab div:last-child{border-bottom:0}
+.rtab div.hd{background:var(--surface-2);color:var(--ink-faint);font-size:10.5px}
+.rtab div.m{background:var(--accent-soft);font-weight:700}
+.rtab div.x{color:var(--ink-faint);text-decoration:line-through}
+/* history stack */
+.hs{display:flex;flex-direction:column-reverse;gap:4px;min-height:120px;justify-content:flex-start;border:1px dashed var(--border-strong);border-radius:10px;padding:8px}
+.hs div{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);border-radius:7px;padding:4px 8px;background:var(--surface);animation:pop .3s;transition:.3s}
+.hs div.cur{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.hs div.fw{opacity:.4;border-style:dashed}
+@media (max-width:760px){.rt{grid-template-columns:1fr}.rtab div{grid-template-columns:1.3fr 1fr}.rtab div span:nth-child(3){display:none}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 6/8</span><span>· Kurs: 86/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 86-modul · Vue Router</span>
+    <h1><span class="steam">Vue Router</span>: SPA navigatsiya va himoyalangan sahifalar</h1>
+    <p class="lead">SPA’da sahifa almashganda brauzer serverdan yangi HTML so‘ramaydi: Vue Router URL’ni o‘zgartiradi (History API), mos marshrutni topadi, <b>guard</b>’lardan o‘tkazadi va kerakli komponentni (kerak bo‘lsa — kechiktirib yuklangan JS bo‘lagini) chizadi. Bank ilovasida guard — Keycloak token va rol tekshiruvi (40-modullardagi Keycloak bilan bog‘laymiz).</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Navigatsiya ichidan ko‘rinish</h2></div><p class="sec-sub">Chapda — ilova (mini brauzer), o‘ngda — har bir o‘tish bosib o‘tadigan bosqichlar. Pastdagi holatlarni o‘zgartirib, bir xil havolani bosing: qayerda to‘xtaydi?</p>
+    <div class="stage">
+      <div class="rt">
+        <div>
+          <div class="brw"><div class="bbar"><button id="bBack" title="orqaga">←</button><button id="bFwd" title="oldinga">→</button><div class="url" id="url">https://bank.uz/</div></div>
+            <div class="nav" id="nav"><a data-to="/">Bosh</a><a data-to="/kartalar">Kartalar</a><a data-to="/kartalar/4417">Karta 4417</a><a data-to="/otkazma">O‘tkazma</a><a data-to="/admin">Admin</a><a data-to="/xyz">/xyz</a></div>
+            <div class="view" id="view"></div></div>
+          <div class="sw"><label><input type="checkbox" id="sLog"> login qilingan</label><label><input type="checkbox" id="sAdm"> rol: admin</label><label><input type="checkbox" id="sExp"> access token muddati o‘tgan</label></div>
+          <div class="rtab" id="rtab"></div>
+        </div>
+        <div><div class="pipe" id="pipe"></div></div>
+      </div>
+      <div class="explain" id="rEx">Havolani bosing. Hozir foydalanuvchi <b>login qilmagan</b> — himoyalangan sahifaga kirsa nima bo‘ladi?</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">router/index.ts</span></div><pre class="code"><span class="k">const</span> routes: <span class="ty">RouteRecordRaw</span>[] = [
+  { path: <span class="st">'/'</span>, component: <span class="ty">Bosh</span> },
+  { path: <span class="st">'/kartalar'</span>, component: () =&gt; <span class="k">import</span>(<span class="st">'@/pages/Kartalar.vue'</span>),       <span class="cm">// lazy chunk</span>
+    meta: { auth: <span class="k">true</span> } },
+  { path: <span class="st">'/kartalar/:id(\\d+)'</span>, component: () =&gt; <span class="k">import</span>(<span class="st">'@/pages/Karta.vue'</span>),
+    props: <span class="k">true</span>, meta: { auth: <span class="k">true</span> } },
+  { path: <span class="st">'/otkazma'</span>, component: () =&gt; <span class="k">import</span>(<span class="st">'@/pages/Otkazma.vue'</span>),
+    meta: { auth: <span class="k">true</span> } },
+  { path: <span class="st">'/admin'</span>, component: () =&gt; <span class="k">import</span>(<span class="st">'@/pages/Admin.vue'</span>),
+    meta: { auth: <span class="k">true</span>, roles: [<span class="st">'admin'</span>] } },
+  { path: <span class="st">'/:pathMatch(.*)*'</span>, component: <span class="ty">NotFound</span> },
+]
+<span class="k">export</span> <span class="k">const</span> router = createRouter({ history: createWebHistory(), routes })
+
+router.beforeEach(<span class="k">async</span> (to) =&gt; {
+  <span class="k">if</span> (!to.meta.auth) <span class="k">return</span> <span class="k">true</span>
+  <span class="k">if</span> (!keycloak.authenticated) {
+    <span class="k">await</span> keycloak.login({ redirectUri: location.origin + to.fullPath })  <span class="cm">// Keycloak'ka ketadi</span>
+    <span class="k">return</span> <span class="k">false</span>
+  }
+  <span class="k">await</span> keycloak.updateToken(<span class="nu">30</span>)            <span class="cm">// 30 s dan kam qolgan bo'lsa — refresh</span>
+  <span class="k">const</span> roles = to.meta.roles <span class="k">as</span> <span class="k">string</span>[] | <span class="k">undefined</span>
+  <span class="k">if</span> (roles &amp;&amp; !roles.some(r =&gt; keycloak.hasRealmRole(r))) <span class="k">return</span> { path: <span class="st">'/403'</span> }
+  <span class="k">return</span> <span class="k">true</span>
+})
+router.afterEach(to =&gt; { document.title = (to.meta.title <span class="k">as</span> <span class="k">string</span>) ?? <span class="st">'Bank'</span> })</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>History stack: push va replace</h2></div><p class="sec-sub">Brauzer tarixi — stek. <code>router.push</code> yangi yozuv qo‘shadi, <code>router.replace</code> joriysini almashtiradi (masalan, login’dan keyin — "orqaga" bosilganda yana login sahifasiga qaytmasin).</p>
+    <div class="stage"><div class="rt"><div>
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="hP1">push("/kartalar")</button><button class="btn" id="hP2">push("/otkazma")</button><button class="btn" id="hRp">replace("/otkazma/tasdiq")</button><button class="btn" id="hBk">router.back()</button><button class="btn" id="hR">↺</button></div>
+      <div class="explain" id="hEx">Tugmalarni bosing va o‘ngdagi stekni kuzating.</div></div>
+      <div><div class="hs" id="hs"></div></div></div></div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Tushuncha</th><th>Nima</th><th>Misol</th></tr><tr><td><code>createWebHistory</code></td><td>Toza URL (<code>/kartalar</code>), serverda fallback kerak</td><td>nginx: <code>try_files $uri /index.html;</code></td></tr><tr><td><code>createWebHashHistory</code></td><td><code>/#/kartalar</code> — server sozlamasiz</td><td>Statik hosting, eski tizimlar</td></tr><tr><td>Dinamik segment</td><td><code>/kartalar/:id</code> → <code>route.params.id</code></td><td><code>props: true</code> bilan komponentga prop</td></tr><tr><td>Query</td><td><code>?sahifa=2&amp;q=aziz</code> → <code>route.query</code></td><td>Filtr va sahifalash holati URL’da</td></tr><tr><td>Nested routes + <code>&lt;RouterView&gt;</code></td><td>Layout ichida sahifa</td><td><code>/kabinet/profil</code>, <code>/kabinet/xavfsizlik</code></td></tr><tr><td>Lazy loading</td><td><code>() =&gt; import(…)</code> — alohida JS bo‘lak</td><td>Bosh sahifa tez ochiladi, admin kodi oddiy mijozga yuklanmaydi</td></tr></table></div>
+    <div class="callout warn"><div class="ct">Guard — xavfsizlik emas, UX</div>Frontend guard foydalanuvchini noto‘g‘ri sahifadan qaytaradi, lekin JS kodi baribir brauzerda — uni chetlab o‘tish mumkin. <b>Haqiqiy himoya — backend</b>: har API so‘rovida token imzosi va rol tekshiriladi (Spring Security + Keycloak, 44–47-modullar).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SPA’da routing qanday ishlaydi?<span class="chev">›</span></summary><div class="iv-a">Router history.pushState bilan URL’ni sahifani qayta yuklamasdan o‘zgartiradi va popstate hodisasini (orqaga/oldinga) tinglaydi. URL marshrut jadvaliga moslanadi, guard’lar ishlaydi, mos komponent &lt;RouterView&gt; ichida render qilinadi. Brauzer serverga faqat birinchi marta (va JS bo‘laklari uchun) murojaat qiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>History mode’da sahifani yangilasa 404 chiqyapti. Nega?<span class="chev">›</span></summary><div class="iv-a">Brauzer /kartalar/4417 ni serverdan so‘raydi, bunday fayl yo‘q. Server barcha noma’lum yo‘llarni index.html’ga qaytarishi kerak (nginx try_files, Spring’da forward). Yoki hash mode.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Navigation guard turlari?<span class="chev">›</span></summary><div class="iv-a">Global: beforeEach, beforeResolve, afterEach. Marshrut darajasida: beforeEnter. Komponent ichida: onBeforeRouteLeave (saqlanmagan forma — "chiqishni tasdiqlaysizmi?"), onBeforeRouteUpdate (bir xil komponent, params o‘zgardi — /kartalar/1 → /kartalar/2).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak bilan himoyalangan marshrutni qanday qilasiz?<span class="chev">›</span></summary><div class="iv-a">meta.auth va meta.roles; beforeEach’da keycloak.authenticated tekshiruvi, yo‘q bo‘lsa keycloak.login({ redirectUri }) (PKCE bilan Authorization Code flow), bor bo‘lsa updateToken(30) va rol tekshiruvi. Lekin asosiy himoya — backend’da JWT tekshiruvi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Lazy loading nima beradi?<span class="chev">›</span></summary><div class="iv-a">Har sahifa alohida JS bo‘lakka (chunk) ajraladi va faqat kerak bo‘lganda yuklanadi — boshlang‘ich bundle kichik, bosh sahifa tez ochiladi. Kamchiligi — birinchi o‘tishda kichik kechikish (prefetch yoki loading holati bilan yumshatiladi).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>/kartalar/1 dan /kartalar/2 ga o‘tildi, lekin ma’lumot yangilanmadi. Nega?<span class="chev">›</span></summary><div class="iv-a">Bir xil komponent qayta ishlatiladi — setup/onMounted qayta ishlamaydi. route.params.id ni watch qilish yoki onBeforeRouteUpdate, yoki &lt;RouterView :key="route.fullPath"&gt;.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Login qilmagan foydalanuvchi /kartalar ga kirdi. beforeEach nima qiladi?</div><button class="opt">Sahifani ko‘rsatadi</button><button class="opt">Keycloak login’ga redirect, keyin qaytaradi</button><button class="opt">404</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. meta.auth — login talab qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Login’dan keyin "orqaga" bosilganda login sahifasiga qaytmaslik uchun?</div><button class="opt">router.push</button><button class="opt">router.replace</button><button class="opt">router.go(2)</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. replace joriy yozuvni almashtiradi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Frontend guard — yetarli himoyami?</div><button class="opt">Ha</button><button class="opt">Yo‘q, backend tokenni tekshirishi shart</button><button class="opt">Faqat admin uchun</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. JS’ni chetlab o‘tish mumkin."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>() =&gt; import("./Admin.vue") nima qiladi?</div><button class="opt">Darhol yuklaydi</button><button class="opt">Alohida chunk — faqat o‘tilganda yuklanadi</button><button class="opt">Xato</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Bu lazy loading."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>/kartalar/:id da id ni olish?</div><button class="opt">route.query.id</button><button class="opt">route.params.id</button><button class="opt">route.id</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Dinamik segment — params."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Pinia va API qatlami</h3>
+      <p>Global holat, axios interceptor bilan token yangilash (bir vaqtda 5 ta 401 — bitta refresh), xatolarni markaziy boshqarish.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill now">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="85-composition-api.html"><span class="cl">← Oldingi dars</span><span class="ct">85 · Composition API</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="87-pinia-api.html"><span class="cl">Keyingi dars →</span><span class="ct">87 · Pinia + API</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:97.7%"></i></div><span>86 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(86)<0)v.push(86);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','86');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(86)<0)D[t].push(86);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var ROUTES=[
+    {p:'/',re:/^\/$/,c:'Bosh',auth:false},
+    {p:'/kartalar',re:/^\/kartalar$/,c:'Kartalar',auth:true,chunk:'Kartalar-8c1f.js',kb:14},
+    {p:'/kartalar/:id(\\d+)',re:/^\/kartalar\/(\d+)$/,c:'Karta',auth:true,chunk:'Karta-2ab9.js',kb:9},
+    {p:'/otkazma',re:/^\/otkazma$/,c:'Otkazma',auth:true,chunk:'Otkazma-51de.js',kb:22},
+    {p:'/admin',re:/^\/admin$/,c:'Admin',auth:true,roles:['admin'],chunk:'Admin-f03c.js',kb:48},
+    {p:'/:pathMatch(.*)*',re:/.*/,c:'NotFound',auth:false}];
+  var loaded={},busy=false,hist=['/'],hi=0,pendingTo=null,runId=0;
+  var ST=[['1','URL o‘zgardi','history.pushState — sahifa qayta yuklanmaydi'],['2','Marshrutni moslash','routes jadvali yuqoridan pastga'],['3','beforeEach (auth guard)',''],['4','Lazy chunk',''],['5','Render &lt;RouterView&gt;',''],['6','afterEach','document.title, analitika']];
+  el('pipe').innerHTML=ST.map(function(s,i){return '<div class="ps" id="ps'+i+'"><span class="dot">'+s[0]+'</span><div><b>'+s[1]+'</b><span class="d" id="pd'+i+'">'+s[2]+'</span>'+(i===3?'<div class="dl"><i id="dlb"></i></div>':'')+'</div></div>';}).join('');
+  function rtab(mi){el('rtab').innerHTML='<div class="hd"><span>path</span><span>component</span><span>meta</span></div>'+ROUTES.map(function(r,i){return '<div class="'+(mi===i?'m':(mi!=null&&i<mi?'x':''))+'"><span>'+r.p+'</span><span>'+r.c+'</span><span>'+(r.auth?'auth'+(r.roles?', admin':''):'—')+'</span></div>';}).join('');}
+  rtab(null);
+  function ps(i,cls,d){var n=el('ps'+i);n.className='ps '+cls;if(d!=null)el('pd'+i).innerHTML=d;}
+  function resetPipe(){ST.forEach(function(s,i){ps(i,'',s[2]);});el('dlb').style.transition='none';el('dlb').style.width='0';}
+  function setUrl(u,cls){var n=el('url');n.textContent=u;n.className='url '+(cls||'ch');if(cls!=='kc')setTimeout(function(){n.className='url';},500);}
+  function act(path){[].forEach.call(el('nav').children,function(a){a.classList.toggle('act',a.getAttribute('data-to')===path);});}
+  function view(html){var v=el('view');v.classList.add('fade');setTimeout(function(){v.innerHTML=html;v.classList.remove('fade');},200);}
+  function page(r,m,path){switch(r.c){
+    case 'Bosh':return '<h4>Xush kelibsiz 👋</h4><div class="mut">Ochiq sahifa — kurslar, filiallar, yangiliklar. Login shart emas.</div>';
+    case 'Kartalar':return '<h4>Mening kartalarim</h4><span class="crd" data-go="/kartalar/4417">UZCARD •• 4417<br>2 350 000</span><span class="crd b" data-go="/kartalar/0921">HUMO •• 0921<br>870 000</span>';
+    case 'Karta':return '<h4>Karta •• '+m[1]+'</h4><div class="mut">route.params.id = "'+m[1]+'" → props: { id: "'+m[1]+'" }</div><div style="margin-top:8px" class="mut">Oxirgi amallar yuklanmoqda (onMounted → API)…</div>';
+    case 'Otkazma':return '<h4>O‘tkazma</h4><div class="mut">Forma. onBeforeRouteLeave — to‘ldirilgan forma tashlab ketilsa ogohlantiradi.</div>';
+    case 'Admin':return '<h4>Admin panel</h4><div class="mut">Foydalanuvchilar, limitlar, audit log.</div>';
+    case '403':return '<h4>403 — ruxsat yo‘q</h4><div class="mut">Sizda <code>admin</code> roli yo‘q.</div>';
+    default:return '<h4>404</h4><div class="mut">'+path+' topilmadi (catch-all marshrut).</div>';}}
+  function kcPage(to){return '<div class="kcv"><div class="kcbox"><small>keycloak.bank.uz · realm: bank</small><b style="font-size:13px">Kirish</b><input value="otabek" readonly><input type="password" value="••••••••" readonly><button id="kcGo">Kirish</button></div><div style="font-size:10.5px;color:#666;margin-top:8px;font-family:var(--font-mono)">redirect_uri=…'+to+'</div></div>';}
+  function wait(ms,id){return new Promise(function(res,rej){setTimeout(function(){id===runId?res():rej('x');},ms);});}
+  function go(path,mode){if(busy)return;busy=true;var id=++runId;resetPipe();var r,m,mi;
+    var logged=el('sLog').checked,adm=el('sAdm').checked,exp=el('sExp').checked;
+    ps(0,'run');setUrl('https://bank.uz'+path);
+    if(mode!=='pop'){if(mode==='replace')hist[hi]=path;else{hist=hist.slice(0,hi+1);hist.push(path);hi++;}}
+    wait(550,id).then(function(){ps(0,'ok');ps(1,'run');
+      for(mi=0;mi<ROUTES.length;mi++){m=path.match(ROUTES[mi].re);if(m){r=ROUTES[mi];break;}}
+      rtab(mi);ps(1,'run','→ <b>'+r.p+'</b>'+(m&&m[1]?' · params.id = "'+m[1]+'"':''));return wait(700,id);})
+    .then(function(){ps(1,'ok');ps(2,'run');
+      if(!r.auth){ps(2,'ok','meta.auth yo‘q → ruxsat');return wait(400,id);}
+      if(!logged){ps(2,'stop','authenticated = false → <b>keycloak.login()</b>');setUrl('https://keycloak.bank.uz/realms/bank/protocol/openid-connect/auth?client_id=web&amp;redirect_uri=…','kc');
+        el('url').textContent='https://keycloak.bank.uz/realms/bank/…/auth?client_id=web&code_challenge=…';
+        [3,4,5].forEach(function(i){ps(i,'skip');});pendingTo=path;view(kcPage(path));act(null);
+        el('rEx').innerHTML='Guard <b>navigatsiyani to‘xtatdi</b> va brauzerni Keycloak login sahifasiga yubordi (Authorization Code + PKCE). <code>redirect_uri</code> da asl manzil saqlangan — kirgandan keyin shu yerga qaytamiz. "Kirish"ni bosing.';busy=false;throw 'stop';}
+      if(exp){ps(2,'run','token 30 s ichida tugaydi → <b>updateToken(30)</b> — refresh token bilan yangi access token…');return wait(1100,id).then(function(){el('sExp').checked=false;ps(2,'run','✓ token yangilandi (foydalanuvchi sezmadi)');return wait(500,id);}).then(roleCheck);}
+      return roleCheck();
+      function roleCheck(){if(r.roles&&!adm){ps(2,'stop','rol tekshiruvi: <b>admin</b> yo‘q → redirect /403');[3].forEach(function(i){ps(i,'skip');});
+          return wait(600,id).then(function(){setUrl('https://bank.uz/403');if(mode!=='pop')hist[hi]='/403';ps(4,'run','403 sahifa');view(page({c:'403'}));act(null);return wait(500,id);}).then(function(){ps(4,'ok');ps(5,'ok','title = "Ruxsat yo‘q"');drawHist();busy=false;
+            el('rEx').innerHTML='Login bor, lekin <b>rol yetmaydi</b>. Guard <code>{ path: "/403" }</code> qaytardi — yangi navigatsiya. Eslatma: bu faqat UX; <code>/api/admin/**</code> ni backend baribir 403 bilan yopadi.';throw 'stop';});}
+        ps(2,'ok','authenticated ✓'+(r.roles?' · rol admin ✓':''));return wait(400,id);}})
+    .then(function(){ps(3,'run');
+      if(!r.chunk){ps(3,'skip','asosiy bundle ichida');return wait(200,id);}
+      if(loaded[r.chunk]){ps(3,'ok',r.chunk+' — keshda, qayta yuklanmaydi');el('dlb').style.transition='none';el('dlb').style.width='100%';return wait(300,id);}
+      ps(3,'run','GET /assets/'+r.chunk+' ('+r.kb+' KB)…');var t=Math.min(1400,300+r.kb*20);el('dlb').style.transition='width '+t+'ms linear';requestAnimationFrame(function(){el('dlb').style.width='100%';});
+      return wait(t,id).then(function(){loaded[r.chunk]=1;ps(3,'ok',r.chunk+' yuklandi ('+r.kb+' KB)');});})
+    .then(function(){ps(4,'run','&lt;'+r.c+'&gt; mount');view(page(r,m,path));act(path);return wait(500,id);})
+    .then(function(){ps(4,'ok');ps(5,'ok','document.title = "'+r.c+' · Bank"');drawHist();busy=false;
+      el('rEx').innerHTML=r.auth?'O‘tish muvaffaqiyatli. '+(r.chunk?'Birinchi o‘tishda <b>'+r.chunk+'</b> yuklandi — keyingi safar keshdan. ':'')+'Holatlarni o‘zgartirib (login’ni o‘chiring, "token muddati o‘tgan"ni yoqing) qayta sinang.':'Ochiq sahifa — guard hech narsa tekshirmadi.';})
+    .catch(function(e){if(e!=='stop'&&e!=='x')console.error(e);if(e==='x')busy=false;drawHist();});}
+  el('nav').addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();go(a.getAttribute('data-to'));}});
+  el('view').addEventListener('click',function(e){var c=e.target.closest('[data-go]');if(c){go(c.getAttribute('data-go'));return;}
+    if(e.target.id==='kcGo'){el('sLog').checked=true;var to=pendingTo;pendingTo=null;
+      el('rEx').innerHTML='Keycloak login muvaffaqiyatli → <code>'+to+'?code=…&amp;state=…</code> ga qaytdi, keycloak-js code’ni tokenlarga almashtirdi. Endi guard o‘tkazadi…';
+      setTimeout(function(){go(to,'replace');},900);}});
+  el('bBack').addEventListener('click',function(){if(busy||hi===0)return;hi--;go(hist[hi],'pop');});
+  el('bFwd').addEventListener('click',function(){if(busy||hi>=hist.length-1)return;hi++;go(hist[hi],'pop');});
+  el('view').innerHTML=page(ROUTES[0]);act('/');
+
+  /* ---------- history stack ---------- */
+  var H2=['/'],h2=0;
+  function drawHist(){}
+  function dh(){el('hs').innerHTML=H2.map(function(p,i){return '<div class="'+(i===h2?'cur':(i>h2?'fw':''))+'">'+(i===h2?'▶ ':'')+p+'</div>';}).join('');}
+  function push(p){H2=H2.slice(0,h2+1);H2.push(p);h2++;dh();el('hEx').innerHTML='<b>push</b>: stekka yangi yozuv qo‘shildi. "Orqaga" — oldingisiga qaytaradi.';}
+  el('hP1').addEventListener('click',function(){push('/kartalar');});
+  el('hP2').addEventListener('click',function(){push('/otkazma');});
+  el('hRp').addEventListener('click',function(){H2[h2]='/otkazma/tasdiq';dh();var n=el('hs').querySelector('.cur');n.style.animation='none';void n.offsetWidth;n.style.animation='';
+    el('hEx').innerHTML='<b>replace</b>: joriy yozuv <b>almashtirildi</b>, stek o‘smadi. O‘tkazma tasdiqlangandan keyin "orqaga" bosilsa — forma qayta yuborilmaydi, oldingi sahifaga qaytadi.';});
+  el('hBk').addEventListener('click',function(){if(h2===0){el('hEx').textContent='Stek boshidasiz.';return;}h2--;dh();el('hEx').innerHTML='<b>back</b>: ko‘rsatkich pastga tushdi; yuqoridagi yozuv "oldinga" uchun saqlanib turibdi (xira). Endi push qilinsa — u o‘chadi.';});
+  el('hR').addEventListener('click',function(){H2=['/'];h2=0;dh();el('hEx').textContent='Tugmalarni bosing va o‘ngdagi stekni kuzating.';});
+  dh();
+})();
+
+</script>
+</body>
+</html>

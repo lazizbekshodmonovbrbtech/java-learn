@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vue komponentlari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+/* props/emit tree */
+.ct{position:relative;height:330px;margin-top:10px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);overflow:hidden}
+.ct svg{position:absolute;inset:0;width:100%;height:100%}
+.ct line{stroke:var(--border-strong);stroke-width:2}
+.cn{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--border-strong);border-radius:12px;padding:6px 10px;background:var(--surface);font-family:var(--font-mono);font-size:11.5px;text-align:center;transition:box-shadow .3s,background .3s,border-color .3s;min-width:120px}
+.cn b{display:block;font-size:12.5px}
+.cn .pr{display:block;color:var(--ink-faint);font-size:10.5px;white-space:nowrap}
+.cn.app{border-color:var(--accent);min-width:190px}
+.cn.hot{box-shadow:0 0 0 6px var(--accent-soft)}
+.cn.rej{box-shadow:0 0 0 6px var(--coral-soft);border-color:var(--coral)}
+.cn.blk{background:var(--coral-soft)}
+.cn button{margin-top:4px;font:inherit;font-size:10.5px;border:1px solid var(--border-strong);border-radius:6px;background:var(--surface-2);color:var(--ink);cursor:pointer;padding:2px 6px}
+.pk{position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);z-index:3;box-shadow:0 0 0 4px rgba(255,255,255,.6);transition:left .6s cubic-bezier(.5,0,.5,1),top .6s cubic-bezier(.5,0,.5,1)}
+.pk.up{background:#E8792B}.pk.dn{background:#2E6FA8}
+.pk span{position:absolute;left:18px;top:-4px;font-family:var(--font-mono);font-size:10.5px;white-space:nowrap;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:0 4px;color:var(--ink)}
+.lgd{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;margin-top:8px}
+.lgd i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.clog{font-family:var(--font-mono);font-size:11.5px;background:#10201A;color:#CFEFE2;border-radius:10px;padding:8px 10px;margin-top:10px;height:96px;overflow-y:auto;line-height:1.6}
+.clog .w{color:#F5DC78}.clog .o{color:#FFB38A}.clog .b{color:#8DBBF0}
+/* slots */
+.sl{display:grid;grid-template-columns:220px 1fr;gap:14px;margin-top:10px}
+.sl>div{min-width:0}
+.presets{display:flex;flex-direction:column;gap:6px}
+.presets button{text-align:left}
+.parts{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.part{border-radius:8px;padding:6px 8px;font-size:12.5px;border:1px solid var(--border);background:var(--surface)}
+.part small{display:block;font-family:var(--font-mono);font-size:10px;color:var(--ink-faint)}
+.modal{border:2px solid var(--border-strong);border-radius:16px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.modal .mh{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface-2);font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.slz{margin:10px;border:2px dashed var(--border-strong);border-radius:10px;min-height:44px;padding:8px 10px;position:relative;transition:.3s}
+.slz>.nm{position:absolute;top:-9px;left:8px;background:var(--surface);padding:0 5px;font-family:var(--font-mono);font-size:10.5px;color:var(--purple)}
+.slz.fill{border-style:solid;border-color:var(--purple)}
+.slz .fb{color:var(--ink-faint);font-size:12.5px;font-style:italic}
+.fly{position:fixed;z-index:50;pointer-events:none;transition:all .6s cubic-bezier(.3,.8,.3,1);border-radius:8px;padding:6px 8px;font-size:12.5px;border:1px solid var(--purple);background:var(--purple-soft);color:var(--ink)}
+/* lifecycle */
+.lc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.lc>div{min-width:0}
+.box{border:2px solid var(--border-strong);border-radius:14px;padding:12px;background:var(--surface);transition:.35s;position:relative}
+.box .t{font-family:var(--font-mono);font-size:12px;font-weight:700}
+.box .stt{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);display:block;margin-top:2px}
+.box .box{margin-top:10px}
+.box.ghost{border-style:dashed;opacity:.45}
+.box.live{border-color:var(--teal)}
+.box.gone{opacity:.15;border-style:dotted}
+.box.now{box-shadow:0 0 0 6px var(--accent-soft);border-color:var(--accent)}
+.domb{display:inline-block;margin-top:6px;font-family:var(--font-mono);font-size:10.5px;border-radius:6px;padding:1px 6px;background:var(--sunken)}
+.domb.y{background:var(--teal-soft);color:var(--teal-ink)}
+.hl{list-style:none;margin:0;padding:0;font-family:var(--font-mono);font-size:12px;max-height:330px;overflow-y:auto}
+.hl li{padding:4px 8px;border-radius:7px;border-left:3px solid transparent;color:var(--ink-faint);transition:.25s}
+.hl li.done{color:var(--ink)}
+.hl li.cur{background:var(--accent-soft);border-left-color:var(--accent);color:var(--ink);font-weight:700}
+.hl li .who{display:inline-block;min-width:52px;font-size:10.5px;border-radius:5px;padding:0 4px;margin-right:6px;text-align:center}
+.hl li .who.p{background:var(--purple-soft);color:var(--purple-ink)}.hl li .who.c{background:var(--teal-soft);color:var(--teal-ink)}
+.hl li.ph{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:400;background:none;border:0;padding-top:8px}
+@media (max-width:700px){.sl,.lc{grid-template-columns:1fr}.cn{min-width:84px;font-size:10px;padding:4px 5px}.cn .pr{font-size:9.5px}.cn.app{min-width:150px}.ct{height:360px}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 4/8</span><span>· Kurs: 84/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 84-modul · komponentlar</span>
+    <h1><span class="steam">Komponentlar</span>: props pastga, emit yuqoriga</h1>
+    <p class="lead">Internet-bank sahifasi — o‘nlab komponentdan iborat daraxt. Ular qanday gaplashadi? Qoida bitta: <b>ma’lumot pastga props bilan tushadi, hodisalar yuqoriga emit bilan chiqadi</b>. Bola ota ma’lumotini o‘zi o‘zgartirmaydi — so‘raydi. Quyida buni paketlar harakatida, slotlarni "teshiklar" sifatida va lifecycle hook’lar tartibini qadam-baqadam ko‘ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>One-way data flow: jonli</h2></div><p class="sec-sub">Karta ostidagi <b>Bloklash</b>ni bosing: to‘q sariq paket (emit) yuqoriga chiqadi, App holatni o‘zgartiradi, ko‘k paketlar (props) pastga tushadi. Keyin "❌ props’ni to‘g‘ridan o‘zgartirish"ni sinang.</p>
+    <div class="stage">
+      <div class="ct" id="ct"><svg id="csvg"></svg></div>
+      <div class="lgd"><span><i style="background:#E8792B"></i>emit (hodisa ↑)</span><span><i style="background:#2E6FA8"></i>props (ma’lumot ↓)</span></div>
+      <div class="ctrls"><button class="btn" id="cBad">❌ bola: props.karta.holat = "blok"</button><button class="btn" id="cR">↺</button></div>
+      <div class="clog" id="clog"></div>
+      <div class="explain" id="cEx">Holat (kartalar ro‘yxati) faqat <b>App</b>’da yashaydi — "yagona haqiqat manbai". Bolalar uni props orqali faqat <b>o‘qiydi</b>.</div>
+    </div>
+    <div class="grid2">
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">KartaItem.vue (bola)</span></div><pre class="code">&lt;<span class="k">script</span> <span class="k">setup</span> lang=<span class="st">"ts"</span>&gt;
+<span class="k">const</span> props = defineProps&lt;{ karta: <span class="ty">Karta</span> }&gt;()
+<span class="k">const</span> emit = defineEmits&lt;{
+  bloklash: [id: number]
+}&gt;()
+&lt;/<span class="k">script</span>&gt;
+
+&lt;<span class="k">template</span>&gt;
+  &lt;div&gt;{{ karta.raqam }} — {{ karta.holat }}&lt;/div&gt;
+  &lt;button <span class="k">@click</span>=<span class="st">"emit('bloklash', karta.id)"</span>&gt;
+    <span class="ty">Bloklash</span>
+  &lt;/button&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">App.vue (ota)</span></div><pre class="code">&lt;<span class="k">script</span> <span class="k">setup</span> lang=<span class="st">"ts"</span>&gt;
+<span class="k">const</span> kartalar = ref&lt;<span class="ty">Karta</span>[]&gt;([...])
+
+<span class="k">async</span> <span class="k">function</span> bloklash(id: number) {
+  <span class="k">await</span> api.post(<span class="st">`/cards/${id}/block`</span>)
+  <span class="k">const</span> k = kartalar.value.find(k =&gt; k.id === id)
+  <span class="k">if</span> (k) k.holat = <span class="st">'blok'</span>   <span class="cm">// ✅ egasi o'zgartiradi</span>
+}
+&lt;/<span class="k">script</span>&gt;
+
+&lt;<span class="k">template</span>&gt;
+  &lt;<span class="ty">KartaRoyxati</span> :kartalar=<span class="st">"kartalar"</span>
+                <span class="k">@bloklash</span>=<span class="st">"bloklash"</span> /&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Slotlar: komponentdagi "teshiklar"</h2></div><p class="sec-sub">Bitta <code>BaseModal</code> — sarlavha, tana va tugmalar joyi bo‘sh (slot). Ota komponent ularni o‘z kontenti bilan to‘ldiradi. Chapdan stsenariy tanlang.</p>
+    <div class="stage"><div class="sl">
+      <div><div class="presets"><button class="btn primary" id="sp0">O‘tkazmani tasdiqlash</button><button class="btn" id="sp1">Kartani bloklash</button><button class="btn" id="sp2">Faqat matn (footer’siz)</button></div>
+        <div class="parts" id="parts"></div></div>
+      <div><div class="modal"><div class="mh"><span>&lt;BaseModal&gt;</span><span>✕</span></div>
+        <div class="slz" id="z0"><span class="nm">&lt;slot name="header"&gt;</span><span class="fb">Standart sarlavha</span></div>
+        <div class="slz" id="z1"><span class="nm">&lt;slot&gt; (default)</span><span class="fb">—</span></div>
+        <div class="slz" id="z2"><span class="nm">&lt;slot name="footer"&gt;</span><span class="fb">[ Yopish ] ← fallback kontent</span></div>
+      </div></div>
+    </div><div class="explain" id="sEx">Slot — komponent ichida ota kontenti uchun ajratilgan joy. Ota bermasa — <b>fallback</b> ko‘rinadi.</div></div>
+    <div class="grid2">
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">BaseModal.vue</span></div><pre class="code">&lt;<span class="k">template</span>&gt;
+  &lt;div <span class="k">class</span>=<span class="st">"modal"</span>&gt;
+    &lt;header&gt;&lt;slot name=<span class="st">"header"</span>&gt;<span class="ty">Standart</span> sarlavha&lt;/slot&gt;&lt;/header&gt;
+    &lt;main&gt;&lt;slot /&gt;&lt;/main&gt;
+    &lt;footer&gt;
+      &lt;slot name=<span class="st">"footer"</span>&gt;
+        &lt;button <span class="k">@click</span>=<span class="st">"$emit('close')"</span>&gt;<span class="ty">Yopish</span>&lt;/button&gt;
+      &lt;/slot&gt;
+    &lt;/footer&gt;
+  &lt;/div&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Ota: slotlarni to‘ldirish + scoped slot</span></div><pre class="code">&lt;<span class="ty">BaseModal</span>&gt;
+  &lt;<span class="k">template</span> #header&gt;O'tkazmani tasdiqlang&lt;/<span class="k">template</span>&gt;
+  &lt;p&gt;<span class="ty">Aziz</span> → <span class="nu">500</span> <span class="nu">000</span> so'm&lt;/p&gt;
+  &lt;<span class="k">template</span> #footer&gt;
+    &lt;button <span class="k">@click</span>=<span class="st">"tasdiqla"</span>&gt;<span class="ty">Tasdiqlash</span>&lt;/button&gt;
+  &lt;/<span class="k">template</span>&gt;
+&lt;/<span class="ty">BaseModal</span>&gt;
+
+&lt;!-- scoped slot: bola ma'lumotni otaga beradi --&gt;
+&lt;<span class="ty">DataTable</span> :rows=<span class="st">"otkazmalar"</span>&gt;
+  &lt;<span class="k">template</span> #row=<span class="st">"{ item }"</span>&gt;
+    &lt;b&gt;{{ item.kimga }}&lt;/b&gt; {{ format(item.summa) }}
+  &lt;/<span class="k">template</span>&gt;
+&lt;/<span class="ty">DataTable</span>&gt;</pre></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Lifecycle: hook’lar qaysi tartibda ishlaydi?</h2></div><p class="sec-sub">Ota (<b>HisobSahifa</b>) ichida bola (<b>TranzaksiyaJadvali</b>). Qadam-baqadam o‘ting: mount, update va unmount paytida kim birinchi?</p>
+    <div class="stage"><div class="lc">
+      <div><div class="box ghost" id="bxP"><span class="t">HisobSahifa (ota)</span><span class="stt" id="stP">hali yaratilmagan</span><span class="domb" id="dmP">DOM: yo‘q</span>
+        <div class="box ghost" id="bxC"><span class="t">TranzaksiyaJadvali (bola)</span><span class="stt" id="stC">hali yaratilmagan</span><span class="domb" id="dmC">DOM: yo‘q</span></div></div></div>
+      <div><ul class="hl" id="hl"></ul></div>
+    </div><div class="ctrls"><button class="btn" id="lcPrev">◀</button><button class="btn primary" id="lcPlay">▶ Avto</button><button class="btn" id="lcNext">▶</button><div class="bar"><div id="lcBar"></div></div></div><div class="explain" id="lcEx"></div></div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Hook</th><th>Nima uchun</th><th>Bank misoli</th></tr><tr><td><code>setup</code> (script setup)</td><td>Holat, computed, funksiyalar</td><td><code>const tranzaksiyalar = ref([])</code></td></tr><tr><td><code>onMounted</code></td><td>DOM tayyor: API chaqiruvi, grafik kutubxonasi, fokus</td><td>Tranzaksiyalarni yuklash, Chart.js chizish</td></tr><tr><td><code>onUpdated</code></td><td>DOM yangilangandan keyin (kamdan-kam kerak)</td><td>Scroll’ni pastga tushirish (chat)</td></tr><tr><td><code>onBeforeUnmount</code> / <code>onUnmounted</code></td><td>Tozalash: timer, WebSocket, listener</td><td>Kurs WebSocket’ini yopish, <code>clearInterval</code> sessiya taymeri</td></tr><tr><td><code>onErrorCaptured</code></td><td>Bolalardagi xatoni ushlash</td><td>Widget xatosi butun sahifani yiqitmasin</td></tr></table></div>
+    <div class="callout warn"><div class="ct">Xotira oqishi (memory leak)</div>onMounted’da <code>setInterval</code> yoki <code>window.addEventListener</code> qo‘shib, onUnmounted’da olib tashlamasangiz — sahifadan chiqqandan keyin ham ishlayveradi. Har kirishda yana bittasi qo‘shiladi. Composable ichida ham shu qoida (85-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Komponentlar aloqasi — qaysi usul qachon</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Usul</th><th>Yo‘nalish</th><th>Qachon</th></tr><tr><td>props / emit</td><td>Ota ↔ bola</td><td>Asosiy usul, 1–2 daraja</td></tr><tr><td><code>v-model</code> (defineModel)</td><td>Ikki tomonlama ota ↔ bola</td><td>Input komponentlar (SummaInput, KartaTanlash)</td></tr><tr><td>slots</td><td>Ota kontenti bola ichiga</td><td>Layout, modal, jadval, karta</td></tr><tr><td>provide / inject</td><td>Ajdod → istalgan avlod</td><td>Tema, til, forma konteksti — "prop drilling"siz</td></tr><tr><td>Pinia store</td><td>Hamma ↔ hamma</td><td>Global holat: foydalanuvchi, token, savat (87-modul)</td></tr><tr><td><code>defineExpose</code> + template ref</td><td>Ota → bola metodi</td><td><code>formaRef.value.validate()</code> — kamdan-kam</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Props va emit — one-way data flow nima?<span class="chev">›</span></summary><div class="iv-a">Ma’lumot ota → bola props orqali oqadi, bola props’ni o‘zgartirmaydi (readonly, dev rejimda ogohlantirish). O‘zgartirish kerak bo‘lsa bola emit bilan hodisa yuboradi, holat egasi (ota yoki store) o‘zgartiradi. Natija — holat qayerda o‘zgarishini topish oson, debugging bashorat qilinadigan.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Props obyekt bo‘lsa, bola props.karta.holat = "x" qilsa nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Props proxy’si shallow readonly — props.karta = … ga ruxsat yo‘q, lekin ichki xossani mutatsiya qilish texnik jihatdan ishlaydi (obyekt ota bilan umumiy) va otaning holati jimgina o‘zgaradi. Bu anti-pattern: ma’lumot oqimi yashirin bo‘ladi. To‘g‘risi — emit yoki lokal nusxa.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Slot va scoped slot farqi?<span class="chev">›</span></summary><div class="iv-a">Oddiy slot — ota kontentni bola ichiga qo‘yadi, kontent ota scope’ida kompilyatsiya qilinadi. Scoped slot — bola slotga ma’lumot uzatadi (&lt;slot :item="row"&gt;), ota uni #row="{ item }" orqali oladi. Jadval, ro‘yxat, renderless komponentlar uchun.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Ota va bola hook’lari qaysi tartibda ishlaydi?<span class="chev">›</span></summary><div class="iv-a">Mount: ota setup → ota onBeforeMount → bola setup → bola onBeforeMount → bola onMounted → ota onMounted (ota oxirida, chunki uning DOM’i bolalarni ham o‘z ichiga oladi). Unmount ham shunga o‘xshash: ota beforeUnmount → bola beforeUnmount → bola unmounted → ota unmounted.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>API chaqiruvini qaysi hook’da qilasiz?<span class="chev">›</span></summary><div class="iv-a">setup’da (async funksiyani chaqirib, natijani ref’ga yozish) yoki onMounted’da — ikkalasi ham ishlaydi; SSR bo‘lsa onMounted server’da ishlamaydi. DOM kerak bo‘lsa — faqat onMounted. Komponent tez-tez qayta mount bo‘lsa — so‘rovni bekor qilish (AbortController) onUnmounted’da.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>provide/inject qachon Pinia o‘rniga?<span class="chev">›</span></summary><div class="iv-a">Daraxtning bir qismiga tegishli kontekst (forma, tema, murakkab komponent kutubxonasi ichki holati) — provide/inject. Ilova bo‘ylab global, devtools’da kuzatiladigan holat — Pinia.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Bola komponent ota ma’lumotini o‘zgartirishi kerak. To‘g‘ri yo‘l?</div><button class="opt">props’ni to‘g‘ridan o‘zgartirish</button><button class="opt">emit bilan hodisa yuborish</button><button class="opt">$parent orqali</button><div class="q-fb" data-ok="To‘g‘ri — one-way data flow." data-no="Yo‘q. Egasiga emit orqali so‘rov yuboriladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Ota va bola onMounted’dan qaysi biri birinchi?</div><button class="opt">Ota</button><button class="opt">Bola</button><button class="opt">Tasodifiy</button><div class="q-fb" data-ok="To‘g‘ri — bola birinchi." data-no="Yo‘q. Ota bolalari DOM’ga tushgandan keyin mounted bo‘ladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Ota slot uchun kontent bermadi. Nima ko‘rinadi?</div><button class="opt">Xato</button><button class="opt">Slot ichidagi fallback kontent</button><button class="opt">Hech narsa, har doim</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. &amp;lt;slot&amp;gt; ichida yozilgan standart kontent chiqadi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>setInterval onMounted’da, onUnmounted’da tozalanmagan. Oqibat?</div><button class="opt">Hech narsa</button><button class="opt">Komponent yo‘q bo‘lsa ham interval ishlaydi — leak</button><button class="opt">Vue avtomatik tozalaydi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Vue siz qo‘shgan timerlarni bilmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Jadval komponenti qator ma’lumotini ota shabloniga berishi kerak?</div><button class="opt">provide</button><button class="opt">scoped slot</button><button class="opt">emit</button><div class="q-fb" data-ok="To‘g‘ri — #row=&quot;{ item }&quot;." data-no="Yo‘q. Bu scoped slot vazifasi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Composition API va composable’lar</h3>
+      <p>Mixins muammosi, useFetch / useDebounce yozish, watch vs watchEffect, lifecycle composable ichida.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill now">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="83-template.html"><span class="cl">← Oldingi dars</span><span class="ct">83 · Template</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="85-composition-api.html"><span class="cl">Keyingi dars →</span><span class="ct">85 · Composition API</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:95.5%"></i></div><span>84 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(84)<0)v.push(84);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','84');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(84)<0)D[t].push(84);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* ---------- props / emit ---------- */
+  var ct=el('ct'),svg=el('csvg');
+  var P={app:[50,14],list:[50,44],k0:[18,80],k1:[50,80],k2:[82,80]};
+  var K;function initK(){K=[{id:1,r:'8600 •• 4417',h:'faol'},{id:2,r:'9860 •• 0921',h:'faol'},{id:3,r:'4278 •• 5530',h:'faol'}];}
+  var busy=false;
+  function clog(h){var l=el('clog');l.insertAdjacentHTML('beforeend','<div>'+h+'</div>');l.scrollTop=l.scrollHeight;}
+  function draw(){ct.querySelectorAll('.cn,.pk').forEach(function(n){n.remove();});svg.innerHTML='';
+    [['app','list'],['list','k0'],['list','k1'],['list','k2']].forEach(function(e){svg.insertAdjacentHTML('beforeend','<line x1="'+P[e[0]][0]+'%" y1="'+P[e[0]][1]+'%" x2="'+P[e[1]][0]+'%" y2="'+P[e[1]][1]+'%"/>');});
+    add('app','cn app','<b>App</b><span class="pr" id="appSt"></span>');
+    add('list','cn','<b>KartaRoyxati</b><span class="pr">props: kartalar</span>');
+    K.forEach(function(k,i){add('k'+i,'cn'+(k.h==='blok'?' blk':''),'<b>KartaItem</b><span class="pr">'+k.r+'</span><span class="pr" id="h'+i+'">holat: '+k.h+'</span><button data-i="'+i+'">Bloklash</button>');});
+    appSt();}
+  function appSt(){el('appSt').innerHTML='kartalar: ['+K.map(function(k){return k.h==='blok'?'<span style="color:var(--coral)">blok</span>':'faol';}).join(', ')+']';}
+  function add(id,cls,html){var d=document.createElement('div');d.className=cls;d.id='cn_'+id;d.style.left=P[id][0]+'%';d.style.top=P[id][1]+'%';d.innerHTML=html;ct.appendChild(d);}
+  function hot(id,c){var n=el('cn_'+id);if(!n)return;n.classList.add(c||'hot');setTimeout(function(){n.classList.remove(c||'hot');},700);}
+  function packet(from,to,cls,label,cb){var p=document.createElement('div');p.className='pk '+cls;p.innerHTML='<span>'+label+'</span>';p.style.left=P[from][0]+'%';p.style.top=P[from][1]+'%';ct.appendChild(p);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){p.style.left=P[to][0]+'%';p.style.top=P[to][1]+'%';});});
+    setTimeout(function(){p.remove();hot(to);if(cb)cb();},650);}
+  ct.addEventListener('click',function(e){var b=e.target.closest('button[data-i]');if(!b||busy)return;var i=+b.getAttribute('data-i');if(K[i].h==='blok'){clog('<span class="w">karta allaqachon bloklangan</span>');return;}busy=true;var kid='k'+i;
+    hot(kid);clog('<span class="o">KartaItem</span> emit(\'bloklash\', '+K[i].id+')');
+    el('cEx').innerHTML='1. Bola <b>o‘zi o‘zgartirmaydi</b> — faqat <code>emit(\'bloklash\', '+K[i].id+')</code> yuboradi.';
+    packet(kid,'list','up','bloklash('+K[i].id+')',function(){clog('<span class="o">KartaRoyxati</span> hodisani yuqoriga uzatdi (re-emit)');
+      packet('list','app','up','bloklash('+K[i].id+')',function(){
+        clog('<span class="b">App</span> await api.post(/cards/'+K[i].id+'/block) → 200');K[i].h='blok';appSt();hot('app');
+        el('cEx').innerHTML='2. <b>App</b> — holat egasi: API chaqirdi va <code>kartalar</code>ni o‘zgartirdi. 3. Reaktivlik yangi props’ni pastga yubormoqda…';
+        setTimeout(function(){packet('app','list','dn',':kartalar',function(){
+          var done=0;[0,1,2].forEach(function(j){packet('list','k'+j,'dn',':karta',function(){
+            if(j===i){el('cn_k'+j).classList.add('blk');el('h'+j).textContent='holat: blok';}
+            done++;if(done===3){clog('<span class="b">render</span> KartaItem #'+K[i].id+' — holat: blok');busy=false;
+              el('cEx').innerHTML='Tsikl tugadi: <b>emit ↑ → egasi o‘zgartiradi → props ↓</b>. Faqat o‘zgargan karta vizual yangilandi (Vue props’ni solishtiradi).';}});});});},350);});});});
+  el('cBad').addEventListener('click',function(){if(busy)return;hot('k1','rej');
+    clog('<span class="w">[Vue warn]: Attempt to mutate prop "karta". Props are readonly.</span>');
+    clog('<span class="w">↳ props.karta = … bloklandi. props.karta.holat = … esa ishlaydi, lekin App holati JIMGINA o‘zgaradi — kim o‘zgartirganini topib bo‘lmaydi.</span>');
+    el('cEx').innerHTML='Props — <b>readonly</b>. Bola props’ni o‘zgartirsa ma’lumot oqimi yashirin bo‘ladi: bir kun App’dagi holat "o‘zidan-o‘zi" o‘zgaradi va buni topish uchun soatlar ketadi. Egasiga emit qiling.';});
+  el('cR').addEventListener('click',function(){if(busy)return;initK();draw();el('clog').innerHTML='';});
+  initK();draw();
+
+  /* ---------- slots ---------- */
+  var PRE=[
+    {h:'O‘tkazmani tasdiqlang',d:'Aziz Karimov → <b>500 000</b> so‘m<br><small>Komissiya 0,5%</small>',f:'[ Bekor ] [ Tasdiqlash ]'},
+    {h:'⚠ Kartani bloklash',d:'8600 •• 4417 kartasi bloklanadi. Qaytarish uchun bankka murojaat qiling.',f:'[ Ha, bloklash ]'},
+    {h:null,d:'Sessiya 2 daqiqadan keyin tugaydi.',f:null}];
+  var ZN=['#header','default','#footer'],FB=['Standart sarlavha','—','[ Yopish ] ← fallback kontent'];
+  var sb=false;
+  function slots(i){if(sb)return;sb=true;[0,1,2].forEach(function(k){el('sp'+k).className='btn'+(k===i?' primary':'');});
+    var p=PRE[i],vals=[p.h,p.d,p.f];
+    el('parts').innerHTML=vals.map(function(v,k){return v?'<div class="part" id="pt'+k+'"><small>&lt;template '+ZN[k]+'&gt;</small>'+v+'</div>':'<div class="part" style="opacity:.5"><small>'+ZN[k]+'</small>berilmadi</div>';}).join('');
+    [0,1,2].forEach(function(k){var z=el('z'+k);z.classList.remove('fill');z.querySelector('.fb')&&z.querySelector('.fb').remove();var c=z.querySelector('.ct2');if(c)c.remove();});
+    var step=0;
+    function nx(){if(step>2){sb=false;el('sEx').innerHTML=(p.f?'Ota uchala slotni to‘ldirdi.':'Ota <b>#header</b> va <b>#footer</b>ni bermadi → BaseModal’dagi <b>fallback</b> kontent chiqdi ("Standart sarlavha", "Yopish").')+' BaseModal kodi <b>bir marta ham o‘zgarmadi</b> — shu slotlarning kuchi.';return;}
+      var k=step++;var z=el('z'+k),v=vals[k];
+      if(!v){z.insertAdjacentHTML('beforeend','<span class="fb ct2">'+FB[k]+'</span>');setTimeout(nx,250);return;}
+      var src=el('pt'+k).getBoundingClientRect(),dst=z.getBoundingClientRect();
+      var f=document.createElement('div');f.className='fly';f.innerHTML=v;f.style.left=src.left+'px';f.style.top=src.top+'px';f.style.width=src.width+'px';document.body.appendChild(f);
+      requestAnimationFrame(function(){requestAnimationFrame(function(){f.style.left=(dst.left+10)+'px';f.style.top=(dst.top+8)+'px';f.style.width=(dst.width-20)+'px';});});
+      setTimeout(function(){f.remove();z.classList.add('fill');z.insertAdjacentHTML('beforeend','<div class="ct2" style="font-size:13px">'+v+'</div>');setTimeout(nx,120);},650);}
+    nx();}
+  [0,1,2].forEach(function(k){el('sp'+k).addEventListener('click',function(){slots(k);});});
+  slots(0);
+
+  /* ---------- lifecycle ---------- */
+  var H=[
+   ['ph','Mount'],
+   ['p','setup()','Ota setup: <code>ref</code>, computed yaratildi. DOM hali yo‘q.',{P:['ghost','setup ishladi','yo‘q']}],
+   ['p','onBeforeMount','Ota shabloni kompilyatsiya qilingan, lekin DOM’ga tushishdan oldin <b>bolalarni yaratish kerak</b>…',{P:['ghost','render boshlandi','yo‘q']}],
+   ['c','setup()','Bola setup — props (hisobId) keldi.',{C:['ghost','setup ishladi','yo‘q']}],
+   ['c','onBeforeMount','Bola DOM’ga tushishga tayyor.',{C:['ghost','render','yo‘q']}],
+   ['c','onMounted','<b>Bola birinchi</b> mounted: uning DOM’i tayyor. Bu yerda jadval uchun API chaqiruvi.',{C:['live','mounted ✓','bor']}],
+   ['p','onMounted','Ota <b>oxirida</b> mounted — chunki uning DOM’i bolalarnikini ham o‘z ichiga oladi. Endi ota ichida bolaning DOM’iga ham ishonch bilan murojaat qilish mumkin.',{P:['live','mounted ✓','bor']}],
+   ['ph','Update — ota holati o‘zgardi (hisobId = 2)'],
+   ['p','onBeforeUpdate','Ota qayta render qilmoqchi.',{P:['live','update…','bor']}],
+   ['c','onBeforeUpdate','Yangi props (hisobId=2) keldi — bola ham yangilanadi.',{C:['live','update…','bor']}],
+   ['c','onUpdated','Bola DOM’i yangilandi.',{C:['live','updated ✓','bor']}],
+   ['p','onUpdated','Ota DOM’i yangilandi (yana — ichkaridan tashqariga).',{P:['live','updated ✓','bor']}],
+   ['ph','Unmount — boshqa sahifaga o‘tildi'],
+   ['p','onBeforeUnmount','Ota hali to‘liq ishlaydi.',{P:['live','unmount…','bor']}],
+   ['c','onBeforeUnmount','Bola: shu yerda <code>clearInterval</code>, WebSocket.close().',{C:['live','unmount…','bor']}],
+   ['c','onUnmounted','Bola o‘chdi.',{C:['gone','unmounted','yo‘q']}],
+   ['p','onUnmounted','Ota o‘chdi. Tozalanmagan timerlar bo‘lsa — ular hali ham ishlayapti (leak).',{P:['gone','unmounted','yo‘q']}]];
+  var steps=[];H.forEach(function(h,i){if(h[0]!=='ph')steps.push(i);});
+  var hl=el('hl');hl.innerHTML=H.map(function(h,i){return h[0]==='ph'?'<li class="ph">'+h[1]+'</li>':'<li id="hk'+i+'"><span class="who '+h[0]+'">'+(h[0]==='p'?'ota':'bola')+'</span>'+h[1]+'</li>';}).join('');
+  function setBox(w,s){var b=el(w==='P'?'bxP':'bxC');b.className='box '+s[0];el(w==='P'?'stP':'stC').textContent=s[1];var d=el(w==='P'?'dmP':'dmC');d.textContent='DOM: '+s[2];d.className='domb'+(s[2]==='bor'?' y':'');}
+  mkStepper('lc',steps.length,function(si){var st={P:['ghost','hali yaratilmagan','yo‘q'],C:['ghost','hali yaratilmagan','yo‘q']};
+    for(var j=0;j<=si;j++){var h=H[steps[j]];if(h[3].P)st.P=h[3].P;if(h[3].C)st.C=h[3].C;}
+    setBox('P',st.P);setBox('C',st.C);var cur=H[steps[si]];el(cur[0]==='p'?'bxP':'bxC').classList.add('now');
+    steps.forEach(function(ix,j){var li=el('hk'+ix);li.className=j<si?'done':(j===si?'cur':'');});
+    var li=el('hk'+steps[si]);if(li){var t=li.offsetTop-hl.offsetTop-60;hl.scrollTop=t;}
+    el('lcEx').innerHTML='<b>'+(si+1)+'/'+steps.length+' · '+(cur[0]==='p'?'Ota':'Bola')+' '+cur[1]+'</b> — '+cur[2];},2200);
+})();
+
+</script>
+</body>
+</html>

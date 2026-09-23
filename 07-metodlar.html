@@ -1,0 +1,466 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Metodlar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:14px;box-shadow:var(--shadow)}
+.anno .a-t{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--accent-ink);margin-bottom:4px}.anno .a-b{font-size:15px}
+.anno code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}
+
+/* call stack */
+.cs-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.cs-flex{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+.cs-stack{background:var(--sunken);border:1px solid var(--border);border-radius:14px;padding:14px;min-height:230px;display:flex;flex-direction:column-reverse;gap:8px;justify-content:flex-start}
+.cs-label{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-align:center;margin-bottom:2px;letter-spacing:.06em}
+.frame{border-radius:11px;padding:10px 13px;border:1.5px solid;animation:pop .3s cubic-bezier(.34,1.4,.5,1)}
+@keyframes pop{from{transform:scale(.9) translateY(6px);opacity:0}to{transform:none;opacity:1}}
+.frame .fname{font-family:var(--font-mono);font-size:13.5px;font-weight:600}
+.frame .fvars{font-family:var(--font-mono);font-size:12px;margin-top:3px;opacity:.9}
+.frame.f-main{background:var(--purple-soft);border-color:var(--purple);color:var(--purple-ink)}
+.frame.f-a{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+.frame.f-b{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}
+.frame.top{box-shadow:var(--shadow-lift);outline:2px solid currentColor;outline-offset:-1px}
+.cs-right{display:flex;flex-direction:column}
+.cs-cap{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 15px;font-size:14.5px;flex:1;min-height:120px}
+.cs-cap .tag{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.cs-cap .tag.push{color:var(--accent-ink)}.cs-cap .tag.pop{color:var(--teal-ink)}.cs-cap .tag.info{color:var(--purple-ink)}
+.cs-cap b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl:active{transform:scale(.95)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.primary:hover{background:var(--accent-ink)}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+
+/* pass by value */
+.pbv-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.pbv-seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;margin-bottom:16px;flex-wrap:wrap}
+.pbv-seg button{border:0;background:transparent;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);transition:.15s}
+.pbv-seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);font-weight:500}
+.pbv-scene{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.pbv-box{border:1.5px solid var(--border);border-radius:13px;padding:14px;background:var(--surface-2);transition:.3s}
+.pbv-box.active{border-color:var(--accent);box-shadow:var(--shadow-lift)}
+.pbv-box h5{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin:0 0 10px;font-weight:600}
+.pbv-var{border:1.5px solid var(--border-strong);border-radius:9px;padding:9px 12px;background:var(--surface);font-family:var(--font-mono);font-size:13.5px;transition:.3s;position:relative}
+.pbv-var .pn{font-size:11px;color:var(--ink-faint)}
+.pbv-var .pv{font-size:16px;font-weight:600;color:var(--accent-ink);margin-top:2px}
+.pbv-var.changed{border-color:var(--coral);background:var(--coral-soft)}
+.pbv-var.changed .pv{color:var(--coral)}
+.pbv-heap{grid-column:1/-1;border:1.5px dashed var(--purple);border-radius:13px;padding:12px 14px;background:var(--purple-soft);margin-top:2px;display:none}
+.pbv-heap.show{display:block}
+.pbv-heap h5{color:var(--purple-ink)}
+.pbv-obj{display:inline-block;background:var(--surface);border:1.5px solid var(--purple);border-radius:9px;padding:8px 14px;font-family:var(--font-mono);font-size:14px;color:var(--purple-ink);transition:.3s}
+.pbv-obj.changed{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}
+.pbv-cap{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 15px;margin-top:14px;min-height:66px;font-size:14.5px}
+.pbv-cap b{color:var(--accent-ink)}.pbv-cap .r{color:var(--coral)}.pbv-cap .g{color:var(--teal-ink)}
+.pbv-run{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.pbv-btn{background:var(--accent);border:0;color:#fff;border-radius:10px;padding:9px 16px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;display:inline-flex;align-items:center;gap:7px}
+.pbv-btn.sec{background:var(--surface-2);border:1.5px solid var(--border);color:var(--ink-soft)}
+
+/* overloading / static */
+.ol-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:16px}
+.ol{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 15px;box-shadow:var(--shadow);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.ol code{font-size:13.5px}.ol .sig{color:var(--purple-ink)}.ol .desc{font-size:13px;color:var(--ink-soft)}
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.si{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.si h4{font-family:var(--font-mono);font-size:14px;margin:0 0 8px}
+.si.stat h4{color:var(--amber)}.si.inst h4{color:var(--teal-ink)}
+.si p{font-size:13.5px;color:var(--ink-soft);margin-bottom:8px}
+.si code{display:block;background:var(--sunken);padding:8px 10px;border-radius:8px;font-size:12.5px;color:var(--accent-ink)}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.cs-flex,.pbv-scene,.si-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B5622A"></span> Java asoslari · 7/7</span><span>· Kurs: 7/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Java kursi · 7-modul · noldan</span>
+    <h1>Metodlar</h1>
+    <p class="lead">Bir xil kodni qayta yozmang — uni "qadoqlab" nom bering, keyin istagancha chaqiring. Metod kirish oladi, ishlaydi, natija qaytaradi. Va Java'ning eng ko'p yanglishtiradigan mavzusi: <b>pass-by-value</b>.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Metodni qismlab</h2></div>
+    <p class="sec-sub">Har bo'lakning aniq vazifasi bor. Rangli qismlarni bosing.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Calculator.java</span></div>
+      <pre class="code"><span class="tap" data-p="ret"><span class="k">public</span> <span class="ty">int</span></span> <span class="tap" data-p="name">jami</span>(<span class="tap" data-p="par"><span class="ty">int</span> a, <span class="ty">int</span> b</span>) {
+    <span class="tap" data-p="body"><span class="ty">int</span> natija = a + b;</span>
+    <span class="tap" data-p="return"><span class="k">return</span> natija;</span>
+}
+
+<span class="cm">// chaqirilishi:</span>
+<span class="ty">int</span> x = jami(<span class="nu">2</span>, <span class="nu">3</span>);   <span class="cm">// x = 5</span></pre>
+    </div>
+    <div class="anno" id="anno"><div class="a-t" id="annoT"></div><div class="a-b" id="annoB"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Parametr va argument</h2></div>
+    <p class="sec-sub"><b>parametr</b> — metod ta'rifidagi bo'sh joy (<code>int a, int b</code>). <b>argument</b> — chaqirishda beradigan haqiqiy qiymat (<code>2, 3</code>). Parametr — quti, argument — unga solingan narsa.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Call stack — metodlar bir-birini chaqirganda</h2></div>
+    <p class="sec-sub">Metod boshqa metodni chaqirsa, JVM Stack'ga yangi "ramka" (frame) qo'yadi. Metod tugasa, ramka olib tashlanadi va natija chaqiruvchiga qaytadi. Oxirgi kirgan birinchi chiqadi. <code>main → jami → kopaytir</code> zanjirini kuzating.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Chain.java</span></div>
+      <pre class="code"><span class="k">void</span> main() { <span class="ty">int</span> r = jami(<span class="nu">2</span>, <span class="nu">3</span>); }
+<span class="ty">int</span> jami(<span class="ty">int</span> a, <span class="ty">int</span> b) { <span class="k">return</span> kopaytir(a + b, <span class="nu">2</span>); }
+<span class="ty">int</span> kopaytir(<span class="ty">int</span> x, <span class="ty">int</span> y) { <span class="k">return</span> x * y; }</pre>
+    </div>
+    <div class="cs-card">
+      <div class="cs-flex">
+        <div>
+          <div class="cs-label">↑ oxirgi kirgan, birinchi chiqadi</div>
+          <div class="cs-stack" id="stack"></div>
+        </div>
+        <div class="cs-right"><div class="cs-cap" aria-live="polite"><div class="tag" id="csTag"></div><div id="csBody"></div></div></div>
+      </div>
+      <div class="controls">
+        <button class="ctl" id="cprev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 18l-6-6 6-6M18 18l-6-6 6-6"/></svg></button>
+        <button class="ctl primary" id="cplay"><svg id="cplayIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span id="cplayLbl">Pauza</span></button>
+        <button class="ctl" id="cnext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 18l6-6-6-6M6 18l6-6-6-6"/></svg></button>
+        <div class="prog"><div class="bar" id="cbar"></div></div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>StackOverflowError</div>
+      Metod o'z-o'zini <b>cheksiz</b> chaqirsa (to'xtash sharti yo'q rekursiya), Stack to'lib ketadi — mashhur <code>StackOverflowError</code>. Har rekursiyada to'xtash sharti (base case) bo'lishi shart.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Pass-by-value — Java'ning eng chalkash mavzusi</h2></div>
+    <p class="sec-sub">Java <b>doim qiymatni nusxalab uzatadi</b> (pass-by-value). Lekin bu primitiv va obyekt uchun boshqacha ko'rinadi. Metod ichida o'zgartirsangiz, tashqaridagi o'zgaradimi? Ikkovini "yugurtiring" va farqni ko'ring — bu suhbatning eng sevimli savoli.</p>
+
+    <div class="pbv-card">
+      <div class="pbv-seg" id="pbvSeg">
+        <button data-m="prim" class="on">primitiv (int)</button>
+        <button data-m="mutate">obyektni o'zgartirish</button>
+        <button data-m="reassign">obyektni qayta tayinlash</button>
+      </div>
+      <div class="pbv-scene">
+        <div class="pbv-box" id="pbvOuter"><h5>main() — tashqarida</h5><div id="pbvOuterV"></div></div>
+        <div class="pbv-box" id="pbvInner"><h5>metod() — ichkarida (nusxa)</h5><div id="pbvInnerV"></div></div>
+        <div class="pbv-heap" id="pbvHeap"><h5>HEAP — obyekt</h5><div id="pbvHeapV"></div></div>
+      </div>
+      <div class="pbv-cap" aria-live="polite" id="pbvCap"></div>
+      <div class="pbv-run">
+        <button class="pbv-btn" id="pbvRun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 5l12 7-12 7z"/></svg>metodni chaqir</button>
+        <button class="pbv-btn sec" id="pbvReset">boshidan</button>
+      </div>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>to'liq javob</div>
+      "Java pass-by-value mi, pass-by-reference mi?" — <b>Doim pass-by-value.</b> Primitivda qiymatning nusxasi uzatiladi. Obyektda esa <b>manzilning (reference) nusxasi</b> uzatiladi — shuning uchun obyekt ichini o'zgartirsa tashqarida ko'rinadi, lekin parametrni yangi obyektga qayta tayinlasa — tashqarida ko'rinmaydi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Overloading, varargs, rekursiya</h2></div>
+    <p class="sec-sub"><b>Overloading</b> — bir nom, turli parametrlar. Java argumentlarga qarab qaysi birini tanlaydi.</p>
+    <div class="ol-grid">
+      <div class="ol"><code><span class="sig">jami(int a, int b)</span></code><span class="desc">ikki butun son</span></div>
+      <div class="ol"><code><span class="sig">jami(double a, double b)</span></code><span class="desc">ikki kasrli son</span></div>
+      <div class="ol"><code><span class="sig">jami(int... sonlar)</span></code><span class="desc">varargs — istalgancha son</span></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Varargs.java</span></div>
+      <pre class="code"><span class="cm">// varargs — istalgancha argument qabul qiladi</span>
+<span class="ty">int</span> jami(<span class="ty">int</span>... sonlar) {   <span class="cm">// ichida array kabi</span>
+    <span class="ty">int</span> s = <span class="nu">0</span>;
+    <span class="k">for</span> (<span class="ty">int</span> n : sonlar) s += n;
+    <span class="k">return</span> s;
+}
+jami(<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>);       <span class="cm">// 6</span>
+jami(<span class="nu">5</span>, <span class="nu">10</span>, <span class="nu">15</span>, <span class="nu">20</span>); <span class="cm">// 50</span>
+
+<span class="cm">// rekursiya — metod o'z-o'zini chaqiradi (base case bilan!)</span>
+<span class="ty">int</span> factorial(<span class="ty">int</span> n) {
+    <span class="k">if</span> (n &lt;= <span class="nu">1</span>) <span class="k">return</span> <span class="nu">1</span>;    <span class="cm">// base case — to'xtash</span>
+    <span class="k">return</span> n * factorial(n - <span class="nu">1</span>);
+}</pre>
+    </div>
+    <div class="si-grid">
+      <div class="si stat"><h4>static metod</h4><p>Obyektsiz, class orqali chaqiriladi. Yordamchi funksiyalar.</p><code>Math.max(3, 7);</code></div>
+      <div class="si inst"><h4>instance metod</h4><p>Avval obyekt yaratasiz, keyin uning ustidan chaqirasiz.</p><code>ism.length();</code></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Java pass-by-value mi yoki pass-by-reference?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Doim pass-by-value.</b> Primitivda qiymat nusxalanadi. Obyektda manzil (reference) nusxalanadi — shuning uchun obyekt ichini o'zgartirsa (<code>user.setName()</code>) tashqarida ko'rinadi, lekin parametrni yangi obyektga tayinlasa (<code>user = new User()</code>) tashqarida ko'rinmaydi. Bu eng ko'p adashtiradigan savol.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Overloading va overriding farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>Overloading</b> — bir class'da bir nomli, turli parametrli metodlar (compile-time). <b>Overriding</b> — ota-class metodini vorisda qayta yozish (runtime, 10-modul). Overload — parametrlar farqli, override — imzo bir xil.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>StackOverflowError qachon chiqadi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Rekursiya to'xtamasa (base case yo'q yoki noto'g'ri), har chaqiruv Stack'ga yangi ramka qo'shadi va Stack to'lib ketadi. Yechim — har rekursiyada aniq to'xtash sharti bo'lishi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>static metod nima va qachon?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Obyektga bog'liq bo'lmagan metod — class orqali to'g'ridan chaqiriladi (<code>Math.max</code>). Obyekt holatiga tegmaydigan yordamchi funksiyalar uchun. static metod instance maydonlariga kira olmaydi (obyekt yo'q).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">1.</span>Metodga <code>int</code> uzatib, ichida o'zgartirsangiz, tashqaridagi qiymat?</div>
+        <button class="opt">O'zgaradi</button>
+        <button class="opt">Xato beradi</button>
+        <button class="opt">O'zgarmaydi (nusxa uzatilgan)</button>
+        <div class="q-fb" data-ok="To'g'ri. Primitiv pass-by-value — qiymatning nusxasi uzatiladi. Ichkaridagi o'zgarish tashqariga ta'sir qilmaydi." data-no="Yo'q. Primitivda nusxa uzatiladi — ichkaridagi o'zgarish tashqariga ta'sir qilmaydi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">2.</span>Obyekt uzatib, metod ichida uning maydonini o'zgartirsangiz?</div>
+        <button class="opt">Tashqarida ham o'zgaradi (bir obyektga ikki reference)</button>
+        <button class="opt">O'zgarmaydi</button>
+        <button class="opt">Yangi obyekt yaratiladi</button>
+        <div class="q-fb" data-ok="To'g'ri. Manzil nusxasi uzatilgani uchun ikkovi bir obyektni ko'rsatadi — ichini o'zgartirsa tashqarida ham ko'rinadi." data-no="Yo'q. Manzil nusxasi bir obyektni ko'rsatadi — maydonni o'zgartirsangiz tashqarida ham ko'rinadi."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">3.</span>Rekursiv metodda base case (to'xtash sharti) bo'lmasa?</div>
+        <button class="opt">null qaytaradi</button>
+        <button class="opt">StackOverflowError — dastur qulaydi</button>
+        <button class="opt">Cheksiz to'g'ri ishlaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. To'xtamas rekursiya Stack'ni to'ldiradi → StackOverflowError. Har rekursiyada base case shart." data-no="Yo'q. To'xtash sharti yo'q rekursiya StackOverflowError beradi."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">4.</span>main → jami → kopaytir. Birinchi qaysi ramka Stack'dan chiqadi?</div>
+        <button class="opt">main</button><button class="opt">jami</button><button class="opt">kopaytir</button>
+        <div class="q-fb" data-ok="To'g'ri. Stack: oxirgi kirgan birinchi chiqadi. kopaytir oxirida qo'yilgan — birinchi tugab, birinchi chiqadi." data-no="Yo'q. Oxirgi kirgan birinchi chiqadi — kopaytir birinchi qaytadi."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi bo'lim · OOP</span>
+      <h3>Klass va obyekt</h3>
+      <p>Java'ning yuragi. Ma'lumot va metodlarni bitta "narsa"ga birlashtiramiz: obyekt. Class — chizma, obyekt — undan yasalgan real narsa. Konstruktor, this, static va ishga tushish tartibi.</p>
+      <div class="topics">
+        <span class="topic-pill">6 · Shartlar &amp; sikllar</span>
+        <span class="topic-pill now">7 · Metodlar</span>
+        <span class="topic-pill">8 · Klass &amp; obyekt</span>
+        <span class="topic-pill">9 · Encapsulation</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="06-shartlar-va-sikllar.html"><span class="cl">← Oldingi dars</span><span class="ct">06 · Shartlar va sikllar</span><span class="cs">☕ Java asoslari</span></a><a class="cn nx" href="08-klass-va-obyekt.html"><span class="cl">Keyingi dars →</span><span class="ct">08 · Klass va obyekt</span><span class="cs">🧱 OOP</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:8.0%"></i></div><span>7 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(7)<0)v.push(7);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','7');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(7)<0)D[t].push(7);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* anatomy */
+  var A={
+    ret:{t:"public int → return tipi",b:"Metod <b>qanday</b> qiymat qaytarishini bildiradi. <code>int</code> — butun son. <code>public</code> — boshqa joydan chaqirsa bo'ladi."},
+    name:{t:"jami → metod nomi",b:"Chaqirganda shu nomni yozasiz. Nom fe'l bo'lgani ma'qul — metod ish qiladi."},
+    par:{t:"(int a, int b) → parametrlar",b:"Metod tashqaridan qanday ma'lumot qabul qilishi. Ichkarida oddiy o'zgaruvchi kabi ishlatiladi."},
+    body:{t:"tana (body)",b:"Asosiy ish. <code>a + b</code> hisoblanib <code>natija</code>ga solinadi."},
+    "return":{t:"return natija",b:"Natijani chaqiruvchiga qaytaradi va metodni tugatadi. Qaytgan qiymat return tipiga mos bo'lishi shart."}
+  };
+  var taps=[].slice.call(document.querySelectorAll('.tap')),annoT=document.getElementById('annoT'),annoB=document.getElementById('annoB');
+  function selTap(el){taps.forEach(function(t){t.classList.remove('sel');});el.classList.add('sel');var d=A[el.getAttribute('data-p')];annoT.textContent=d.t;annoB.innerHTML=d.b;}
+  taps.forEach(function(el){el.setAttribute('tabindex','0');el.setAttribute('role','button');el.addEventListener('click',function(){selTap(el);});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();selTap(el);}});});
+  selTap(taps[0]);
+
+  /* call stack */
+  var F={
+    main:'<div class="frame f-main"><div class="fname">main()</div><div class="fvars">r = ?</div></div>',
+    jami:'<div class="frame f-a"><div class="fname">jami(a=2, b=3)</div><div class="fvars">a+b = 5</div></div>',
+    kop:'<div class="frame f-b"><div class="fname">kopaytir(x=5, y=2)</div><div class="fvars">x*y = 10</div></div>'
+  };
+  var steps=[
+    {stack:['main'],tag:'info',tagT:'boshlash',body:'<b>main()</b> ishga tushdi va Stack\'ga qo\'yildi.'},
+    {stack:['main','jami'],tag:'push',tagT:'push ↑',body:'main <b>jami(2, 3)</b> ni chaqirdi. Yangi ramka ustiga qo\'yildi.'},
+    {stack:['main','jami','kop'],tag:'push',tagT:'push ↑',body:'jami <b>kopaytir(5, 2)</b> ni chaqirdi. Yana ramka ustiga.'},
+    {stack:['main','jami'],tag:'pop',tagT:'return ↓',body:'kopaytir <b>10</b> qaytardi. Ramkasi olib tashlandi.'},
+    {stack:['main'],tag:'pop',tagT:'return ↓',body:'jami ham <b>10</b> qaytardi. Ramkasi olib tashlandi. main r=10 oldi.'},
+    {stack:['main'],tag:'info',tagT:'tugadi',body:'main tugaydi. <b>r = 10</b> ✓ Stack bo\'shadi.'}
+  ];
+  var stack=document.getElementById('stack'),csTag=document.getElementById('csTag'),csBody=document.getElementById('csBody'),cbar=document.getElementById('cbar');
+  var ci=0,cplaying=true,ctimer=null;
+  function crender(){var s=steps[ci];stack.innerHTML=s.stack.map(function(key){return F[key];}).join('');var frames=[].slice.call(stack.children);if(frames.length)frames[frames.length-1].classList.add('top');csTag.className='tag '+s.tag;csTag.textContent=s.tagT;csBody.innerHTML=s.body;cbar.style.width=((ci/(steps.length-1))*100)+'%';}
+  function cgo(n){ci=(n+steps.length)%steps.length;crender();if(cplaying)csched();}
+  function csched(){clearTimeout(ctimer);ctimer=setTimeout(function(){cgo(ci+1);},2400);}
+  function csetBtn(){document.getElementById('cplayLbl').textContent=cplaying?'Pauza':'Davom';document.getElementById('cplayIcon').innerHTML=cplaying?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>';}
+  function cplay(){cplaying=true;csetBtn();csched();}function cpause(){cplaying=false;csetBtn();clearTimeout(ctimer);}
+  document.getElementById('cplay').addEventListener('click',function(){cplaying?cpause():cplay();});
+  document.getElementById('cnext').addEventListener('click',function(){cgo(ci+1);cpause();});
+  document.getElementById('cprev').addEventListener('click',function(){cgo(ci-1);cpause();});
+  crender();csetBtn();csched();
+
+  /* pass by value */
+  var pbvOuterV=document.getElementById('pbvOuterV'),pbvInnerV=document.getElementById('pbvInnerV'),pbvHeap=document.getElementById('pbvHeap'),pbvHeapV=document.getElementById('pbvHeapV'),pbvCap=document.getElementById('pbvCap');
+  var pbvOuter=document.getElementById('pbvOuter'),pbvInner=document.getElementById('pbvInner');
+  var pbvMode='prim';
+  function pbvReset(){
+    pbvOuter.classList.remove('active');pbvInner.classList.remove('active');
+    if(pbvMode==='prim'){
+      pbvHeap.classList.remove('show');
+      pbvOuterV.innerHTML='<div class="pbv-var"><div class="pn">int x</div><div class="pv">5</div></div>';
+      pbvInnerV.innerHTML='<div class="pbv-var" style="opacity:.4"><div class="pn">int p (nusxa)</div><div class="pv">—</div></div>';
+      pbvCap.innerHTML='<code>x = 5</code>. Metod <code>o\'zgartir(x)</code> chaqiramiz. "Metodni chaqir"ni bosing.';
+    } else {
+      pbvHeap.classList.add('show');
+      pbvOuterV.innerHTML='<div class="pbv-var"><div class="pn">User u</div><div class="pv">→ 0x50</div></div>';
+      pbvInnerV.innerHTML='<div class="pbv-var" style="opacity:.4"><div class="pn">User p (nusxa)</div><div class="pv">—</div></div>';
+      pbvHeapV.innerHTML='<span class="pbv-obj">User{ ism: "Ali" }</span>';
+      pbvCap.innerHTML=pbvMode==='mutate'?'<code>u → User{"Ali"}</code>. Metod ichida <code>p.setIsm("Vali")</code> qilamiz.':'<code>u → User{"Ali"}</code>. Metod ichida <code>p = new User("Vali")</code> qilamiz.';
+    }
+  }
+  function pbvRun(){
+    pbvInner.classList.add('active');
+    if(pbvMode==='prim'){
+      pbvInnerV.innerHTML='<div class="pbv-var changed"><div class="pn">int p (nusxa)</div><div class="pv">99</div></div>';
+      setTimeout(function(){
+        pbvCap.innerHTML='Metod ichida <code>p = 99</code> qilindi (nusxa o\'zgardi). Lekin tashqarida <span class="g">x hali ham 5</span> — nusxa mustaqil edi. <b>Primitiv: tashqari o\'zgarmaydi.</b>';
+      },400);
+    } else if(pbvMode==='mutate'){
+      pbvInnerV.innerHTML='<div class="pbv-var"><div class="pn">User p (nusxa)</div><div class="pv">→ 0x50</div></div>';
+      setTimeout(function(){
+        pbvHeapV.innerHTML='<span class="pbv-obj changed">User{ ism: "Vali" }</span>';
+        pbvCap.innerHTML='<code>p</code> ham, <code>u</code> ham <b>bir xil obyektni</b> (0x50) ko\'rsatadi. <code>p.setIsm("Vali")</code> o\'sha obyektni o\'zgartirdi → <span class="r">tashqarida u.ism ham "Vali"</span>. <b>Obyekt ichini o\'zgartirish tashqarida ko\'rinadi.</b>';
+      },400);
+    } else {
+      pbvInnerV.innerHTML='<div class="pbv-var changed"><div class="pn">User p (nusxa)</div><div class="pv">→ 0x88</div></div>';
+      setTimeout(function(){
+        pbvHeapV.innerHTML='<span class="pbv-obj">User{ ism: "Ali" }</span> &nbsp; <span class="pbv-obj changed">User{ ism: "Vali" } (0x88)</span>';
+        pbvCap.innerHTML='<code>p = new User("Vali")</code> — p endi <b>boshqa obyektga</b> (0x88) ko\'rsatadi. Lekin <span class="g">u hali ham eski 0x50 ni</span> ko\'rsatadi. <b>Parametrni qayta tayinlash tashqarida ko\'rinmaydi</b> — chunki manzilning nusxasi o\'zgardi, asli emas.';
+      },400);
+    }
+  }
+  [].slice.call(document.querySelectorAll('#pbvSeg button')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('#pbvSeg button')).forEach(function(x){x.classList.toggle('on',x===b);});pbvMode=b.getAttribute('data-m');pbvReset();});});
+  document.getElementById('pbvRun').addEventListener('click',pbvRun);
+  document.getElementById('pbvReset').addEventListener('click',pbvReset);
+  pbvReset();
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

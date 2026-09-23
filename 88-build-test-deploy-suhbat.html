@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vue: build, test, deploy va suhbat</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+.fc-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fc-top button{font-family:var(--font-mono);font-size:11.5px}
+.fc-top button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card3{perspective:1200px;margin-top:12px;cursor:pointer}
+.card3 .in{position:relative;min-height:230px;transition:transform .6s;transform-style:preserve-3d}
+.card3.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;border:2px solid var(--border-strong);padding:20px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);box-shadow:var(--shadow)}
+.face.back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent);justify-content:flex-start;overflow-y:auto}
+.face .tp{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:8px}
+.face .qq{font-family:var(--font-display);font-size:21px;font-weight:600;line-height:1.3}
+.face .aa{font-size:14.5px;line-height:1.65}
+.face .aa code{background:var(--surface);padding:1px 5px;border-radius:5px}
+.fc-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.fc-nav .cnt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);margin-left:auto}
+.prog2{height:6px;border-radius:3px;background:var(--sunken);overflow:hidden;margin-top:8px}
+.prog2>div{height:100%;background:var(--teal);transition:width .3s}
+.q-txt pre{margin:8px 0 2px;font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:10px;white-space:pre;overflow-x:auto;font-weight:400}
+.mock{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.mq{font-family:var(--font-display);font-size:20px;font-weight:600;padding:18px;border-radius:14px;border:2px solid var(--border-strong);background:var(--surface);min-height:90px;display:flex;align-items:center}
+.timer{font-family:var(--font-mono);font-size:30px;font-weight:700;text-align:center;color:var(--accent-ink)}
+.timer.low{color:var(--coral)}
+.hint2{font-size:13.5px;color:var(--ink-soft)}
+
+.bp{margin-top:10px;display:grid;grid-template-columns:1fr 250px;gap:14px}
+.bp>div{min-width:0}
+.fl{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;min-height:190px;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.fi{font-family:var(--font-mono);font-size:11px;border-radius:7px;padding:5px 8px;border:1.5px solid var(--border-strong);background:var(--surface);transition:all .45s;white-space:nowrap}
+.fi small{color:var(--ink-faint);margin-left:4px}
+.fi.vue{border-color:#2C8F68}.fi.ts{border-color:#3178C6}.fi.css{border-color:#8B5CF6}.fi.img{border-color:#D9822B}.fi.lib{border-color:#94A3B8;border-style:dashed}
+.fi.dead{opacity:.25;text-decoration:line-through}
+.fi.out{background:#10201A;color:#CFEFE2;border-color:#10201A}
+.fi.out small{color:#82D8B1}
+.fi.nw{animation:pop .4s}
+.meter2{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--surface)}
+.meter2 .big{font-family:var(--font-mono);font-size:30px;font-weight:700;transition:.3s}
+.meter2 .lbl{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.szbar{height:10px;border-radius:5px;background:var(--sunken);overflow:hidden;margin:8px 0}
+.szbar i{display:block;height:100%;background:var(--accent);transition:width .6s}
+.stl{list-style:none;margin:10px 0 0;padding:0;font-family:var(--font-mono);font-size:11.5px}
+.stl li{padding:3px 6px;border-radius:6px;color:var(--ink-faint)}
+.stl li.cur{background:var(--accent-soft);color:var(--ink);font-weight:700}
+.stl li.done{color:var(--ink)}
+@media (max-width:700px){.bp{grid-template-columns:1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 8/8</span><span>· Kurs: 88/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 88-modul · yakun</span>
+    <h1>Build, test, deploy — va <span class="steam">Vue suhbati</span></h1>
+    <p class="lead">Vue trekining yakuniy darsi. Avval <code>npm run build</code> ichida nima bo‘lishini ko‘ramiz: 2 MB manba kodi qanday qilib 70 KB’ga aylanadi. Keyin test va Docker + nginx bilan deploy. Oxirida — 81–87-modullar bo‘yicha flashcard’lar, vaziyatli savollar va vaqtli mock suhbat.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>npm run build — ichkaridan</h2></div><p class="sec-sub">Vite (Rollup) bosqichlari. Har qadamda fayllar va umumiy hajm qanday o‘zgarishini kuzating.</p>
+    <div class="stage"><div class="bp">
+      <div class="fl" id="fl"></div>
+      <div><div class="meter2"><div class="lbl">brauzerga ketadigan hajm</div><div class="big" id="sz">—</div><div class="szbar"><i id="szb"></i></div><div class="lbl" id="szl"></div></div><ul class="stl" id="stl"></ul></div>
+    </div><div class="ctrls"><button class="btn" id="bdPrev">◀</button><button class="btn primary" id="bdPlay">▶ Avto</button><button class="btn" id="bdNext">▶</button><div class="bar"><div id="bdBar"></div></div></div><div class="explain" id="bdEx"></div></div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Dockerfile — multi-stage</span></div><pre class="code"><span class="cm"># 1) build: Node faqat shu bosqichda</span>
+FROM node:<span class="nu">22</span>-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN <span class="k">npm</span> ci
+COPY . .
+RUN <span class="k">npm</span> <span class="k">run</span> build          <span class="cm"># vue-tsc --noEmit &amp;&amp; vite build → /app/dist</span>
+
+<span class="cm"># 2) runtime: faqat statik fayllar + nginx (~25 MB image)</span>
+FROM nginx:<span class="nu">1.27</span>-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">nginx.conf</span></div><pre class="code">server {
+  listen <span class="nu">80</span>;
+  root /usr/share/nginx/html;
+
+  location /assets/ {                       <span class="cm"># hash'li fayllar — abadiy kesh</span>
+    add_header Cache-Control <span class="st">"public, max-age=31536000, immutable"</span>;
+  }
+  location / {
+    try_files $uri /index.html;             <span class="cm"># SPA history mode fallback</span>
+    add_header Cache-Control <span class="st">"no-cache"</span>;     <span class="cm"># index.html doim yangi</span>
+  }
+  location /api/ { proxy_pass http:<span class="cm">//backend:8080; }   # CORS kerak emas</span>
+}</pre></div>
+    <div class="callout info"><div class="ct">Muhit sozlamalari</div><code>import.meta.env.VITE_API_URL</code> build paytida kodga <b>yozib qo‘yiladi</b> — bitta image’ni dev/prod’da ishlatish uchun runtime config (<code>/config.json</code> yoki nginx’da <code>envsubst</code>). Va eslang: <code>VITE_</code> o‘zgaruvchilar brauzerda ochiq — u yerga sir (secret) qo‘yilmaydi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Test: Vitest + Vue Test Utils</h2></div>
+    <div class="grid2"><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">KartaItem.spec.ts</span></div><pre class="code"><span class="k">import</span> { mount } <span class="k">from</span> <span class="st">'@vue/test-utils'</span>
+<span class="k">import</span> <span class="ty">KartaItem</span> <span class="k">from</span> <span class="st">'./KartaItem.vue'</span>
+
+test(<span class="st">'Bloklash bosilganda id bilan emit qiladi'</span>, <span class="k">async</span> () =&gt; {
+  <span class="k">const</span> w = mount(<span class="ty">KartaItem</span>, {
+    props: { karta: { id: <span class="nu">7</span>, raqam: <span class="st">'8600 •• 4417'</span>, holat: <span class="st">'faol'</span> } }
+  })
+  <span class="k">await</span> w.get(<span class="st">'button'</span>).trigger(<span class="st">'click'</span>)
+  expect(w.emitted(<span class="st">'bloklash'</span>)).toEqual([[<span class="nu">7</span>]])
+})
+
+test(<span class="st">'bloklangan kartada tugma o‘chiq'</span>, () =&gt; {
+  <span class="k">const</span> w = mount(<span class="ty">KartaItem</span>, { props: { karta: { id: <span class="nu">7</span>, raqam: <span class="st">'…'</span>, holat: <span class="st">'blok'</span> } } })
+  expect(w.get(<span class="st">'button'</span>).attributes()).toHaveProperty(<span class="st">'disabled'</span>)
+})</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">hisob.store.spec.ts</span></div><pre class="code"><span class="k">import</span> { setActivePinia, createPinia } <span class="k">from</span> <span class="st">'pinia'</span>
+vi.mock(<span class="st">'@/api/http'</span>)
+
+beforeEach(() =&gt; setActivePinia(createPinia()))
+
+test(<span class="st">'server xatosida balans qaytariladi'</span>, <span class="k">async</span> () =&gt; {
+  vi.mocked(api.post).mockRejectedValue(<span class="k">new</span> <span class="ty">Error</span>(<span class="st">'500'</span>))
+  <span class="k">const</span> s = useHisobStore()
+  s.balans = <span class="nu">1_000_000</span>
+  <span class="k">await</span> expect(s.otkazmaQil(<span class="nu">300_000</span>, <span class="st">'Aziz'</span>)).rejects.toThrow()
+  expect(s.balans).toBe(<span class="nu">1_000_000</span>)          <span class="cm">// rollback</span>
+})</pre></div></div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Daraja</th><th>Asbob</th><th>Nimani</th></tr><tr><td>Unit</td><td>Vitest</td><td>composable, store, format funksiyalar</td></tr><tr><td>Komponent</td><td>Vitest + Vue Test Utils (yoki Testing Library)</td><td>props → render, click → emit, slot’lar</td></tr><tr><td>E2E</td><td>Playwright / Cypress</td><td>Login (Keycloak) → o‘tkazma → tarixda ko‘rinishi</td></tr><tr><td>Statik</td><td>vue-tsc, ESLint, Prettier</td><td>Tiplar va uslub — CI’da birinchi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Flashcard’lar: butun Vue treki</h2></div><p class="sec-sub">Kartani bosing — javob. "Bilaman" — to‘plamdan chiqadi.</p><div class="stage">
+      <div class="fc-top" id="fcT"></div>
+      <div class="card3" id="fc"><div class="in"><div class="face"><div class="tp" id="fcTp"></div><div class="qq" id="fcQ"></div><div class="hint2" style="margin-top:10px">👆 bosing — javob</div></div><div class="face back"><div class="tp">Javob</div><div class="aa" id="fcA"></div></div></div></div>
+      <div class="fc-nav"><button class="btn" id="fcPrev">◀</button><button class="btn" id="fcAgain">🔁 Takrorlash</button><button class="btn primary" id="fcKnow">✓ Bilaman</button><button class="btn" id="fcNext">▶</button><button class="btn" id="fcShuf">🔀</button><span class="cnt" id="fcC"></span></div>
+      <div class="prog2"><div id="fcP"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Vaziyatli savollar</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Sahifa ochilishi 6 soniya. Qanday tahlil qilasiz va tezlashtirasiz?<span class="chev">›</span></summary><div class="iv-a">O‘lchash: Lighthouse, Network (bundle hajmi, so‘rovlar zanjiri), Performance. Yechimlar: route bo‘yicha lazy loading, og‘ir kutubxonalarni (grafik, xarita) dinamik import, tree-shaking’ni buzuvchi importlarni tuzatish (lodash → lodash-es yoki alohida funksiyalar), rasmlarni siqish, gzip/brotli, kesh (hash + immutable), API so‘rovlarini parallel qilish va keraksizini kechiktirish, katta ro‘yxatda virtual scroll.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Deploy’dan keyin ba’zi foydalanuvchilarda oq ekran. Sababi?<span class="chev">›</span></summary><div class="iv-a">Ko‘pincha: index.html keshlangan va u yangi deploy’da o‘chirilgan eski hash’li chunk’larni so‘raydi (404). Yechim: index.html no-cache, eski asset’larni bir muddat saqlash, router.onError’da chunk yuklash xatosida sahifani qayta yuklash.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Frontend’da XSS’dan qanday himoyalanasiz?<span class="chev">›</span></summary><div class="iv-a">{{ }} avtomatik escape qiladi; v-html’ni foydalanuvchi matni bilan ishlatmaslik (kerak bo‘lsa DOMPurify); URL’larni tekshirish (javascript: sxemasi); CSP header; token’ni localStorage’da saqlamaslik yoki BFF pattern; bog‘liqliklarni npm audit / Dependabot bilan kuzatish.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Vue 2 → Vue 3 migratsiyasi rejasi?<span class="chev">›</span></summary><div class="iv-a">@vue/compat (migration build) bilan boshlash, ogohlantirishlarni birma-bir yopish: global API (createApp), v-model o‘zgarishlari, filtrlar olib tashlangan, event bus yo‘q ($on); Vuex → Pinia; Vue Router 4; Vuetify va boshqa UI kutubxonalarining 3-versiyasi. Yangi kod — Composition API + TS, eskisi bosqichma-bosqich.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Backend dasturchi sifatida frontend jamoa bilan API kontraktini qanday kelishasiz?<span class="chev">›</span></summary><div class="iv-a">OpenAPI spetsifikatsiyasi (springdoc) — yagona manba; frontend tiplarni generatsiya qiladi (openapi-typescript/orval); o‘zgarishlar versiyalanadi; xatolar ProblemDetail formatida; sahifalash, sana (ISO) va pul formatlari (string yoki tiyin) kelishilgan; mock server (MSW) bilan parallel ishlash.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Mock suhbat</h2></div><p class="sec-sub">Tasodifiy savol + 2 daqiqa. Ovoz chiqarib javob bering.</p><div class="stage"><div class="mock">
+      <div class="mq" id="mq">"Boshlash"ni bosing</div>
+      <div class="timer" id="tm">2:00</div>
+      <div class="ctrls" style="justify-content:center"><button class="btn primary" id="mGo">▶ Boshlash</button><button class="btn" id="mNext">Keyingi savol</button></div>
+      <div class="hint2" id="mh"></div>
+    </div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Kurs yakuni 🎉</span>
+      <h3>Noldan suhbatgacha — yo‘l bosib o‘tildi</h3>
+      <p>Java, Spring, PostgreSQL, Keycloak, Redis, Kafka, JavaScript, TypeScript va Vue. Endi — bosh sahifadagi suhbat treki bilan takrorlang va real loyiha qiling: shu kursdagi bank misollarini bitta full-stack ilovaga yig‘ing.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill now">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="87-pinia-api.html"><span class="cl">← Oldingi dars</span><span class="ct">87 · Pinia + API</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="index.html"><span class="cl">Kurs tugadi 🎉</span><span class="ct">Barcha darslar</span><span class="cs">Xaritaga qaytish</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:100.0%"></i></div><span>88 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(88)<0)v.push(88);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','88');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(88)<0)D[t].push(88);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+window.mkQA=function(C,MQ){var el=function(id){return document.getElementById(id);};
+  var topics=['Hammasi'].concat(C.map(function(c){return c[0];}).filter(function(t,i,a){return a.indexOf(t)===i;})),tp='Hammasi',known=[],deck=[],pos=0;
+  function build(){deck=C.map(function(c,i){return i;}).filter(function(i){return (tp==='Hammasi'||C[i][0]===tp)&&known.indexOf(i)<0;});pos=Math.min(pos,Math.max(0,deck.length-1));show();}
+  function show(){var fl=el('fc').classList.contains('flip');el('fc').classList.remove('flip');var tot=C.filter(function(c){return tp==='Hammasi'||c[0]===tp;}).length,kn=known.filter(function(i){return tp==='Hammasi'||C[i][0]===tp;}).length;
+    el('fcP').style.width=(tot?kn/tot*100:0)+'%';
+    if(!deck.length){el('fcTp').textContent='🎉';el('fcQ').textContent='Bu mavzudagi hamma kartani bilasiz!';el('fcA').innerHTML='';el('fcC').textContent=kn+' / '+tot+' bilaman';return;}
+    var c=C[deck[pos]];setTimeout(function(){el('fcTp').textContent=c[0];el('fcQ').textContent=c[1];el('fcA').innerHTML=c[2];},fl?300:0);
+    el('fcC').textContent=(pos+1)+' / '+deck.length+' · bilaman: '+kn+'/'+tot;}
+  el('fcT').innerHTML=topics.map(function(t){return '<button class="btn'+(t===tp?' on':'')+'">'+t+'</button>';}).join('');
+  el('fcT').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});tp=b.textContent;pos=0;build();});
+  el('fc').addEventListener('click',function(){if(deck.length)this.classList.toggle('flip');});
+  el('fcNext').addEventListener('click',function(){if(deck.length){pos=(pos+1)%deck.length;show();}});
+  el('fcPrev').addEventListener('click',function(){if(deck.length){pos=(pos-1+deck.length)%deck.length;show();}});
+  el('fcKnow').addEventListener('click',function(){if(!deck.length)return;known.push(deck[pos]);build();});
+  el('fcAgain').addEventListener('click',function(){if(!deck.length)return;var x=deck.splice(pos,1)[0];deck.push(x);if(pos>=deck.length)pos=0;show();});
+  el('fcShuf').addEventListener('click',function(){deck.sort(function(){return Math.random()-.5;});pos=0;show();});
+  build();
+  var mt=null,left=120,mi=-1;
+  function tick(){left--;var m=Math.floor(left/60),s=left%60;el('tm').textContent=m+':'+(s<10?'0':'')+s;el('tm').className='timer'+(left<=20?' low':'');if(left<=0){clearInterval(mt);mt=null;el('mh').innerHTML='⏰ Vaqt tugadi. Qayta ko‘rish: <b>'+MQ[mi][1]+'-modul</b>.';}}
+  function next(){mi=(mi+1+Math.floor(Math.random()*(MQ.length-1)))%MQ.length;el('mq').textContent=MQ[mi][0];left=120;el('tm').textContent='2:00';el('tm').className='timer';el('mh').innerHTML='Tuzilma: ta’rif → qanday ishlaydi → misol (bankdan) → tuzoq/cheklov.';clearInterval(mt);mt=setInterval(tick,1000);}
+  el('mGo').addEventListener('click',next);el('mNext').addEventListener('click',next);
+};
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var SRC=[['App.vue','vue',6],['Kartalar.vue','vue',11],['Karta.vue','vue',8],['Otkazma.vue','vue',14],['Admin.vue','vue',19],['router.ts','ts',3],['hisob.ts','ts',4],['http.ts','ts',3],['useDebounce.ts','ts',1],['main.css','css',22],['logo.png','img',180],['vue','lib',520],['vue-router','lib',160],['pinia','lib',90],['axios','lib',110],['lodash','lib',540],['chart.js','lib',210],['keycloak-js','lib',70]];
+  var STEPS=[
+   {n:'Manba',x:'Loyiha: .vue, .ts, CSS, rasm va node_modules’dagi kutubxonalar. Hammasini "shunday" yuborsak — ~2 MB va yuzlab so‘rov.',kb:2027},
+   {n:'vue-tsc --noEmit',x:'Avval tiplar tekshiriladi. Vite o‘zi tip tekshirmaydi (faqat tiplarni o‘chiradi) — shuning uchun build skripti <code>vue-tsc && vite build</code>. Xato bo‘lsa build shu yerda yiqiladi.',kb:2027,tsc:1},
+   {n:'SFC kompilyatsiya',x:'<b>.vue</b> fayllar JS’ga: template → render funksiya (statik qismlar hoist qilinadi), &lt;script setup&gt; → setup(), &lt;style scoped&gt; → data-v-xxx atributli CSS. TS tiplari o‘chiriladi.',kb:1990,sfc:1},
+   {n:'Tree-shaking',x:'Faqat <b>ishlatilgan</b> eksportlar qoladi. <code>import _ from "lodash"</code> — hammasi kiradi (tree-shake bo‘lmaydi, CommonJS). <code>lodash-es</code> dan <code>debounce</code> — faqat 1 funksiya. Vue’ning ishlatilmagan qismlari (Transition, KeepAlive) ham chiqib ketdi.',kb:1210,ts:1},
+   {n:'Code splitting',x:'Lazy route’lar (<code>() =&gt; import()</code>) <b>alohida chunk</b>larga bo‘lindi. Bosh sahifa uchun faqat <b>index.js</b> kerak; Admin va chart.js faqat admin sahifasiga kirganda yuklanadi.',kb:420,split:1},
+   {n:'Minify + hash',x:'Nomlar qisqartirildi, bo‘shliqlar olib tashlandi (esbuild). Fayl nomiga <b>kontent hash</b>: <code>index-a3f9c1.js</code> — kontent o‘zgarsa nom o‘zgaradi, shuning uchun uni abadiy keshlash mumkin.',kb:212,min:1,split:1},
+   {n:'gzip / brotli',x:'nginx siqib yuboradi: bosh sahifa uchun tarmoq bo‘ylab <b>~70 KB</b>. 2 MB’dan 30 marta kam. Tayyor <b>dist/</b> — Docker image’ga.',kb:68,gz:1,min:1,split:1}];
+  el('stl').innerHTML=STEPS.map(function(s,i){return '<li id="st'+i+'">'+(i+1)+'. '+s.n+'</li>';}).join('');
+  var OUT=[['index.html','',1],['index-a3f9c1.js','bosh',96],['vendor-7be210.js','vue+router+pinia',88],['Kartalar-8c1f.js','lazy',6],['Karta-2ab9.js','lazy',4],['Otkazma-51de.js','lazy',8],['Admin-f03c.js','lazy+chart',74],['index-d41e.css','',9],['logo-0c9a.webp','',21]];
+  function draw(s){var h='';
+    if(!s.split){SRC.forEach(function(f){var dead=s.ts&&(f[0]==='lodash'||f[1]==='lib'&&false);var sz=f[2];
+        if(s.ts){if(f[0]==='lodash')sz=1;if(f[0]==='vue')sz=190;if(f[0]==='vue-router')sz=70;if(f[0]==='pinia')sz=20;if(f[0]==='axios')sz=40;if(f[0]==='chart.js')sz=160;if(f[0]==='keycloak-js')sz=45;if(f[0]==='logo.png')sz=21;}
+        var name=f[0];if(s.sfc&&f[1]==='vue')name=f[0].replace('.vue','.js');if(s.sfc&&f[1]==='ts')name=f[0].replace('.ts','.js');if(s.ts&&f[0]==='lodash')name='lodash-es/debounce';if(s.ts&&f[0]==='logo.png')name='logo.webp';
+        h+='<span class="fi '+f[1]+(s.ts&&f[0]==='lodash'?' dead':'')+'">'+name+'<small>'+sz+' KB</small></span>';});
+      if(s.tsc)h+='<span class="fi out nw">✓ vue-tsc: 0 xato</span>';}
+    else{OUT.forEach(function(o,i){var sz=s.min?o[2]:Math.round(o[2]*1.9);if(s.gz)sz=Math.max(1,Math.round(sz/3.1));h+='<span class="fi out nw" style="animation-delay:'+(i*60)+'ms">'+(s.min?o[0]:o[0].replace(/-[0-9a-f]{4,6}/,''))+'<small>'+sz+' KB'+(o[1]?' · '+o[1]:'')+'</small></span>';});}
+    el('fl').innerHTML=h;}
+  mkStepper('bd',STEPS.length,function(i){var s=STEPS[i];draw(s);el('sz').textContent=s.kb>=1000?(s.kb/1000).toFixed(2)+' MB':s.kb+' KB';el('szb').style.width=(s.kb/2027*100)+'%';
+    el('szl').textContent=i===0?'manba':'bosh sahifa uchun: '+(i>=4?(i===6?'≈70 KB (gzip)':(i===5?'≈200 KB':'≈400 KB')):'hammasi bitta');
+    STEPS.forEach(function(_,k){el('st'+k).className=k<i?'done':(k===i?'cur':'');});
+    el('bdEx').innerHTML='<b>'+(i+1)+'/'+STEPS.length+' · '+s.n+'</b> — '+s.x;},2800);
+})();
+mkQA([
+ ['Asoslar','Vue nima va nimasi bilan ajralib turadi?','Progressiv, deklarativ UI framework: reaktivlik tizimi + komponentlar + SFC. Kichikdan boshlab to‘liq SPA’gacha kengaytiriladi, o‘rganish oson, template HTML’ga yaqin.'],
+ ['Asoslar','Virtual DOM nima, Vue qanday optimallashtiradi?','UI’ning JS’dagi daraxt ko‘rinishi; o‘zgarishda yangi daraxt eski bilan solishtirilib (diff), minimal DOM operatsiyalari qilinadi. Vue kompilyatori statik tugunlarni hoist qiladi va dinamik joylarni patch flag bilan belgilaydi — diff faqat o‘zgaruvchan qismlarda.'],
+ ['Asoslar','SFC nima?','.vue fayl: template, script (setup), style (scoped) — bitta komponentning hammasi bir joyda. Vite plugin kompilyatsiya qiladi.'],
+ ['Reaktivlik','Vue 3 reaktivligi qanday ishlaydi?','Proxy (reactive) va getter/setter (ref). Effect ishlaganda o‘qilganlar track qilinadi, o‘zgarganda trigger faqat bog‘liq effect’larni scheduler orqali qayta ishga tushiradi.'],
+ ['Reaktivlik','ref va reactive?','ref — har qanday qiymat, .value; reactive — obyekt, destructuring’da reaktivlik yo‘qoladi. Tavsiya — ref.'],
+ ['Reaktivlik','computed va watch?','computed — keshlangan sof hosila; watch — yon ta’sir, eski/yangi qiymat.'],
+ ['Reaktivlik','nextTick nima uchun?','DOM yangilanishi microtask’da batch qilinadi; yangilangan DOM’ni o‘qish uchun await nextTick().'],
+ ['Template','v-if va v-show?','v-if — DOM’dan olib tashlaydi (mount/unmount); v-show — display:none. Tez-tez almashsa v-show.'],
+ ['Template',':key nima uchun?','Diff elementlarni key bo‘yicha juftlaydi. Index key — qayta tartiblashda DOM holati (input, fokus) noto‘g‘ri qatorda qoladi. Barqaror id kerak.'],
+ ['Template','v-model ichkarida?',':value + @input (komponentda modelValue + update:modelValue, defineModel()). Modifikatorlar: .number, .trim, .lazy.'],
+ ['Komponent','Props va emit?','One-way data flow: ma’lumot pastga props bilan, hodisa yuqoriga emit bilan. Props readonly.'],
+ ['Komponent','Slot va scoped slot?','Slot — ota kontenti uchun joy; scoped slot — bola slotga ma’lumot beradi (#row="{ item }").'],
+ ['Komponent','Ota/bola hook tartibi?','Mount: ota setup → bola setup → bola mounted → ota mounted. Unmount ham ichkaridan tashqariga.'],
+ ['Komponent','provide/inject?','Ajdoddan istalgan avlodga prop drilling’siz ma’lumot. Tema, forma konteksti.'],
+ ['Composition','Composable nima?','useXxx() — holatli mantiqni qayta ishlatish uchun funksiya, ref’lar qaytaradi, o‘z resurslarini tozalaydi. Mixin’dan aniqroq.'],
+ ['Composition','Qidiruvda race condition?','Debounce + watch onCleanup’da AbortController.abort() — eski javob yangisining ustidan yozmaydi.'],
+ ['Router','Navigation guard’lar?','beforeEach/beforeResolve/afterEach, beforeEnter, onBeforeRouteLeave/Update. Auth: meta.auth + Keycloak.'],
+ ['Router','History mode’da 404?','Server noma’lum yo‘llarni index.html’ga qaytarishi kerak (try_files).'],
+ ['Router','Lazy loading?','() => import() — route alohida chunk, faqat o‘tilganda yuklanadi.'],
+ ['Pinia','Pinia nima, storeToRefs?','Global store (state, getters, actions), devtools. storeToRefs — destructuring’da reaktivlikni saqlash.'],
+ ['Pinia','Parallel 401 va token refresh?','Single-flight: bitta umumiy refresh promise, qolgan so‘rovlar kutadi va qayta yuboriladi. Aks holda rotation’da invalid_grant.'],
+ ['Pinia','Optimistic update?','UI darhol o‘zgaradi, xatoda rollback. Bankda "kutilmoqda" holati va Idempotency-Key bilan.'],
+ ['Deploy','Hash’li fayl nomlari nima uchun?','Kontent o‘zgarsa nom o‘zgaradi → asset’larni immutable keshlash, index.html esa no-cache.'],
+ ['Deploy','VITE_ o‘zgaruvchilar?','Build paytida kodga yoziladi va brauzerda ochiq — sir saqlanmaydi. Bir image ko‘p muhit — runtime config.'],
+ ['Xavfsizlik','Frontend guard yetarlimi?','Yo‘q — faqat UX. Haqiqiy himoya backend’da har so‘rovda token va rol tekshiruvi.']],
+ [['Vue reaktivligini Proxy darajasida tushuntiring.','82'],['v-for’da index key nima uchun xavfli? Misol keltiring.','83'],['Props’ni bola komponentda o‘zgartirsa nima bo‘ladi?','84'],['Composable yozing: useDebounce. Nimalarga e’tibor berasiz?','85'],['Keycloak bilan himoyalangan route qanday qilinadi?','86'],['5 ta so‘rov bir vaqtda 401 oldi — interceptor qanday bo‘lishi kerak?','87'],['Deploy’dan keyin oq ekran — sababi va yechimi?','88'],['computed va watch — qachon qaysi biri?','82'],['v-if va v-show farqi va qaysi birini qachon tanlaysiz?','83'],['Pinia va composable farqi?','87']]);
+
+</script>
+</body>
+</html>

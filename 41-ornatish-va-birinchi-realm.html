@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keycloak o'rnatish</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F1F2;--surface:#FFFFFF;--surface-2:#FBF7F8;--sunken:#F1E8EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E8DCDF;--border-strong:#D7C5CA;
+  --accent:#A3344A;--accent-ink:#7D2236;--accent-soft:#F6E4E8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* compose tap */
+.cmp{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:16px;box-shadow:var(--shadow)}
+.cmp pre{margin:0;padding:14px 16px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;overflow-x:auto}
+.cmp .ln{display:block;border-radius:5px;padding:0 6px;cursor:pointer;transition:.15s}
+.cmp .ln.t:hover{background:var(--accent-soft)}
+.cmp .ln.on{background:var(--accent);color:#fff}
+.cmp .ln:not(.t){cursor:default}
+.copy{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:4px 10px;cursor:pointer;color:var(--ink)}
+/* terminal */
+.term{background:#15110F;color:#E6DDD3;border-radius:14px;padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;min-height:220px;margin-top:14px;overflow-x:auto;white-space:pre}
+.term .p{color:#8FD35F}.term .w{color:#E0A64B}.term .g{color:#6FD1B2}.term .d{color:#8C8578}
+/* admin mock */
+.adm{display:grid;grid-template-columns:190px 1fr;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:14px;background:var(--surface);min-height:330px}
+.adm .side{background:#2A2426;color:#E8DCDF;padding:10px 0;font-size:12.5px}
+.adm .side .rl{padding:6px 14px 10px;font-family:var(--font-mono);font-size:11px;color:#C9A9B1;border-bottom:1px solid #3A3033;margin-bottom:6px}
+.adm .side div.it{padding:7px 14px;transition:.2s}
+.adm .side div.it.on{background:var(--accent);color:#fff}
+.adm .main{padding:14px 16px}
+.adm .crumb{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.adm h5{margin:4px 0 12px;font-family:var(--font-display);font-size:17px}
+.fld{display:grid;grid-template-columns:170px 1fr;gap:10px;align-items:center;margin-bottom:8px;font-size:13px;padding:5px 8px;border-radius:9px;transition:.3s}
+.fld .lb{color:var(--ink-soft)}
+.fld .vl{font-family:var(--font-mono);font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:5px 8px;background:var(--surface-2);min-height:28px}
+.fld.hl{background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent)}
+.fld .sw{display:inline-block;width:34px;height:18px;border-radius:9px;background:var(--border-strong);position:relative;vertical-align:middle}
+.fld .sw.on{background:var(--teal)}
+.fld .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.fld .sw.on::after{left:18px}
+.savebtn{display:inline-block;margin-top:6px;background:var(--accent);color:#fff;border-radius:8px;padding:6px 14px;font-size:12.5px}
+/* endpoints */
+.eps{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.ep{display:grid;grid-template-columns:200px 1fr;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;background:var(--surface-2);font-family:var(--font-mono);font-size:12px;transition:.15s}
+.ep:hover,.ep.on{border-color:var(--accent);background:var(--accent-soft)}
+.ep .k{color:var(--accent-ink);font-weight:600}
+.ep .u{color:var(--ink-soft);word-break:break-all}
+.json{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-all;margin-top:10px;min-height:80px}
+.json .k{color:var(--purple-ink)}.json .s{color:var(--accent-ink)}.json .n{color:var(--coral)}
+@media (max-width:640px){.adm{grid-template-columns:1fr}.adm .side{display:none}.fld{grid-template-columns:1fr}.ep{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#A3344A"></span> Keycloak · 2/10</span><span>· Kurs: 41/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Keycloak · 41-modul · amaliy</span>
+    <h1>O'rnatish va <span class="steam">birinchi realm</span></h1>
+    <p class="lead">Nazariya yetarli, endi ishga tushiramiz. Docker Compose bilan Keycloak 26.7 + PostgreSQL ko'taramiz, admin konsolda <code>bank</code> realm'ini, client'larni, rolni va foydalanuvchini yaratamiz, keyin birinchi tokenni <code>curl</code> bilan olamiz. Oxirida hammasini bitta JSON faylga eksport qilamiz — keyingi safar bir buyruq bilan tiklanadi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>docker-compose.yml — har qator nima qiladi</h2></div>
+    <p class="sec-sub">Rangli qatorlarga bosing — izohi pastda chiqadi. Faylni "Nusxa" tugmasi bilan olib, bo'sh papkaga saqlang.</p>
+    <div class="cmp"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">docker-compose.yml</span><button class="copy" data-copy="compose">Nusxa</button></div><pre id="cmp"></pre></div>
+    <div class="tap-note" id="cmpNote">Qatorni tanlang.</div>
+    <div class="callout warn"><div class="ct">⚠ Versiyaga e'tibor</div>Keycloak 26'dan boshlab admin <code>KC_BOOTSTRAP_ADMIN_USERNAME/PASSWORD</code> orqali yaratiladi (eski <code>KEYCLOAK_ADMIN</code> endi eskirgan). Health va metrics alohida <b>9000</b> (management) portida: <code>http://localhost:9000/health/ready</code>. Internetdagi eski maqolalarda <code>/auth/</code> prefiksi uchraydi — 17-versiyadan beri u yo'q.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Ishga tushirish — terminal</h2></div>
+    <p class="sec-sub">Tugmani bosing va Keycloak ishga tushishini kuzating. Qaysi log qatori nimani anglatishi terminal ostida.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="runBtn">▶ docker compose up</button></div>
+      <div class="term" id="term"><span class="d">$ _</span></div>
+      <div class="explain" id="termEx">Log'ni o'qishni o'rganish muhim: prod'da muammo birinchi bo'lib shu yerda ko'rinadi.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Dev va prod rejim</h2></div>
+    <table class="tbl">
+      <tr><th></th><th><code>start-dev</code></th><th><code>start</code> (prod)</th></tr>
+      <tr><td>HTTPS</td><td>shart emas, HTTP ishlaydi</td><td><b>majburiy</b> (yoki TLS'ni proksi yopadi: <code>KC_PROXY_HEADERS=xforwarded</code>)</td></tr>
+      <tr><td>Hostname</td><td>ixtiyoriy</td><td><code>KC_HOSTNAME=https://auth.bank.uz</code> majburiy — tokendagi <code>iss</code> shundan olinadi</td></tr>
+      <tr><td>Kesh</td><td>lokal</td><td>klaster (Infinispan, nodalar bir-birini topadi)</td></tr>
+      <tr><td>Theme/kesh</td><td>o'chiq (tahrirlash qulay)</td><td>yoqilgan</td></tr>
+      <tr><td>Build</td><td>har start'da</td><td><code>kc.sh build</code> bilan oldindan optimallashtirilgan image (tez start)</td></tr>
+    </table>
+    <div class="callout iv"><div class="ct">🎯 Suhbatda</div>"Nega prod'da tokenlarda iss noto'g'ri chiqdi?" — ko'pincha <code>KC_HOSTNAME</code> berilmagan yoki proksi <code>X-Forwarded-*</code> header'larini uzatmagan. Natijada <code>iss=http://keycloak:8080/...</code> bo'lib qoladi va API tokenni rad etadi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Admin konsolda qadamma-qadam</h2></div>
+    <p class="sec-sub"><code>http://localhost:8080</code> → admin / admin. Quyida konsolning soddalashtirilgan maketi. Har qadamda qaysi maydon muhimligi yoritiladi.</p>
+    <div class="stage">
+      <div class="adm"><div class="side" id="admSide"></div><div class="main" id="admMain"></div></div>
+      <div class="ctrls"><button class="btn" id="admPrev">‹</button><button class="btn primary" id="admPlay">▶ Avto</button><button class="btn" id="admNext">›</button><div class="bar"><div id="admBar"></div></div></div>
+      <div class="explain" id="admEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Discovery: Keycloak o'zini tanishtiradi</h2></div>
+    <p class="sec-sub">Har realm'da <code>/.well-known/openid-configuration</code> manzili bor. Unda barcha endpoint'lar ro'yxati turadi. Spring faqat <code>issuer-uri</code>ni oladi, qolganini shu hujjatdan o'zi topadi. Endpoint'ga bosing.</p>
+    <div class="eps" id="eps"></div>
+    <div class="explain" id="epEx">Endpoint'ni tanlang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Birinchi token — curl bilan</h2></div>
+    <p class="sec-sub">Eng oddiy flow — <b>client_credentials</b>: <code>tolov-service</code> servisi o'z nomidan token oladi (foydalanuvchisiz). So'rovni yuboring.</p>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">terminal</span></div>
+<pre class="code">curl -s -X POST http://localhost:8080/realms/bank/protocol/openid-connect/token \
+  -d grant_type=client_credentials \
+  -d client_id=tolov-service \
+  -d client_secret=svc-secret-change-me</pre></div>
+    <div class="ctrls"><button class="btn primary" id="tokBtn">▶ Yuborish</button></div>
+    <div class="json" id="tokOut">Javob shu yerda.</div>
+    <div class="explain" id="tokEx"></div>
+    <div class="callout warn"><div class="ct">⚠ Password grant haqida</div>Internetda <code>grant_type=password&amp;username=...&amp;password=...</code> misollari juda ko'p. Bu <b>Resource Owner Password</b> grant — OAuth 2.1'da olib tashlangan: ilova foydalanuvchi parolini ko'radi, MFA ishlamaydi. Faqat lokal test uchun (client'da "Direct access grants" yoqilgan bo'lsa). Haqiqiy login — Authorization Code + PKCE (43-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Realm export/import — sozlamalar kodda turadi</h2></div>
+    <p class="sec-sub">Qo'lda bosib-bosib sozlash — takrorlanmaydi va git'da iz qoldirmaydi. Realm'ni JSON qilib saqlang: compose'dagi <code>./realm</code> papkasiga qo'ysangiz, <code>--import-realm</code> uni birinchi ishga tushishda yuklaydi.</p>
+    <div class="cmp"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">realm/bank-realm.json</span><button class="copy" data-copy="realm">Nusxa</button></div><pre id="realmPre"></pre></div>
+    <div class="grid2">
+      <div class="card"><h4>Eksport qilish</h4><p><code>docker compose exec keycloak /opt/keycloak/bin/kc.sh export --realm bank --dir /opt/keycloak/data/import --users realm_file</code><br>Tayyor bo'lgach, JSON'dagi parol va sirlarni tozalang — git'ga sir yozilmaydi.</p></div>
+      <div class="card"><h4>Kod sifatida (IaC)</h4><p>Katta jamoalarda: <b>keycloak-config-cli</b> (JSON/YAML dan idempotent qo'llash) yoki <b>Terraform</b> keycloak provider. Admin konsol — faqat ko'rish uchun, o'zgarishlar PR orqali.</p></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 kcadm.sh — Admin CLI</div><code>kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin</code> → <code>kcadm.sh create users -r bank -s username=dilnoza -s enabled=true</code>. Skriptlar va CI uchun qulay. Xuddi shu ishni Admin REST API ham qiladi: <code>POST /admin/realms/bank/users</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak ma'lumotlarini qayerda saqlaydi? H2'da qolsa nima bo'ladi?<span class="chev">›</span></summary><div class="iv-a">Realm, user, client va sozlamalar tashqi relatsion bazada (PostgreSQL, MySQL, Oracle, MSSQL). Dev rejimda default — ichki H2 fayl: konteyner o'chsa, hamma narsa yo'qoladi va klaster qurib bo'lmaydi. Prod'da doim tashqi DB kerak, zaxira nusxasi va HA bilan.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Issuer URL qanday aniqlanadi va nega muhim?<span class="chev">›</span></summary><div class="iv-a"><code>{hostname}/realms/{realm}</code>. Tokenning <code>iss</code> claim'i aynan shu qiymat. Resource server <code>issuer-uri</code> bilan solishtiradi va discovery orqali JWKS'ni topadi. Hostname noto'g'ri bo'lsa (ichki docker nomi, http o'rniga https), tokenlar rad etiladi. Prod'da <code>KC_HOSTNAME</code> doim aniq beriladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak sozlamalarini muhitlar orasida (dev→test→prod) qanday ko'chirasiz?<span class="chev">›</span></summary><div class="iv-a">Realm JSON git'da saqlanadi va sirlar placeholder bilan almashtiriladi. keycloak-config-cli yoki Terraform bilan CI'da qo'llanadi. Sirlar vault/secret manager'dan keladi. Admin konsolda qo'lda o'zgartirish faqat dev'da.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>/.well-known/openid-configuration nima?<span class="chev">›</span></summary><div class="iv-a">OIDC Discovery hujjati: issuer, authorization/token/userinfo/end_session endpoint'lari, jwks_uri, qo'llab-quvvatlanadigan grant va algoritmlar. Kutubxonalar faqat issuer'ni bilib, qolganini shu yerdan avtomatik oladi — endpoint'larni qo'lda yozish shart emas.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">1.</span>Keycloak 26'da admin foydalanuvchini qaysi env yaratadi?</div>
+        <button class="opt">KEYCLOAK_USER</button><button class="opt">KEYCLOAK_ADMIN</button><button class="opt">KC_BOOTSTRAP_ADMIN_USERNAME</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. 26+ — KC_BOOTSTRAP_ADMIN_USERNAME/PASSWORD; KEYCLOAK_ADMIN eskirgan."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">2.</span>Token endpoint manzili?</div>
+        <button class="opt">/realms/bank/protocol/openid-connect/token</button><button class="opt">/auth/token</button><button class="opt">/admin/realms/bank/token</button>
+        <div class="q-fb" data-ok="To'g'ri. Uni discovery hujjatidan ham olish mumkin." data-no="Yo'q. /realms/{realm}/protocol/openid-connect/token (eski versiyalarda /auth prefiksi bor edi)."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Prod'da start-dev ishlatsak asosiy xavf?</div>
+        <button class="opt">Sekinroq ishlaydi</button><button class="opt">HTTP ruxsat, ichki H2, klaster yo'q, keshlar o'chiq</button><button class="opt">Admin konsol ochilmaydi</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. Dev rejim xavfsizlik va barqarorlik cheklovlarini yumshatadi — prod uchun emas."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Mijozning haqiqiy login'i uchun qaysi flow?</div>
+        <button class="opt">Password grant</button><button class="opt">Authorization Code + PKCE</button><button class="opt">Client credentials</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. Foydalanuvchi logini — Authorization Code + PKCE; client_credentials faqat servislar uchun."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Keycloak</span>
+      <h3>OAuth 2.0 va OpenID Connect asoslari</h3>
+      <p>4 ta rol, 3 ta token, scope va claim — protokol "nega aynan shunday" qurilganini mehmonxona kalit-kartasi misolida ko'ramiz.</p>
+      <div class="topics"><span class="topic-pill">40 · IAM</span><span class="topic-pill now">41 · O'rnatish</span><span class="topic-pill">42 · OAuth2/OIDC</span><span class="topic-pill">43 · Flow'lar</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="40-keycloak-va-iam.html"><span class="cl">← Oldingi dars</span><span class="ct">40 · Keycloak va IAM</span><span class="cs">🔐 Keycloak</span></a><a class="cn nx" href="42-oauth-2-0-va-oidc.html"><span class="cl">Keyingi dars →</span><span class="ct">42 · OAuth 2.0 va OIDC</span><span class="cs">🔐 Keycloak</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:46.6%"></i></div><span>41 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(41)<0)v.push(41);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','41');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(41)<0)D[t].push(41);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var COMPOSE="services:\n  postgres:\n    image: postgres:16\n    environment:\n      POSTGRES_DB: keycloak\n      POSTGRES_USER: keycloak\n      POSTGRES_PASSWORD: keycloak\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n\n  keycloak:\n    image: quay.io/keycloak/keycloak:26.7\n    command: start-dev --import-realm\n    environment:\n      KC_BOOTSTRAP_ADMIN_USERNAME: admin\n      KC_BOOTSTRAP_ADMIN_PASSWORD: admin\n      KC_DB: postgres\n      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak\n      KC_DB_USERNAME: keycloak\n      KC_DB_PASSWORD: keycloak\n      KC_HEALTH_ENABLED: \"true\"\n      KC_METRICS_ENABLED: \"true\"\n    ports:\n      - \"8080:8080\"\n      - \"9000:9000\"\n    volumes:\n      - ./realm:/opt/keycloak/data/import\n    depends_on:\n      - postgres\n\nvolumes:\n  pgdata:", REALM="{\n  \"realm\": \"bank\",\n  \"enabled\": true,\n  \"accessTokenLifespan\": 300,\n  \"ssoSessionIdleTimeout\": 1800,\n  \"bruteForceProtected\": true,\n  \"roles\": {\n    \"realm\": [\n      { \"name\": \"MIJOZ\" },\n      { \"name\": \"KASSIR\" },\n      { \"name\": \"ADMIN\" }\n    ],\n    \"client\": {\n      \"tolov-service\": [ { \"name\": \"transfer.create\" }, { \"name\": \"transfer.read\" } ]\n    }\n  },\n  \"clients\": [\n    {\n      \"clientId\": \"internet-bank\",\n      \"publicClient\": false,\n      \"secret\": \"ib-secret-change-me\",\n      \"standardFlowEnabled\": true,\n      \"directAccessGrantsEnabled\": false,\n      \"redirectUris\": [\"http://localhost:8081/login/oauth2/code/keycloak\"],\n      \"webOrigins\": [\"http://localhost:8081\"],\n      \"attributes\": { \"pkce.code.challenge.method\": \"S256\" }\n    },\n    {\n      \"clientId\": \"mobile-app\",\n      \"publicClient\": true,\n      \"standardFlowEnabled\": true,\n      \"redirectUris\": [\"uz.bank.app://callback\"],\n      \"attributes\": { \"pkce.code.challenge.method\": \"S256\" }\n    },\n    {\n      \"clientId\": \"tolov-service\",\n      \"publicClient\": false,\n      \"secret\": \"svc-secret-change-me\",\n      \"standardFlowEnabled\": false,\n      \"serviceAccountsEnabled\": true\n    }\n  ],\n  \"users\": [\n    {\n      \"username\": \"otabek\",\n      \"email\": \"otabek@bank.uz\",\n      \"firstName\": \"Otabek\",\n      \"emailVerified\": true,\n      \"enabled\": true,\n      \"attributes\": { \"filial_id\": [\"12\"] },\n      \"credentials\": [ { \"type\": \"password\", \"value\": \"otabek123\", \"temporary\": false } ],\n      \"realmRoles\": [\"MIJOZ\"]\n    },\n    {\n      \"username\": \"service-account-tolov-service\",\n      \"enabled\": true,\n      \"serviceAccountClientId\": \"tolov-service\",\n      \"clientRoles\": { \"tolov-service\": [\"transfer.read\"] }\n    }\n  ]\n}";
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  /* compose tap */
+  var notes={
+    'image: postgres:16':'Keycloak ma’lumotlari (realm, user, client) shu PostgreSQL’da saqlanadi. H2 ishlatilsa, konteyner o’chganda hammasi yo’qoladi.',
+    'pgdata:/var/lib/postgresql/data':'Volume — DB fayllari konteyner qayta yaratilganda ham saqlanib qoladi.',
+    'image: quay.io/keycloak/keycloak:26.7':'Rasmiy image. Minor versiyani qotiring (26.7), <code>latest</code> ishlatmang — yangilash ongli ravishda, changelog o’qilib qilinadi.',
+    'command: start-dev --import-realm':'<b>start-dev</b> — dev rejim (HTTP, keshsiz). <b>--import-realm</b> — /opt/keycloak/data/import ichidagi JSON realm’larni birinchi ishga tushishda yuklaydi (realm allaqachon bo’lsa, o’tkazib yuboradi).',
+    'KC_BOOTSTRAP_ADMIN_USERNAME: admin':'master realm’dagi vaqtinchalik admin. 26+ versiyadagi nomi shu. Prod’da darhol haqiqiy admin yaratib, bu vaqtinchalik admin’ni o’chiring.',
+    'KC_DB: postgres':'DB vendori. Keycloak shunga qarab JDBC drayverni tanlaydi.',
+    'KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak':'Docker tarmog’ida servis nomi (postgres) hostname bo’ladi.',
+    'KC_HEALTH_ENABLED: "true"':'<code>:9000/health/live</code> va <code>/health/ready</code> — Kubernetes probe’lari uchun.',
+    'KC_METRICS_ENABLED: "true"':'<code>:9000/metrics</code> — Prometheus formatida: login soni, xatolar, JVM, DB pool.',
+    '- "8080:8080"':'Asosiy HTTP port: login sahifa, token endpoint, admin konsol.',
+    '- "9000:9000"':'Management port (25+): health va metrics. Prod’da tashqariga ochilmaydi.',
+    '- ./realm:/opt/keycloak/data/import':'Lokal <code>realm/</code> papkasi → import papkasi. bank-realm.json ni shu yerga qo’yasiz (7-bo’lim).'
+  };
+  var cmp=document.getElementById('cmp');
+  cmp.innerHTML=COMPOSE.split('\n').map(function(l){var k=l.trim();var t=notes[k];return '<span class="ln'+(t?' t':'')+'" data-k="'+esc(k).replace(/"/g,'&quot;')+'">'+(esc(l)||' ')+'</span>';}).join('');
+  cmp.addEventListener('click',function(e){var l=e.target.closest('.ln.t');if(!l)return;[].slice.call(cmp.children).forEach(function(x){x.classList.toggle('on',x===l);});document.getElementById('cmpNote').innerHTML='<b>'+esc(l.dataset.k)+'</b><br>'+notes[l.dataset.k];});
+  document.getElementById('realmPre').textContent=REALM;
+  [].slice.call(document.querySelectorAll('.copy')).forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.copy==='compose'?COMPOSE:REALM;try{navigator.clipboard.writeText(t).then(function(){b.textContent='✓ Nusxalandi';setTimeout(function(){b.textContent='Nusxa';},1500);},function(){b.textContent='Qo’lda belgilang';});}catch(e){b.textContent='Qo’lda belgilang';}});});
+
+  /* terminal */
+  var L=[
+    ['p','$ docker compose up'],
+    ['d','[+] Running 3/3  ✔ Network  ✔ postgres  ✔ keycloak'],
+    ['d','postgres-1  | database system is ready to accept connections'],
+    ['','keycloak-1 | Updating the configuration and installing your custom providers, if any. Please wait.'],
+    ['','keycloak-1 | Server configuration updated and persisted. Run the following command to review the configuration:'],
+    ['g','keycloak-1 | Database: postgres · Schema created (Liquibase)'],
+    ['','keycloak-1 | Created temporary admin user with username admin'],
+    ['g','keycloak-1 | Realm \'bank\' imported'],
+    ['w','keycloak-1 | Running the server in development mode. DO NOT use this configuration in production.'],
+    ['g','keycloak-1 | Keycloak 26.7.x on JVM (powered by Quarkus) started in 8.412s. Listening on: http://0.0.0.0:8080. Management interface listening on http://0.0.0.0:9000.'],
+    ['p','$ curl -s localhost:9000/health/ready'],
+    ['g','{"status":"UP","checks":[{"name":"Keycloak database connections async health check","status":"UP"}]}']
+  ];
+  var EX=['','','PostgreSQL tayyor. Keycloak unga ulanadi.','<b>Build bosqichi</b>: Quarkus konfiguratsiyani (DB vendori, feature’lar) “qotiradi”. Prod’da bu bosqich image yig’ilayotganda (<code>kc.sh build</code>) bajariladi — start tezlashadi.','','Birinchi ishga tushishda Liquibase jadvallarni yaratadi (90 dan ortiq jadval). Keyingi versiyaga o’tganda migratsiyalarni ham u bajaradi — shuning uchun oldin DB zaxirasi olinadi.','Bootstrap admin master realm’da yaratildi.','--import-realm ishladi: bank-realm.json yuklandi.','Dev rejim ogohlantirishi — prod’da bu qator bo’lmasligi kerak.','<b>Tayyor.</b> 8080 — foydalanuvchilar uchun, 9000 — monitoring uchun.','Readiness probe: DB bilan aloqa bor.','<b>UP</b> — Kubernetes endi trafik yuborishi mumkin. Keyingi qadam: <code>http://localhost:8080</code> → admin konsol.'];
+  var term=document.getElementById('term'),tt=[];
+  document.getElementById('runBtn').addEventListener('click',function(){tt.forEach(clearTimeout);tt=[];term.innerHTML='';L.forEach(function(l,i){tt.push(setTimeout(function(){term.innerHTML+='<span class="'+l[0]+'">'+esc(l[1])+'</span>\n';term.scrollTop=term.scrollHeight;if(EX[i])document.getElementById('termEx').innerHTML=EX[i];},i*650));});});
+
+  /* admin mock */
+  var MENU=['Manage realms','Clients','Client scopes','Realm roles','Users','Groups','Sessions','Events','Realm settings','Authentication','Identity providers','User federation'];
+  function sw(on){return '<span class="sw'+(on?' on':'')+'"></span>';}
+  var A=[
+    {m:0,r:'master',c:'Manage realms › Create realm',h:'Create realm',f:[['Realm name','bank',1],['Enabled',sw(1),0],['Resource file','(ixtiyoriy: JSON yuklash)',0]],x:'<b>1. Realm yaratish.</b> Nom URL’ga kiradi (<code>/realms/bank</code>) va keyin o’zgartirish qiyin — oddiy, kichik harf, bo’shliqsiz nom tanlang. JSON yuklab ham yaratish mumkin.'},
+    {m:8,r:'bank',c:'Realm settings › Tokens / Sessions',h:'Realm settings',f:[['Access Token Lifespan','5 min',1],['SSO Session Idle','30 min',1],['SSO Session Max','10 h',0],['Brute force detection',sw(1),1]],x:'<b>2. Realm sozlamalari.</b> Access token qisqa (5 daqiqa) bo’lsin: o’g’irlansa zarar kichik. Sessiya idle — foydalanuvchi faol bo’lmasa 30 daqiqada chiqarib yuboriladi (bank uchun odatiy talab). Brute force — bir necha noto’g’ri paroldan keyin vaqtincha bloklaydi.'},
+    {m:1,r:'bank',c:'Clients › Create client › General',h:'Create client',f:[['Client type','OpenID Connect',0],['Client ID','internet-bank',1],['Name','Internet-bank',0]],x:'<b>3. Client yaratish.</b> client_id — ilova Keycloak’ka o’zini shu nom bilan tanitadi. Har ilova uchun alohida client: bittasi buzilsa, faqat o’sha o’chiriladi.'},
+    {m:1,r:'bank',c:'Clients › internet-bank › Capability config',h:'Capability config',f:[['Client authentication',sw(1)+' → confidential',1],['Standard flow',sw(1)+' (Authorization Code)',1],['Direct access grants',sw(0)+' (password grant)',1],['Service accounts',sw(0),0],['PKCE Method','S256',1]],x:'<b>4. Qobiliyatlar.</b> <b>Client authentication ON</b> — confidential (server’da sir saqlanadi, mobil ilova uchun OFF bo’ladi). <b>Standard flow</b> — Authorization Code. <b>Direct access grants OFF</b> — password grant’ni o’chiramiz. PKCE S256 — confidential client uchun ham tavsiya etiladi.'},
+    {m:1,r:'bank',c:'Clients › internet-bank › Login settings',h:'Login settings',f:[['Valid redirect URIs','http://localhost:8081/login/oauth2/code/keycloak',1],['Web origins','http://localhost:8081',0],['Valid post logout redirect URIs','http://localhost:8081/',0]],x:'<b>5. Redirect URI — xavfsizlikda eng muhim maydon.</b> Keycloak kodni faqat shu manzillarga qaytaradi. <code>*</code> yozilsa, hujumchi <code>redirect_uri=https://evil.com</code> berib kodni o’g’irlashi mumkin. Aniq manzil yozing.'},
+    {m:3,r:'bank',c:'Realm roles › Create role',h:'Create role',f:[['Role name','MIJOZ',1],['Description','Bank mijozi',0]],x:'<b>6. Realm roli.</b> Tokenda <code>realm_access.roles: ["MIJOZ", ...]</code> bo’lib keladi. Nomlash kelishuvini oldindan belgilang (katta harf yoki kichik), Spring’da mapping shunga bog’liq bo’ladi (46-modul).'},
+    {m:4,r:'bank',c:'Users › Create user',h:'Create user',f:[['Username','otabek',1],['Email','otabek@bank.uz',0],['Email verified',sw(1),1],['First name','Otabek',0],['Required user actions','—',0]],x:'<b>7. Foydalanuvchi.</b> Email verified — aks holda birinchi login’da tasdiqlash so’raladi. Required actions (parolni yangilash, OTP sozlash) — birinchi kirishda majburiy qadamlar.'},
+    {m:4,r:'bank',c:'Users › otabek › Credentials',h:'Set password',f:[['Password','••••••••',0],['Temporary',sw(0),1]],x:'<b>8. Parol.</b> <b>Temporary ON</b> bo’lsa, birinchi kirishda parolni almashtirish talab qilinadi. Real ishga tushirishda aynan shunday qilinadi — admin parolni bilmasligi kerak. Test uchun OFF.'},
+    {m:4,r:'bank',c:'Users › otabek › Role mapping',h:'Assign roles',f:[['Realm roles','MIJOZ ✓',1],['Client roles','—',0],['Effective roles','MIJOZ, default-roles-bank, offline_access, uma_authorization',0]],x:'<b>9. Rol berish.</b> Effective roles — to’g’ridan-to’g’ri berilgan, guruhlar va composite rollar orqali kelganlar yig’indisi. <code>default-roles-bank</code> har yangi userga avtomatik beriladi. Tayyor! Endi <code>otabek</code> internet-bank orqali kira oladi.'},
+    {m:6,r:'bank',c:'Sessions',h:'Sessions',f:[['User','otabek',0],['IP','172.18.0.1',0],['Started','10:42',0],['Clients','internet-bank',1],['Action','Sign out',1]],x:'<b>10. Tekshiruv.</b> Login’dan keyin sessiya shu yerda ko’rinadi. <b>Sign out</b> — sessiyani majburan yopish (47-modul). Events bo’limida LOGIN, CODE_TO_TOKEN hodisalarini ko’rasiz (avval Realm settings → Events’da yoqilgan bo’lishi kerak).'}
+  ];
+  var side=document.getElementById('admSide'),main=document.getElementById('admMain');
+  mkStepper('adm',A.length,function(i){var a=A[i];
+    side.innerHTML='<div class="rl">realm: '+a.r+' ▾</div>'+MENU.map(function(m,k){return '<div class="it'+(k===a.m?' on':'')+'">'+m+'</div>';}).join('');
+    main.innerHTML='<div class="crumb">'+a.c+'</div><h5>'+a.h+'</h5>'+a.f.map(function(f){return '<div class="fld'+(f[2]?' hl':'')+'"><span class="lb">'+f[0]+'</span><span class="vl">'+f[1]+'</span></div>';}).join('')+'<span class="savebtn">Save</span>';
+    document.getElementById('admEx').innerHTML=a.x;},3600);
+
+  /* endpoints */
+  var B='http://localhost:8080/realms/bank';
+  var E=[['issuer',B,'Tokendagi <code>iss</code> aynan shu qiymat. Spring’da <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code> ga shu yoziladi.'],
+    ['authorization_endpoint',B+'/protocol/openid-connect/auth','Brauzer shu yerga yo’naltiriladi — login sahifa. Authorization Code flow’ning 1-qadami.'],
+    ['token_endpoint',B+'/protocol/openid-connect/token','Kodni tokenga almashtirish, refresh, client_credentials — hammasi shu yerda (POST, backend’dan).'],
+    ['userinfo_endpoint',B+'/protocol/openid-connect/userinfo','Access token bilan chaqirilsa, foydalanuvchi ma’lumotini (claim’larni) qaytaradi.'],
+    ['end_session_endpoint',B+'/protocol/openid-connect/logout','RP-initiated logout: SSO sessiyani yopish (47-modul).'],
+    ['jwks_uri',B+'/protocol/openid-connect/certs','Public kalitlar ro’yxati. Resource server imzoni shu kalitlar bilan tekshiradi va ularni keshlaydi (44-modul).'],
+    ['introspection_endpoint',B+'/protocol/openid-connect/token/introspect','"Bu token hali ham aktivmi?" — server’dan so’rash (opaque token yoki darhol bekor qilish talab qilinganda).'],
+    ['revocation_endpoint',B+'/protocol/openid-connect/revoke','Refresh tokenni bekor qilish (logout’da).'],
+    ['grant_types_supported','["authorization_code","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code", …]','Qo’llanadigan flow’lar. Qaysi biri client uchun yoqilgani client sozlamasida belgilanadi.']];
+  var eps=document.getElementById('eps');eps.innerHTML=E.map(function(e,i){return '<div class="ep" data-i="'+i+'"><span class="k">'+e[0]+'</span><span class="u">'+esc(e[1])+'</span></div>';}).join('');
+  eps.addEventListener('click',function(ev){var d=ev.target.closest('.ep');if(!d)return;[].slice.call(eps.children).forEach(function(x){x.classList.toggle('on',x===d);});document.getElementById('epEx').innerHTML='<b>'+E[+d.dataset.i][0]+'</b> — '+E[+d.dataset.i][2];});
+
+  /* token */
+  function b64u(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+  document.getElementById('tokBtn').addEventListener('click',function(){
+    var now=Math.floor(Date.now()/1000);
+    var h={alg:'RS256',typ:'JWT',kid:'bk-7Qm…'},p={exp:now+300,iat:now,jti:'a1b2c3',iss:B,aud:'account',sub:'4d1c…',typ:'Bearer',azp:'tolov-service',scope:'profile email',clientId:'tolov-service',preferred_username:'service-account-tolov-service',resource_access:{'tolov-service':{roles:['transfer.read']}}};
+    var at=b64u(h)+'.'+b64u(p)+'.Xk9s…imzo';
+    var out=document.getElementById('tokOut');out.innerHTML='<span class="d">… 180 ms</span>';
+    setTimeout(function(){
+      out.innerHTML='{\n  <span class="k">"access_token"</span>: <span class="s">"'+at.slice(0,70)+'…"</span>,\n  <span class="k">"expires_in"</span>: <span class="n">300</span>,\n  <span class="k">"refresh_expires_in"</span>: <span class="n">0</span>,\n  <span class="k">"token_type"</span>: <span class="s">"Bearer"</span>,\n  <span class="k">"not-before-policy"</span>: <span class="n">0</span>,\n  <span class="k">"scope"</span>: <span class="s">"profile email"</span>\n}\n\n<span class="d">── access_token payload (jwt.io yoki base64 -d) ──</span>\n'+esc(JSON.stringify(p,null,2));
+      document.getElementById('tokEx').innerHTML='<b>Nimaga e’tibor bering:</b> <code>refresh_expires_in: 0</code> — client_credentials’da refresh token yo’q (servis har safar yangi token oladi). <code>sub</code> — service account userining id’si. <code>resource_access.tolov-service.roles</code> — client roli. <code>expires_in: 300</code> — realm’dagi 5 daqiqa. Imzo <b>RS256</b> — Keycloak’ning private kaliti bilan, <code>kid</code> orqali JWKS’dan public kalit topiladi.';
+    },450);
+  });
+})();
+
+</script>
+</body>
+</html>

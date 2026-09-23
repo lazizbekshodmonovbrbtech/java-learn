@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JavaScript modullar, npm va fetch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F8F6EC;--surface:#FFFFFF;--surface-2:#FCFBF4;--sunken:#F2EEDC;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E7E1C6;--border-strong:#D6CEA8;
+  --accent:#B08900;--accent-ink:#7A5E00;--accent-soft:#F6EDC6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+
+.graph{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;align-items:start}
+.graph>div{min-width:0;display:flex;flex-direction:column;gap:8px}
+.mod{border:2px solid var(--border-strong);border-radius:11px;padding:7px 9px;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);transition:.35s}
+.mod b{display:block;font-size:12px;margin-bottom:3px}
+.mod .ex{display:block;padding:1px 5px;border-radius:4px;margin:1px 0;transition:.35s}
+.mod .ex.used{background:var(--teal-soft);color:var(--teal-ink)}
+.mod .ex.dead{text-decoration:line-through;opacity:.4;background:var(--coral-soft)}
+.mod.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.mod.npm{border-style:dashed}
+.bundle{border:2px solid var(--accent);border-radius:12px;padding:10px;font-family:var(--font-mono);font-size:12px;background:var(--accent-soft);text-align:center;opacity:.2;transition:.4s}
+.bundle.on{opacity:1}
+.bundle b{font-size:18px;font-family:var(--font-display)}
+/* semver */
+.sv{display:grid;grid-template-columns:1fr 1.3fr;gap:12px;margin-top:10px;align-items:start}
+.sv>div{min-width:0}
+.rin{width:100%;font-family:var(--font-mono);font-size:15px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink);box-sizing:border-box}
+.vers{display:flex;flex-wrap:wrap;gap:5px}
+.vers span{font-family:var(--font-mono);font-size:12px;padding:4px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface-2);transition:.25s}
+.vers span.m{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:700}
+.vers span.best{box-shadow:0 0 0 3px var(--accent);}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.chips button{font-family:var(--font-mono);font-size:11.5px}
+/* cors */
+.seqd{position:relative;margin-top:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);padding:10px 0 12px}
+.lh{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font-family:var(--font-mono);font-size:11.5px;font-weight:600;margin-bottom:6px}
+.lh span{display:inline-block;padding:5px 10px;border-radius:9px;border:1.5px solid var(--border-strong);background:var(--surface)}
+.lanes{position:absolute;top:44px;bottom:10px;left:0;right:0;pointer-events:none}
+.lanes i{position:absolute;top:0;bottom:0;border-left:1.5px dashed var(--border-strong)}
+.msgs{position:relative;display:flex;flex-direction:column;gap:4px;min-height:170px}
+.msg{position:relative;height:32px;opacity:.12;transition:opacity .3s}
+.msg.on,.msg.done{opacity:1}
+.msg .ln{position:absolute;top:20px;height:2px;background:var(--ink-soft)}
+.msg.on .ln{background:var(--accent)}
+.msg .ln.r::after,.msg .ln.l::after{content:"";position:absolute;top:-4px;border:5px solid transparent}
+.msg .ln.r::after{right:-2px;border-left:7px solid var(--ink-soft);border-right:0}
+.msg .ln.l::after{left:-2px;border-right:7px solid var(--ink-soft);border-left:0}
+.msg .lb{position:absolute;top:0;font-family:var(--font-mono);font-size:10.5px;white-space:nowrap;transform:translateX(-50%);background:var(--surface-2);padding:0 4px;border-radius:4px}
+.msg.bad .lb{color:var(--coral);font-weight:700}.msg.ok .lb{color:var(--teal-ink)}
+.msg.self .lb{transform:none}
+.cls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.cls>div{min-width:0}
+.cls label{display:block;font-size:12.5px;margin-top:6px}
+.cls select,.cls input[type=text]{width:100%;font-family:var(--font-mono);font-size:12.5px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink);box-sizing:border-box}
+.verd{border:2px solid var(--border-strong);border-radius:12px;padding:12px;font-size:14px;background:var(--surface)}
+.verd.pf{border-color:var(--amber);background:var(--amber-soft)}.verd.sm{border-color:var(--teal);background:var(--teal-soft)}
+.verd b{font-family:var(--font-display);font-size:18px;display:block;margin-bottom:4px}
+@media (max-width:760px){.graph,.sv,.cls{grid-template-columns:1fr}.seqd{overflow-x:auto}.seqd>*{min-width:660px}}
+
+.btn.primary,.topic-pill.now,.yrs button.on{color:#1D1A0C!important}
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B08900"></span> JavaScript · 9/10</span><span>· Kurs: 73/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>JavaScript · 73-modul · modul va tarmoq</span>
+    <h1>Modullar, npm va <span class="steam">fetch</span></h1>
+    <p class="lead">Bu modul JS’ni backend bilan bog‘laydi: kodni modullarga bo‘lish, npm paketlari (JS’ning Maven’i), Vite bilan yig‘ish va Spring Boot API’ga <code>fetch</code> orqali JWT bilan murojaat. Va har bir frontend+backend dasturchi bir marta to‘qnashadigan xato — <b>CORS</b>.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>ES modullar va tree shaking</h2></div><p class="sec-sub">Har fayl — modul: faqat <code>export</code> qilingan narsalar tashqariga ko‘rinadi. Build vositasi (Vite/Rollup) import grafidan foydalanib, <b>ishlatilmagan kodni tashlaydi</b>. Qadamlarni kuzating.</p>
+    <div class="stage">
+      <div class="graph" id="gr"></div>
+      <div class="bundle" id="bnd">📦 dist/assets/index-a1b2c3.js<br><b id="bsz">—</b></div>
+      <div class="ctrls"><button class="btn" id="trPrev">◀</button><button class="btn primary" id="trPlay">▶ Avto</button><button class="btn" id="trNext">▶</button><div class="bar"><div id="trBar"></div></div></div>
+      <div class="explain" id="trEx"></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">format.js / main.js</span></div><pre class="code"><span class="cm">// format.js</span>
+<span class="k">export</span> <span class="k">function</span> som(n) { <span class="k">return</span> n.toLocaleString(<span class="st">"ru-RU"</span>) + <span class="st">" so'm"</span>; }   <span class="cm">// named export</span>
+<span class="k">export</span> <span class="k">const</span> VALYUTALAR = [<span class="st">"UZS"</span>, <span class="st">"USD"</span>, <span class="st">"EUR"</span>];
+<span class="k">export</span> <span class="k">default</span> <span class="k">function</span> sana(d) { <span class="k">return</span> d.toLocaleDateString(<span class="st">"uz-UZ"</span>); } <span class="cm">// default export</span>
+
+<span class="cm">// main.js</span>
+<span class="k">import</span> sana, { som, VALYUTALAR as V } <span class="k">from</span> <span class="st">"./format.js"</span>;      <span class="cm">// default + named (qayta nomlash)</span>
+<span class="k">import</span> * as api <span class="k">from</span> <span class="st">"./api.js"</span>;                                 <span class="cm">// namespace</span>
+<span class="k">const</span> { <span class="ty">Chart</span> } = <span class="k">await</span> <span class="k">import</span>(<span class="st">"chart.js"</span>);                      <span class="cm">// dinamik — alohida bo'lak (lazy)</span></pre></div><div class="tbl-wrap"><table class="tbl"><tr><th></th><th>Java</th><th>JS (ES modules)</th></tr><tr><td>Birlik</td><td>Klass/paket</td><td>Fayl</td></tr><tr><td>Ko‘rinish</td><td>public / package-private</td><td>export qilingan / qilinmagan</td></tr><tr><td>Import</td><td><code>import uz.bank.Format;</code></td><td><code>import { som } from "./format.js"</code></td></tr><tr><td>Sikl bog‘liqlik</td><td>Ruxsat</td><td>Ruxsat, lekin initsializatsiya tartibi tuzoq</td></tr><tr><td>Eski format</td><td>—</td><td>CommonJS: <code>require</code> / <code>module.exports</code> (Node)</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>npm va semver: qaysi versiya o‘rnatiladi?</h2></div><p class="sec-sub"><code>package.json</code>dagi diapazonni yozing — npm registrdagi qaysi versiyalar mos kelishini va qaysi biri tanlanishini ko‘ring (<code>axios</code> versiyalari misolida).</p>
+    <div class="stage"><div class="sv">
+      <div><input class="rin" id="rin" value="^1.7.2" aria-label="Versiya diapazoni"><div class="chips" id="rch"></div><div class="explain" id="rEx" style="margin-top:10px"></div></div>
+      <div><div class="vers" id="vers"></div></div>
+    </div></div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">package.json (// izohlar — faqat tushuntirish uchun, JSON’da izoh bo‘lmaydi)</span></div><pre class="code">{
+  <span class="st">"name"</span>: <span class="st">"internet-bank-ui"</span>,
+  <span class="st">"private"</span>: <span class="k">true</span>,
+  <span class="st">"type"</span>: <span class="st">"module"</span>,
+  <span class="st">"scripts"</span>: {
+    <span class="st">"dev"</span>: <span class="st">"vite"</span>,                      <span class="cm">// mvn spring-boot:run analogi</span>
+    <span class="st">"build"</span>: <span class="st">"vue-tsc &amp;&amp; vite build"</span>,
+    <span class="st">"test"</span>: <span class="st">"vitest"</span>
+  },
+  <span class="st">"dependencies"</span>: {                     <span class="cm">// production'ga ketadi (compile scope)</span>
+    <span class="st">"vue"</span>: <span class="st">"^3.5.13"</span>,
+    <span class="st">"axios"</span>: <span class="st">"~1.7.9"</span>,
+    <span class="st">"keycloak-js"</span>: <span class="st">"26.1.0"</span>
+  },
+  <span class="st">"devDependencies"</span>: {                  <span class="cm">// faqat build/test uchun (test/provided scope)</span>
+    <span class="st">"vite"</span>: <span class="st">"^6.0.0"</span>,
+    <span class="st">"typescript"</span>: <span class="st">"~5.7.2"</span>,
+    <span class="st">"vitest"</span>: <span class="st">"^3.0.0"</span>
+  }
+}</pre></div><div class="callout warn"><div class="ct">⚠️ package-lock.json — commit qiling</div>Lock fayl daraxtdagi <b>har bir</b> paketning aniq versiyasini va hash’ini qotiradi. CI’da <code>npm ci</code> (lock’dan aynan o‘rnatadi). Lock’siz bugun va ertaga turli versiyalar tushishi mumkin. Supply chain hujumlari (zararli paket versiyasi) sababli: <code>npm audit</code>, ichki registry (Nexus/Artifactory), yangi versiyalarni darhol olmaslik.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>fetch bilan Spring API’ga murojaat</h2></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">http.js — kichik, lekin to‘liq wrapper</span></div><pre class="code"><span class="k">const</span> BASE = <span class="k">import</span>.meta.env.VITE_API_URL;          <span class="cm">// "https://api.bank.uz"</span>
+
+<span class="k">export</span> <span class="k">async</span> <span class="k">function</span> http(path, { method = <span class="st">"GET"</span>, body, signal } = {}) {
+  <span class="k">const</span> res = <span class="k">await</span> fetch(BASE + path, {
+    method,
+    signal: signal ?? <span class="ty">AbortSignal</span>.timeout(<span class="nu">10_000</span>),
+    headers: {
+      <span class="st">"Accept"</span>: <span class="st">"application/json"</span>,
+      ...(body &amp;&amp; { <span class="st">"Content-Type"</span>: <span class="st">"application/json"</span> }),
+      ...(auth.token &amp;&amp; { <span class="st">"Authorization"</span>: <span class="st">`Bearer ${auth.token}`</span> }),   <span class="cm">// Keycloak access token</span>
+      <span class="st">"X-Request-Id"</span>: crypto.randomUUID(),                                <span class="cm">// tracing / idempotency</span>
+    },
+    body: body &amp;&amp; JSON.stringify(body),
+  });
+  <span class="k">if</span> (res.status === <span class="nu">401</span>) { <span class="k">await</span> auth.refresh(); <span class="k">return</span> http(path, { method, body, signal }); }
+  <span class="k">if</span> (!res.ok) {
+    <span class="k">const</span> problem = <span class="k">await</span> res.json().<span class="k">catch</span>(() =&gt; ({}));                  <span class="cm">// Spring ProblemDetail</span>
+    <span class="k">throw</span> <span class="ty">Object</span>.assign(<span class="k">new</span> <span class="ty">Error</span>(problem.detail ?? res.statusText), { status: res.status, problem });
+  }
+  <span class="k">return</span> res.status === <span class="nu">204</span> ? <span class="k">null</span> : res.json();
+}
+
+<span class="cm">// ishlatish</span>
+<span class="k">const</span> tx = <span class="k">await</span> http(<span class="st">"/api/p2p"</span>, { method: <span class="st">"POST"</span>, body: { karta: <span class="st">"8600…"</span>, summa: <span class="nu">150000</span> } });</pre></div><div class="callout tip"><div class="ct">💡 Spring tomonda</div>Xatolarni <code>ProblemDetail</code> (RFC 9457) formatida qaytaring (27-modul) — frontend <code>detail</code>, <code>title</code>, <code>errors</code> maydonlarini bir xil o‘qiydi. Katta ID’lar — string, pul — butun tiyin yoki string (66-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>CORS: brauzer nega so‘rovni blokladi?</h2></div><p class="sec-sub">Ilova <code>https://app.bank.uz</code> da, API — <code>https://api.bank.uz</code> da (boshqa origin). JSON POST yuborilyapti. Spring’da CORS sozlanganmi — tanlang va qadamlarni o‘ting.</p>
+    <div class="stage">
+      <div class="seg" id="coseg"><button data-c="0">CORS sozlanmagan</button><button class="on" data-c="1">CorsConfigurationSource bor</button></div>
+      <div class="seqd"><div class="lh"><div><span>🌐 app.bank.uz (JS)</span></div><div><span>🧭 Brauzer</span></div><div><span>🍃 api.bank.uz</span></div></div><div class="lanes"><i style="left:16.66%"></i><i style="left:50%"></i><i style="left:83.33%"></i></div><div class="msgs" id="cm"></div></div>
+      <div class="ctrls"><button class="btn" id="coPrev">◀</button><button class="btn primary" id="coPlay">▶ Avto</button><button class="btn" id="coNext">▶</button><div class="bar"><div id="coBar"></div></div></div>
+      <div class="explain" id="coEx"></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">SecurityConfig.java</span></div><pre class="code"><span class="k">@Bean</span>
+<span class="ty">SecurityFilterChain</span> api(<span class="ty">HttpSecurity</span> http) <span class="k">throws</span> <span class="ty">Exception</span> {
+    <span class="k">return</span> http
+        .cors(<span class="ty">Customizer</span>.withDefaults())                 <span class="cm">// quyidagi bean'ni ishlatadi; preflight auth'dan oldin o'tadi</span>
+        .authorizeHttpRequests(a -&gt; a.anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(<span class="ty">Customizer</span>.withDefaults()))
+        .build();
+}
+
+<span class="k">@Bean</span>
+<span class="ty">CorsConfigurationSource</span> corsConfigurationSource() {
+    <span class="k">var</span> c = <span class="k">new</span> <span class="ty">CorsConfiguration</span>();
+    c.setAllowedOrigins(<span class="ty">List</span>.of(<span class="st">"https://app.bank.uz"</span>));            <span class="cm">// "*" EMAS</span>
+    c.setAllowedMethods(<span class="ty">List</span>.of(<span class="st">"GET"</span>, <span class="st">"POST"</span>, <span class="st">"PUT"</span>, <span class="st">"DELETE"</span>));
+    c.setAllowedHeaders(<span class="ty">List</span>.of(<span class="st">"Authorization"</span>, <span class="st">"Content-Type"</span>, <span class="st">"X-Request-Id"</span>));
+    c.setMaxAge(<span class="nu">3600L</span>);                                               <span class="cm">// preflight 1 soat keshlanadi</span>
+    <span class="k">var</span> src = <span class="k">new</span> <span class="ty">UrlBasedCorsConfigurationSource</span>();
+    src.registerCorsConfiguration(<span class="st">"/api/**"</span>, c);
+    <span class="k">return</span> src;
+}</pre></div>
+    <div class="stage">
+      <div class="cls"><div>
+        <label>Metod<select id="cM"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></label>
+        <label>Content-Type<select id="cC"><option>—</option><option>application/json</option><option>application/x-www-form-urlencoded</option><option>text/plain</option></select></label>
+        <label><input type="checkbox" id="cA"> Authorization: Bearer … sarlavhasi</label></div>
+        <div class="verd" id="cV"></div></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 CORS — xavfsizlik devori emas</div>CORS — <b>brauzer</b> qoidasi: boshqa sayt JS’i sizning API javobingizni o‘qiy olmasligi uchun. curl, Postman, server-server chaqiruvlar CORS’ni bilmaydi. Shuning uchun API autentifikatsiyasi (JWT) baribir shart. Lokal ishlashda CORS’dan qochish: Vite <code>server.proxy</code> — so‘rovlar bir origin’dan ketadi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Token’ni qayerda saqlash?</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Joy</th><th>XSS’da o‘g‘irlanadimi</th><th>CSRF xavfi</th><th>Izoh</th></tr><tr><td><code>localStorage</code></td><td><b>Ha</b> — har qanday skript o‘qiydi</td><td>Yo‘q</td><td>Oddiy, lekin bank uchun tavsiya etilmaydi</td></tr><tr><td>JS xotirasi (o‘zgaruvchi)</td><td>Qiyinroq (XSS paytida baribir so‘rov yuborish mumkin)</td><td>Yo‘q</td><td>Sahifa yangilansa yo‘qoladi → silent refresh (keycloak-js shunday)</td></tr><tr><td>HttpOnly Secure SameSite cookie + <b>BFF</b></td><td>Yo‘q — JS ko‘rmaydi</td><td>Bor → SameSite + CSRF token</td><td>Token’lar backend-for-frontend’da (Spring Cloud Gateway), brauzerda faqat sessiya cookie. OAuth 2.0 for Browser-Based Apps tavsiyasi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ES modullar va CommonJS farqi?<span class="chev">›</span></summary><div class="iv-a">ESM: import/export, statik tuzilma (build vaqtida tahlil qilinadi → tree shaking), asinxron yuklanish, live bindings, brauzer va Node’da standart. CommonJS: require/module.exports, dinamik, sinxron, Node’ning eski formati.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Tree shaking nima?<span class="chev">›</span></summary><div class="iv-a">Bundler import grafidan ishlatilmagan export’larni aniqlab, yakuniy bundle’dan chiqarib tashlashi. ESM statik bo‘lgani uchun mumkin. Yon ta’sirli modullar ("sideEffects" package.json’da) ehtiyotkorlik talab qiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>^1.2.3 va ~1.2.3 farqi?<span class="chev">›</span></summary><div class="iv-a">^ — major o‘zgarmaydi: ≥1.2.3 <2.0.0. ~ — minor o‘zgarmaydi: ≥1.2.3 <1.3.0. 0.x uchun ^ qat’iyroq: ^0.2.3 → <0.3.0. Aniq versiya — prefikssiz. Lock fayl haqiqiy o‘rnatilgan versiyani qotiradi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>CORS nima va preflight qachon bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Cross-Origin Resource Sharing — brauzer boshqa origin’ga so‘rov yuborib, javobni JS’ga berishdan oldin server ruxsatini (Access-Control-Allow-* sarlavhalari) tekshiradi. Preflight (OPTIONS) — "oddiy bo‘lmagan" so‘rovlar oldidan: GET/HEAD/POST’dan boshqa metod, application/json Content-Type, Authorization kabi maxsus sarlavhalar.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>fetch va axios farqi?<span class="chev">›</span></summary><div class="iv-a">fetch — brauzerga qurilgan, Promise, HTTP xatolarda reject qilmaydi, JSON’ni qo‘lda parse, timeout — AbortSignal. axios — kutubxona: interceptor’lar, avtomatik JSON, xato status’da reject, eski brauzerlar, upload progress. Ko‘p Vue loyihalari axios’ni tanlaydi (87-modul).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SPA’da JWT’ni qayerda saqlash kerak?<span class="chev">›</span></summary><div class="iv-a">Eng xavfsiz — BFF: token’lar serverda, brauzerda HttpOnly cookie. Aks holda — xotirada (localStorage emas), qisqa umrli access token + refresh (Keycloak silent SSO), qat’iy CSP va XSS’ga qarshi himoya.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>"axios": "^1.7.2". npm 2.0.0 ni o‘rnatadimi?</div><button class="opt">Ha</button><button class="opt">Yo‘q — ^ major’ni o‘zgartirmaydi</button><button class="opt">Faqat lock fayl bo‘lmasa</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. ^1.x.x &lt; 2.0.0."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Frontend application/json bilan POST yubordi. Brauzer nima qiladi?</div><button class="opt">Darhol yuboradi</button><button class="opt">Avval OPTIONS preflight</button><button class="opt">Bloklaydi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. JSON Content-Type preflight talab qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Postman’dan so‘rov ishladi, brauzerdan CORS xatosi. Sabab?</div><button class="opt">Server o‘chiq</button><button class="opt">Server Access-Control-Allow-Origin qaytarmayapti — CORS faqat brauzerda tekshiriladi</button><button class="opt">Token noto‘g‘ri</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Postman CORS’ni tekshirmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Ishlatilmagan export bundle’ga tushmasligi uchun…</div><button class="opt">CommonJS</button><button class="opt">ES modullar + tree shaking</button><button class="opt">eval</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Statik ESM kerak."></div></div><div class="q" data-correct="2"><div class="q-txt"><span class="qn">5.</span>Bank SPA’sida access token uchun eng xavfsiz joy?</div><button class="opt">localStorage</button><button class="opt">sessionStorage</button><button class="opt">Backend (BFF), brauzerda HttpOnly cookie</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. JS o‘qiy oladigan joy XSS’ga ochiq."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · JavaScript</span>
+      <h3>JS suhbat savollari</h3>
+      <p>Trekning barcha savollari flashcard’larda, "kod nima chiqaradi" mashqlari va vaziyatli savollar.</p>
+      <div class="topics"><span class="topic-pill">65 · Qanday ishlaydi</span><span class="topic-pill">66 · Tiplar</span><span class="topic-pill">67 · Closure</span><span class="topic-pill">68 · Obyekt/massiv</span><span class="topic-pill">69 · Prototype</span><span class="topic-pill">70 · Event loop</span><span class="topic-pill">71 · Promise</span><span class="topic-pill">72 · DOM</span><span class="topic-pill now">73 · Modul/fetch</span><span class="topic-pill">74 · Suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="72-dom-va-hodisalar.html"><span class="cl">← Oldingi dars</span><span class="ct">72 · DOM va hodisalar</span><span class="cs">🟨 JavaScript</span></a><a class="cn nx" href="74-js-suhbat-savollari.html"><span class="cl">Keyingi dars →</span><span class="ct">74 · JS suhbat savollari</span><span class="cs">🟨 JavaScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:83.0%"></i></div><span>73 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(73)<0)v.push(73);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','73');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(73)<0)D[t].push(73);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* tree shaking */
+  var MOD=[[['main.js',[['import { som } from "./format.js"','u'],['import { tolovYubor } from "./api.js"','u'],['import dayjs from "dayjs"','u']]]],
+    [['format.js',[['som()','u'],['VALYUTALAR','d'],['sana() (default)','d']]],['api.js',[['tolovYubor()','u'],['tarix()','d']]]],
+    [['auth.js',[['token','u'],['logout()','d']]],['dayjs (npm)',[['default','u']],1],['lodash-es (npm)',[['debounce','d'],['… 300+ funksiya','d']],1]]];
+  function drawG(state){el('gr').innerHTML=MOD.map(function(col,ci){return '<div>'+col.map(function(m){return '<div class="mod'+(m[2]?' npm':'')+(state.on.indexOf(m[0])>=0?' on':'')+'"><b>'+m[0]+'</b>'+m[1].map(function(x){var c=state.shake?(x[1]==='u'?'used':'dead'):(state.mark&&x[1]==='u'?'used':'');return '<span class="ex '+c+'">'+x[0]+'</span>';}).join('')+'</div>';}).join('')+'</div>';}).join('');}
+  var TS=[[{on:['main.js'],mark:0,shake:0},'Build <b>entry</b> — main.js. Vite (Rollup) undan boshlab import grafini quradi.',0],
+    [{on:['main.js','format.js','api.js','dayjs (npm)'],mark:0,shake:0},'main.js import qilgan modullar topildi — statik <code>import</code> bo‘lgani uchun kodni <b>bajarmasdan</b> tahlil qilish mumkin.',0],
+    [{on:['main.js','format.js','api.js','dayjs (npm)','auth.js'],mark:0,shake:0},'api.js → auth.js. lodash-es hech kim tomonidan import qilinmagan — grafga umuman kirmaydi.',0],
+    [{on:['main.js','format.js','api.js','dayjs (npm)','auth.js'],mark:1,shake:0},'Qaysi export’lar <b>haqiqatan ishlatilgani</b> belgilandi (yashil).',0],
+    [{on:['main.js','format.js','api.js','dayjs (npm)','auth.js'],mark:1,shake:1},'<b>Tree shaking</b>: ishlatilmagan export’lar (qizil) bundle’ga kirmaydi. Keyin minifikatsiya va siqish.',1]];
+  mkStepper('tr',TS.length,function(i){drawG(TS[i][0]);el('trEx').innerHTML=TS[i][1];var b=el('bnd');b.className='bundle'+(TS[i][2]?' on':'');el('bsz').textContent=TS[i][2]?'48 KB → gzip 17 KB':'—';},2400);
+
+  /* semver */
+  var VERS=['1.6.8','1.7.0','1.7.2','1.7.4','1.7.9','1.8.0','1.8.4','1.9.0','1.10.0','2.0.0-beta.1','2.0.0','2.1.3'];
+  function pv(v){var m=v.match(/^(\d+)\.(\d+)\.(\d+)(-.+)?$/);return m?[+m[1],+m[2],+m[3],m[4]||'']:null;}
+  function cmp(a,b){for(var i=0;i<3;i++){if(a[i]!==b[i])return a[i]-b[i];}if(a[3]&&!b[3])return -1;if(!a[3]&&b[3])return 1;return a[3]<b[3]?-1:a[3]>b[3]?1:0;}
+  function sat(v,r){var p=pv(v);if(!p)return false;r=r.trim();var m;
+    if(p[3]&&!/-/.test(r))return false;
+    if((m=r.match(/^\^(\d+)\.(\d+)\.(\d+)$/))){var b=[+m[1],+m[2],+m[3],''];if(cmp(p,b)<0)return false;if(b[0]>0)return p[0]===b[0];if(b[1]>0)return p[0]===0&&p[1]===b[1];return p[0]===0&&p[1]===0&&p[2]===b[2];}
+    if((m=r.match(/^~(\d+)\.(\d+)\.(\d+)$/))){var c=[+m[1],+m[2],+m[3],''];return cmp(p,c)>=0&&p[0]===c[0]&&p[1]===c[1];}
+    if((m=r.match(/^>=\s*(\d+)\.(\d+)\.(\d+)$/)))return cmp(p,[+m[1],+m[2],+m[3],''])>=0;
+    if((m=r.match(/^(\d+)\.(\d+)\.(\d+)$/)))return cmp(p,[+m[1],+m[2],+m[3],''])===0;
+    if(r==='*'||r==='latest')return !p[3];
+    if((m=r.match(/^(\d+)\.x$/)))return p[0]===+m[1];
+    return null;}
+  var RX={'^1.7.2':'<b>^</b> (caret, npm default): major bir xil — <code>&gt;=1.7.2 &lt;2.0.0</code>. Yangi funksiyalar va tuzatishlar keladi, buzuvchi o‘zgarishlar (2.0) — yo‘q (semver’ga rioya qilinsa!).','~1.7.2':'<b>~</b> (tilde): minor bir xil — <code>&gt;=1.7.2 &lt;1.8.0</code>. Faqat patch (xato tuzatish). Konservativ.','1.7.2':'Aniq versiya. Bank loyihalarida muhim kutubxonalar (keycloak-js, kripto) uchun ko‘p ishlatiladi.','>=1.7.0':'Chegarasiz yuqori — 2.x ham mos! Xavfli: buzuvchi o‘zgarishlar kirib keladi.','^0.2.3':'0.x da ^ qat’iyroq: <code>&lt;0.3.0</code> — 0.x’da har minor buzuvchi hisoblanadi.','*':'Har qanday barqaror versiya — hech qachon ishlatmang.'};
+  function drawV(){var r=el('rin').value,ms=VERS.filter(function(v){return sat(v,r);}),bad=VERS.some(function(v){return sat(v,r)===null;});
+    var best=ms.slice().sort(function(a,b){return cmp(pv(b),pv(a));})[0];
+    el('vers').innerHTML=VERS.map(function(v){var m=ms.indexOf(v)>=0;return '<span class="'+(m?'m':'')+(v===best?' best':'')+'">'+v+'</span>';}).join('');
+    el('rEx').innerHTML=bad?'Bu sintaksis simulyatorda qo‘llanmaydi. Misollardan birini tanlang.':(RX[r]||'Mos versiyalar: '+ms.length+' ta.')+(best?' <br>npm install tanlaydi: <b>'+best+'</b> (mos keluvchilarning eng yangisi). Keyin lock faylga yoziladi.':' <br><b>Mos versiya yo‘q</b> — ETARGET xato.');}
+  el('rch').innerHTML=Object.keys(RX).map(function(k){return '<button class="btn">'+k+'</button>';}).join('');
+  el('rch').addEventListener('click',function(e){if(e.target.tagName==='BUTTON'){el('rin').value=e.target.textContent;drawV();}});
+  el('rin').addEventListener('input',drawV);drawV();
+
+  /* cors sequence */
+  var X=[16.66,50,83.33];
+  var CO=[[[0,1,'fetch POST /api/p2p (JSON, Bearer)','','JS so‘rov yubordi. Brauzer: origin boshqa + JSON + Authorization → <b>preflight</b> kerak.'],[1,2,'OPTIONS /api/p2p  Origin, Access-Control-Request-*','','Brauzer o‘zi (JS emas) OPTIONS so‘rov yubordi: "shu origin’dan POST, shu sarlavhalar bilan mumkinmi?"'],[2,1,'401 / 403, Allow-* sarlavhalari yo‘q','bad','Spring’da CORS sozlanmagan: OPTIONS Security filter’ga tushdi, token yo‘q (preflight token yubormaydi!) → 401. Access-Control-Allow-Origin yo‘q.'],[1,0,'✗ TypeError: Failed to fetch (CORS)','bad','Brauzer asl POST’ni <b>umuman yubormadi</b>. JS faqat "Failed to fetch" oladi, konsolda — CORS xatosi. Network tab’da OPTIONS qizil.']],
+    [[0,1,'fetch POST /api/p2p (JSON, Bearer)','','Preflight kerak.'],[1,2,'OPTIONS /api/p2p  Origin: https://app.bank.uz','','Preflight.'],[2,1,'204 · Allow-Origin/-Methods/-Headers, Max-Age','ok','<code>.cors()</code> CorsFilter’ni autentifikatsiyadan <b>oldin</b> qo‘ydi — OPTIONS token’siz ham to‘g‘ri javob oldi. Max-Age — keyingi 1 soat preflight qilinmaydi.'],[1,2,'POST /api/p2p  Authorization: Bearer eyJ…','','Ruxsat bor — brauzer asl so‘rovni yubordi.'],[2,1,'201 · Access-Control-Allow-Origin: app.bank.uz','ok','Javobda ham Allow-Origin bor.'],[1,0,'✓ res.json() → { id: "p-17" }','ok','Brauzer javobni JS’ga berdi.']]];
+  var cv=1,cst;
+  function drawCo(){el('cm').innerHTML=CO[cv].map(function(m){var a=X[m[0]],b=X[m[1]],l=Math.min(a,b),w=Math.abs(a-b),dir=m[1]>m[0]?'r':'l';return '<div class="msg '+m[3]+'"><span class="ln '+dir+'" style="left:'+l+'%;width:'+w+'%"></span><span class="lb" style="left:'+(l+w/2)+'%">'+m[2]+'</span></div>';}).join('');}
+  function mkCo(){drawCo();if(cst)cst.stop();cst=mkStepper('co',CO[cv].length,function(i){[].forEach.call(el('cm').children,function(d,k){d.classList.toggle('on',k===i);d.classList.toggle('done',k<i);});el('coEx').innerHTML=CO[cv][i][4];},2400);}
+  el('coseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});cv=+b.dataset.c;['coPrev','coPlay','coNext'].forEach(function(id){var o=el(id),n=o.cloneNode(true);o.parentNode.replaceChild(n,o);});mkCo();});mkCo();
+
+  /* classifier */
+  function cls(){var m=el('cM').value,c=el('cC').value,a=el('cA').checked,why=[];
+    if(['GET','HEAD','POST'].indexOf(m)<0)why.push('metod '+m);if(c==='application/json')why.push('Content-Type: application/json');if(a)why.push('Authorization sarlavhasi');
+    var v=el('cV');if(why.length){v.className='verd pf';v.innerHTML='<b>Preflight (OPTIONS) kerak</b>Sabab: '+why.join(', ')+'. Server Access-Control-Allow-* bilan javob berishi kerak.';}
+    else{v.className='verd sm';v.innerHTML='<b>"Oddiy" so‘rov</b>Preflight’siz yuboriladi, lekin javobni JS o‘qishi uchun baribir <code>Access-Control-Allow-Origin</code> kerak. (Shuning uchun oddiy formalar CSRF’ga ochiq — SameSite cookie va CSRF token.)';}}
+  ['cM','cC','cA'].forEach(function(i){el(i).addEventListener('change',cls);});cls();
+})();
+
+</script>
+</body>
+</html>

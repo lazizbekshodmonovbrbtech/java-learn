@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vue template sintaksisi</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+/* v-if vs v-show */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.vs>div{min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.vs h6{margin:0 0 8px;font-family:var(--font-mono);font-size:12.5px}
+.tree{font-family:var(--font-mono);font-size:12px;line-height:1.9}
+.tree .tn{display:block;padding:0 6px;border-radius:6px;transition:.35s;white-space:nowrap;overflow:hidden}
+.tree .tn.in1{padding-left:18px}.tree .tn.in2{padding-left:32px}
+.tree .tn.gone{max-height:0;opacity:0;padding-top:0;padding-bottom:0}
+.tree .tn.shw{max-height:30px}
+.tree .tn.hid{opacity:.4;text-decoration:line-through;text-decoration-color:var(--coral)}
+.tree .tn.flash{background:var(--accent-soft)}
+.tree .tn.flashr{background:var(--coral-soft)}
+.prev{margin-top:8px;border:1px dashed var(--border-strong);border-radius:10px;padding:8px;min-height:60px;background:var(--surface)}
+.otp{border-radius:8px;background:var(--accent);color:#fff;padding:6px 10px;font-size:13px;transition:.3s}
+.meter{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.meter span{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface)}
+.meter b{font-size:13px}
+/* keys */
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.kg>div{min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.kg h6{margin:0 0 8px;font-family:var(--font-mono);font-size:12.5px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.kl{position:relative;display:flex;flex-direction:column;gap:6px;min-height:200px}
+.kr{display:grid;grid-template-columns:auto 1fr 96px;gap:8px;align-items:center;border:2px solid var(--border-strong);border-radius:10px;padding:6px 8px;background:var(--surface);transition:background .4s,border-color .4s;will-change:transform}
+.kr .dm{font-family:var(--font-mono);font-size:10.5px;color:#fff;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.kr .tx{font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kr .tx small{display:block;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+.kr input{width:100%;box-sizing:border-box;font:inherit;font-size:12px;border:1px solid var(--border);border-radius:7px;padding:4px 6px;background:var(--surface-2);color:var(--ink)}
+.kr.patch{background:#FFF4C9;border-color:#D9A400}
+.kr.new{animation:kin .45s}
+.kr.bad input{border-color:var(--coral);background:var(--coral-soft)}
+@keyframes kin{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.ops{font-family:var(--font-mono);font-size:11.5px;margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.ops span{border:1px solid var(--border);border-radius:8px;padding:2px 7px;background:var(--surface)}
+.ops b{font-size:13px}
+:root[data-theme="dark"] .kr.patch{background:#4A3B06}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kr.patch{background:#4A3B06}}
+/* v-model */
+.vm{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.vm>div{min-width:0}
+.vm .fld{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--surface-2)}
+.vm label.cb{display:inline-flex;gap:6px;align-items:center;font-family:var(--font-mono);font-size:12.5px;margin:0 12px 6px 0;cursor:pointer}
+.vm input.big{width:100%;box-sizing:border-box;font-size:18px;padding:8px 10px;border-radius:10px;border:2px solid var(--border-strong);background:var(--surface);color:var(--ink);font-family:var(--font-mono)}
+.stbox{font-family:var(--font-mono);font-size:12.5px;border-radius:12px;background:#10201A;color:#CFEFE2;padding:12px;line-height:1.8}
+.stbox .k{color:#8DBBF0}.stbox .v{color:#F5DC78}.stbox .ty{color:#82D8B1}.stbox .er{color:#FF9D8A}
+.stbox .pulse{animation:pop .35s}
+.evlog{font-family:var(--font-mono);font-size:11.5px;margin-top:8px;height:66px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:6px 8px;background:var(--surface)}
+/* bubbling */
+.bub{margin-top:10px;display:grid;grid-template-columns:1fr 240px;gap:12px}
+.bub>div{min-width:0}
+.lay{border:2px solid var(--border-strong);border-radius:14px;padding:14px 12px 12px;position:relative;transition:.25s;background:var(--surface)}
+.lay>.lb{white-space:nowrap;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;position:absolute;top:-10px;left:12px;background:var(--surface);padding:0 6px;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.lay.hit{border-color:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+.lay.blk{border-color:var(--coral);border-style:dashed}
+.lay .lay{margin-top:10px}
+.mods label{display:flex;gap:6px;align-items:center;font-family:var(--font-mono);font-size:12.5px;margin-bottom:6px;cursor:pointer}
+.navlink{color:var(--accent);text-decoration:underline;font-size:13px}
+@media (max-width:700px){.lay>.lb{font-size:10px}.lay{padding:14px 8px 10px}.vs,.kg,.vm,.bub{grid-template-columns:1fr}.kr{grid-template-columns:auto 1fr 78px}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 3/8</span><span>· Kurs: 83/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 83-modul · template</span>
+    <h1><span class="steam">Template</span>: HTML’ga mantiq qo‘shish</h1>
+    <p class="lead">Vue shabloni — oddiy HTML, lekin maxsus atributlar (<b>direktivalar</b>) bilan: <code>v-if</code>, <code>v-for</code>, <code>v-model</code>, <code>@click</code>. Kompilyator ularni render funksiyaga aylantiradi. Bu darsda eng ko‘p xato qilinadigan joylarni jonli ko‘ramiz: v-if va v-show farqi, <b>v-for’da :key nega muhim</b>, v-model modifikatorlari va event bubbling.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>v-if va v-show: DOM’da nima bo‘ladi?</h2></div><p class="sec-sub">Ikkala tomonda bir xil "SMS kod kiriting" bloki. Ko‘rsatish/yashirishni bir necha marta bosing va chapdagi DOM daraxtini kuzating.</p>
+    <div class="stage">
+      <div class="vs">
+        <div><h6>&lt;div v-if="kodKerak"&gt;</h6>
+          <div class="tree" id="tA"><span class="tn">&lt;form&gt;</span><span class="tn in1">&lt;input summa&gt;</span><span class="tn in1 shw" id="tAo">&lt;div class="otp"&gt; ← OtpKiritish</span><span class="tn in2 shw" id="tAi">&lt;input kod&gt;</span><span class="tn in1 gone" id="tAc" style="color:var(--ink-faint)">&lt;!--v-if--&gt;</span><span class="tn in1">&lt;button&gt;</span></div>
+          <div class="prev"><div class="otp" id="pA">SMS kod: ______</div></div>
+          <div class="meter"><span>mount: <b id="mA">1</b></span><span>unmount: <b id="uA">0</b></span><span>DOM’da: <b id="dA">ha</b></span></div></div>
+        <div><h6>&lt;div v-show="kodKerak"&gt;</h6>
+          <div class="tree" id="tB"><span class="tn">&lt;form&gt;</span><span class="tn in1">&lt;input summa&gt;</span><span class="tn in1 shw" id="tBo">&lt;div class="otp" <i id="sB">style=""</i>&gt;</span><span class="tn in2 shw" id="tBi">&lt;input kod&gt;</span><span class="tn in1">&lt;button&gt;</span></div>
+          <div class="prev"><div class="otp" id="pB">SMS kod: ______</div></div>
+          <div class="meter"><span>mount: <b id="mB">1</b></span><span>unmount: <b>0</b></span><span>DOM’da: <b>doim</b></span></div></div>
+      </div>
+      <div class="ctrls"><button class="btn primary" id="vsT">kodKerak = !kodKerak</button><button class="btn" id="vsT5">5 marta tez almashtirish</button></div>
+      <div class="explain" id="vsEx"><b>v-if</b> elementni (va ichidagi komponentni) butunlay yaratadi/o‘chiradi — lifecycle hook’lar ishlaydi, ichki holat yo‘qoladi. <b>v-show</b> faqat <code>display:none</code> qo‘yadi.</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th></th><th>v-if</th><th>v-show</th></tr><tr><td>Yashirinda</td><td>DOM’da yo‘q (komment o‘rinbosar)</td><td>DOM’da bor, <code>display:none</code></td></tr><tr><td>Almashtirish narxi</td><td>Qimmat: mount/unmount, hook’lar</td><td>Arzon: bitta CSS xossa</td></tr><tr><td>Boshlang‘ich narx</td><td>Arzon: false bo‘lsa umuman render qilinmaydi</td><td>Doim render qilinadi</td></tr><tr><td>Ichki holat (input qiymati)</td><td>Yo‘qoladi</td><td>Saqlanadi</td></tr><tr><td>v-else / template bilan</td><td>Ha</td><td>Yo‘q</td></tr><tr><td>Qachon</td><td>Kam o‘zgaradigan shart, ruxsat (rol) tekshiruvi</td><td>Tez-tez almashadigan tab, dropdown</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>v-for va :key — eng mashhur xato</h2></div><p class="sec-sub">Ikkala ro‘yxat bir xil ma’lumot. Har qatorga izoh yozilgan (bu <b>DOM ichidagi holat</b> — input qiymati). Rangli <b>DOM#</b> belgisi — qaysi haqiqiy DOM elementi ekanini ko‘rsatadi. "Boshiga qo‘shish"ni bosing va izohlar kimda qolganiga qarang.</p>
+    <div class="stage">
+      <div class="kg">
+        <div><h6><span>:key="index"</span><span id="kAst"></span></h6><div class="kl" id="kA"></div><div class="ops" id="oA"></div></div>
+        <div><h6><span>:key="t.id"</span><span id="kBst"></span></h6><div class="kl" id="kB"></div><div class="ops" id="oB"></div></div>
+      </div>
+      <div class="ctrls"><button class="btn primary" id="kAdd">Boshiga yangi o‘tkazma</button><button class="btn" id="kDel">Birinchisini o‘chirish</button><button class="btn" id="kSort">Summa bo‘yicha saralash</button><button class="btn" id="kR">↺</button></div>
+      <div class="explain" id="kEx">Vue ro‘yxatni yangilaganda eski va yangi virtual tugunlarni <b>key bo‘yicha</b> juftlaydi. Key bir xil bo‘lsa — "bu o‘sha element" deb hisoblaydi va DOM’ni qayta ishlatadi.</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TransferList.vue</span></div><pre class="code">&lt;<span class="k">template</span>&gt;
+  &lt;ul&gt;
+    &lt;!-- ❌ index o<span class="st">'zgaradi: boshiga qo'</span>shilsa hammasi siljiydi --&gt;
+    &lt;li <span class="k">v-for</span>=<span class="st">"(t, i) in otkazmalar"</span> :key=<span class="st">"i"</span>&gt;…&lt;/li&gt;
+
+    &lt;!-- ✅ barqaror, noyob identifikator (DB id, UUID) --&gt;
+    &lt;li <span class="k">v-for</span>=<span class="st">"t in otkazmalar"</span> :key=<span class="st">"t.id"</span>&gt;
+      {{ t.kimga }} — {{ format(t.summa) }}
+      &lt;input <span class="k">v-model</span>=<span class="st">"t.izoh"</span> /&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/<span class="k">template</span>&gt;</pre></div>
+    <div class="callout warn"><div class="ct">Qoidalar</div><code>:key</code> — noyob va <b>barqaror</b> bo‘lsin (id). <code>Math.random()</code> — har renderda yangi key, ya’ni hamma element qayta yaratiladi. Index — faqat ro‘yxat hech qachon qayta tartiblanmasa va qatorlarda ichki holat bo‘lmasa. Va <b>v-if bilan v-for bir elementda</b> ishlatilmaydi (Vue 3’da v-if ustun) — filtrni computed’ga chiqaring.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>v-model va modifikatorlar</h2></div><p class="sec-sub"><code>v-model</code> — bu shunchaki <code>:value</code> + <code>@input</code>. Modifikatorlarni yoqib-o‘chirib, summa maydoniga yozing va holatdagi qiymat <b>turi</b> qanday o‘zgarishini kuzating.</p>
+    <div class="stage"><div class="vm">
+      <div class="fld">
+        <label class="cb"><input type="checkbox" id="mN"> .number</label><label class="cb"><input type="checkbox" id="mT"> .trim</label><label class="cb"><input type="checkbox" id="mL"> .lazy</label>
+        <input class="big" id="vmIn" value="  1500  " autocomplete="off">
+        <div class="evlog" id="vmLog"></div>
+      </div>
+      <div>
+        <div class="stbox" id="vmSt"></div>
+        <div class="explain" id="vmEx" style="margin-top:8px">Hozir modifikator yo‘q: input qiymati doim <b>string</b>. <code>summa + 100</code> → "  1500  100" (konkatenatsiya!).</div>
+      </div>
+    </div></div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">v-model = syntactic sugar</span></div><pre class="code">&lt;!-- yozasiz: --&gt;
+&lt;input <span class="k">v-model</span>.number.trim=<span class="st">"summa"</span> /&gt;
+
+&lt;!-- kompilyator aylantiradi (taxminan): --&gt;
+&lt;input :value=<span class="st">"summa"</span>
+       <span class="k">@input</span>=<span class="st">"summa = parseFloat($event.target.value.trim()) || $event.target.value"</span> /&gt;
+
+&lt;!-- komponentda (<span class="ty">Vue</span> <span class="nu">3.4</span>+): --&gt;
+&lt;<span class="ty">SummaInput</span> <span class="k">v-model</span>=<span class="st">"summa"</span> /&gt;   &lt;!-- ichida: <span class="k">const</span> model = defineModel() --&gt;</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Event modifikatorlar: bubbling jonli</h2></div><p class="sec-sub">Ichki tugmani bosing — hodisa qanday yuqoriga "ko‘tarilishini" ko‘ring. Keyin modifikatorlarni yoqing.</p>
+    <div class="stage"><div class="bub">
+      <div>
+        <div class="lay" id="L0"><span class="lb">&lt;div @click="sahifa"&gt;</span>
+          <div class="lay" id="L1"><span class="lb">&lt;div.karta @click="kartaniOch"&gt;</span>
+            <div class="lay" id="L2"><span class="lb">&lt;button @click<i id="mStr"></i>="ochirish"&gt;</span>
+              <button class="btn primary" id="bIn">🗑 Kartani o‘chirish</button>
+            </div>
+            <div style="margin-top:10px"><a href="#" class="navlink" id="aIn">Batafsil (havola)</a> <span style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)">@click<i id="mPr"></i></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mods">
+        <label><input type="checkbox" id="mS"> .stop — tugmada</label>
+        <label><input type="checkbox" id="mO"> .once — tugmada</label>
+        <label><input type="checkbox" id="mP" checked> .prevent — havolada</label>
+        <div class="evlog" id="bLog" style="height:150px"></div>
+      </div>
+    </div>
+    <div class="explain" id="bEx">.stop’siz: tugma bosilsa karta ham "ochiladi" — foydalanuvchi o‘chirmoqchi edi, lekin karta sahifasiga o‘tib ketdi. Klassik bug.</div></div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Modifikator</th><th>Ekvivalent</th><th>Misol</th></tr><tr><td><code>.stop</code></td><td><code>e.stopPropagation()</code></td><td>Karta ichidagi tugma</td></tr><tr><td><code>.prevent</code></td><td><code>e.preventDefault()</code></td><td><code>&lt;form @submit.prevent&gt;</code> — sahifa qayta yuklanmasin</td></tr><tr><td><code>.once</code></td><td>Bir marta ishlaydi</td><td>"To‘lash" tugmasi — ikki marta yubormaslik (lekin server idempotentligi baribir kerak!)</td></tr><tr><td><code>.self</code></td><td><code>e.target === e.currentTarget</code></td><td>Modal fonini bosganda yopish</td></tr><tr><td><code>@keyup.enter</code>, <code>.esc</code></td><td>Klaviatura</td><td>Qidiruvni Enter bilan yuborish</td></tr><tr><td><code>.capture</code>, <code>.passive</code></td><td>addEventListener opsiyalari</td><td>Scroll ishlashi (passive)</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Direktivalar shpargalkasi</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Direktiva</th><th>Qisqa</th><th>Vazifa</th></tr><tr><td><code>{{ ifoda }}</code></td><td>—</td><td>Matn interpolatsiyasi (HTML escape qilinadi — XSS’dan xavfsiz)</td></tr><tr><td><code>v-bind:href</code></td><td><code>:href</code></td><td>Atributni ifodaga bog‘lash; <code>:class="{ faol: ok }"</code>, <code>:style</code></td></tr><tr><td><code>v-on:click</code></td><td><code>@click</code></td><td>Hodisa</td></tr><tr><td><code>v-if / v-else-if / v-else</code></td><td>—</td><td>Shartli render</td></tr><tr><td><code>v-show</code></td><td>—</td><td>CSS bilan yashirish</td></tr><tr><td><code>v-for="x in xs"</code></td><td>—</td><td>Ro‘yxat (<code>:key</code> bilan!)</td></tr><tr><td><code>v-model</code></td><td>—</td><td>Ikki tomonlama bog‘lash</td></tr><tr><td><code>v-slot:nom</code></td><td><code>#nom</code></td><td>Slotlar (84-modul)</td></tr><tr><td><code>v-html</code></td><td>—</td><td>⚠ Xom HTML — foydalanuvchi matni bilan hech qachon (XSS)</td></tr><tr><td><code>v-once</code>, <code>v-memo</code></td><td>—</td><td>Render optimizatsiyasi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>v-if va v-show farqi? Qaysi birini qachon ishlatasiz?<span class="chev">›</span></summary><div class="iv-a">v-if elementni DOM’dan butunlay olib tashlaydi/yaratadi (komponent unmount/mount, hook’lar, ichki holat yo‘qoladi); boshlang‘ich narx arzon, almashtirish qimmat. v-show doim render qiladi, faqat display:none. Tez-tez almashadigan narsalar — v-show, kam o‘zgaradigan yoki ruxsatga bog‘liq bloklar — v-if.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>v-for’da key nima uchun kerak? Index’ni key qilsa nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Vue diff algoritmi eski va yangi tugunlarni key bo‘yicha juftlaydi. Index key bo‘lsa, boshiga qo‘shish/o‘chirish/saralashda index’lar siljiydi — Vue boshqa ma’lumotni eski DOM elementiga "patch" qiladi. Natija: input qiymatlari, fokus, komponent ichki holati, animatsiyalar noto‘g‘ri qatorda qoladi va keraksiz patch’lar ko‘payadi. Barqaror id kerak.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>v-if va v-for bir elementda ishlatsa bo‘ladimi?<span class="chev">›</span></summary><div class="iv-a">Tavsiya etilmaydi. Vue 3’da v-if ustun turadi, shuning uchun v-if ichida v-for o‘zgaruvchisi hali mavjud emas. Filtrlashni computed’ga chiqaring yoki tashqi &lt;template v-for&gt; ishlating.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>v-model ichkarida qanday ishlaydi?<span class="chev">›</span></summary><div class="iv-a">Input uchun :value + @input (checkbox — checked + change, select — value + change). Komponentda — modelValue prop + update:modelValue emit; Vue 3.4+ da defineModel() makrosi. Bir nechta v-model: v-model:title.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>v-html nima uchun xavfli?<span class="chev">›</span></summary><div class="iv-a">U satrni HTML sifatida qo‘yadi, escape qilmaydi — foydalanuvchi kiritgan matnda skript yoki onerror="…" bo‘lsa XSS. Faqat ishonchli yoki sanitize qilingan (DOMPurify) kontent bilan.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>.stop va .prevent farqi?<span class="chev">›</span></summary><div class="iv-a">.stop — hodisaning ota elementlarga ko‘tarilishini to‘xtatadi (stopPropagation). .prevent — brauzerning standart harakatini bekor qiladi (forma yuborish, havolaga o‘tish). Ular bir-biriga bog‘liq emas, birga ham ishlatiladi: @click.stop.prevent.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Tab’lar sekundiga bir necha marta almashadi. Qaysi direktiva?</div><button class="opt">v-if</button><button class="opt">v-show</button><button class="opt">v-for</button><div class="q-fb" data-ok="To‘g‘ri — faqat CSS." data-no="Yo‘q. v-if har safar mount/unmount qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Ro‘yxat boshiga element qo‘shildi, key=index. Nima bo‘ladi?</div><button class="opt">Faqat yangi element yaratiladi</button><button class="opt">Barcha qatorlar patch qilinadi, input qiymatlari "siljib" qoladi</button><button class="opt">Xato chiqadi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Index’lar siljiydi — Vue boshqa ma’lumotni eski DOM’ga yozadi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>&lt;input v-model="summa"&gt; ga 100 yozildi. typeof summa?</div><button class="opt">number</button><button class="opt">string</button><button class="opt">bigint</button><div class="q-fb" data-ok="To‘g‘ri — .number kerak." data-no="Yo‘q. Input qiymati har doim string."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Forma yuborilganda sahifa yangilanmasin?</div><button class="opt">@submit.stop</button><button class="opt">@submit.prevent</button><button class="opt">@submit.once</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Standart harakatni .prevent bekor qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Server’dan kelgan izoh matnini chiqarish kerak. To‘g‘ri usul?</div><button class="opt">v-html="izoh"</button><button class="opt">{{ izoh }}</button><button class="opt">innerHTML</button><div class="q-fb" data-ok="To‘g‘ri — escape qilinadi." data-no="Yo‘q. v-html XSS’ga ochiq."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Komponentlar</h3>
+      <p>props pastga, emit yuqoriga (animatsiyada), slotlar va lifecycle hook’lar ketma-ketligi.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill now">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="82-reaktivlik.html"><span class="cl">← Oldingi dars</span><span class="ct">82 · Reaktivlik</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="84-komponentlar.html"><span class="cl">Keyingi dars →</span><span class="ct">84 · Komponentlar</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:94.3%"></i></div><span>83 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(83)<0)v.push(83);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','83');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(83)<0)D[t].push(83);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* ---------- v-if / v-show ---------- */
+  var on=true,mA=1,uA=0,mB=1;
+  function flash(n,c){n.classList.remove('flash','flashr');void n.offsetWidth;n.classList.add(c);setTimeout(function(){n.classList.remove(c);},500);}
+  function tog(){on=!on;
+    ['tAo','tAi'].forEach(function(i){var n=el(i);n.classList.toggle('gone',!on);n.classList.toggle('shw',on);});
+    var cm=el('tAc');cm.classList.toggle('gone',on);cm.classList.toggle('shw',!on);
+    if(on){mA++;el('mA').textContent=mA;}else{uA++;el('uA').textContent=uA;}
+    el('dA').textContent=on?'ha':'yo‘q';
+    el('pA').style.display=on?'':'none';
+    ['tBo','tBi'].forEach(function(i){var n=el(i);n.classList.toggle('hid',!on);flash(n,'flash');});
+    el('sB').textContent=on?'style=""':'style="display:none"';
+    el('pB').style.display=on?'':'none';
+    if(!on)flash(el('tA').children[1],'flashr');
+    el('vsEx').innerHTML=on?'Ko‘rsatildi. <b>v-if</b>: OtpKiritish qaytadan <b>yaratildi</b> (mount = '+mA+') — ichidagi kiritilgan kod yo‘qoldi. <b>v-show</b>: element joyida edi, faqat style o‘zgardi.':'Yashirildi. <b>v-if</b>: tugunlar DOM’dan <b>olib tashlandi</b> (o‘rnida <code>&lt;!--v-if--&gt;</code> komment). <b>v-show</b>: tugunlar bor, faqat <code>display:none</code>.';}
+  el('vsT').addEventListener('click',tog);
+  el('vsT5').addEventListener('click',function(){var k=0;(function nx(){tog();k++;if(k<5)setTimeout(nx,380);else el('vsEx').innerHTML+= '<br>5 almashtirishda v-if: '+(mA-1+uA)+' ta mount/unmount; v-show: 0 ta — shuning uchun tez almashadigan joylarda v-show.';})();});
+
+  /* ---------- keys ---------- */
+  var COL=['#2E6FA8','#8B5CF6','#D9822B','#2C8F68','#C8372D','#0F766E','#B45309','#475569'];
+  var BASE=[{id:101,k:'Aziz',s:500000,n:'ijara'},{id:102,k:'Madina',s:1200000,n:'kredit'},{id:103,k:'Bekzod',s:250000,n:'kommunal'}];
+  var NEWS=[{id:104,k:'Nodira',s:800000},{id:105,k:'Jasur',s:90000},{id:106,k:'Sevara',s:3000000},{id:107,k:'Otabek',s:150000}];
+  var items,nextNew,S={};
+  function fmt(n){return n.toLocaleString('ru-RU');}
+  function side(key){return {key:key,box:el(key==='i'?'kA':'kB'),ops:el(key==='i'?'oA':'oB'),nodes:[],dc:0,c:{patch:0,create:0,remove:0,move:0}};}
+  function mk(sd,it,notes){sd.dc++;var d=document.createElement('div');d.className='kr new';var c=COL[(sd.dc-1)%COL.length];
+    d.innerHTML='<span class="dm" style="background:'+c+'">DOM#'+sd.dc+'</span><span class="tx"></span><input placeholder="izoh…">';
+    d._it=null;d.querySelector('input').value=notes||'';setTimeout(function(){d.classList.remove('new');},460);return d;}
+  function fill(d,it){d.querySelector('.tx').innerHTML=it.k+' — '+fmt(it.s)+'<small>id '+it.id+'</small>';d._it=it;}
+  function first(sd){return sd.nodes.map(function(d){return d.getBoundingClientRect().top;});}
+  function flip(sd,before,olds){sd.nodes.forEach(function(d){var i=olds.indexOf(d);if(i<0)return;var dy=before[i]-d.getBoundingClientRect().top;if(Math.abs(dy)>1){d.style.transition='none';d.style.transform='translateY('+dy+'px)';requestAnimationFrame(function(){requestAnimationFrame(function(){d.style.transition='transform .5s cubic-bezier(.2,.8,.2,1),background .4s,border-color .4s';d.style.transform='';});});}});}
+  function render(sd,init){var olds=sd.nodes.slice(),before=first(sd);var made=[],patched=[];
+    if(sd.key==='i'){
+      items.forEach(function(it,i){var d=sd.nodes[i];if(!d){d=mk(sd,it,init?it.n:'');sd.nodes.push(d);sd.box.appendChild(d);if(!init)sd.c.create++;made.push(d);}
+        else if(d._it!==it){sd.c.patch++;patched.push(d);}
+        fill(d,it);});
+      while(sd.nodes.length>items.length){var r=sd.nodes.pop();r.remove();sd.c.remove++;}
+    }else{
+      var map={};sd.nodes.forEach(function(d){map[d._it.id]=d;});var nn=[];
+      items.forEach(function(it){var d=map[it.id];if(!d){d=mk(sd,it,init?it.n:'');if(!init)sd.c.create++;made.push(d);}else delete map[it.id];fill(d,it);nn.push(d);});
+      Object.keys(map).forEach(function(k){map[k].remove();sd.c.remove++;});
+      var moved=0;nn.forEach(function(d,i){var oi=olds.indexOf(d);if(oi>=0){var prevOld=olds.filter(function(x){return nn.indexOf(x)>=0;});if(prevOld.indexOf(d)!==nn.filter(function(x){return olds.indexOf(x)>=0;}).indexOf(d))moved++;}sd.box.appendChild(d);});
+      sd.c.move+=moved;sd.nodes=nn;flip(sd,before,olds);
+    }
+    patched.forEach(function(d){d.classList.add('patch');setTimeout(function(){d.classList.remove('patch');},900);});
+    sd.nodes.forEach(function(d){var v=d.querySelector('input').value;d.classList.toggle('bad',v!==(d._it.n||''));});
+    sd.ops.innerHTML='<span>patch: <b>'+sd.c.patch+'</b></span><span>create: <b>'+sd.c.create+'</b></span><span>remove: <b>'+sd.c.remove+'</b></span>'+(sd.key==='id'?'<span>move: <b>'+sd.c.move+'</b></span>':'');}
+  function stat(){var bad=S.i.nodes.filter(function(d){return d.classList.contains('bad');}).length;
+    el('kAst').innerHTML=bad?'<span style="color:var(--coral)">⚠ '+bad+' izoh noto‘g‘ri qatorda</span>':'<span style="color:var(--teal)">✓</span>';
+    el('kBst').innerHTML='<span style="color:var(--teal)">✓ izohlar egasida</span>';}
+  function reset(){items=BASE.map(function(x){return Object.assign({},x);});nextNew=0;S.i=S.i||side('i');S.id=S.id||side('id');
+    ['i','id'].forEach(function(k){var sd=S[k];sd.box.innerHTML='';sd.nodes=[];sd.dc=0;sd.c={patch:0,create:0,remove:0,move:0};render(sd,true);});stat();
+    el('kEx').innerHTML='Vue ro‘yxatni yangilaganda eski va yangi virtual tugunlarni <b>key bo‘yicha</b> juftlaydi. Key bir xil bo‘lsa — "bu o‘sha element" deb hisoblaydi va DOM’ni qayta ishlatadi. Izohlarni o‘zingiz ham o‘zgartirib ko‘ring.';}
+  function both(){render(S.i);render(S.id);stat();}
+  el('kAdd').addEventListener('click',function(){var n=NEWS[nextNew%NEWS.length];nextNew++;items.unshift({id:n.id+Math.floor((nextNew-1)/NEWS.length)*10,k:n.k,s:n.s});both();
+    el('kEx').innerHTML='<b>key=index:</b> yangi element index 0 ni oldi → Vue "0-element o‘zgardi" deb o‘yladi: DOM#1’ga yangi matn yozdi (sariq = patch), va hokazo, oxirida bitta yangi DOM yaratdi. Izohlar esa DOM’da qoldi — <b>"ijara" endi boshqa odamda!</b><br><b>key=id:</b> faqat 1 ta yangi DOM yaratildi, qolganlari joyidan siljidi — izohlar egasi bilan.';});
+  el('kDel').addEventListener('click',function(){if(!items.length)return;items.shift();both();
+    el('kEx').innerHTML='<b>key=index:</b> oxirgi DOM o‘chirildi (!), qolganlariga keyingi ma’lumot yozildi — birinchi qatorning izohi endi ikkinchi odamda. <b>key=id:</b> aynan o‘chirilgan elementning DOM’i ketdi.';});
+  el('kSort').addEventListener('click',function(){items.sort(function(a,b){return b.s-a.s;});both();
+    el('kEx').innerHTML='Saralash: <b>key=index</b> — DOM joyida qoldi, hamma matn qayta yozildi (ko‘p patch), izohlar aralashdi. <b>key=id</b> — DOM elementlari <b>ko‘chirildi</b> (FLIP animatsiya), patch = 0.';});
+  el('kR').addEventListener('click',reset);
+  document.addEventListener('input',function(e){if(e.target.closest&&e.target.closest('.kr')){var d=e.target.closest('.kr');if(d._it){d._it.n=e.target.value;d.classList.remove('bad');stat();}}});
+  reset();
+
+  /* ---------- v-model ---------- */
+  var inp=el('vmIn'),val='  1500  ',pulse=0;
+  function mods(){return {n:el('mN').checked,t:el('mT').checked,l:el('mL').checked};}
+  function conv(raw){var m=mods();var v=raw;if(m.t)v=v.trim();if(m.n){var f=parseFloat(v);if(!isNaN(f))v=f;}return v;}
+  function vlog(h){var l=el('vmLog');l.insertAdjacentHTML('beforeend','<div>'+h+'</div>');l.scrollTop=l.scrollHeight;}
+  function show(){var t=typeof val;var plus=(t==='number')?(val+100):(JSON.stringify(val+100));
+    el('vmSt').innerHTML='<div class="pulse" style="animation:none"><span class="k">summa</span> = <span class="v">'+JSON.stringify(val)+'</span></div><div><span class="k">typeof</span> = <span class="ty">"'+t+'"</span></div><div><span class="k">summa + 100</span> = '+(t==='number'?'<span class="v">'+plus+'</span> ✓':'<span class="er">'+plus+'</span> ✗ konkatenatsiya')+'</div><div><span class="k">summa &gt; 999</span> = '+(t==='number'?String(val>999):'<span class="er">"'+val+'" &gt; 999</span> → '+String(val>999)+' (tasodifan)')+'</div>';
+    var d=el('vmSt').firstChild;d.style.animation='';void d.offsetWidth;
+    var m=mods();var arr=[];if(m.n)arr.push('.number');if(m.t)arr.push('.trim');if(m.l)arr.push('.lazy');
+    el('vmEx').innerHTML='<code>v-model'+arr.join('')+'="summa"</code> — '+(m.l?'<b>.lazy</b>: holat faqat <b>change</b> hodisasida (fokus chiqqanda / Enter) yangilanadi, har harfda emas. ':'har harfda <b>input</b> hodisasi. ')+(m.n?'<b>.number</b> parseFloat qiladi. ':'Qiymat <b>string</b>! ')+(m.t?'<b>.trim</b> bo‘shliqlarni kesdi.':'');}
+  function upd(ev){val=conv(inp.value);vlog('<b>'+ev+'</b> → summa = '+JSON.stringify(val));show();}
+  inp.addEventListener('input',function(){if(mods().l){vlog('<span style="color:var(--ink-faint)">input (e’tiborsiz — .lazy)</span>');return;}upd('input');});
+  inp.addEventListener('change',function(){if(mods().l)upd('change');});
+  ['mN','mT','mL'].forEach(function(i){el(i).addEventListener('change',function(){val=conv(inp.value);show();});});
+  show();
+
+  /* ---------- bubbling ---------- */
+  var onceUsed=false,busy=false;
+  function blog(h){var l=el('bLog');l.insertAdjacentHTML('beforeend','<div>'+h+'</div>');l.scrollTop=l.scrollHeight;}
+  function upMods(){el('mStr').textContent=(el('mS').checked?'.stop':'')+(el('mO').checked?'.once':'');el('mPr').textContent=el('mP').checked?'.prevent':'';}
+  ['mS','mO','mP'].forEach(function(i){el(i).addEventListener('change',function(){if(i==='mO')onceUsed=false;upMods();});});upMods();
+  function hit(id,cls){var n=el(id);n.classList.add(cls);setTimeout(function(){n.classList.remove(cls);},520);}
+  function chain(list,done){var i=0;(function nx(){if(i>=list.length){busy=false;if(done)done();return;}list[i]();i++;setTimeout(nx,520);})();}
+  el('bIn').addEventListener('click',function(e){e.stopPropagation();if(busy)return;busy=true;el('bLog').innerHTML='';var st=el('mS').checked,once=el('mO').checked;var steps=[];
+    if(once&&onceUsed){steps.push(function(){hit('L2','blk');blog('button: <b>.once</b> — handler allaqachon ishlagan, e’tiborsiz');});}
+    else{steps.push(function(){hit('L2','hit');blog('1. button → <b>ochirish()</b> ✓');});if(once)onceUsed=true;}
+    if(st){steps.push(function(){hit('L1','blk');blog('2. <b>.stop</b> — ko‘tarilish to‘xtadi 🛑');});
+      el('bEx').innerHTML='<b>.stop</b>: hodisa tugmada qoldi, karta ochilmadi. To‘g‘ri xulq.';}
+    else{steps.push(function(){hit('L1','hit');blog('2. karta → <b>kartaniOch()</b> ⚠ kutilmagan');});steps.push(function(){hit('L0','hit');blog('3. sahifa → <b>sahifa()</b>');});
+      el('bEx').innerHTML='.stop’siz: tugma bosilsa karta ham "ochiladi" — foydalanuvchi o‘chirmoqchi edi, lekin karta sahifasiga o‘tib ketdi. Klassik bug. <b>.stop</b>ni yoqing.';}
+    chain(steps);});
+  el('aIn').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(busy)return;busy=true;el('bLog').innerHTML='';var pv=el('mP').checked;
+    chain([function(){blog('havola bosildi');},function(){if(pv){blog('<b>.prevent</b>: brauzer sahifaga o‘tmadi ✓ (SPA router o‘zi hal qiladi)');}else{blog('<span style="color:var(--coral)">.prevent yo‘q → brauzer <b>/batafsil</b> ga o‘tadi, SPA holati yo‘qoladi</span>');}},function(){hit('L1','hit');blog('karta → kartaniOch() (bubbling — .prevent ko‘tarilishni to‘xtatmaydi!)');}]);
+    el('bEx').innerHTML='.prevent standart harakatni (sahifaga o‘tish) bekor qiladi, lekin hodisa baribir yuqoriga ko‘tariladi — bular <b>mustaqil</b>.';});
+})();
+
+</script>
+</body>
+</html>

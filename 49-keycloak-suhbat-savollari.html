@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keycloak suhbat savollari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F1F2;--surface:#FFFFFF;--surface-2:#FBF7F8;--sunken:#F1E8EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E8DCDF;--border-strong:#D7C5CA;
+  --accent:#A3344A;--accent-ink:#7D2236;--accent-soft:#F6E4E8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+.cats{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.cat{border:1.5px solid var(--border);background:var(--surface-2);border-radius:999px;padding:6px 12px;cursor:pointer;font-family:var(--font-mono);font-size:12px}
+.cat.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.cat b{color:var(--ink-faint);font-weight:400;margin-left:4px}
+.fc-wrap{perspective:1200px;margin-top:14px}
+.fc{position:relative;min-height:240px;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.fc.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.face.back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent)}
+.face .tagl{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;display:flex;justify-content:space-between}
+.face .qt{font-family:var(--font-display);font-size:20px;font-weight:600;line-height:1.3;flex:1}
+.face .at{font-size:14.5px;line-height:1.6;flex:1;overflow:auto}
+.face .hint{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:10px}
+.fcb{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.fcb .sp{flex:1}
+.btn.good{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}.btn.badb{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.prog{display:flex;gap:14px;font-family:var(--font-mono);font-size:12.5px;margin-top:10px;flex-wrap:wrap}
+.prog b.g{color:var(--teal-ink)}.prog b.r{color:var(--coral)}
+/* order */
+.ord{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.ord>div{min-width:0}
+.pool,.ans{display:flex;flex-direction:column;gap:6px;min-height:120px;border:1.5px dashed var(--border-strong);border-radius:12px;padding:8px}
+.oi{border:1.5px solid var(--border);border-radius:10px;padding:8px 11px;background:var(--surface);font-size:13px;cursor:pointer;transition:.15s;animation:pop .25s}
+.oi:hover{border-color:var(--accent)}
+.oi.ok{border-color:var(--teal);background:var(--teal-soft)}
+.oi.bad{border-color:var(--coral);background:var(--coral-soft)}
+.oi .n{font-family:var(--font-mono);font-weight:700;color:var(--accent-ink);margin-right:6px}
+.lbl2{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+/* scenario */
+.scn{border:1.5px solid var(--border);border-radius:14px;padding:14px;background:var(--surface-2);margin-top:10px}
+.scn .sq{font-family:var(--font-display);font-weight:600;font-size:15.5px}
+.scn .opts{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.scn .opts button{text-align:left;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;background:var(--surface);cursor:pointer;font-size:13.5px;color:var(--ink)}
+.scn .opts button.ok{border-color:var(--teal);background:var(--teal-soft)}
+.scn .opts button.bad{border-color:var(--coral);background:var(--coral-soft)}
+.scn .why{margin-top:10px;font-size:13.5px;display:none;background:var(--surface);border-radius:10px;padding:10px 12px;border-left:3px solid var(--accent)}
+.scn .why.show{display:block}
+.mock{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mq{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--surface-2)}
+.mq .mqq{font-family:var(--font-display);font-weight:600;font-size:15px}
+.mq .mqa{display:none;margin-top:8px;font-size:14px;color:var(--ink-soft);line-height:1.6}
+.mq.open .mqa{display:block}
+.mq .mqt{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-top:6px;cursor:pointer}
+.timer{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--accent-ink)}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:12px}
+.mm{display:flex;gap:10px;align-items:center;border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;background:var(--surface-2);text-decoration:none;color:var(--ink);font-size:13.5px}
+.mm:hover{border-color:var(--accent);background:var(--accent-soft)}
+.mm .n{font-family:var(--font-mono);font-size:11.5px;width:26px;color:var(--accent-ink);font-weight:600}
+.mm.self{border-color:var(--accent);background:var(--accent-soft)}
+.done-card{background:var(--surface);border:2px solid var(--teal);border-radius:20px;padding:30px 24px;box-shadow:var(--shadow-lift);text-align:center;margin-top:20px}
+.done-card h3{font-size:26px;margin-bottom:10px}.done-card p{color:var(--ink-soft);font-size:15px;max-width:58ch;margin:0 auto}
+@media (max-width:640px){.ord{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#A3344A"></span> Keycloak · 10/10</span><span>· Kurs: 49/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Keycloak · 49-modul · yakuniy</span>
+    <h1>Keycloak <span class="steam">suhbat savollari</span></h1>
+    <p class="lead">Trekning eng ko'p so'raladigan savollari bir joyda. <b>Flashcard</b> bilan o'zingizni sinang. <b>Flow'ni tartibga soling</b> — suhbatda "doskada chizing" topshirig'ining mashqi. <b>Vaziyatli savollar</b> — "prod'da shunday bo'ldi, nima qilasiz?". Oxirida — mock suhbat.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Flashcard</h2></div>
+    <p class="sec-sub">Kartaga bosing — javob chiqadi. "Bilmadim" bosganlaringiz oxirida qayta keladi. Klaviatura: probel — aylantirish, → bildim, ← bilmadim.</p>
+    <div class="cats" id="cats"></div>
+    <div class="stage">
+      <div class="fc-wrap"><div class="fc" id="fc"><div class="face front"><div class="tagl"><span id="fcCat"></span><span id="fcIdx"></span></div><div class="qt" id="fcQ"></div><div class="hint">bosing → javob</div></div><div class="face back"><div class="tagl"><span>Javob</span><span id="fcMod"></span></div><div class="at" id="fcA"></div></div></div></div>
+      <div class="fcb"><button class="btn badb" id="fcNo">✗ Bilmadim</button><button class="btn good" id="fcYes">✓ Bildim</button><span class="sp"></span><button class="btn" id="fcShuf">⇄ Aralashtir</button><button class="btn" id="fcReset">↺ Boshidan</button></div>
+      <div class="prog"><span>Qoldi: <b id="pLeft">0</b></span><span>Bildim: <b class="g" id="pYes">0</b></span><span>Bilmadim: <b class="r" id="pNo">0</b></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>"Doskada chizing": Authorization Code + PKCE</h2></div>
+    <p class="sec-sub">Qadamlarni to'g'ri tartibda bosing. Xato bossangiz, qadam qizil bo'ladi va joyida qoladi.</p>
+    <div class="stage">
+      <div class="seg" id="oSel"><button class="on" data-o="code">Auth Code + PKCE</button><button data-o="api">API so'rov tekshiruvi</button><button data-o="logout">Back-channel logout</button></div>
+      <div class="ord"><div><div class="lbl2">Aralash qadamlar</div><div class="pool" id="pool"></div></div><div><div class="lbl2">Sizning tartibingiz</div><div class="ans" id="ans"></div></div></div>
+      <div class="ctrls"><button class="btn" id="oReset">↺ Qaytadan</button><span id="oScore" style="font-family:var(--font-mono);font-size:12.5px"></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Vaziyatli savollar — "nima qilasiz?"</h2></div>
+    <div id="scns"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Mock suhbat — 8 savol, 12 daqiqa</h2></div>
+    <p class="sec-sub">Ovoz chiqarib javob bering, keyin solishtiring. Javobni 42-modulda tavsiya qilingan tuzilmada bering: ta'rif → nega → misol → chegara.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="mockGo">▶ Boshlash</button><span class="timer" id="timer">12:00</span></div>
+      <div class="mock" id="mock"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Keycloak treki xaritasi</h2></div>
+    <div class="map" id="kmap"></div>
+    <div class="done-card">
+      <span class="eyebrow" style="color:var(--teal-ink);display:block;margin-bottom:8px">Keycloak treki yakunlandi</span>
+      <h3>49 / 49 🔐</h3>
+      <p>IAM'dan boshlab PKCE, JWKS rotatsiyasi, rol meros daraxti, Spring converter, back-channel logout va production klastergacha. Amaliy qadam: 41-moduldagi docker-compose'ni ko'taring, 46-moduldagi resource server'ni ulang va 47-moduldagi logout'ni haqiqiy Keycloak'da sinab ko'ring.</p>
+    </div>
+  </section>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="48-kengaytirish-va-production.html"><span class="cl">← Oldingi dars</span><span class="ct">48 · Kengaytirish va production</span><span class="cs">🔐 Keycloak</span></a><a class="cn nx" href="50-redis-nima-va-nega-tez.html"><span class="cl">Keyingi dars →</span><span class="ct">50 · Redis nima va nega tez</span><span class="cs">⚡ Redis</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:55.7%"></i></div><span>49 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(49)<0)v.push(49);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','49');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(49)<0)D[t].push(49);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var Q=[
+   ['asos','Keycloak nima va nega kerak?','Ochiq kodli IAM server: OIDC/OAuth 2.0 va SAML orqali markazlashgan autentifikatsiya, SSO, foydalanuvchi va rollarni boshqarish, MFA, identity brokering, LDAP federatsiya. Ilovalar parolni ko’rmaydi, faqat imzolangan tokenni tekshiradi. Parol, MFA va bloklash bir joyda boshqariladi.',40],
+   ['asos','Realm, client, user, role — farqi?','Realm — izolyatsiyalangan maydon (o’z userlari, kalitlari, siyosatlari). Client — token so’raydigan ilova. User — odam yoki service account. Role — huquq (realm yoki client darajasida). Group — userlar to’plami, rollar va atributlarni meros qilib beradi.',40],
+   ['asos','Public va confidential client farqi?','Confidential sirni xavfsiz saqlay oladi (backend) va /token’da client_secret yoki private_key_jwt bilan autentifikatsiya qiladi. Public (SPA, mobil) sir saqlay olmaydi — himoyani PKCE beradi.',40],
+   ['asos','master realm’dan nega foydalanmaslik kerak?','Faqat Keycloak’ni boshqarish (super-admin) uchun. Ilovalar va foydalanuvchilar alohida realm’da bo’lishi kerak: izolyatsiya, alohida siyosatlar, admin huquqlari sizib chiqmaydi.',40],
+   ['oauth','OAuth 2.0 va OIDC farqi?','OAuth 2.0 — delegatsiyalangan avtorizatsiya: ilova resursga kirish uchun access token oladi. OIDC — uning ustidagi identity qatlami: scope=openid, id_token, standart claim’lar, userinfo, discovery, logout.',42],
+   ['oauth','Access, refresh va ID token farqi?','Access — API uchun, qisqa, Bearer. Refresh — faqat Keycloak uchun, yangi access olishga, sessiyaga bog’langan. ID — client uchun “kim login qildi”, API’ga yuborilmaydi.',42],
+   ['oauth','Scope va rol farqi?','Scope — ilovaga berilgan ruxsat doirasi (foydalanuvchi va client kelishuvi). Rol — foydalanuvchining huquqi. Yakuniy huquq — ularning kesishmasi.',42],
+   ['flow','Authorization Code flow qadamlari?','verifier/challenge/state/nonce → 302 /auth → login (Keycloak’da) → 302 redirect_uri?code&state → state tekshiruvi → back-channel POST /token (code, redirect_uri, client auth, code_verifier) → access/refresh/id → id_token tekshiruvi → API’ga Bearer.',43],
+   ['flow','PKCE nima va nimadan himoya qiladi?','code_verifier (tasodifiy sir) va code_challenge = BASE64URL(SHA256(verifier)). Challenge /auth’ga, verifier /token’ga yuboriladi. O’g’irlangan kodni verifier’siz almashtirib bo’lmaydi — authorization code interception va injection hujumlaridan himoya. OAuth 2.1’da hamma client’lar uchun majburiy, faqat S256.',43],
+   ['flow','Implicit va password grant nega eskirgan?','Implicit: token URL’da — oqib chiqadi, refresh yo’q. Password: ilova parolni ko’radi, MFA/SSO/IdP ishlamaydi. OAuth 2.1 ikkalasini olib tashlagan.',43],
+   ['flow','Servislararo autentifikatsiya qanday?','Client Credentials: har servisning o’z client’i va service account’i, minimal client rollari, audience cheklovi, token keshlanadi. Foydalanuvchi konteksti kerak bo’lsa — token exchange yoki relay.',43],
+   ['flow','state va nonce nima uchun?','state — so’rov va callback’ni bog’laydi, login CSRF’dan himoya. nonce — id_token ichiga yoziladi, replay’dan himoya.',43],
+   ['token','Resource server JWT’ni qanday tekshiradi?','Format → alg (RS256, none/HS rad) → kid bo’yicha JWKS’dan kalit (kesh, noma’lum kid bo’lsa qayta yuklash) → imzo → exp/nbf (skew bilan) → iss → aud → typ/rollar/scope. Hammasi lokal, Keycloak’ka murojaat qilinmaydi.',44],
+   ['token','Nega RS256, HS256 emas?','Assimetrik: private kalit faqat Keycloak’da, API’larda public kalit. Tekshiruvchi token yasay olmaydi. HS256’da tekshira oladigan har bir servis token yasay ham oladi.',44],
+   ['token','Kalit rotatsiyasi qanday uzilishsiz o’tadi?','Yangi kalit avval passive qo’shiladi, keyin active bo’ladi; eskisi passive holatda JWKS’da qoladi va eng uzun token muddati o’tguncha tekshiruv uchun ishlatiladi, keyin o’chiriladi. Tanlashni header’dagi kid hal qiladi.',44],
+   ['token','aud claim nega muhim?','Token qaysi API uchun chiqarilganini bildiradi. Tekshirilmasa, boshqa ilova uchun berilgan token bu API’da ham ishlaydi (confused deputy). Keycloak’da Audience mapper, Spring’da audiences/validator.',44],
+   ['token','Access token nega qisqa?','JWT lokal tekshiriladi va bekor qilib bo’lmaydi — o’g’irlangan yoki bekor qilingan token exp’gacha ishlaydi. Qisqa muddat xavf oynasini kichraytiradi, refresh esa qulaylikni saqlaydi (refresh Keycloak’da tekshiriladi).',44],
+   ['rol','Realm role va client role farqi?','Realm — lavozim (realm_access.roles). Client — API’ga xos ruxsat (resource_access.<client>.roles). Composite rol ularni bog’laydi: KASSIR → transfer.create + hisob.read.',45],
+   ['rol','Effective roles qanday hisoblanadi?','To’g’ridan-to’g’ri rollar + guruhlar (ota guruhlar bilan) + default-roles + composite’lar rekursiv; keyin client scope (Full scope allowed / role scope mapping) bo’yicha filtrlanadi.',45],
+   ['rol','Tokenga o’z claim’ingizni qanday qo’shasiz?','User atributi (User Profile’da e’lon qilinadi) → client scope → User Attribute mapper (claim nomi, tipi, access/id/userinfo) → client’ga default scope. Murakkab mantiq — custom ProtocolMapper SPI.',45],
+   ['rol','Full scope allowed nima?','ON: foydalanuvchining barcha rollari har client tokeniga tushadi. OFF: faqat client scope’ga qo’shilgan rollar — least privilege va kichik token.',45],
+   ['spring','Nega hasRole(\'KASSIR\') 403 beradi, token ichida KASSIR bor?','Default JwtAuthenticationConverter faqat scope → SCOPE_* qiladi. realm_access.roles’ni o’qib, ROLE_ prefiksi bilan authority qiladigan converter kerak.',46],
+   ['spring','Eski Keycloak adapter o’rniga nima?','Spring Security’ning standart modullari: oauth2-resource-server (API), oauth2-client (oauth2Login, client_credentials). Keycloak adapterlari olib tashlangan.',46],
+   ['spring','Egalikni (IDOR) qanday tekshirasiz?','Rol “kim ekanini” aytadi, “bu uning resursi ekanini” emas. API’da sub/filial_id ni bazadagi ma’lumot bilan solishtirish — @PreAuthorize SpEL yoki guard bean orqali.',46],
+   ['spring','Docker’da “iss claim is not valid” — nega?','Token bir hostname orqali olingan (localhost), API boshqasini kutyapti (keycloak:8080). Hamma joyda bitta tashqi KC_HOSTNAME; ichki manzil kerak bo’lsa — jwk-set-uri + alohida iss validator.',46],
+   ['sso','SSO qanday ishlaydi?','Keycloak o’z domenida SSO cookie qo’yadi. Keyingi ilova /auth’ga yo’naltirganda, cookie bilan sessiya taniladi va login formasiz kod beriladi. Har ilova baribir o’z flow’idan o’tadi.',47],
+   ['sso','Logout qildim, qaytib parolsiz kirdim — nega?','Faqat ilova sessiyasi yopilgan, Keycloak SSO sessiyasi tirik. RP-initiated logout kerak: end_session_endpoint + id_token_hint.',47],
+   ['sso','Back-channel logout nima?','Keycloak sessiya tugaganda har client’ning backchannel URL’iga server’dan logout_token (JWT, sid) yuboradi; ilova shu sid’li sessiyani yopadi. Brauzerga bog’liq emas — ishonchli.',47],
+   ['sso','Admin xodimni blokladi — access token-chi?','Yangi login/refresh darhol rad etiladi. Mavjud access token stateless API’da exp’gacha ishlaydi. Choralar: qisqa lifespan, not-before push, sezgir operatsiyada introspection, gateway’da sid blacklist.',47],
+   ['prod','MFA’ni faqat kassirlarga qanday yoqasiz?','Browser flow nusxasi → Conditional OTP sub-flow → Condition “user role: KASSIR” → OTP Form REQUIRED; OTP yo’q bo’lsa Configure OTP required action.',48],
+   ['prod','Keycloak HA qanday quriladi?','≥2 nodalar LB orqasida, umumiy PostgreSQL (HA, backup), Infinispan klaster (sessiyalar/keshlar), 26+ da persistent sessions, K8s’da Operator va :9000 probe’lar, Prometheus metrics.',48],
+   ['prod','Brokering va federation farqi?','Brokering — autentifikatsiya boshqa IdP’da (Google, AD FS; OIDC/SAML redirect). Federation — userlar tashqi omborda (LDAP/AD), login formasi Keycloak’niki.',48],
+   ['prod','Keycloak sozlamalarini qanday boshqarasiz?','Realm konfiguratsiyasi git’da (JSON / keycloak-config-cli / Terraform), sirlar vault’da, CI orqali qo’llanadi. Admin konsolda qo’lda o’zgarish — faqat dev’da. Admin events yoqilgan.',48],
+   ['prod','Keycloak yangilashda nimaga e’tibor berasiz?','Release notes va upgrading guide, DB backup (Liquibase migratsiyasi qaytmaydi), staging’da prod nusxasi bilan sinov, custom SPI/theme qayta yig’ish, smoke test.',48]
+  ];
+  var CATS={all:'Hammasi',asos:'Asoslar',oauth:'OAuth/OIDC',flow:'Flow’lar',token:'Token',rol:'Rollar',spring:'Spring',sso:'SSO/logout',prod:'Production'};
+  var cat='all',deck=[],ptr=0,yes=0,no=0,flipped=false,cats=document.getElementById('cats'),fc=document.getElementById('fc');
+  function counts(){var c={all:Q.length};Q.forEach(function(q){c[q[0]]=(c[q[0]]||0)+1;});return c;}
+  function drawCats(){var c=counts();cats.innerHTML=Object.keys(CATS).map(function(k){return '<span class="cat'+(k===cat?' on':'')+'" data-k="'+k+'">'+CATS[k]+'<b>'+(c[k]||0)+'</b></span>';}).join('');}
+  cats.addEventListener('click',function(e){var c=e.target.closest('.cat');if(!c)return;cat=c.dataset.k;drawCats();reset();});
+  function filtered(){return Q.map(function(q,i){return i;}).filter(function(i){return cat==='all'||Q[i][0]===cat;});}
+  function reset(){deck=filtered();ptr=0;yes=0;no=0;flipped=false;draw();}
+  function draw(){fc.classList.toggle('flip',flipped);document.getElementById('pLeft').textContent=Math.max(deck.length-ptr,0);document.getElementById('pYes').textContent=yes;document.getElementById('pNo').textContent=no;
+    if(ptr>=deck.length){document.getElementById('fcQ').textContent='Tugadi! '+yes+' bildingiz, '+no+' bilmadingiz. “Boshidan” bilan qayta.';document.getElementById('fcCat').textContent='';document.getElementById('fcIdx').textContent='';document.getElementById('fcA').textContent='';return;}
+    var q=Q[deck[ptr]];document.getElementById('fcCat').textContent=CATS[q[0]];document.getElementById('fcIdx').textContent=(ptr+1)+' / '+deck.length;document.getElementById('fcQ').textContent=q[1];document.getElementById('fcA').textContent=q[2];document.getElementById('fcMod').textContent=q[3]+'-modul';}
+  fc.addEventListener('click',function(){if(ptr>=deck.length)return;flipped=!flipped;fc.classList.toggle('flip',flipped);});
+  document.getElementById('fcYes').addEventListener('click',function(){if(ptr>=deck.length)return;yes++;ptr++;flipped=false;draw();});
+  document.getElementById('fcNo').addEventListener('click',function(){if(ptr>=deck.length)return;no++;deck.push(deck[ptr]);ptr++;flipped=false;draw();});
+  document.getElementById('fcShuf').addEventListener('click',function(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=deck[i];deck[i]=deck[j];deck[j]=t;}ptr=0;flipped=false;draw();});
+  document.getElementById('fcReset').addEventListener('click',reset);
+  document.addEventListener('keydown',function(e){if(/INPUT|TEXTAREA|BUTTON/.test(e.target.tagName))return;if(e.key===' '){e.preventDefault();fc.click();}if(e.key==='ArrowRight')document.getElementById('fcYes').click();if(e.key==='ArrowLeft')document.getElementById('fcNo').click();});
+  drawCats();reset();
+
+  /* ordering */
+  var O={code:['Ilova code_verifier, code_challenge, state, nonce yaratadi','Brauzer /auth ga yo’naltiriladi (client_id, redirect_uri, scope=openid, challenge)','Foydalanuvchi Keycloak sahifasida login qiladi (parol, OTP)','Keycloak redirect_uri?code&state ga qaytaradi','Ilova state’ni tekshiradi','Ilova back-channel’da POST /token: code + code_verifier + client auth','Keycloak kod, redirect_uri va SHA256(verifier)==challenge ni tekshiradi','Ilova access, refresh, id token oladi va id_token’ni (nonce bilan) tekshiradi','Ilova API’ni Authorization: Bearer access_token bilan chaqiradi'],
+    api:['Bearer tokenni header’dan ajratish','Header: alg kutilgan (RS256) ekanini tekshirish','kid bo’yicha JWKS keshidan public kalitni topish','Imzoni tekshirish','exp / nbf (clock skew bilan)','iss == realm URL','aud ∋ shu API','Rollar → authority (converter), keyin @PreAuthorize va egalik tekshiruvi'],
+    logout:['Foydalanuvchi ilovada “Chiqish”ni bosadi','Ilova lokal sessiyasini o’chiradi','Brauzer end_session_endpoint’ga id_token_hint bilan yo’naltiriladi','Keycloak SSO sessiyasini yopadi, cookie’larni o’chiradi','Keycloak har client’ning backchannel URL’iga logout_token (sid) POST qiladi','Har ilova sid bo’yicha o’z sessiyasini o’chiradi','Brauzer post_logout_redirect_uri ga qaytadi']};
+  var oKey='code',nextIdx=0,errs=0,pool=document.getElementById('pool'),ans=document.getElementById('ans');
+  function oReset(){var items=O[oKey].map(function(t,i){return [t,i];});for(var i=items.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=items[i];items[i]=items[j];items[j]=t;}nextIdx=0;errs=0;
+    pool.innerHTML=items.map(function(x){return '<div class="oi" data-i="'+x[1]+'">'+x[0]+'</div>';}).join('');ans.innerHTML='';document.getElementById('oScore').textContent='0 / '+O[oKey].length;}
+  pool.addEventListener('click',function(e){var it=e.target.closest('.oi');if(!it)return;var i=+it.dataset.i;
+    if(i===nextIdx){it.classList.remove('bad');it.classList.add('ok');it.innerHTML='<span class="n">'+(i+1)+'.</span>'+O[oKey][i];ans.appendChild(it);nextIdx++;
+      document.getElementById('oScore').textContent=nextIdx+' / '+O[oKey].length+(nextIdx===O[oKey].length?(errs?' · tugadi, '+errs+' ta xato bilan':' · mukammal! ✓'):'');}
+    else{errs++;it.classList.add('bad');setTimeout(function(){it.classList.remove('bad');},600);}});
+  document.getElementById('oSel').addEventListener('click',function(e){if(!e.target.dataset.o)return;oKey=e.target.dataset.o;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});oReset();});
+  document.getElementById('oReset').addEventListener('click',oReset);oReset();
+
+  /* scenarios */
+  var SC=[
+    ['Mobil ilova chiqarildi. Xavfsizlik tekshiruvi: “APK ichida client_secret topildi”. Nima qilasiz?',['Secret’ni obfuskatsiya qilamiz','Client’ni public qilamiz, secret’ni rotate qilamiz, PKCE S256 majburiy, App Links','Secret’ni serverdan yuklab olamiz'],1,'Mobil ilova sir saqlay olmaydi — obfuskatsiya faqat vaqtni cho’zadi. To’g’ri model: public client + PKCE, oqib chiqqan secret darhol bekor qilinadi. Redirect uchun App Links / Universal Links.'],
+    ['Prod’da hamma so’rovlar 401: “signature verification failed”. Kecha Keycloak’da kalit almashtirilgan. Sabab?',['Eski kalit darhol o’chirilgan, yoki API JWKS’ni yangilamayapti (qattiq kodlangan public key)','Token muddati o’tgan','Rollar yo’qolgan'],0,'Rotatsiyada eski kalit passive holatda qolishi kerak edi. Agar API kalitni konfiguratsiyada qattiq saqlagan bo’lsa (JWKS emas), yangi kid’ni tanimaydi. Yechim: JWKS URI orqali dinamik kalit, rotatsiya runbook’i.'],
+    ['Auditor: “Ishdan ketgan xodim o’chirilgandan keyin 20 daqiqa davomida API’ga so’rov yuborgan”. Nima qilasiz?',['Keycloak’ni almashtiramiz','Access lifespan’ni 5 daqiqaga tushiramiz, back-channel logout, offboarding’da sign-out + not-before; sezgir operatsiyalarda introspection','Hech narsa — normal holat'],1,'Access token 20+ daqiqa bo’lgan. Qisqa lifespan + back-channel logout ilova sessiyalarini yopadi + offboarding jarayonida sessiyalarni majburan yopish. Sezgir endpoint’lar introspection bilan.'],
+    ['Token hajmi 12 KB, Nginx 400 “Request Header Or Cookie Too Large” qaytaryapti.',['Nginx buffer’ni 64 KB qilamiz va unutamiz','Full scope OFF, groups claim’ni olib tashlash, keraksiz mapper’larni access token’dan o’chirish; vaqtincha buffer’ni oshirish','Tokenni ikkiga bo’lamiz'],1,'Asosiy sabab — foydalanuvchining barcha rollari/guruhlari har tokenga tushyapti. Least privilege: client faqat kerakli rollarni oladi. Buffer’ni oshirish — faqat vaqtinchalik chora.'],
+    ['Keycloak klasterining bitta nodasi qulab tushdi. Foydalanuvchilar nima sezadi?',['Hamma qayta login qiladi','Deyarli hech narsa: LB nodani chiqaradi, sessiyalar boshqa nodalarda/DB’da bor, API’lar JWT’ni lokal tekshiradi','Hamma API’lar 500 qaytaradi'],1,'HA to’g’ri qurilgan bo’lsa, sessiyalar Infinispan’da nusxada (owners) va 26+ da DB’da ham. API’lar Keycloak’ka bog’liq emas.'],
+    ['Yangi talab: “5 mln so’mdan katta o’tkazma — faqat OTP bilan”.',['Hammaga OTP majburiy qilamiz','Step-up: LoA sozlash, ilova o’tkazmada acr_values=2 so’raydi, API acr ≥ 2 ni tekshiradi','Frontend’da OTP formasi qo’shamiz'],1,'Step-up authentication: kundalik ish uchun parol, sezgir operatsiyada qo’shimcha omil. Tekshiruv backend’da (tokendagi acr), frontend’ga ishonilmaydi.']
+  ];
+  var sc=document.getElementById('scns');
+  sc.innerHTML=SC.map(function(s,i){return '<div class="scn" data-i="'+i+'"><div class="sq">'+(i+1)+'. '+s[0]+'</div><div class="opts">'+s[1].map(function(o,k){return '<button data-k="'+k+'">'+o+'</button>';}).join('')+'</div><div class="why">'+s[3]+'</div></div>';}).join('');
+  sc.addEventListener('click',function(e){var b=e.target.closest('.opts button');if(!b)return;var box=b.closest('.scn');if(box.dataset.done)return;box.dataset.done=1;var s=SC[+box.dataset.i];var btns=box.querySelectorAll('.opts button');btns[s[2]].classList.add('ok');if(+b.dataset.k!==s[2])b.classList.add('bad');box.querySelector('.why').classList.add('show');});
+
+  /* mock */
+  var mt=null;
+  document.getElementById('mockGo').addEventListener('click',function(){clearInterval(mt);var idx=Q.map(function(q,i){return i;});for(var i=idx.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=idx[i];idx[i]=idx[j];idx[j]=t;}
+    var m=document.getElementById('mock');m.innerHTML=idx.slice(0,8).map(function(i,k){return '<div class="mq"><div class="mqq">'+(k+1)+'. '+Q[i][1]+'</div><div class="mqt">javobni ko’r ▾</div><div class="mqa">'+Q[i][2]+'</div></div>';}).join('');
+    [].slice.call(m.querySelectorAll('.mqt')).forEach(function(t){t.addEventListener('click',function(){t.parentNode.classList.toggle('open');});});
+    var s=12*60,tm=document.getElementById('timer');function tick(){var mm=Math.floor(s/60),ss=s%60;tm.textContent=(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;if(s<=0){clearInterval(mt);tm.textContent='Vaqt tugadi';}s--;}tick();mt=setInterval(tick,1000);});
+
+  /* map */
+  var MAP=[[40,'Keycloak va IAM','40-keycloak-va-iam.html'],[41,'O’rnatish va birinchi realm','41-ornatish-va-birinchi-realm.html'],[42,'OAuth 2.0 va OIDC','42-oauth-2-0-va-oidc.html'],[43,'Grant flow’lar va PKCE','43-grant-flowlar-va-pkce.html'],[44,'Token ichida: JWT, JWKS','44-token-ichida-jwt-jwks.html'],[45,'Rollar, guruhlar, mapper’lar','45-rollar-guruhlar-mapperlar.html'],[46,'Spring Boot + Keycloak','46-spring-boot-keycloak.html'],[47,'Sessiya, SSO, logout','47-sessiya-sso-logout.html'],[48,'Kengaytirish va production','48-kengaytirish-va-production.html'],[49,'Suhbat savollari (shu sahifa)',''],[39,'← Butun kurs xaritasi (1–39)','39-savol-javoblar.html']];
+  document.getElementById('kmap').innerHTML=MAP.map(function(m){return m[2]?'<a class="mm" href="'+m[2]+'"><span class="n">'+m[0]+'</span>'+m[1]+'</a>':'<span class="mm self"><span class="n">'+m[0]+'</span>'+m[1]+'</span>';}).join('');
+})();
+
+</script>
+</body>
+</html>

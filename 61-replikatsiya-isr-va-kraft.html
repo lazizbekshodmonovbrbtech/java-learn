@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kafka replikatsiya: ISR, HW, KRaft</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F1F2F4;--surface:#FFFFFF;--surface-2:#F8F9FA;--sunken:#E8EBEF;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDE1E7;--border-strong:#C8CED7;
+  --accent:#334155;--accent-ink:#1E293B;--accent-soft:#E2E6EC;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0D1014;--surface:#171B21;--surface-2:#1D2229;--sunken:#12151A;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#29303A;--border-strong:#3A4350;
+  --accent:#A5B4C8;--accent-ink:#C3CEDC;--accent-soft:#1F2630;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+
+
+.rp{display:flex;flex-direction:column;gap:8px;margin-top:10px;position:relative}
+.brow{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;border:1.5px solid var(--border);border-radius:11px;padding:7px 9px;background:var(--surface-2);transition:.3s}
+.brow.lead{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.brow.down{border-color:var(--coral);background:var(--coral-soft);opacity:.55}
+.brow.out{border-style:dashed;border-color:var(--amber)}
+.brow .nm{font-family:var(--font-mono);font-size:12px}
+.brow .nm small{display:block;font-size:10.5px;color:var(--ink-soft)}
+.brow .nm .tg{display:inline-block;font-size:10px;padding:1px 6px;border-radius:5px;margin-top:3px;margin-right:3px}
+.tg.l{background:var(--accent);color:#fff}.tg.i{background:var(--teal-soft);color:var(--teal-ink)}.tg.o{background:var(--amber-soft);color:var(--amber)}.tg.s{background:var(--coral-soft);color:var(--coral)}
+.cells{display:flex;gap:3px;position:relative;min-height:30px;align-items:center;overflow-x:auto}
+.cl{flex:none;width:30px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10.5px;background:var(--accent);color:#fff;transition:.3s}
+.cl.unc{background:var(--accent-soft);color:var(--accent-ink);border:1.5px dashed var(--accent)}
+.cl.tr{background:var(--coral);animation:shake .4s;opacity:.4}
+.cl.nw{animation:pop .3s}
+.hwbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-family:var(--font-mono);font-size:12px}
+.hwbar .b{border:1px solid var(--border);border-radius:9px;padding:5px 10px;background:var(--surface-2)}
+.hwbar .b b{font-size:14px}
+.hwbar .b.bad{border-color:var(--coral);background:var(--coral-soft)}
+.cview{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+.cview i{font-style:normal;width:22px;height:20px;border-radius:5px;background:var(--teal);color:#fff;font-family:var(--font-mono);font-size:10px;display:flex;align-items:center;justify-content:center}
+.unc-tog{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* kraft */
+.kr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.kc{border:2px solid var(--border-strong);border-radius:12px;padding:10px;text-align:center;font-family:var(--font-mono);font-size:11.5px;background:var(--surface);transition:.3s}
+.kc b{display:block;font-size:13px}
+.kc.act{border-color:var(--purple);background:var(--purple-soft)}
+.kc.dn{border-color:var(--coral);background:var(--coral-soft);opacity:.55}
+.kc .ml{margin-top:6px;display:flex;gap:2px;justify-content:center;flex-wrap:wrap}
+.kc .ml span{width:14px;height:14px;border-radius:3px;background:var(--purple);opacity:.8}
+.brokers2{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.brokers2 span{border:1.5px solid var(--border-strong);border-radius:9px;padding:5px 10px;font-family:var(--font-mono);font-size:11px;background:var(--surface-2);transition:.3s}
+.brokers2 span.upd{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-soft)}
+@media (max-width:700px){.brow{grid-template-columns:1fr}.kr{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#334155"></span> Kafka · 5/8</span><span>· Kurs: 61/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Kafka · 61-modul · replikatsiya</span>
+    <h1>Replikatsiya: <span class="steam">ISR</span>, high watermark, KRaft</h1>
+    <p class="lead">Bitta broker diski yonib ketsa ham to‘lov hodisalari yo‘qolmasligi kerak. Kafka buni har partition’ni bir nechta broker’da nusxalash bilan ta’minlaydi. Lekin "nusxa bor" va "nusxa yangi" — boshqa-boshqa narsalar. ISR, high watermark va leader saylovi — shu farqni boshqaradi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Replikatsiya laboratoriyasi</h2></div><p class="sec-sub">Partition <code>tolovlar-0</code>, RF=3, <code>min.insync.replicas=2</code>, producer <code>acks=all</code>. Xabar yozing, follower’ni sekinlashtiring, leader’ni o‘chiring — ISR, HW va consumer ko‘radigan qism qanday o‘zgarishini kuzating.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="rP">✍️ Xabar yozish</button><button class="btn" id="rS">🐢 broker-3 sekin</button><button class="btn" id="rK" style="border-color:var(--coral)">💥 Leader o‘chsin</button><button class="btn" id="rU">♻️ Barcha broker’lar qaytsin</button><button class="btn" id="rX">↺</button></div>
+      <div class="unc-tog" style="margin-top:10px"><button class="tog" id="uT" aria-label="unclean"></button><span class="tog-lbl">unclean.leader.election.enable=true (xavfli!)</span></div>
+      <div class="rp" id="rp"></div>
+      <div class="hwbar"><span class="b">ISR: <b id="hIsr">—</b></span><span class="b">High watermark: <b id="hHw">0</b></span><span class="b" id="hSt">Holat: <b>—</b></span></div>
+      <div class="hwbar"><span>Consumer ko‘radi:</span><div class="cview" id="cv"></div></div>
+      <div class="explain" id="rEx">To‘q rang — <b>committed</b> (HW dan past, barcha ISR’da bor). Och, punktir — leader’da bor, lekin hali committed emas (consumer ko‘rmaydi).</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Atama</th><th>Ma’nosi</th></tr><tr><td><b>LEO</b> (log end offset)</td><td>Replika logidagi keyingi offset (oxirgi + 1)</td></tr><tr><td><b>ISR</b> (in-sync replicas)</td><td>Leader’dan <code>replica.lag.time.max.ms</code> (default 30 s) dan ko‘p orqada qolmagan replikalar (leader ham kiradi)</td></tr><tr><td><b>HW</b> (high watermark)</td><td>ISR’dagi minimal LEO. Undan pastdagi xabarlar <b>committed</b> — consumer faqat shularni ko‘radi</td></tr><tr><td><b>min.insync.replicas</b></td><td>acks=all yozuvi uchun ISR kamida shuncha bo‘lishi kerak, aks holda NotEnoughReplicas</td></tr><tr><td><b>unclean.leader.election</b></td><td>ISR bo‘sh qolsa, sinxron bo‘lmagan replikani leader qilishga ruxsat: mavjudlik ↑, lekin committed xabarlar yo‘qolishi mumkin. Default: false</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Replikalarni joylashtirish: rack awareness</h2></div><p class="sec-sub">RF=3 bo‘lsa-yu, uchala nusxa bitta serverxona (rack/AZ)da tursa — elektr uzilishida hammasi birga ketadi. <code>broker.rack</code> sozlanganda Kafka nusxalarni turli rack’larga tarqatadi.</p><div class="tbl-wrap"><table class="tbl"><tr><th>Sozlama</th><th>Tavsiya (bank)</th></tr><tr><td><code>default.replication.factor</code></td><td>3</td></tr><tr><td><code>min.insync.replicas</code></td><td>2</td></tr><tr><td><code>unclean.leader.election.enable</code></td><td>false</td></tr><tr><td><code>broker.rack</code></td><td>Har broker uchun DC/AZ nomi (masalan <code>tash-dc1</code>, <code>tash-dc2</code>, <code>tash-dc3</code>)</td></tr><tr><td><code>client.rack</code> + <code>replica.selector.class</code></td><td>Consumer eng yaqin follower’dan o‘qiy oladi (KIP-392) — DC’lar aro trafikni tejash</td></tr><tr><td>DC’lar aro DR</td><td>Alohida cluster + MirrorMaker 2 (asinxron, RPO > 0) yoki stretched cluster (kechikish past bo‘lsa)</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>KRaft: metadata qayerda turadi?</h2></div><p class="sec-sub">Kafka 4.x’da ZooKeeper yo‘q. Topic’lar, partition leader’lari, ISR — bularning hammasi <b>metadata log</b>da, uni 3 (yoki 5) ta controller Raft protokoli bilan replikatsiya qiladi. Qadamlarni o‘ting.</p>
+    <div class="stage">
+      <div class="kr" id="kr"></div>
+      <div class="brokers2" id="bk2"><span>broker-1</span><span>broker-2</span><span>broker-3</span><span>broker-4</span></div>
+      <div class="ctrls"><button class="btn" id="kfPrev">◀</button><button class="btn primary" id="kfPlay">▶ Avto</button><button class="btn" id="kfNext">▶</button><div class="bar"><div id="kfBar"></div></div></div>
+      <div class="explain" id="kfEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>ISR nima va replika qachon undan chiqadi?<span class="chev">›</span></summary><div class="iv-a">Leader bilan sinxron replikalar to‘plami. Follower replica.lag.time.max.ms (30 s) davomida leader LEO’siga yetib olmasa (yoki fetch qilmasa) — ISR’dan chiqariladi; yetib olgach qaytadi. ISR o‘zgarishlari controller orqali metadata’ga yoziladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>High watermark nima? Consumer nega hamma xabarni darhol ko‘rmaydi?<span class="chev">›</span></summary><div class="iv-a">HW — barcha ISR replikalarda mavjud bo‘lgan oxirgi offset chegarasi. Consumer faqat HW gacha o‘qiydi, chunki undan yuqorisi leader yiqilsa yo‘qolishi mumkin (yangi leader’da bo‘lmasligi mumkin) — "ko‘rilgan, keyin yo‘qolgan" xabarlarning oldini oladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>RF=3, min.insync=2, acks=all. Nechta broker yo‘qolishiga chidaydi?<span class="chev">›</span></summary><div class="iv-a">Bitta broker yo‘qolsa — yozish ham, o‘qish ham ishlaydi, ma’lumot yo‘qolmaydi. Ikkitasi yo‘qolsa — o‘qish ishlaydi (leader tirik bo‘lsa), yozish NotEnoughReplicas bilan to‘xtaydi, lekin committed ma’lumot yo‘qolmaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Unclean leader election nima?<span class="chev">›</span></summary><div class="iv-a">ISR’da tirik replika qolmaganda ISR’dan tashqaridagi (orqada qolgan) replikani leader qilish. Partition tezroq mavjud bo‘ladi, lekin u bilmagan committed xabarlar yo‘qoladi. Bankda — o‘chiq (mavjudlikdan ko‘ra izchillik muhim).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Leader yiqilganda nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">Controller broker yo‘qolganini aniqlaydi (heartbeat), ISR’dan yangi leader tanlaydi, metadata’ni yangilaydi; producer va consumer’lar metadata’ni yangilab yangi leader’ga ulanadi. Followerlar yangi leader bilan kelishish uchun HW’dan yuqori, committed bo‘lmagan qismini truncate qiladi (leader epoch).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>KRaft ZooKeeper’dan nimasi bilan yaxshi?<span class="chev">›</span></summary><div class="iv-a">Bitta tizim (alohida ZK cluster yo‘q), metadata Kafka log sifatida — tezroq controller failover, millionlab partition’gacha masshtab, oddiyroq operatsiya va xavfsizlik sozlamasi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Leader’da offset 0–9, ISR’dagi follower’larda 0–7. HW?</div><button class="opt">10</button><button class="opt">8</button><button class="opt">0</button><div class="q-fb" data-ok="To‘g‘ri — ISR’dagi minimal LEO." data-no="Yo‘q. HW = min(LEO) ISR bo‘yicha = 8."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Follower 40 s orqada qoldi (replica.lag.time.max.ms=30 s). Nima bo‘ladi?</div><button class="opt">Broker o‘chiriladi</button><button class="opt">ISR’dan chiqariladi, yetib olsa qaytadi</button><button class="opt">Leader bo‘ladi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. ISR’dan chiqadi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>ISR = {leader}, min.insync=2, acks=all producer yozdi. Natija?</div><button class="opt">Yoziladi</button><button class="opt">NotEnoughReplicas xato</button><button class="opt">Kutib turadi abadiy</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. ISR &lt; min.insync → rad etiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>unclean.leader.election=true ning xavfi?</div><button class="opt">Sekinlik</button><button class="opt">Committed xabarlarning yo‘qolishi</button><button class="opt">Dublikat topic</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Orqada qolgan replika leader bo‘lsa — u bilmagan xabarlar yo‘qoladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Kafka 4.x’da controller vazifasini kim bajaradi?</div><button class="opt">ZooKeeper</button><button class="opt">KRaft controller kvorumi</button><button class="opt">Har broker mustaqil</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. KRaft."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Kafka</span>
+      <h3>Spring Kafka</h3>
+      <p>@KafkaListener, xatolarni qayta urinish, Dead Letter Topic, batch listener va Testcontainers bilan test.</p>
+      <div class="topics"><span class="topic-pill">57 · Nega Kafka</span><span class="topic-pill">58 · Partition</span><span class="topic-pill">59 · Producer</span><span class="topic-pill">60 · Consumer</span><span class="topic-pill now">61 · Replikatsiya</span><span class="topic-pill">62 · Spring Kafka</span><span class="topic-pill">63 · Pattern’lar</span><span class="topic-pill">64 · Operatsiya + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="60-consumer-group-va-rebalancing.html"><span class="cl">← Oldingi dars</span><span class="ct">60 · Consumer group va rebalancing</span><span class="cs">📨 Kafka</span></a><a class="cn nx" href="62-spring-kafka.html"><span class="cl">Keyingi dars →</span><span class="ct">62 · Spring Kafka</span><span class="cs">📨 Kafka</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:69.3%"></i></div><span>61 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(61)<0)v.push(61);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','61');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(61)<0)D[t].push(61);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var B,L,isr,unclean=false,timer,lagT,msg,truncated;
+  function init(){B=[{id:1,up:true,slow:false,log:[]},{id:2,up:true,slow:false,log:[]},{id:3,up:true,slow:false,log:[]}];L=0;isr=[0,1,2];lagT=[0,0,0];msg=0;truncated={};
+    for(var i=0;i<4;i++){msg++;B.forEach(function(b){b.log.push(msg);});}draw();el('rEx').innerHTML='To‘q rang — <b>committed</b> (HW dan past, barcha ISR’da bor). Och, punktir — leader’da bor, lekin hali committed emas (consumer ko‘rmaydi).';}
+  function hw(){if(L<0)return 0;var m=Infinity;isr.forEach(function(i){if(B[i].up)m=Math.min(m,B[i].log.length);});return m===Infinity?0:m;}
+  var hwv=0;
+  function draw(){if(L>=0)hwv=Math.max(0,Math.min(hw(),B[L].log.length));
+    el('rp').innerHTML=B.map(function(b,i){var tags=(i===L&&b.up?'<span class="tg l">leader</span>':'')+(isr.indexOf(i)>=0&&b.up?'<span class="tg i">ISR</span>':'<span class="tg o">ISR tashqari</span>')+(b.slow?'<span class="tg s">sekin</span>':'');
+      var cells=b.log.map(function(m,k){return '<span class="cl'+(k>=hwv?' unc':'')+'">'+k+'</span>';}).join('')+(truncated[i]||[]).map(function(k){return '<span class="cl tr">'+k+'</span>';}).join('');
+      return '<div class="brow'+(!b.up?' down':i===L?' lead':isr.indexOf(i)<0?' out':'')+'"><div class="nm"><b>broker-'+b.id+'</b> '+(b.up?'':'💥')+'<small>LEO '+b.log.length+'</small>'+tags+'</div><div class="cells">'+cells+'</div></div>';}).join('');
+    var liveIsr=isr.filter(function(i){return B[i].up;});el('hIsr').textContent='{'+liveIsr.map(function(i){return B[i].id;}).join(', ')+'}';el('hHw').textContent=hwv;
+    var st=el('hSt');if(L<0){st.className='b bad';st.innerHTML='Holat: <b>OFFLINE</b>';}else if(liveIsr.length<2){st.className='b bad';st.innerHTML='Holat: <b>yozish yo‘q (ISR&lt;2)</b>';}else{st.className='b';st.innerHTML='Holat: <b>sog‘lom</b>';}
+    var cv='';if(L>=0)for(var k=0;k<hwv;k++)cv+='<i>'+k+'</i>';el('cv').innerHTML=cv||'<span style="font-size:12px;color:var(--ink-faint)">hech narsa</span>';truncated={};}
+  function tick(){if(L<0)return;var lead=B[L];var ch=false;
+    B.forEach(function(b,i){if(i===L||!b.up)return;var behind=lead.log.length-b.log.length;
+      if(behind>0){if(!b.slow||Math.random()<0.2){b.log.push(lead.log[b.log.length]);ch=true;}}
+      if(lead.log.length-b.log.length>0)lagT[i]++;else lagT[i]=0;
+      if(isr.indexOf(i)>=0&&lagT[i]>=5){isr.splice(isr.indexOf(i),1);ch=true;el('rEx').innerHTML='broker-'+b.id+' <code>replica.lag.time.max.ms</code> davomida yetib ololmadi → <b>ISR’dan chiqarildi</b>. Endi HW uni kutmaydi va yozish davom etadi (ISR=2 ≥ min.insync).';}
+      if(isr.indexOf(i)<0&&lead.log.length===b.log.length){isr.push(i);isr.sort();ch=true;el('rEx').innerHTML='broker-'+b.id+' leader’ga yetib oldi → <b>ISR’ga qaytdi</b>.';}});
+    if(ch)draw();}
+  timer=setInterval(tick,700);
+  el('rP').addEventListener('click',function(){if(L<0){el('rEx').innerHTML='Partition <b>offline</b> — leader yo‘q. Producer <code>NotLeaderOrFollower</code>/timeout oladi va metadata yangilanishini kutadi.';return;}
+    var live=isr.filter(function(i){return B[i].up;});if(live.length<2){el('rEx').innerHTML='<b>NotEnoughReplicasException</b>: ISR='+live.length+' &lt; min.insync.replicas=2. Broker yozuvni rad etdi — producer retry qiladi. Xabar yo‘qolmaydi, lekin yozish to‘xtadi.';return;}
+    msg++;B[L].log.push(msg);draw();el('rEx').innerHTML='Leader offset <b>'+(B[L].log.length-1)+'</b> ni yozdi (och rang — hali committed emas). Follower’lar fetch qilgach HW siljiydi va acks=all producer tasdiq oladi.';});
+  el('rS').addEventListener('click',function(){var b=B[2];b.slow=!b.slow;this.textContent=b.slow?'⚡ broker-3 tezlashsin':'🐢 broker-3 sekin';draw();el('rEx').innerHTML=b.slow?'broker-3 diski sekinlashdi (GC, disk I/O). Bir necha xabar yozing va kuzating.':'broker-3 tiklandi — yetib olsa ISR’ga qaytadi.';});
+  el('uT').addEventListener('click',function(){unclean=!unclean;this.classList.toggle('on',unclean);});
+  el('rK').addEventListener('click',function(){if(L<0)return;var old=L;B[old].up=false;
+    var cand=isr.filter(function(i){return i!==old&&B[i].up;});var hwBefore=hwv;
+    if(cand.length){cand.sort(function(a,b){return B[b].log.length-B[a].log.length;});L=cand[0];
+      // followers truncate to new leader LEO (leader epoch)
+      B.forEach(function(b,i){if(i!==L&&b.up&&b.log.length>B[L].log.length){truncated[i]=[];for(var k=B[L].log.length;k<b.log.length;k++)truncated[i].push(k);b.log=b.log.slice(0,B[L].log.length);}});
+      isr=isr.filter(function(i){return i!==old;});var lost=B[old].log.length-B[L].log.length;draw();
+      el('rEx').innerHTML='broker-'+B[old].id+' yiqildi. Controller <b>ISR’dan</b> broker-'+B[L].id+' ni leader qildi. '+(lost>0?'Eski leader’dagi '+lost+' ta <b>committed bo‘lmagan</b> xabar yo‘qoldi — lekin ular uchun producer ack olmagan edi (acks=all), shuning uchun u qayta yuboradi. ':'')+'<b>Committed xabarlar (HW='+hwBefore+' gacha) to‘liq saqlandi.</b>';}
+    else{var any=B.map(function(b,i){return i;}).filter(function(i){return B[i].up;});
+      if(unclean&&any.length){any.sort(function(a,b){return B[b].log.length-B[a].log.length;});L=any[0];var lost2=hwBefore-B[L].log.length;isr=[L];draw();
+        el('rEx').innerHTML='ISR’da tirik replika qolmadi. <b>Unclean election</b>: ISR tashqaridagi broker-'+B[L].id+' leader bo‘ldi. U faqat '+B[L].log.length+' ta xabarni biladi → <b style="color:var(--coral)">'+Math.max(0,lost2)+' ta committed xabar yo‘qoldi</b> — producer’lar ular uchun ack olgan edi! Bank uchun qabul qilinmaydi.';}
+      else{L=-1;draw();el('rEx').innerHTML='ISR’da tirik replika yo‘q, unclean election o‘chiq → partition <b>OFFLINE</b>. Ma’lumot yo‘qolmadi, lekin ISR’dagi broker qaytmaguncha bu partition ishlamaydi. (Mavjudlik ↔ izchillik tanlovi.)';}}});
+  el('rU').addEventListener('click',function(){B.forEach(function(b,i){if(!b.up){b.up=true;if(L>=0){var h=hw();if(b.log.length>h){truncated[i]=[];for(var k=h;k<b.log.length;k++)truncated[i].push(k);b.log=b.log.slice(0,h);}}lagT[i]=5;}});
+    if(L<0){var c=B.map(function(b,i){return i;});c.sort(function(a,b){return B[b].log.length-B[a].log.length;});L=c[0];isr=[L];}
+    draw();el('rEx').innerHTML='Broker’lar qaytdi. Qaytgan follower avval <b>HW gacha truncate</b> qiladi (qizil — o‘chirilgan committed bo‘lmagan qism), keyin leader’dan fetch qilib yetib oladi va ISR’ga qo‘shiladi.';});
+  el('rX').addEventListener('click',function(){init();el('rS').textContent='🐢 broker-3 sekin';});
+  init();
+
+  /* kraft */
+  var KS=[[[1,0,0],'act0',[],'3 ta controller (KRaft kvorumi). <b>controller-1</b> — aktiv (Raft leader). Metadata log barcha controller’larda replikatsiya qilinadi.'],
+    [[1,0,0],'act0',[0,1,2,3],'Admin yangi topic yaratdi → aktiv controller metadata log’ga yozuv qo‘shdi, kvorum (2/3) tasdiqladi → broker’lar metadata’ni <b>o‘zlari tortib oladi</b> (fetch) va yangi partition’larni ochadi.'],
+    [[1,0,0],'act0',[1],'broker-2 heartbeat yubormay qo‘ydi → controller uni "fenced" deb belgiladi va u leader bo‘lgan partition’lar uchun ISR’dan yangi leader tanladi — bu ham metadata log’dagi yozuv.'],
+    [[-1,1,0],'act1',[0,2,3],'controller-1 yiqildi. Qolgan ikkitasi Raft bo‘yicha saylov o‘tkazdi → <b>controller-2</b> yangi aktiv. Metadata log’i unda to‘liq — failover soniyalar ichida (ZooKeeper davrida katta cluster’larda daqiqalar olardi).'],
+    [[-1,1,0],'act1',[],'Kvorum qoidasi: 3 controller’dan 1 tasi, 5 tadan 2 tasi yo‘qolishi mumkin. Production’da controller’lar broker’lardan alohida (dedicated mode), turli rack’larda.']];
+  el('kr').innerHTML=[1,2,3].map(function(i){return '<div class="kc" id="kc'+i+'"><b>controller-'+i+'</b><span></span><div class="ml">'+'<span></span>'.repeat(6)+'</div></div>';}).join('');
+  mkStepper('kf',KS.length,function(i){var s=KS[i];[0,1,2].forEach(function(k){var d=el('kc'+(k+1));d.className='kc'+(s[0][k]===-1?' dn':s[0][k]===1?' act':'');d.querySelector('span').textContent=s[0][k]===-1?'💥 o‘chiq':s[0][k]===1?'aktiv (leader)':'follower';});
+    [].forEach.call(el('bk2').children,function(b,k){b.className=s[2].indexOf(k)>=0?'upd':'';});el('kfEx').innerHTML=s[3];},2600);
+})();
+
+</script>
+</body>
+</html>

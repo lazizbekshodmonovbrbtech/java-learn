@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Keycloak production</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F6F1F2;--surface:#FFFFFF;--surface-2:#FBF7F8;--sunken:#F1E8EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E8DCDF;--border-strong:#D7C5CA;
+  --accent:#A3344A;--accent-ink:#7D2236;--accent-soft:#F6E4E8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#170F11;--surface:#221719;--surface-2:#2A1D20;--sunken:#1C1315;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#3A272B;--border-strong:#4D343A;
+  --accent:#E0788C;--accent-ink:#EC97A7;--accent-soft:#3A1C23;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+.fb{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-top:12px;align-items:start}
+.fb>div{min-width:0}
+.flow{border:1px solid var(--border);border-radius:14px;background:var(--surface);overflow:hidden}
+.flow .fh{padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.ex{display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--border);font-size:13px;transition:.3s}
+.ex:last-child{border-bottom:0}
+.ex .nm{font-family:var(--font-mono);font-size:12px}
+.ex.l1 .nm{padding-left:16px}.ex.l2 .nm{padding-left:32px}
+.ex select{font-family:var(--font-mono);font-size:11.5px;padding:4px 6px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface-2);color:var(--ink)}
+.ex.hit{background:var(--accent-soft)}
+.ex.skip{opacity:.35}
+.ex.sub .nm{font-weight:700}
+.pol{display:flex;gap:6px;flex-wrap:wrap}
+.users{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.path{display:flex;flex-direction:column;gap:6px}
+.ps{display:flex;gap:10px;align-items:center;border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;background:var(--surface-2);font-size:13px;animation:pop .35s both}
+.ps .e{font-size:18px;width:24px;text-align:center}
+.ps.ok{border-color:var(--teal);background:var(--teal-soft)}
+.ps.bad{border-color:var(--coral);background:var(--coral-soft)}
+.ps.act{border-color:var(--amber);background:var(--amber-soft)}
+.phone{border:2px solid var(--border-strong);border-radius:22px;padding:14px;background:var(--surface);min-height:240px}
+.phone .scr{border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--surface-2);min-height:200px}
+.phone .bar2{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint);text-align:center;margin-bottom:8px}
+/* brute */
+.bf{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
+.bf i{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-style:normal;font-family:var(--font-mono);font-size:12px;animation:pop .25s}
+.bf i.x{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.bf i.l{background:var(--ink);color:var(--bg)}
+/* checklist */
+.chk{display:flex;flex-direction:column;gap:5px;margin-top:12px}
+.ci{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--border);border-radius:10px;padding:8px 11px;background:var(--surface-2);cursor:pointer;font-size:13px;transition:.15s}
+.ci input{margin-top:3px;accent-color:var(--teal)}
+.ci small{display:block;color:var(--ink-soft);font-size:12px}
+.ci.done{border-color:var(--teal);background:var(--teal-soft)}
+.ci .cat{font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--border);margin-left:6px}
+.score{display:flex;align-items:center;gap:12px;margin-top:10px}
+.score .big{font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--accent-ink)}
+.score .meter{flex:1;height:10px;border-radius:5px;background:var(--sunken);overflow:hidden}
+.score .meter>div{height:100%;background:var(--teal);transition:width .3s}
+/* cluster */
+.cl{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:12px}
+.clrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.nd{border:2px solid var(--border);border-radius:12px;padding:9px 14px;text-align:center;font-family:var(--font-mono);font-size:12px;background:var(--surface-2);transition:.35s;min-width:120px}
+.nd b{display:block;font-family:var(--font-display);font-size:14px}
+.nd.up{border-color:var(--teal);background:var(--teal-soft)}
+.nd.down{border-color:var(--coral);background:var(--coral-soft);opacity:.6}
+.nd.lb{border-color:var(--accent)}
+.clarrow{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint)}
+.isp{font-family:var(--font-mono);font-size:11px;color:var(--purple-ink);background:var(--purple-soft);border-radius:8px;padding:4px 10px}
+@media (max-width:760px){.fb{grid-template-columns:1fr}.ex{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#A3344A"></span> Keycloak · 9/10</span><span>· Kurs: 48/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Keycloak · 48-modul · production</span>
+    <h1>Kengaytirish va <span class="steam">production</span></h1>
+    <p class="lead">Dev'da Keycloak bir buyruq bilan ishga tushadi. Bankda esa undan ko'proq narsa talab qilinadi: MFA, brute-force himoyasi, korporativ AD, audit, klaster, uzilishsiz yangilash va regulyator tekshiruvi. Bu modul — o'sha "qolgan 90%".</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Login oqimi konstruktori (Authentication flows)</h2></div>
+    <p class="sec-sub">Keycloak'da login — o'zgartiriladigan qadamlar daraxti. Har qadamning <b>requirement</b>i bor. OTP siyosatini tanlang, keyin foydalanuvchini tanlab, u qaysi yo'ldan o'tishini ko'ring.</p>
+    <div class="stage">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:6px">OTP SIYOSATI</div>
+      <div class="seg pol" id="pol"><button data-p="off">O'chiq</button><button class="on" data-p="cfg">OTP sozlaganlarga</button><button data-p="role">KASSIR roliga majburiy</button><button data-p="all">Hammaga majburiy</button></div>
+      <div class="fb">
+        <div class="flow"><div class="fh">browser-bank flow</div><div id="flow"></div></div>
+        <div class="phone"><div class="bar2">auth.bank.uz</div><div class="scr"><div class="path" id="path"></div></div></div>
+      </div>
+      <div class="users" id="users"><button class="btn primary" data-u="otabek">👤 Otabek (mijoz, OTP bor)</button><button class="btn" data-u="dilnoza">👩‍💼 Dilnoza (KASSIR, OTP yo'q)</button><button class="btn" data-u="sardor">🍪 Sardor (SSO cookie bor)</button></div>
+      <div class="explain" id="fEx"></div>
+    </div>
+    <table class="tbl"><tr><th>Requirement</th><th>Ma'nosi</th></tr>
+      <tr><td><code>REQUIRED</code></td><td>Albatta bajariladi, muvaffaqiyatsiz bo'lsa — flow to'xtaydi</td></tr>
+      <tr><td><code>ALTERNATIVE</code></td><td>Bir darajadagi alternativlardan bittasi muvaffaqiyatli bo'lsa yetadi (Cookie YOKI forma)</td></tr>
+      <tr><td><code>CONDITIONAL</code></td><td>Sub-flow: ichidagi <b>Condition</b>'lar true bo'lsagina bajariladi (user configured, user role, client, LoA)</td></tr>
+      <tr><td><code>DISABLED</code></td><td>O'chiq</td></tr></table>
+    <div class="callout tip"><div class="ct">💡 Step-up authentication</div>"Ko'rish uchun parol yetarli, o'tkazma uchun esa OTP kerak": Level of Authentication (LoA) sozlanadi. Ilova <code>acr_values=2</code> (yoki <code>claims</code>) so'raydi, Keycloak kerak bo'lsa faqat OTP qadamini qo'shimcha so'raydi, tokendagi <code>acr</code> esa 2 bo'ladi. API o'tkazmada <code>acr ≥ 2</code>ni tekshiradi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Brute-force himoyasi</h2></div>
+    <p class="sec-sub">Realm settings → Security defenses → Brute force detection. Hujumchi Otabekning parolini tanlamoqda. Tugmani bosib turing.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="bfTry">❌ Noto'g'ri parol</button><button class="btn" id="bfWait">⏩ 1 daqiqa kutish</button><button class="btn" id="bfReset">↺</button><span style="font-family:var(--font-mono);font-size:12px">Max login failures: <b>5</b> · Wait increment: <b>1 daq</b> · Max wait: <b>15 daq</b></span></div>
+      <div class="bf" id="bf"></div>
+      <div class="explain" id="bfEx">Har urinish — LOGIN_ERROR hodisasi.</div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ Ikki tomonlama qilich</div>Brute-force himoyasi boshqa odamni bloklab qo'yish uchun ham ishlatilishi mumkin: hujumchi ataylab noto'g'ri parol kiritib, haqiqiy mijozni kira olmaydigan qilib qo'yadi (DoS). Shuning uchun <b>doimiy</b> bloklash emas, vaqtinchalik (o'sib boruvchi) kutish. Qo'shimcha himoya — proksi/WAF darajasida IP bo'yicha rate limit va CAPTCHA.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Tashqi manbalar: brokering va federation</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>🌐 Identity brokering</h4><p>Keycloak boshqa IdP'ga yo'naltiradi (Google, OneID, boshqa Keycloak, ADFS/SAML). U yerdan kelgan identity'ni o'z foydalanuvchisiga bog'laydi. <b>First broker login</b> flow: yangi user yaratish yoki mavjudiga bog'lash.</p><p style="margin-top:6px;color:var(--coral)">⚠ Email bo'yicha avtomatik bog'lash — faqat IdP email'ni <b>tasdiqlagan</b> bo'lsa (email_verified). Aks holda hujumchi sizning email'ingiz bilan akkaunt ochib, sizning akkauntingizga bog'lanib oladi.</p></div>
+      <div class="card"><h4>🗂 User federation (LDAP / AD)</h4><p>Xodimlar AD'da turadi. Keycloak LDAP'ga ulanadi: parolni AD'da tekshiradi, atributlar va guruhlarni mapper'lar bilan oladi. Rejimlar: <b>READ_ONLY</b> (AD — yagona manba), <b>WRITABLE</b>, <b>UNSYNCED</b>. Import yoqilsa, userlar Keycloak bazasiga ham nusxalanadi (tezroq, lekin sinxronizatsiya kerak).</p><p style="margin-top:6px">Staff realm uchun odatiy tanlov: LDAP READ_ONLY + group mapper (AD guruhlari → Keycloak guruhlari → rollar).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Klaster va yuqori mavjudlik (HA)</h2></div>
+    <p class="sec-sub">Nodaga bosing — uni "o'chiring" va nima bo'lishini ko'ring.</p>
+    <div class="stage">
+      <div class="cl" id="cl">
+        <div class="nd lb"><b>Load balancer / Ingress</b>TLS · sticky (ixtiyoriy) · rate limit</div>
+        <div class="clarrow">↓ ↓ ↓</div>
+        <div class="clrow" id="nodes"></div>
+        <div class="isp">⇄ Infinispan (embedded): sessiyalar, keshlar, action token'lar — nodalar orasida · discovery: jdbc-ping (26 default)</div>
+        <div class="clarrow">↓</div>
+        <div class="clrow"><div class="nd up"><b>PostgreSQL</b>primary + replica · backup/PITR</div></div>
+      </div>
+      <div class="explain" id="clEx">Nodaga bosing.</div>
+    </div>
+    <div class="grid3">
+      <div class="card"><h4>Kubernetes</h4><p><b>Keycloak Operator</b>: Keycloak CR, realm import CR, rolling update. Kamida 2–3 replica, PodDisruptionBudget, readiness :9000/health/ready.</p></div>
+      <div class="card"><h4>Multi-site</h4><p>Ikki data-markaz: tashqi Infinispan klasteri + sinxron replikatsiyali DB. Murakkab — faqat haqiqiy DR talabi bo'lsa.</p></div>
+      <div class="card"><h4>Monitoring</h4><p><code>:9000/metrics</code> → Prometheus: login/sek, LOGIN_ERROR, token so'rovlari, JVM, DB pool, Infinispan. Grafana dashboard + alert.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Events, audit va kengaytirish (SPI)</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>Events</h4><p><b>User events</b>: LOGIN, LOGIN_ERROR, LOGOUT, CODE_TO_TOKEN, REFRESH_TOKEN, UPDATE_PASSWORD… <b>Admin events</b>: kim qaysi rolni kimga berdi (representation bilan). Bazada saqlanadi (expiration bilan) va <b>event listener SPI</b> orqali Kafka/SIEM'ga yuboriladi. Bank auditi uchun admin events majburiy.</p></div>
+      <div class="card"><h4>SPI — kod bilan kengaytirish</h4><p>Java JAR'ni <code>/opt/keycloak/providers</code>'ga qo'yasiz: <b>Authenticator</b> (masalan, SMS OTP yoki MyID), <b>EventListener</b> (Kafka), <b>UserStorageProvider</b> (eski bank bazasidagi foydalanuvchilar), <b>ProtocolMapper</b> (custom claim), <b>RequiredAction</b>. Theme — login sahifa dizayni (FreeMarker yoki Keycloakify/React).</p></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Admin REST API — backend'dan foydalanuvchi yaratish</span></div>
+<pre class="code"><span class="cm">// org.keycloak:keycloak-admin-client — alohida client (service account + realm-management: manage-users)</span>
+<span class="ty">Keycloak</span> kc = <span class="ty">KeycloakBuilder</span>.builder().serverUrl(<span class="st">"https://auth.bank.uz"</span>).realm(<span class="st">"bank"</span>)
+        .grantType(<span class="st">"client_credentials"</span>).clientId(<span class="st">"onboarding-service"</span>).clientSecret(secret).build();
+<span class="ty">UserRepresentation</span> u = <span class="k">new</span> <span class="ty">UserRepresentation</span>();
+u.setUsername(<span class="st">"998901234567"</span>); u.setEnabled(<span class="k">true</span>);
+u.setAttributes(<span class="ty">Map</span>.of(<span class="st">"mijoz_id"</span>, <span class="ty">List</span>.of(<span class="st">"500123"</span>)));
+u.setRequiredActions(<span class="ty">List</span>.of(<span class="st">"UPDATE_PASSWORD"</span>, <span class="st">"CONFIGURE_TOTP"</span>));
+<span class="ty">Response</span> r = kc.realm(<span class="st">"bank"</span>).users().create(u);        <span class="cm">// 201 + Location: …/users/{id}</span></pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Production chek-listi</h2></div>
+    <p class="sec-sub">O'z tizimingizni belgilab chiqing. Ball faqat shu sahifada, xotirada saqlanadi.</p>
+    <div class="score"><span class="big" id="sc">0%</span><div class="meter"><div id="scm" style="width:0"></div></div></div>
+    <div class="chk" id="chk"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Yangilash (upgrade) jarayoni</h2></div>
+    <table class="tbl">
+      <tr><th>Qadam</th><th>Nima uchun</th></tr>
+      <tr><td>1. Release notes + Upgrading guide o'qish</td><td>Breaking change'lar (masalan, 25→26: bootstrap admin, persistent sessions, hostname v2)</td></tr>
+      <tr><td>2. DB backup (va realm export)</td><td>Liquibase migratsiyasini orqaga qaytarib bo'lmaydi</td></tr>
+      <tr><td>3. Staging'da prod ma'lumot nusxasi bilan sinash</td><td>Migratsiya vaqti, custom SPI va theme mosligi</td></tr>
+      <tr><td>4. Custom SPI/theme'ni yangi versiyaga qayta kompilyatsiya</td><td>Ichki API'lar o'zgaradi</td></tr>
+      <tr><td>5. Rolling update (patch/minor) yoki qisqa oyna (major)</td><td>Turli versiyadagi nodalar bitta klasterda ishlamasligi mumkin</td></tr>
+      <tr><td>6. Smoke test: login, refresh, logout, admin, metrics</td><td>—</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak'da MFA qanday yoqiladi? Faqat ba'zilarga-chi?<span class="chev">›</span></summary><div class="iv-a">Browser flow nusxasini olasiz (built-in flow'ni tahrirlamang), Forms ichidagi Conditional OTP sub-flow'ni CONDITIONAL qilasiz va condition qo'shasiz: "User configured" (OTP sozlaganlar), "User role" (masalan, KASSIR), yoki "Condition - client". OTP'ni majburiy qilish uchun Required action "Configure OTP"ni yoqasiz. WebAuthn/passkey — alohida authenticator. Flow'ni realm'ga (yoki bitta client'ga override qilib) bog'laysiz.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak'ni qanday masshtablaysiz va HA qilasiz?<span class="chev">›</span></summary><div class="iv-a">Bir nechta stateless-ga yaqin nodalar LB orqasida, umumiy PostgreSQL (HA bilan), nodalar Infinispan orqali sessiya va keshlarni tarqatadi (26'da sessiyalar DB'da ham saqlanadi). Kubernetes'da Keycloak Operator, readiness/liveness :9000'da. Bottleneck ko'pincha DB va parol hashing (CPU — PBKDF2/Argon2 iteratsiyalari) bo'ladi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Identity brokering va user federation farqi?<span class="chev">›</span></summary><div class="iv-a">Brokering: autentifikatsiya boshqa IdP'da (foydalanuvchi o'sha yerga yo'naltiriladi, OIDC/SAML orqali). Federation: foydalanuvchi ma'lumotlari tashqi omborda (LDAP/AD), lekin login formasi Keycloak'niki, parolni Keycloak LDAP orqali tekshiradi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak'ni o'z ehtiyojimizga qanday moslaymiz?<span class="chev">›</span></summary><div class="iv-a">Avval konfiguratsiya (flow'lar, mapper'lar, policy'lar), keyin theme (dizayn), eng oxirida SPI (Java kodi). SPI kuchli, lekin har yangilashda qayta sinash kerak. Keycloak'ni fork qilmang.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Keycloak xavfsizligi uchun eng muhim 5 ta sozlama?<span class="chev">›</span></summary><div class="iv-a">1) Admin konsol ichki tarmoqda / alohida hostname, master admin MFA bilan. 2) Aniq redirect URI'lar + PKCE S256, implicit va password grant o'chiq. 3) Qisqa access token, refresh rotation. 4) Brute-force + parol siyosati (+ MFA). 5) Events/admin events → SIEM, muntazam yangilash (CVE'lar).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Cookie va Forms ALTERNATIVE. SSO cookie yaroqli bo'lsa?</div>
+        <button class="opt">Baribir parol so'raladi</button><button class="opt">Forms o'tkazib yuboriladi — login formasiz</button><button class="opt">Xato</button>
+        <div class="q-fb" data-ok="To'g'ri. SSO shunday ishlaydi." data-no="Yo'q. Alternative — bittasi muvaffaqiyatli bo'lsa yetadi."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>Faqat KASSIR'larga OTP majburiy — qanday?</div>
+        <button class="opt">OTP Form REQUIRED top-level'da</button><button class="opt">Har kassirga qo'lda</button><button class="opt">CONDITIONAL sub-flow + "Condition - user role: KASSIR"</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. Conditional sub-flow + role condition."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span>Brute-force'da doimiy bloklashning xavfi?</div>
+        <button class="opt">Hujumchi haqiqiy foydalanuvchini ataylab bloklab qo'yadi (DoS)</button><button class="opt">Sekinlashadi</button><button class="opt">Xavfi yo'q</button>
+        <div class="q-fb" data-ok="To'g'ri. Vaqtinchalik, o'sib boruvchi kutish yaxshiroq." data-no="Yo'q. Doimiy blok — DoS vektori."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Xodimlar AD'da. Keycloak'ga qanday ulanadi?</div>
+        <button class="opt">Identity brokering</button><button class="opt">User federation (LDAP)</button><button class="opt">Realm import</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. AD/LDAP — user federation."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Yakuniy modul · Keycloak</span>
+      <h3>Keycloak suhbat savollari</h3>
+      <p>Trekning barcha savollari flashcard'larda, mock suhbat va "doskada chizing" topshiriqlari.</p>
+      <div class="topics"><span class="topic-pill">47 · SSO/logout</span><span class="topic-pill now">48 · Production</span><span class="topic-pill">49 · Savollar</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="47-sessiya-sso-logout.html"><span class="cl">← Oldingi dars</span><span class="ct">47 · Sessiya, SSO, logout</span><span class="cs">🔐 Keycloak</span></a><a class="cn nx" href="49-keycloak-suhbat-savollari.html"><span class="cl">Keyingi dars →</span><span class="ct">49 · Keycloak suhbat savollari</span><span class="cs">🔐 Keycloak</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:54.5%"></i></div><span>48 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(48)<0)v.push(48);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','48');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(48)<0)D[t].push(48);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var pol='cfg',user='otabek';
+  var U={otabek:{n:'Otabek',roles:['MIJOZ'],otp:true,cookie:false},dilnoza:{n:'Dilnoza',roles:['KASSIR'],otp:false,cookie:false},sardor:{n:'Sardor',roles:['MIJOZ'],otp:false,cookie:true}};
+  function execs(){
+    var cond=pol==='off'?'DISABLED':(pol==='all'?'REQUIRED':'CONDITIONAL');
+    var rows=[['Cookie','ALTERNATIVE',0,'cookie'],['Identity Provider Redirector','ALTERNATIVE',0,'idp'],['browser-bank forms','ALTERNATIVE',0,'forms',1],['Username Password Form','REQUIRED',1,'pw'],['Conditional OTP',cond,1,'cotp',1]];
+    if(pol==='cfg')rows.push(['Condition - user configured','REQUIRED',2,'c1']);
+    if(pol==='role')rows.push(['Condition - user role: KASSIR','REQUIRED',2,'c2']);
+    rows.push(['OTP Form','REQUIRED',2,'otp']);
+    return rows;}
+  var flow=document.getElementById('flow');
+  function drawFlow(hit){flow.innerHTML=execs().map(function(r){var h=hit&&hit[r[3]];return '<div class="ex l'+r[2]+(r[4]?' sub':'')+(h==='hit'?' hit':h==='skip'?' skip':'')+'"><span class="nm">'+(r[2]?'└ ':'')+r[0]+'</span><select disabled><option>'+r[1]+'</option></select></div>';}).join('');}
+  function run(){
+    var u=U[user],steps=[],hit={};
+    if(u.cookie){hit.cookie='hit';['idp','forms','pw','cotp','c1','c2','otp'].forEach(function(k){hit[k]='skip';});
+      steps.push(['🍪','Cookie: KEYCLOAK_IDENTITY yaroqli → <b>muvaffaqiyat</b>','ok']);steps.push(['✅','Login formasiz, darhol kod bilan qaytdi (SSO). Qolgan ALTERNATIVE’lar tekshirilmadi.','ok']);}
+    else{hit.cookie='skip';hit.idp='skip';hit.forms='hit';hit.pw='hit';
+      steps.push(['🍪','Cookie: yo’q → keyingi alternative','']);
+      steps.push(['🔑','Username + parol: '+u.n+' ✓','ok']);
+      var need=false,why='';
+      if(pol==='off'){hit.cotp='skip';hit.otp='skip';why='OTP sub-flow DISABLED';}
+      else if(pol==='all'){hit.cotp='hit';hit.otp='hit';need=true;why='OTP hammaga REQUIRED';}
+      else if(pol==='cfg'){hit.cotp='hit';hit.c1='hit';need=u.otp;why=u.otp?'Condition “user configured”: OTP sozlangan → true':'Condition “user configured”: OTP yo’q → false → sub-flow o’tkazib yuborildi';if(!need)hit.otp='skip';else hit.otp='hit';}
+      else{hit.cotp='hit';hit.c2='hit';need=u.roles.indexOf('KASSIR')>=0;why=need?'Condition “user role KASSIR” → true':'Condition “user role KASSIR” → false';hit.otp=need?'hit':'skip';}
+      steps.push(['⚙️',why,'']);
+      if(need){if(u.otp)steps.push(['📱','OTP Form: 6 xonali kod (Google Authenticator / FreeOTP) ✓','ok']);
+        else steps.push(['🧭','OTP sozlanmagan → <b>Required action: Configure OTP</b> — QR kodni skanerlash, keyin kod','act']);}
+      steps.push(['✅','Autentifikatsiya tugadi → SSO sessiya → kod bilan ilovaga qaytish. acr='+(need?'2 (MFA)':'1 (parol)'),'ok']);
+      if(!need&&u.roles.indexOf('KASSIR')>=0)steps.push(['⚠️','Kassir faqat parol bilan kirdi — kassa amaliyotlari uchun bank siyosatiga zid bo’lishi mumkin','bad']);}
+    drawFlow(hit);
+    document.getElementById('path').innerHTML=steps.map(function(s,i){return '<div class="ps '+s[2]+'" style="animation-delay:'+(i*180)+'ms"><span class="e">'+s[0]+'</span><span>'+s[1]+'</span></div>';}).join('');
+    var ex={off:'OTP umuman yo’q — faqat parol. Bank mijozlari uchun zamonaviy talablarga javob bermaydi.',cfg:'“Ixtiyoriy MFA”: OTP’ni o’zi sozlaganlar undan foydalanadi, qolganlar — faqat parol. Mijozlar uchun boshlang’ich variant.',role:'Rolga bog’liq: KASSIR’lar OTP’siz kira olmaydi (birinchi kirishda sozlashga majbur). Mijozlardan esa OTP umuman so’ralmaydi — hatto sozlagan bo’lsa ham, chunki condition faqat rolga qaraydi. Ikkalasini birlashtirish uchun sub-flow’da ikkita condition’li alohida shox qilinadi.',all:'Hammaga majburiy. Birinchi kirishda har kim OTP sozlaydi. Xavfsiz, lekin foydalanuvchi uchun ishqalanish ko’proq — passkey/WebAuthn yoki push-tasdiq yaxshiroq tajriba beradi.'};
+    document.getElementById('fEx').innerHTML='<b>Siyosat:</b> '+ex[pol];
+  }
+  document.getElementById('pol').addEventListener('click',function(e){if(!e.target.dataset.p)return;pol=e.target.dataset.p;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});run();});
+  document.getElementById('users').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;user=b.dataset.u;[].slice.call(this.children).forEach(function(x){x.classList.toggle('primary',x===b);});run();});
+  run();
+
+  /* brute force */
+  var fails=0,lockUntil=0,now=0,bf=document.getElementById('bf'),bfEx=document.getElementById('bfEx');
+  function bfDraw(){var html='';for(var i=0;i<fails;i++)html+='<i class="x">✗</i>';if(now<lockUntil)html+='<i class="l">🔒</i>';bf.innerHTML=html;}
+  document.getElementById('bfTry').addEventListener('click',function(){
+    if(now<lockUntil){bfEx.innerHTML='🔒 Hisob vaqtincha bloklangan: yana <b>'+(lockUntil-now)+' daqiqa</b>. Keycloak “Invalid username or password” deb javob beradi — hujumchiga bloklanganini aytmaydi (aks holda foydalanuvchi borligini bilib oladi).';return;}
+    fails++;bfDraw();
+    if(fails>=5&&fails%5===0){var n=fails/5;var wait=Math.min(15,n);lockUntil=now+wait;bfDraw();bfEx.innerHTML='<b>'+fails+' ta xato</b> → vaqtincha bloklash: <b>'+wait+' daqiqa</b> (har 5 xatodan keyin kutish +1 daq, maksimal 15). Event: <code>LOGIN_ERROR error=user_temporarily_disabled</code>. Admin Users → otabek’da ko’radi va qo’lda ochishi mumkin.';}
+    else bfEx.innerHTML='Xato #'+fails+'. Event: <code>LOGIN_ERROR error=invalid_user_credentials</code>. '+(5-fails%5)+' ta urinishdan keyin bloklanadi.';});
+  document.getElementById('bfWait').addEventListener('click',function(){now++;bfDraw();bfEx.innerHTML=now>=lockUntil&&lockUntil?'Kutish tugadi — yana urinish mumkin. Xatolar hisoblagichi saqlanadi (Failure reset time o’tguncha): keyingi blok uzunroq bo’ladi.':'⏩ 1 daqiqa o’tdi.';});
+  document.getElementById('bfReset').addEventListener('click',function(){fails=0;lockUntil=0;now=0;bfDraw();bfEx.innerHTML='Har urinish — LOGIN_ERROR hodisasi.';});
+
+  /* cluster */
+  var N=[true,true,true],nodes=document.getElementById('nodes');
+  function clDraw(){nodes.innerHTML=N.map(function(u,i){return '<div class="nd '+(u?'up':'down')+'" data-i="'+i+'" style="cursor:pointer"><b>keycloak-'+(i+1)+'</b>'+(u?'UP · :8080 / :9000':'DOWN')+'</div>';}).join('');}
+  nodes.addEventListener('click',function(e){var d=e.target.closest('.nd');if(!d)return;var i=+d.dataset.i;N[i]=!N[i];clDraw();var up=N.filter(Boolean).length;
+    document.getElementById('clEx').innerHTML=up===3?'Hammasi ishlayapti. Sessiyalar Infinispan’da nodalar orasida (owners=2) va DB’da saqlanadi.':up>0?'<b>keycloak-'+(i+1)+' o’chdi.</b> LB readiness probe orqali uni chiqarib tashladi. Undagi sessiyalar boshqa nodalarda nusxada (va DB’da) turibdi — foydalanuvchilar <b>qayta login qilmaydi</b>. API’lar umuman sezmaydi: ular JWT’ni lokal tekshiradi.':'<b>Hamma nodalar o’chdi.</b> Yangi login va refresh ishlamaydi. API’lar mavjud access tokenlarni exp’gacha qabul qilaveradi, keyin foydalanuvchilar “chiqib ketadi”. Klaster qayta ko’tarilganda persistent sessions tufayli sessiyalar DB’dan tiklanadi (26+).';});
+  clDraw();
+
+  /* checklist */
+  var C=[['net','HTTPS hamma joyda, KC_HOSTNAME aniq, proksi X-Forwarded to’g’ri','iss va redirect’lar to’g’ri, cookie Secure'],['net','Admin konsol ichki tarmoqda yoki alohida hostname (KC_HOSTNAME_ADMIN)','Internetdan /admin ochiq emas'],['acc','master realm admin’lari MFA bilan, bootstrap admin o’chirilgan',''],['acc','Brute-force detection + parol siyosati (uzunlik, history, not username)',''],['acc','Xodimlar/kassirlar uchun MFA majburiy',''],['tok','Access token 5–10 daq, refresh rotation yoqilgan',''],['tok','Har client: aniq redirect URI, PKCE S256, implicit va direct access grants o’chiq',''],['tok','Full scope allowed OFF, audience mapper’lar, minimal rollar',''],['ops','Events + admin events yoqilgan, SIEM’ga yuboriladi, retention belgilangan',''],['ops','Klaster ≥2 nodali, DB HA + backup, restore sinab ko’rilgan',''],['ops','Metrics/alert: LOGIN_ERROR sakrashi, token endpoint latency',''],['ops','Realm konfiguratsiyasi git’da (IaC), qo’lda o’zgarish faqat dev’da',''],['ops','Yangilanishlar muntazam (security advisories kuzatiladi)',''],['sec','Client secret’lar vault’da, rotatsiya rejasi bor; kalit rotatsiyasi runbook’i','']];
+  var chk=document.getElementById('chk'),cat={net:'tarmoq',acc:'kirish',tok:'token',ops:'operatsiya',sec:'sir'};
+  chk.innerHTML=C.map(function(c,i){return '<label class="ci"><input type="checkbox" data-i="'+i+'"><span>'+c[1]+'<span class="cat">'+cat[c[0]]+'</span>'+(c[2]?'<small>'+c[2]+'</small>':'')+'</span></label>';}).join('');
+  chk.addEventListener('change',function(){var boxes=chk.querySelectorAll('input'),n=0;[].slice.call(boxes).forEach(function(b){b.closest('.ci').classList.toggle('done',b.checked);if(b.checked)n++;});var p=Math.round(n/C.length*100);document.getElementById('sc').textContent=p+'%';document.getElementById('scm').style.width=p+'%';});
+})();
+
+</script>
+</body>
+</html>

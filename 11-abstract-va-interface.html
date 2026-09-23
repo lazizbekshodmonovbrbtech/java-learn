@@ -1,0 +1,351 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>Abstract va interface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(34px,7vw,56px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+/* spectrum */
+.spectrum{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:20px;border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)}
+.sp{padding:18px 14px;text-align:center;border-right:1px solid var(--border)}
+.sp:last-child{border-right:0}
+.sp.i{background:var(--purple-soft)}.sp.a{background:var(--amber-soft)}.sp.c{background:var(--teal-soft)}
+.sp h4{font-family:var(--font-mono);font-size:14px;margin:0 0 8px}
+.sp.i h4{color:var(--purple-ink)}.sp.a h4{color:var(--amber)}.sp.c h4{color:var(--teal-ink)}
+.sp .bar{height:8px;border-radius:4px;background:var(--surface);overflow:hidden;margin:8px 0}
+.sp .fill{height:100%;border-radius:4px}
+.sp.i .fill{width:8%;background:var(--purple)}.sp.a .fill{width:55%;background:var(--amber)}.sp.c .fill{width:100%;background:var(--teal)}
+.sp .pct{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}
+.sp .d{font-size:12px;color:var(--ink-soft);margin-top:8px}
+.spectrum-lbl{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-top:8px}
+
+/* socket demo */
+.socket-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.socket{border:2px dashed var(--purple);border-radius:16px;padding:18px;background:var(--purple-soft);margin-bottom:16px;text-align:center;transition:.3s}
+.socket .st{font-family:var(--font-mono);font-size:12px;color:var(--purple-ink);font-weight:600;letter-spacing:.05em;margin-bottom:10px}
+.socket .plug-zone{min-height:60px;display:flex;align-items:center;justify-content:center}
+.socket .plug{background:var(--surface);border:1.5px solid var(--teal);border-radius:12px;padding:12px 18px;font-family:var(--font-mono);font-size:14px;color:var(--teal-ink);animation:drop .4s cubic-bezier(.34,1.4,.5,1)}
+.socket .plug .pm{font-weight:600}.socket .plug .pd{font-size:11.5px;color:var(--ink-soft);margin-top:3px}
+@keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+.socket .empty{color:var(--ink-faint);font-size:13px;font-style:italic}
+.impl-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.impl-btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink);transition:.15s}
+.impl-btn:hover{border-color:var(--teal)}
+.impl-btn.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.socket-out{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:14px;font-family:var(--font-mono);font-size:13.5px;text-align:center;min-height:44px;color:var(--ink)}
+.socket-out b{color:var(--accent-ink)}
+
+/* three cards */
+.three{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.tcard h4{font-family:var(--font-mono);font-size:13.5px;margin:0 0 8px}
+.tcard.a h4{color:var(--amber)}.tcard.i h4{color:var(--purple-ink)}
+.tcard ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-soft)}.tcard li{margin-bottom:5px}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.three{grid-template-columns:1fr}.spectrum{grid-template-columns:1fr}.sp{border-right:0;border-bottom:1px solid var(--border)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#9A5B2E"></span> OOP · 4/6</span><span>· Kurs: 11/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>OOP · 11-modul · noldan</span>
+    <h1>Abstract va <span class="steam">interface</span></h1>
+    <p class="lead">Ikki qurilish bloki — farqi qanchalik "tayyor" ekani. Interface — sof shartnoma ("nima qilish kerak"). Abstract class — yarim tayyor. Bu ikkovi katta tizimlarni moslashuvchan qiladi.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>To'liqlik spektri</h2></div>
+    <p class="sec-sub">Uchtasini bir chiziqda ko'ring: <b>interface</b> deyarli bo'sh (faqat shartnoma), <b>abstract class</b> yarim tayyor, <b>oddiy class</b> to'liq tayyor (obyekt beradi).</p>
+    <div class="spectrum">
+      <div class="sp i"><h4>interface</h4><div class="bar"><div class="fill"></div></div><div class="pct">~0% tayyor</div><div class="d">faqat metod nomlari (shartnoma)</div></div>
+      <div class="sp a"><h4>abstract class</h4><div class="bar"><div class="fill"></div></div><div class="pct">~50% tayyor</div><div class="d">ba'zi metodlar tayyor, ba'zisi bo'sh</div></div>
+      <div class="sp c"><h4>class</h4><div class="bar"><div class="fill"></div></div><div class="pct">100% tayyor</div><div class="d">hammasi tayyor, new bilan yasaladi</div></div>
+    </div>
+    <div class="spectrum-lbl"><span>← mavhum (obyekt bermaydi)</span><span>aniq (obyekt beradi) →</span></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Interface — sof shartnoma</h2></div>
+    <p class="sec-sub">Interface faqat "qaysi metodlar bo'lishi shart"ligini aytadi, "qanday"ni emat. Class uni <code>implements</code> qiladi va metodlarni to'ldiradi. Bank to'lov tizimi buni yaxshi ko'rsatadi.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Tolov.java</span></div>
+      <pre class="code"><span class="k">interface</span> <span class="ty">Tolov</span> {
+    <span class="ty">String</span> tola(<span class="ty">int</span> summa);   <span class="cm">// faqat shartnoma — tanasi yo'q</span>
+}
+
+<span class="k">class</span> <span class="ty">Karta</span> <span class="k">implements</span> <span class="ty">Tolov</span> {
+    <span class="cm">@Override</span>
+    <span class="k">public</span> <span class="ty">String</span> tola(<span class="ty">int</span> s) { <span class="k">return</span> s + <span class="st">" so'm kartadan yechildi"</span>; }
+}
+<span class="k">class</span> <span class="ty">Naqd</span> <span class="k">implements</span> <span class="ty">Tolov</span> {
+    <span class="cm">@Override</span>
+    <span class="k">public</span> <span class="ty">String</span> tola(<span class="ty">int</span> s) { <span class="k">return</span> s + <span class="st">" so'm naqd olindi"</span>; }
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Interfeysga "ulash" — jonli</h2></div>
+    <p class="sec-sub">Kod faqat <code>Tolov</code> interfeysini biladi. Qaysi haqiqiy amalga oshirish "ulanishini" tanlang — kod o'zgarmaydi, lekin xatti-harakat o'zgaradi. Bu — Strategy pattern va Spring DI'ning asosi.</p>
+
+    <div class="socket-card">
+      <div class="socket" id="socket">
+        <div class="st">Tolov tolov = ... (interfeys tipi)</div>
+        <div class="plug-zone" id="plugZone"><span class="empty">Pastdan bittasini ulang ↓</span></div>
+      </div>
+      <div class="impl-btns" id="implBtns">
+        <button class="impl-btn" data-i="karta">new Karta()</button>
+        <button class="impl-btn" data-i="naqd">new Naqd()</button>
+        <button class="impl-btn" data-i="wallet">new Wallet()</button>
+      </div>
+      <div class="socket-out" id="socketOut">Ulaganingizdan so'ng <code>tolov.tola(50000)</code> chaqiriladi.</div>
+    </div>
+    <div class="callout iv">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/></svg>nega bu kuchli</div>
+      Kod <code>Tolov</code>ga bog'langan, aniq class'ga emas. Ertaga yangi to'lov turi (Crypto) qo'shsangiz — mavjud kod o'zgarmaydi. Bu "programming to interface" — moslashuvchan, kengaytiriladigan dizayn. Spring butunlay shunga qurilgan (24-modul).
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>default va static metodlar</h2></div>
+    <p class="sec-sub">Java 8'dan interface'da <code>default</code> metod (tayyor tana bilan) bo'lishi mumkin — barcha amalga oshirishlar avtomatik oladi, xohlasa qayta yozadi. Bu eski interfeyslarga yangi metod qo'shishni buzmasdan imkon berdi.</p>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Default.java</span></div>
+      <pre class="code"><span class="k">interface</span> <span class="ty">Tolov</span> {
+    <span class="ty">String</span> tola(<span class="ty">int</span> summa);          <span class="cm">// abstract — majburiy</span>
+
+    <span class="k">default</span> <span class="ty">String</span> chek() {              <span class="cm">// tayyor tana — ixtiyoriy</span>
+        <span class="k">return</span> <span class="st">"Chek chop etildi"</span>;
+    }
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Abstract class vs interface</h2></div>
+    <p class="sec-sub">Ikkovi ham to'g'ridan-to'g'ri obyekt bermaydi. Qachon qaysi biri?</p>
+    <div class="three">
+      <div class="tcard a"><h4>abstract class</h4><ul>
+        <li>Umumiy <b>holat</b> (maydonlar) bo'lsa</li>
+        <li>Tayyor kod + bo'sh metod aralash</li>
+        <li>Faqat <b>bitta</b>sidan extends</li>
+        <li>"is-a" kuchli aloqa</li>
+      </ul></div>
+      <div class="tcard i"><h4>interface</h4><ul>
+        <li>Faqat <b>xatti-harakat</b> shartnomasi</li>
+        <li>Bir class <b>ko'p</b> interfeys oladi</li>
+        <li>Bog'liq bo'lmagan class'larga umumiy qobiliyat</li>
+        <li>"can-do" aloqa (Comparable, Runnable)</li>
+      </ul></div>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>ko'p meros</div>
+      Class faqat bitta class'dan extends qiladi, lekin <b>ko'p interfeys</b>ni implements qila oladi: <code>class Karta implements Tolov, Serializable, Comparable</code>. Java'da "ko'p meros" aynan shunday hal qilinadi.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>abstract class va interface farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a"><b>abstract class</b> — holat (maydonlar), konstruktor, tayyor+bo'sh metodlar bo'lishi mumkin; faqat bittasidan extends. <b>interface</b> — asosan shartnoma (Java 8+ da default/static metod ham), maydon konstantalar; ko'p interfeysni implements qilsa bo'ladi. Umumiy holat kerak → abstract; faqat qobiliyat kerak → interface.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nima uchun "program to interface"?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Kodni aniq class'ga emas, interfeysga bog'lasangiz, amalga oshirishni bemalol almashtirasiz (test uchun mock, yangi tur qo'shish) va mavjud kod buzilmaydi. Bu moslashuvchanlik va bo'shbog'liqlik (loose coupling) beradi — Spring DI shunga asoslanadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Interface'da default metod nega qo'shildi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Java 8'da. Eski interfeyslarga yangi metod qo'shsangiz, barcha mavjud amalga oshirishlar buzilardi. default metod tayyor tana beradi — yangi metod qo'shilsa ham eski kod ishlayveradi (masalan Collection'ga stream() qo'shilganda).</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Bir class nechta interfeys implements qila oladi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Istagancha (ko'p). <code>class A implements X, Y, Z</code>. Class'lar uchun esa faqat bitta extends. Shu sabab Java'da "ko'p meros" interfeyslar orqali amalga oshiriladi (diamond problem'ni oldini olib).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">1.</span>Interface asosan nimani belgilaydi?</div>
+        <button class="opt">Obyektlarning qiymatlarini</button>
+        <button class="opt">Xotira hajmini</button>
+        <button class="opt">Nima qilish kerakligini (shartnoma), qandayligini emas</button>
+        <div class="q-fb" data-ok="To'g'ri. Interface — shartnoma: qaysi metodlar bo'lishi shart. Amalga oshirishni implements qiluvchi class hal qiladi." data-no="Yo'q. Interface 'nima' (qaysi metodlar) ni belgilaydi, 'qanday'ni class hal qiladi."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">2.</span>Bir class nechta interfeys va nechta class'dan meros oladi?</div>
+        <button class="opt">Ko'p class, bitta interfeys</button>
+        <button class="opt">Bitta class (extends), ko'p interfeys (implements)</button>
+        <button class="opt">Faqat bittadan har biri</button>
+        <div class="q-fb" data-ok="To'g'ri. extends — faqat bitta class. implements — istagancha interfeys. Ko'p meros interfeyslar orqali." data-no="Yo'q. Bitta class'dan extends, ko'p interfeysdan implements."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">3.</span>Umumiy holat (maydonlar) va tayyor kod kerak bo'lsa qaysi biri?</div>
+        <button class="opt">abstract class</button>
+        <button class="opt">interface</button>
+        <button class="opt">enum</button>
+        <div class="q-fb" data-ok="To'g'ri. abstract class holat (maydonlar), konstruktor va tayyor metodlarni saqlaydi. interface asosan shartnoma." data-no="Yo'q. Umumiy holat + tayyor kod uchun abstract class mos."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Kodni interfeysga bog'lashning foydasi?</div>
+        <button class="opt">Tezroq ishlaydi</button>
+        <button class="opt">Amalga oshirishni bemalol almashtirasiz, kod buzilmaydi</button>
+        <button class="opt">Xotira tejaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. Interfeysga bog'lasangiz, implementatsiyani almashtirish (yangi tur, test mock) mavjud kodni buzmaydi — loose coupling." data-no="Yo'q. Asosiy foyda — moslashuvchanlik: implementatsiyani almashtirsangiz kod buzilmaydi."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul</span>
+      <h3>equals, hashCode va immutability</h3>
+      <p>Ikki obyekt qachon "teng"? HashMap ularni qanday topadi? equals/hashCode kontrakti — suhbatning eng texnik savoli, jonli hash demo bilan.</p>
+      <div class="topics">
+        <span class="topic-pill">10 · Meros</span>
+        <span class="topic-pill now">11 · Abstract &amp; interface</span>
+        <span class="topic-pill">12 · equals/hashCode</span>
+        <span class="topic-pill">13 · enum</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="10-meros-va-polimorfizm.html"><span class="cl">← Oldingi dars</span><span class="ct">10 · Meros va polimorfizm</span><span class="cs">🧱 OOP</span></a><a class="cn nx" href="12-equals-va-hashcode.html"><span class="cl">Keyingi dars →</span><span class="ct">12 · equals va hashCode</span><span class="cs">🧱 OOP</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:12.5%"></i></div><span>11 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(11)<0)v.push(11);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','11');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(11)<0)D[t].push(11);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  var IMPL={
+    karta:{name:'Karta',desc:'implements Tolov',out:'<b>50 000 so\'m kartadan yechildi</b> — Karta.tola() ishladi'},
+    naqd:{name:'Naqd',desc:'implements Tolov',out:'<b>50 000 so\'m naqd olindi</b> — Naqd.tola() ishladi'},
+    wallet:{name:'Wallet',desc:'implements Tolov',out:'<b>50 000 so\'m hamyondan yechildi</b> — Wallet.tola() ishladi'}
+  };
+  var plugZone=document.getElementById('plugZone'),socketOut=document.getElementById('socketOut');
+  var implBtns=[].slice.call(document.querySelectorAll('#implBtns .impl-btn'));
+  function plug(i){
+    implBtns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-i')===i);});
+    var d=IMPL[i];
+    plugZone.innerHTML='<div class="plug"><div class="pm">'+d.name+'</div><div class="pd">'+d.desc+'</div></div>';
+    socketOut.innerHTML='tolov = new '+d.name+'();<br>tolov.tola(50000) → '+d.out;
+  }
+  implBtns.forEach(function(b){b.addEventListener('click',function(){plug(b.getAttribute('data-i'));});});
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

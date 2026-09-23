@@ -1,0 +1,363 @@
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><title>enum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F2EA;--surface:#FFFFFF;--surface-2:#FBF8F1;--sunken:#F0ECE1;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#B5622A;--accent-ink:#8A491E;--accent-soft:#F3E6D7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#161309;--surface:#211C13;--surface-2:#282116;--sunken:#1B160D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#342C1D;--border-strong:#463C29;
+  --accent:#E28C48;--accent-ink:#F0A96A;--accent-soft:#33261A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.hint{color:var(--ink-faint);font-size:13.5px;margin-top:12px;font-family:var(--font-mono);display:flex;gap:8px;align-items:flex-start;line-height:1.55}
+.hint svg{flex-shrink:0;margin-top:3px}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+/* status flow */
+.flow-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.flow-row{display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.fstate{border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;background:var(--surface-2);font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);cursor:pointer;transition:.25s;text-align:center}
+.fstate:hover{border-color:var(--border-strong)}
+.fstate.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);transform:translateY(-3px);box-shadow:var(--shadow-lift);font-weight:600}
+.fstate.done{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink)}
+.fstate .fo{font-size:10px;opacity:.7;display:block}
+.farrow{color:var(--ink-faint);font-family:var(--font-mono)}
+.flow-out{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:13px 15px;font-family:var(--font-mono);font-size:13px;min-height:44px;color:var(--ink);text-align:center}
+.flow-out b{color:var(--accent-ink)}
+.flow-btns{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.flow-btn{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 16px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px}
+.flow-btn.sec{background:var(--surface-2);border:1.5px solid var(--border);color:var(--ink-soft)}
+
+/* enum with fields */
+.ef-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ef-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.ef-btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 16px;cursor:pointer;font-family:var(--font-mono);font-size:13px;color:var(--ink);transition:.15s}
+.ef-btn:hover{border-color:var(--teal)}
+.ef-btn.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.ef-panel{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.ef-name{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--teal-ink)}
+.ef-fields{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft);margin-top:8px}
+.ef-fee{font-family:var(--font-mono);font-size:15px;margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px}
+.ef-fee b{color:var(--accent-ink)}
+
+/* methods */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:2px solid var(--teal);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block;color:var(--teal-ink)}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#9A5B2E"></span> OOP · 6/6</span><span>· Kurs: 13/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>OOP · 13-modul · noldan</span>
+    <h1><span class="steam">enum</span></h1>
+    <p class="lead">Ba'zi qiymatlar cheklangan to'plamdan bo'ladi: hafta kunlari, buyurtma holatlari, to'lov turlari. enum aynan shu — nomlangan konstantalar to'plami. String o'rniga enum ishlatish xatolarni yo'q qiladi.</p>
+  </header>
+
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Nega enum? String'ning muammosi</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Nega.java</span></div>
+      <pre class="code"><span class="cm">// ❌ String bilan — xatolarga ochiq</span>
+<span class="ty">String</span> holat = <span class="st">"PAID"</span>;
+holat = <span class="st">"paid"</span>;     <span class="cm">// katta-kichik xato — bilinmaydi</span>
+holat = <span class="st">"PIAD"</span>;     <span class="cm">// terish xatosi — kompilyator tutmaydi!</span>
+
+<span class="cm">// ✓ enum bilan — kompilyator himoyalaydi</span>
+<span class="ty">Holat</span> holat = <span class="ty">Holat</span>.PAID;
+holat = <span class="ty">Holat</span>.PIAD;  <span class="cm">// ❌ kompilyatsiya xatosi — bunday konstanta yo'q!</span></pre>
+    </div>
+    <div class="callout tip">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>asosiy foyda</div>
+      enum bilan faqat <b>ruxsat etilgan qiymatlar</b> mumkin. Noto'g'ri qiymat kompilyatsiyadayoq tutiladi — String'da esa faqat ishga tushganda (yoki umuman) bilinadi. Bank holatlari uchun bu juda muhim.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Holat oqimi — jonli</h2></div>
+    <p class="sec-sub">Buyurtma holatlari enum bilan. Har konstanta o'z tartib raqamiga (ordinal) ega. Holatni bosing yoki "Keyingi bosqich"ni bosing — oqimni kuzating.</p>
+    <div class="flow-card">
+      <div class="flow-row" id="flowRow"></div>
+      <div class="flow-out" id="flowOut"></div>
+      <div class="flow-btns">
+        <button class="flow-btn" id="flowNext">Keyingi bosqich →</button>
+        <button class="flow-btn sec" id="flowReset">boshidan</button>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Holat.java</span></div>
+      <pre class="code"><span class="k">enum</span> <span class="ty">Holat</span> { KUTILMOQDA, TOLANGAN, JONATILDI, YETKAZILDI }
+
+<span class="cm">// switch bilan — enum juda mos:</span>
+<span class="k">switch</span> (holat) {
+    <span class="k">case</span> KUTILMOQDA -&gt; System.out.println(<span class="st">"To'lov kutilmoqda"</span>);
+    <span class="k">case</span> TOLANGAN   -&gt; System.out.println(<span class="st">"Tayyorlanmoqda"</span>);
+    <span class="k">case</span> YETKAZILDI -&gt; System.out.println(<span class="st">"Yakunlandi ✓"</span>);
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Maydon va metodli enum</h2></div>
+    <p class="sec-sub">enum shunchaki nom emas — u to'liq class. Har konstanta <b>maydon</b> va <b>metod</b>larga ega bo'lishi mumkin. To'lov turini bosing — uning komissiyasi va hisoblangan haqqi ko'rinadi (bank misoli).</p>
+    <div class="ef-card">
+      <div class="ef-btns" id="efBtns">
+        <button class="ef-btn on" data-t="CARD">CARD</button>
+        <button class="ef-btn" data-t="CASH">CASH</button>
+        <button class="ef-btn" data-t="WALLET">WALLET</button>
+      </div>
+      <div class="ef-panel" id="efPanel"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">TolovTuri.java</span></div>
+      <pre class="code"><span class="k">enum</span> <span class="ty">TolovTuri</span> {
+    CARD(<span class="nu">1.0</span>), CASH(<span class="nu">0.0</span>), WALLET(<span class="nu">0.5</span>);  <span class="cm">// har biriga maydon</span>
+
+    <span class="k">private final</span> <span class="ty">double</span> komissiya;   <span class="cm">// foizda</span>
+    <span class="ty">TolovTuri</span>(<span class="ty">double</span> k) { <span class="k">this</span>.komissiya = k; }  <span class="cm">// konstruktor</span>
+
+    <span class="k">public</span> <span class="ty">double</span> haq(<span class="ty">double</span> summa) {          <span class="cm">// metod</span>
+        <span class="k">return</span> summa * komissiya / <span class="nu">100</span>;
+    }
+}
+TolovTuri.CARD.haq(<span class="nu">100000</span>);  <span class="cm">// 1000 so'm</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Foydali metodlar</h2></div>
+    <p class="sec-sub">Har enum avtomatik shu metodlarga ega.</p>
+    <div class="mgrid">
+      <div class="m"><div class="mn">values()</div><div class="md">barcha konstantalar massivi</div></div>
+      <div class="m"><div class="mn">valueOf("PAID")</div><div class="md">matndan enum'ga</div></div>
+      <div class="m"><div class="mn">name()</div><div class="md">konstanta nomi (matn)</div></div>
+      <div class="m"><div class="mn">ordinal()</div><div class="md">tartib raqami (0 dan)</div></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Metodlar.java</span></div>
+      <pre class="code"><span class="k">for</span> (<span class="ty">Holat</span> h : <span class="ty">Holat</span>.values()) {   <span class="cm">// hammasini aylanish</span>
+    System.out.println(h.name() + <span class="st">" = "</span> + h.ordinal());
+}
+<span class="ty">Holat</span> h = <span class="ty">Holat</span>.valueOf(<span class="st">"TOLANGAN"</span>);  <span class="cm">// matndan (masalan bazadan)</span></pre>
+    </div>
+    <div class="callout warn">
+      <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>ordinal'ga tayanmang</div>
+      Bazaga <code>ordinal()</code> (0,1,2) ni saqlamang — enum tartibini o'zgartirsangiz yoki oraga yangi konstanta qo'shsangiz, eski ma'lumot buziladi. Nom (<code>name()</code>) yoki alohida kod maydonini saqlang.
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>enum nima va String'dan afzalligi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Cheklangan nomlangan konstantalar to'plami. String'dan afzal: (1) faqat ruxsat etilgan qiymatlar — noto'g'risi kompilyatsiyada tutiladi; (2) switch bilan xavfsiz; (3) maydon/metod qo'sha oladi; (4) type-safe. Holatlar, turlar uchun ideal.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>enum'da maydon va metod bo'la oladimi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Ha. enum aslida to'liq class — har konstanta obyekt kabi maydon (konstruktor orqali) va metodlarga ega bo'lishi mumkin. Masalan har sayyoraning massasi/radiusi, har to'lov turining komissiyasi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>enum obyektlari nechta nusxada?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Har konstanta — <b>bitta</b> nusxa (singleton), JVM tomonidan bir marta yaratiladi. Shuning uchun enum'larni <code>==</code> bilan solishtirsa bo'ladi (aynan bir obyekt). enum — Java'da singleton yaratishning ham eng xavfsiz usuli.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Bazaga enum'ni qanday saqlaysiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Nomini (<code>name()</code>, String sifatida) yoki alohida barqaror kod maydonini. <code>ordinal()</code> (tartib raqam) ni SAQLAMANG — enum tartibi o'zgarsa ma'lumot buziladi. JPA'da <code>@Enumerated(EnumType.STRING)</code> ishlatiladi (28-modul).</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz">
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">1.</span>enum'ning String'dan asosiy afzalligi?</div>
+        <button class="opt">Tezroq ishlaydi</button>
+        <button class="opt">Faqat ruxsat etilgan qiymatlar — noto'g'risi kompilyatsiyada tutiladi</button>
+        <button class="opt">Kam joy egallaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. enum type-safe — noto'g'ri qiymat kompilyatsiyadayoq xato beradi. String'da terish xatosi bilinmay qoladi." data-no="Yo'q. Asosiy afzallik — type safety: faqat ruxsat etilgan qiymatlar, xato kompilyatsiyada tutiladi."></div>
+      </div>
+      <div class="q" data-correct="0">
+        <div class="q-txt"><span class="qn">2.</span>enum konstantasi nechta nusxada mavjud?</div>
+        <button class="opt">Bitta (singleton)</button>
+        <button class="opt">Har chaqirishda yangi</button>
+        <button class="opt">Cheksiz</button>
+        <div class="q-fb" data-ok="To'g'ri. Har enum konstantasi bitta nusxada (JVM yaratadi). Shuning uchun == bilan solishtirsa bo'ladi." data-no="Yo'q. Har enum konstantasi bitta nusxada — singleton. == bilan solishtirsa bo'ladi."></div>
+      </div>
+      <div class="q" data-correct="2">
+        <div class="q-txt"><span class="qn">3.</span>Barcha enum konstantalarini olish uchun?</div>
+        <button class="opt">getAll()</button>
+        <button class="opt">list()</button>
+        <button class="opt">values()</button>
+        <div class="q-fb" data-ok="To'g'ri. values() barcha konstantalar massivini qaytaradi — for-each bilan aylanish mumkin." data-no="Yo'q. values() barcha enum konstantalarini beradi."></div>
+      </div>
+      <div class="q" data-correct="1">
+        <div class="q-txt"><span class="qn">4.</span>Bazaga enum'ni saqlashda nimadan qochish kerak?</div>
+        <button class="opt">name() ni saqlash</button>
+        <button class="opt">ordinal() ni saqlash</button>
+        <button class="opt">Alohida kod maydonini saqlash</button>
+        <div class="q-fb" data-ok="To'g'ri. ordinal() tartibga bog'liq — enum'ni qayta tartiblasangiz eski ma'lumot noto'g'ri bo'lib qoladi. name() yoki kod saqlang." data-no="Yo'q. ordinal() dan qoching — tartib o'zgarsa ma'lumot buziladi. name() xavfsizroq."></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">OOP bloki tugadi ✓ — Keyingi bo'lim: Core</span>
+      <h3>Kolleksiyalar va HashMap ichki tuzilishi</h3>
+      <p>List, Set, Map — endi ularning ichini ochamiz: ArrayList qanday kengayadi, HashMap bucketlar bilan qanday ishlaydi (12-moduldagi hash bilan bog'lanadi), qachon qaysi biri.</p>
+      <div class="topics">
+        <span class="topic-pill">1–12 ✓</span>
+        <span class="topic-pill now">13 · enum</span>
+        <span class="topic-pill">14 · Kolleksiyalar</span>
+        <span class="topic-pill">15 · Generics</span>
+        <span class="topic-pill">…</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="12-equals-va-hashcode.html"><span class="cl">← Oldingi dars</span><span class="ct">12 · equals va hashCode</span><span class="cs">🧱 OOP</span></a><a class="cn nx" href="14-kolleksiyalar.html"><span class="cl">Keyingi dars →</span><span class="ct">14 · Kolleksiyalar</span><span class="cs">⚙️ Java Core</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:14.8%"></i></div><span>13 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(13)<0)v.push(13);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','13');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(13)<0)D[t].push(13);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+
+  /* status flow */
+  var STATES=[{n:'KUTILMOQDA',d:'To\'lov kutilmoqda'},{n:'TOLANGAN',d:'Tayyorlanmoqda'},{n:'JONATILDI',d:'Yo\'lda'},{n:'YETKAZILDI',d:'Yakunlandi ✓'}];
+  var flowRow=document.getElementById('flowRow'),flowOut=document.getElementById('flowOut');
+  flowRow.innerHTML=STATES.map(function(s,i){return '<div class="fstate" data-i="'+i+'"><span class="fo">ordinal '+i+'</span>'+s.n+'</div>'+(i<STATES.length-1?'<span class="farrow">→</span>':'');}).join('');
+  var fstates=[].slice.call(flowRow.querySelectorAll('.fstate'));
+  var fi=0;
+  function frender(){
+    fstates.forEach(function(f,k){f.classList.toggle('active',k===fi);f.classList.toggle('done',k<fi);});
+    flowOut.innerHTML='Holat.<b>'+STATES[fi].n+'</b> (ordinal '+fi+') → "'+STATES[fi].d+'"';
+  }
+  fstates.forEach(function(f){f.addEventListener('click',function(){fi=+f.getAttribute('data-i');frender();});});
+  document.getElementById('flowNext').addEventListener('click',function(){fi=(fi+1)%STATES.length;frender();});
+  document.getElementById('flowReset').addEventListener('click',function(){fi=0;frender();});
+  frender();
+
+  /* enum with fields */
+  var TYPES={
+    CARD:{komissiya:1.0,desc:'Bank kartasi'},
+    CASH:{komissiya:0.0,desc:'Naqd pul'},
+    WALLET:{komissiya:0.5,desc:'Elektron hamyon'}
+  };
+  var efPanel=document.getElementById('efPanel');
+  function showEf(t){
+    [].slice.call(document.querySelectorAll('#efBtns .ef-btn')).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});
+    var d=TYPES[t];var summa=100000;var haq=summa*d.komissiya/100;
+    efPanel.innerHTML='<div class="ef-name">TolovTuri.'+t+'</div>'
+      +'<div class="ef-fields">komissiya = '+d.komissiya.toFixed(1)+'% · '+d.desc+'</div>'
+      +'<div class="ef-fee">'+t+'.haq(100 000) = <b>'+haq.toLocaleString('en-US')+' so\'m</b></div>';
+  }
+  [].slice.call(document.querySelectorAll('#efBtns .ef-btn')).forEach(function(b){b.addEventListener('click',function(){showEf(b.getAttribute('data-t'));});});
+  showEf('CARD');
+
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+})();
+</script>

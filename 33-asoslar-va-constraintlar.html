@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PostgreSQL asoslari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐘</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F8FB;--sunken:#E6ECF2;
+  --ink:#182430;--ink-soft:#4C5866;--ink-faint:#7C8896;--border:#D8E0E9;--border-strong:#C3CDD8;
+  --accent:#2E6FA8;--accent-ink:#1F5183;--accent-soft:#E1EDF7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* table */
+.dbt{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:16px;box-shadow:var(--shadow);overflow-x:auto;background:var(--surface)}
+.dbt table{border-collapse:collapse;width:100%;font-family:var(--font-mono);font-size:12.5px;min-width:480px}
+.dbt th{background:var(--accent-soft);color:var(--accent-ink);text-align:left;padding:9px 12px;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.dbt th small{display:block;font-weight:400;color:var(--ink-faint);font-size:10.5px}
+.dbt td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.dbt tr:last-child td{border-bottom:0}
+.dbt tr.new td{background:var(--teal-soft);animation:pop .4s}
+.dbt tr.bad td{background:var(--coral-soft)}
+.dbt .pk{color:var(--accent-ink);font-weight:600}.dbt .fk{color:var(--purple-ink)}
+/* insert tester */
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.frm label{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
+.frm input,.frm select{font-family:var(--font-mono);font-size:13.5px;padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);color:var(--ink)}
+.cons{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.cn{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);transition:.25s}
+.cn .ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--sunken);flex-shrink:0}
+.cn.ok{border-color:var(--teal);background:var(--teal-soft)}.cn.ok .ic{background:var(--teal);color:#fff}
+.cn.bad{border-color:var(--coral);background:var(--coral-soft)}.cn.bad .ic{background:var(--coral);color:#fff}
+.cn .cd{color:var(--ink-soft);font-size:11.5px;flex:1}
+.sqlout{margin-top:12px;font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;white-space:pre-wrap;line-height:1.6;min-height:60px}
+.sqlout.err{color:var(--coral);border-color:var(--coral)}.sqlout.ok{color:var(--teal-ink);border-color:var(--teal)}
+/* types */
+.tcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:14px}
+.tc{border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;cursor:pointer;background:var(--surface-2);transition:.2s}
+.tc:hover{border-color:var(--border-strong)}.tc.on{border-color:var(--accent);background:var(--accent-soft)}
+.tc .tn{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:600}.tc .td{font-size:12px;color:var(--ink-soft)}
+/* cascade */
+.rel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.rt{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.rt .rh{background:var(--surface-2);padding:8px 12px;font-family:var(--font-mono);font-size:12px;font-weight:600;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.rr{padding:8px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;transition:.4s;cursor:pointer}
+.rr:last-child{border-bottom:0}
+.rr.sel{background:var(--accent-soft);border-left:3px solid var(--accent)}
+.rr.link{background:var(--purple-soft)}
+.rr.gone{opacity:.25;text-decoration:line-through;background:var(--coral-soft)}
+.rr.nulled .fkv{color:var(--amber);font-weight:700}
+.rr .fkv{color:var(--purple-ink)}
+/* normalization */
+.wide{overflow-x:auto;margin-top:12px}
+.wide table{border-collapse:collapse;font-family:var(--font-mono);font-size:11.5px;width:100%;min-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+.wide th,.wide td{padding:6px 9px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.wide th{background:var(--surface-2);color:var(--ink-soft)}
+.wide td.dup{background:var(--coral-soft);color:var(--coral)}
+.wide td.hl{background:var(--teal-soft)}
+.split{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.split .mini{border:1px solid var(--border);border-radius:10px;overflow:hidden;font-family:var(--font-mono);font-size:11px;background:var(--surface);animation:pop .4s both}
+.split .mini .mh{background:var(--accent-soft);color:var(--accent-ink);padding:5px 8px;font-weight:600}
+.split .mini div{padding:4px 8px;border-bottom:1px solid var(--border)}
+@media (max-width:560px){.rel{grid-template-columns:1fr}.split{grid-template-columns:1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2E6FA8"></span> PostgreSQL · 1/4</span><span>· Kurs: 33/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>PostgreSQL · 33-modul · noldan</span>
+    <h1>PostgreSQL asoslari <span class="steam">va constraint'lar</span></h1>
+    <p class="lead">Backend ma'lumotni relatsion bazada — jadvallarda saqlaydi. Lekin jadval shunchaki "Excel" emas: u <b>qoidalarni o'zi himoya qiladi</b>. Noto'g'ri satr kiritib ko'ring — baza sizni qanday to'xtatishini ko'rasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Jadval anatomiyasi — bank misolida</h2></div>
+    <p class="sec-sub">Har ustun: <b>nom + tip + qoidalar</b>. Har satr — bitta yozuv. Ustun sarlavhasiga bosing — nima uchun aynan shu tip tanlangani.</p>
+    <div class="dbt"><table id="hisobT">
+      <thead><tr><th data-c="id">id<small>bigint · PK</small></th><th data-c="raqam">raqam<small>char(20) · UNIQUE</small></th><th data-c="mijoz_id">mijoz_id<small>bigint · FK</small></th><th data-c="valyuta">valyuta<small>char(3) · NOT NULL</small></th><th data-c="balans">balans<small>numeric(18,2) · CHECK ≥ 0</small></th><th data-c="ochilgan">ochilgan<small>timestamptz · DEFAULT now()</small></th></tr></thead>
+      <tbody>
+        <tr><td class="pk">1</td><td>20208000123456789012</td><td class="fk">1</td><td>UZS</td><td>1 250 000.00</td><td>2024-03-01 09:00+05</td></tr>
+        <tr><td class="pk">2</td><td>20208000123456789013</td><td class="fk">1</td><td>USD</td><td>300.00</td><td>2024-03-02 11:15+05</td></tr>
+        <tr><td class="pk">3</td><td>20208000123456789014</td><td class="fk">2</td><td>UZS</td><td>0.00</td><td>2024-03-05 14:40+05</td></tr>
+      </tbody></table></div>
+    <div class="tap-note" id="colNote">Ustun sarlavhasiga bosing.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Constraint'lar — bazaning o'zi qo'riqchi</h2></div>
+    <p class="sec-sub">Java kodida tekshirish yaxshi, lekin bazaga 5 xil servis yozadi. <b>Constraint</b> — oxirgi chegara: qoidani buzgan satr hech qachon kirmaydi. Qiymatlarni o'zgartirib, INSERT qiling.</p>
+    <div class="stage">
+      <div class="frm">
+        <label>raqam (UNIQUE)<input id="fRaqam" value="20208000123456789015"></label>
+        <label>mijoz_id (FK → mijoz)<select id="fMijoz"><option value="1">1 · Otabek</option><option value="2">2 · Dilnoza</option><option value="99">99 · (mavjud emas)</option></select></label>
+        <label>valyuta (NOT NULL)<input id="fVal" value="UZS"></label>
+        <label>balans (CHECK ≥ 0)<input id="fBal" type="number" value="50000"></label>
+      </div>
+      <div class="cons" id="cons"></div>
+      <div class="ctrls"><button class="btn primary" id="doIns">INSERT INTO hisob …</button><button class="btn" id="preset1">Preset: takror raqam</button><button class="btn" id="preset2">Preset: manfiy balans</button><button class="btn" id="preset3">Preset: yo'q mijoz</button></div>
+      <div class="sqlout" id="sqlout">Natija shu yerda.</div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">V1__hisob.sql</span></div>
+      <pre class="code"><span class="k">CREATE TABLE</span> hisob (
+    id        <span class="ty">bigint</span> <span class="k">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,  <span class="cm">-- serial o'rniga zamonaviy usul</span>
+    raqam     <span class="ty">char(20)</span> <span class="k">NOT NULL UNIQUE</span>,
+    mijoz_id  <span class="ty">bigint</span> <span class="k">NOT NULL REFERENCES</span> mijoz(id),
+    valyuta   <span class="ty">char(3)</span> <span class="k">NOT NULL DEFAULT</span> <span class="st">'UZS'</span>,
+    balans    <span class="ty">numeric(18,2)</span> <span class="k">NOT NULL DEFAULT</span> <span class="nu">0</span> <span class="k">CHECK</span> (balans &gt;= <span class="nu">0</span>),
+    ochilgan  <span class="ty">timestamptz</span> <span class="k">NOT NULL DEFAULT</span> now(),
+    <span class="k">CONSTRAINT</span> uq_mijoz_valyuta <span class="k">UNIQUE</span> (mijoz_id, valyuta)   <span class="cm">-- bir mijozda bir valyutada bitta hisob</span>
+);</pre>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Java tomonda</div>Constraint buzilsa JDBC <code>SQLException</code> → Spring <code>DataIntegrityViolationException</code>. Uni <code>@ExceptionHandler</code>'da ushlab 409 Conflict qaytaring. Lekin UNIQUE'ga tayanib "avval SELECT, keyin INSERT" yozmang — ikki so'rov orasida boshqa tranzaksiya kirishi mumkin (race). INSERT qiling, xatoni ushlang, yoki <code>ON CONFLICT DO NOTHING</code>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Tiplar: to'g'ri tanlov, noto'g'ri tanlov</h2></div>
+    <p class="sec-sub">Tipga bosing — qachon ishlatiladi va qanday xato ko'p uchraydi.</p>
+    <div class="tcards" id="tcards"></div>
+    <div class="explain" id="tEx">Tipni tanlang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Foreign key va ON DELETE — mijoz o'chsa nima bo'ladi?</h2></div>
+    <p class="sec-sub">FK ikki jadvalni bog'laydi. Ota yozuv o'chirilganda bola yozuvlar taqdiri <b>ON DELETE</b> qoidasiga bog'liq. Rejimni tanlab, mijozni o'chiring.</p>
+    <div class="stage">
+      <div class="seg" id="odSeg"><button class="on" data-m="RESTRICT">RESTRICT (default)</button><button data-m="CASCADE">CASCADE</button><button data-m="SET NULL">SET NULL</button></div>
+      <div class="rel">
+        <div class="rt"><div class="rh"><span>mijoz</span><span>PK id</span></div><div id="mRows"></div></div>
+        <div class="rt"><div class="rh"><span>hisob</span><span>FK mijoz_id</span></div><div id="hRows"></div></div>
+      </div>
+      <div class="ctrls"><button class="btn primary" id="delBtn">DELETE FROM mijoz WHERE id = 1</button><button class="btn" id="odReset">Tiklash</button></div>
+      <div class="sqlout" id="odOut">Mijozni tanlang (chapda) va o'chiring.</div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ Bankda</div>Moliyaviy yozuvlar (hisob, tranzaksiya) <b>hech qachon CASCADE</b> bilan o'chmasin — audit talab. Odatda umuman o'chirilmaydi: <code>holat = 'YOPILGAN'</code> (soft delete). CASCADE — faqat haqiqiy "bola" ma'lumot uchun (masalan, buyurtma → buyurtma qatorlari).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Normalizatsiya — nega bitta katta jadval yomon</h2></div>
+    <p class="sec-sub">Hammasini bitta jadvalga yozsangiz ma'lumot takrorlanadi va bir joyda o'zgarib, boshqa joyda qoladi (anomaliya). Qadamlab ajratamiz.</p>
+    <div class="stage">
+      <div id="normView"></div>
+      <div class="ctrls"><button class="btn" id="nmPrev">‹</button><button class="btn primary" id="nmPlay">▶ Avto</button><button class="btn" id="nmNext">›</button><div class="bar"><div id="nmBar"></div></div></div>
+      <div class="explain" id="nmEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Sxema o'zgarishi: ALTER va migratsiya</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">V2__hisob_holat.sql</span></div>
+      <pre class="code"><span class="k">ALTER TABLE</span> hisob <span class="k">ADD COLUMN</span> holat <span class="ty">varchar(20)</span> <span class="k">NOT NULL DEFAULT</span> <span class="st">'FAOL'</span>;
+<span class="k">ALTER TABLE</span> hisob <span class="k">ADD CONSTRAINT</span> ck_holat <span class="k">CHECK</span> (holat <span class="k">IN</span> (<span class="st">'FAOL'</span>,<span class="st">'BLOK'</span>,<span class="st">'YOPILGAN'</span>));
+<span class="k">CREATE INDEX</span> ix_hisob_mijoz <span class="k">ON</span> hisob(mijoz_id);      <span class="cm">-- FK ustuniga indeks avtomatik EMAS!</span>
+<span class="k">ALTER TABLE</span> hisob <span class="k">RENAME COLUMN</span> ochilgan <span class="k">TO</span> ochilgan_vaqt;
+<span class="k">DROP TABLE IF EXISTS</span> eski_jadval;</pre>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>Flyway / Liquibase</h4><p>Sxemani qo'lda emas, <b>versiyalangan SQL fayllar</b> bilan o'zgartiring: <code>V1__init.sql</code>, <code>V2__holat.sql</code>. Spring Boot ishga tushganda yangi fayllarni avtomatik qo'llaydi, <code>flyway_schema_history</code> jadvalida qaysi biri bajarilganini saqlaydi. <code>spring.jpa.hibernate.ddl-auto=validate</code> — prod'da <b>hech qachon update/create</b>.</p></div>
+      <div class="card"><h4>psql — 5 buyruq</h4><p><code>\l</code> bazalar · <code>\c bank</code> ulanish · <code>\dt</code> jadvallar · <code>\d hisob</code> jadval tuzilishi (constraint'lar bilan) · <code>\x</code> kengaytirilgan ko'rinish. Ulanish: <code>psql -h localhost -U bank -d bank</code>.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>PRIMARY KEY va UNIQUE farqi?<span class="chev">›</span></summary><div class="iv-a">Ikkalasi ham takrorlanmaslikni kafolatlaydi va avtomatik indeks yaratadi. PK: jadvalda <b>bitta</b>, <b>NULL bo'lmaydi</b>, FK'lar unga ishora qiladi. UNIQUE: bir nechta bo'lishi mumkin, NULL'ga ruxsat (va bir nechta NULL — PostgreSQL'da NULL ≠ NULL). Pul/biznes kaliti (hisob raqami) — UNIQUE, texnik id — PK.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Pul uchun qaysi tip? Nega float emas?<span class="chev">›</span></summary><div class="iv-a"><code>numeric(18,2)</code> — o'nlik aniq. <code>float/double</code> ikkilik — 0.1 aniq ifodalanmaydi, yig'indi xatolari to'planadi. Java'da <code>BigDecimal</code> bilan juft. Muqobil: tiyinlarda <code>bigint</code>.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>serial, identity, uuid — qaysi biri?<span class="chev">›</span></summary><div class="iv-a"><code>serial</code> — eski (sequence + default, ownership muammolari). <code>GENERATED ALWAYS AS IDENTITY</code> — SQL standarti, tavsiya. <code>uuid</code> — tarqoq tizimlar, mijoz tomonda yaratish, id'ni taxmin qilib bo'lmaydi; kamchilik: 16 bayt, indeks tasodifiy (fragmentatsiya) — UUIDv7 yechadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>timestamp va timestamptz farqi?<span class="chev">›</span></summary><div class="iv-a"><code>timestamptz</code> UTC'da saqlaydi, sessiya zonasiga qarab ko'rsatadi — DST va ko'p zonali tizimda to'g'ri. <code>timestamp</code> — "devordagi soat", zona yo'q. Deyarli har doim <code>timestamptz</code>. Java: <code>Instant</code> / <code>OffsetDateTime</code>.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>FK ustuniga indeks avtomatik yaratiladimi?<span class="chev">›</span></summary><div class="iv-a">Yo'q! PK va UNIQUE'ga — ha, FK'ga — yo'q. FK'siz indeks: ota yozuvni o'chirish/yangilashda bola jadval to'liq skan bo'ladi, JOIN'lar sekin. Har FK'ga <code>CREATE INDEX</code> — odat qiling.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Normalizatsiya nima, qachon denormalizatsiya qilasiz?<span class="chev">›</span></summary><div class="iv-a">Takrorlanishni yo'qotish, har fakt bir joyda (1NF: atomar qiymatlar; 2NF: kalitga to'liq bog'liqlik; 3NF: kalit bo'lmagan ustunlar bir-biriga bog'liq emas). Denormalizatsiya — o'qish tezligi uchun ataylab takrorlash (hisobot jadvallari, cache ustunlar), yozishda sinxronlash mas'uliyati bilan.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>balans = -500 kiritilsa, CHECK (balans ≥ 0) bo'lsa?</div>
+        <button class="opt">Kiradi, keyin Java tekshiradi</button><button class="opt">Baza rad etadi — check_violation</button><button class="opt">0 ga aylantiriladi</button>
+        <div class="q-fb" data-ok="To'g'ri. Constraint — oxirgi chegara, satr kirmaydi." data-no="Yo'q. CHECK buzilsa INSERT/UPDATE xato bilan rad etiladi."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">2.</span>Tranzaksiya vaqtini saqlash uchun?</div>
+        <button class="opt">timestamp</button><button class="opt">date</button><button class="opt">timestamptz</button>
+        <div class="q-fb" data-ok="To'g'ri. UTC'da saqlanadi, zona muammosi yo'q." data-no="Yo'q. timestamptz — zona bilan, bank uchun to'g'ri."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">3.</span>ON DELETE RESTRICT bilan bolasi bor mijozni o'chirsak?</div>
+        <button class="opt">Xato — o'chmaydi</button><button class="opt">Hisoblar ham o'chadi</button><button class="opt">mijoz_id NULL bo'ladi</button>
+        <div class="q-fb" data-ok="To'g'ri. RESTRICT/NO ACTION — bog'langan yozuv bo'lsa taqiqlaydi." data-no="Yo'q. RESTRICT — bola yozuv bor ekan, ota o'chmaydi."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>FK ustuniga indeks…</div>
+        <button class="opt">Avtomatik yaratiladi</button><button class="opt">Qo'lda yaratish kerak</button><button class="opt">Kerak emas</button>
+        <div class="q-fb" data-ok="To'g'ri. Faqat PK/UNIQUE avtomatik." data-no="Yo'q. FK indeksi avtomatik emas — CREATE INDEX yozing."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · PostgreSQL</span>
+      <h3>SQL chuqur: JOIN, subquery, CTE, window</h3>
+      <p>Har JOIN turini jonli ko'rish, GROUP BY/HAVING, ichki so'rovlar, WITH (CTE), window funksiyalar — bank hisobotlari misolida.</p>
+      <div class="topics"><span class="topic-pill">32 · Security</span><span class="topic-pill now">33 · PG asoslari</span><span class="topic-pill">34 · SQL chuqur</span><span class="topic-pill">35 · Indeks & EXPLAIN</span><span class="topic-pill">36 · Tranzaksiya</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="32-security-va-jwt.html"><span class="cl">← Oldingi dars</span><span class="ct">32 · Security va JWT</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="34-sql-chuqur.html"><span class="cl">Keyingi dars →</span><span class="ct">34 · SQL chuqur</span><span class="cs">🐘 PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:37.5%"></i></div><span>33 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(33)<0)v.push(33);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','33');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(33)<0)D[t].push(33);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* column notes */
+  var notes={id:'<b>id bigint IDENTITY PK</b> — texnik kalit. int 2.1 mlrd\'da tugaydi; bank tranzaksiyalari uchun bigint. Biznes ma\'nosi yo\'q — hisob raqami alohida ustun.',raqam:'<b>raqam char(20) UNIQUE</b> — biznes kaliti. Ikki hisobda bir raqam bo\'lmasligi kerak — baza o\'zi tekshiradi.',mijoz_id:'<b>mijoz_id bigint FK</b> — mijoz jadvalidagi id\'ga ishora. Mavjud bo\'lmagan mijozga hisob ochib bo\'lmaydi.',valyuta:'<b>valyuta char(3) NOT NULL</b> — ISO 4217 kodi (UZS, USD). NOT NULL — valyutasiz hisob ma\'nosiz.',balans:'<b>balans numeric(18,2)</b> — pul. 18 raqam, 2 kasr. float EMAS! CHECK (balans ≥ 0) — overdraft yo\'q.',ochilgan:'<b>ochilgan timestamptz DEFAULT now()</b> — zona bilan vaqt. INSERT\'da bermasangiz baza o\'zi qo\'yadi.'};
+  document.getElementById('hisobT').addEventListener('click',function(e){var th=e.target.closest('th');if(!th)return;document.getElementById('colNote').innerHTML=notes[th.dataset.c];});
+
+  /* insert tester */
+  var existing=['20208000123456789012','20208000123456789013','20208000123456789014'],pairs=[[1,'UZS'],[1,'USD'],[2,'UZS']];
+  var fR=document.getElementById('fRaqam'),fM=document.getElementById('fMijoz'),fV=document.getElementById('fVal'),fB=document.getElementById('fBal'),cons=document.getElementById('cons'),out=document.getElementById('sqlout');
+  function check(){
+    var r=fR.value.trim(),m=+fM.value,v=fV.value.trim(),b=fB.value===''?null:+fB.value;
+    var list=[
+      {n:'NOT NULL (raqam, valyuta, balans)',ok:r!==''&&v!==''&&b!==null,d:'bo\'sh qiymat taqiqlangan',err:'null value in column "'+(r===''?'raqam':v===''?'valyuta':'balans')+'" violates not-null constraint'},
+      {n:'UNIQUE (raqam)',ok:existing.indexOf(r)<0,d:'bunday raqam allaqachon bor',err:'duplicate key value violates unique constraint "hisob_raqam_key"\nDETAIL: Key (raqam)=('+r+') already exists.'},
+      {n:'FOREIGN KEY (mijoz_id → mijoz.id)',ok:m===1||m===2,d:'mijoz mavjud bo\'lishi shart',err:'insert or update on table "hisob" violates foreign key constraint "hisob_mijoz_id_fkey"\nDETAIL: Key (mijoz_id)=('+m+') is not present in table "mijoz".'},
+      {n:'CHECK (balans >= 0)',ok:b===null||b>=0,d:'manfiy balans taqiqlangan',err:'new row for relation "hisob" violates check constraint "hisob_balans_check"\nDETAIL: Failing row contains (4, '+r+', '+m+', '+v+', '+b+', ...).'},
+      {n:'UNIQUE (mijoz_id, valyuta)',ok:!pairs.some(function(p){return p[0]===m&&p[1]===v;}),d:'bir mijozda bir valyutada bitta hisob',err:'duplicate key value violates unique constraint "uq_mijoz_valyuta"\nDETAIL: Key (mijoz_id, valyuta)=('+m+', '+v+') already exists.'}
+    ];
+    cons.innerHTML=list.map(function(c){return '<div class="cn '+(c.ok?'ok':'bad')+'"><span class="ic">'+(c.ok?'✓':'✗')+'</span><span>'+c.n+'</span><span class="cd">'+c.d+'</span></div>';}).join('');
+    return list;
+  }
+  [fR,fM,fV,fB].forEach(function(el){el.addEventListener('input',check);});check();
+  document.getElementById('doIns').addEventListener('click',function(){
+    var list=check(),bad=list.filter(function(c){return !c.ok;});
+    var sql='INSERT INTO hisob (raqam, mijoz_id, valyuta, balans)\nVALUES (\''+fR.value+'\', '+fM.value+', \''+fV.value+'\', '+fB.value+');\n\n';
+    if(bad.length){out.className='sqlout err';out.textContent=sql+'ERROR:  '+bad[0].err+'\n\n→ Satr KIRMADI. Tranzaksiya bekor (rollback).';}
+    else{out.className='sqlout ok';out.textContent=sql+'INSERT 0 1\n\n→ Satr kirdi: id = 4 (identity o\'zi berdi), ochilgan = now().';
+      var tb=document.querySelector('#hisobT tbody');var tr=document.createElement('tr');tr.className='new';tr.innerHTML='<td class="pk">4</td><td>'+fR.value+'</td><td class="fk">'+fM.value+'</td><td>'+fV.value+'</td><td>'+(+fB.value).toFixed(2)+'</td><td>hozir</td>';tb.appendChild(tr);
+      existing.push(fR.value);pairs.push([+fM.value,fV.value]);check();}
+  });
+  document.getElementById('preset1').addEventListener('click',function(){fR.value='20208000123456789012';fM.value='2';fV.value='USD';fB.value='100';check();});
+  document.getElementById('preset2').addEventListener('click',function(){fR.value='20208000123456789099';fM.value='2';fV.value='USD';fB.value='-500';check();});
+  document.getElementById('preset3').addEventListener('click',function(){fR.value='20208000123456789098';fM.value='99';fV.value='UZS';fB.value='0';check();});
+
+  /* types */
+  var types=[
+    {n:'integer / bigint',d:'butun son',x:'<b>integer</b> ±2.1 mlrd, <b>bigint</b> ±9.2×10¹⁸. Tranzaksiya id — bigint (integer 2 yilda tugashi mumkin). smallint — kichik kodlar.'},
+    {n:'numeric(p,s)',d:'aniq kasr — PUL',x:'<b>numeric(18,2)</b>: 18 raqam, 2 kasr. Aniq o\'nlik arifmetika. Sekinroq, lekin pulda aniqlik muhim. Java: BigDecimal.'},
+    {n:'real / double',d:'ikkilik kasr',x:'Fizika, statistika — ha. <b>Pul — YO\'Q</b>: 0.1+0.2=0.30000000000000004. Yig\'indi hisobotda tiyinlar "yo\'qoladi".'},
+    {n:'varchar(n) / text',d:'matn',x:'PostgreSQL\'da ikkalasi bir xil tez. <b>varchar(n)</b> — uzunlik chegarasi (validatsiya), <b>text</b> — cheksiz. char(n) — bo\'shliq bilan to\'ldiradi (valyuta kodi kabi qat\'iy uzunlik uchun).'},
+    {n:'boolean',d:'true/false',x:'NULL ham bo\'lishi mumkin — "noma\'lum". Flag ustunlar uchun NOT NULL DEFAULT false yozing.'},
+    {n:'date / time',d:'faqat sana / faqat vaqt',x:'<b>date</b> — tug\'ilgan kun, kredit sanasi. <b>time</b> — ish vaqti. Java: LocalDate / LocalTime.'},
+    {n:'timestamptz',d:'sana+vaqt+zona',x:'UTC\'da saqlanadi. Tranzaksiya vaqti, audit — doim shu. <b>timestamp</b> (zonasiz) — tuzoq: server zonasi o\'zgarsa hamma vaqt "suriladi".'},
+    {n:'uuid',d:'128-bit noyob id',x:'Tarqoq tizimlar, tashqi API\'da ko\'rsatiladigan id (taxmin qilib bo\'lmaydi). gen_random_uuid(). Indeks tasodifiy — katta jadvalda sekinroq; UUIDv7 vaqt-tartibli.'},
+    {n:'jsonb',d:'binar JSON',x:'Sxemasi o\'zgaruvchan ma\'lumot (metadata, so\'rov loglari). GIN indeks bilan ichidan qidirish mumkin. Lekin asosiy ustunlarni jsonb\'ga yashirmang — constraint va JOIN yo\'qoladi.'},
+    {n:'enum / check',d:'cheklangan qiymatlar',x:'holat: CREATE TYPE holat AS ENUM (...) yoki varchar + CHECK IN (...). CHECK — o\'zgartirish oson (ALTER CONSTRAINT), enum — tartibli lekin qiymat o\'chirish qiyin. Java enum bilan juft.'},
+    {n:'array',d:'massiv ustun',x:'text[] — teglar, telefonlar. Qulay, lekin FK yo\'q; bog\'lanish jadvali ko\'pincha to\'g\'riroq.'},
+    {n:'bytea',d:'binar ma\'lumot',x:'Fayl, rasm. Katta fayllarni bazada saqlamang — S3/MinIO + bazada faqat yo\'l.'}
+  ];
+  var tc=document.getElementById('tcards');tc.innerHTML=types.map(function(t,i){return '<div class="tc" data-i="'+i+'"><div class="tn">'+t.n+'</div><div class="td">'+t.d+'</div></div>';}).join('');
+  tc.addEventListener('click',function(e){var c=e.target.closest('.tc');if(!c)return;[].slice.call(tc.children).forEach(function(x){x.classList.toggle('on',x===c);});document.getElementById('tEx').innerHTML=types[+c.dataset.i].x;});
+
+  /* on delete */
+  var mode='RESTRICT',sel=1,mij=[{id:1,n:'Otabek'},{id:2,n:'Dilnoza'}],his=[{id:1,m:1,v:'UZS'},{id:2,m:1,v:'USD'},{id:3,m:2,v:'UZS'}],state;
+  function odReset(){state={mij:mij.map(function(x){return Object.assign({},x);}),his:his.map(function(x){return Object.assign({},x);})};drawOd();document.getElementById('odOut').className='sqlout';document.getElementById('odOut').textContent='Mijozni tanlang va o\'chiring. Rejim: ON DELETE '+mode;}
+  function drawOd(){
+    document.getElementById('mRows').innerHTML=state.mij.map(function(m){return '<div class="rr'+(m.id===sel?' sel':'')+(m.gone?' gone':'')+'" data-id="'+m.id+'"><span><b>'+m.id+'</b> '+m.n+'</span></div>';}).join('');
+    document.getElementById('hRows').innerHTML=state.his.map(function(h){return '<div class="rr'+(h.m===sel?' link':'')+(h.gone?' gone':'')+(h.nulled?' nulled':'')+'"><span>#'+h.id+' '+h.v+'</span><span class="fkv">mijoz_id: '+(h.m===null?'NULL':h.m)+'</span></div>';}).join('');
+    document.getElementById('delBtn').textContent='DELETE FROM mijoz WHERE id = '+sel;
+  }
+  document.getElementById('mRows').addEventListener('click',function(e){var r=e.target.closest('.rr');if(!r)return;sel=+r.dataset.id;drawOd();});
+  document.getElementById('odSeg').addEventListener('click',function(e){if(!e.target.dataset.m)return;mode=e.target.dataset.m;[].slice.call(this.children).forEach(function(b){b.classList.toggle('on',b===e.target);});odReset();});
+  document.getElementById('odReset').addEventListener('click',odReset);
+  document.getElementById('delBtn').addEventListener('click',function(){
+    var o=document.getElementById('odOut'),kids=state.his.filter(function(h){return h.m===sel&&!h.gone;});
+    var m=state.mij.filter(function(x){return x.id===sel;})[0];if(!m||m.gone){o.className='sqlout';o.textContent='DELETE 0 — bunday mijoz yo\'q (allaqachon o\'chgan).';return;}
+    if(mode==='RESTRICT'&&kids.length){o.className='sqlout err';o.textContent='DELETE FROM mijoz WHERE id = '+sel+';\n\nERROR:  update or delete on table "mijoz" violates foreign key constraint "hisob_mijoz_id_fkey" on table "hisob"\nDETAIL: Key (id)=('+sel+') is still referenced from table "hisob".\n\n→ Mijoz o\'chmadi: '+kids.length+' ta hisob unga bog\'langan. Avval hisoblarni hal qiling.';return;}
+    m.gone=true;
+    if(mode==='CASCADE'){kids.forEach(function(h){h.gone=true;});o.className='sqlout ok';o.textContent='DELETE FROM mijoz WHERE id = '+sel+';\n\nDELETE 1\n\n→ Mijoz o\'chdi va CASCADE bo\'yicha '+kids.length+' ta hisob ham JIMGINA o\'chdi. Bankda — falokat (audit yo\'qoldi).';}
+    else if(mode==='SET NULL'){kids.forEach(function(h){h.m=null;h.nulled=true;});o.className='sqlout ok';o.textContent='DELETE FROM mijoz WHERE id = '+sel+';\n\nDELETE 1\n\n→ Mijoz o\'chdi, '+kids.length+' ta hisobning mijoz_id = NULL bo\'ldi ("egasiz" hisob). Ustun NOT NULL bo\'lsa bu rejim ishlamaydi.';}
+    else{o.className='sqlout ok';o.textContent='DELETE 1 — bolasi yo\'q edi, bemalol o\'chdi.';}
+    drawOd();
+  });
+  odReset();
+
+  /* normalization stepper */
+  var wide='<div class="wide"><table><tr><th>tx_id</th><th>mijoz</th><th>mijoz_tel</th><th>hisob</th><th>valyuta</th><th>summa</th><th>filial</th><th>filial_manzil</th></tr>'+
+   '<tr><td>1</td><td class="d1">Otabek</td><td class="d1">+998 90…</td><td>…012</td><td>UZS</td><td>50 000</td><td class="d2">Chilonzor</td><td class="d2">Bunyodkor 12</td></tr>'+
+   '<tr><td>2</td><td class="d1">Otabek</td><td class="d1">+998 90…</td><td>…012</td><td>UZS</td><td>120 000</td><td class="d2">Chilonzor</td><td class="d2">Bunyodkor 12</td></tr>'+
+   '<tr><td>3</td><td class="d1">Otabek</td><td class="d1">+998 90…</td><td>…013</td><td>USD</td><td>30</td><td class="d3">Yunusobod</td><td class="d3">Amir Temur 5</td></tr>'+
+   '<tr><td>4</td><td>Dilnoza</td><td>+998 93…</td><td>…014</td><td>UZS</td><td>75 000</td><td class="d2">Chilonzor</td><td class="d2">Bunyodkor 12</td></tr></table></div>';
+  var split='<div class="split"><div class="mini"><div class="mh">mijoz</div><div>1 · Otabek · +998 90…</div><div>2 · Dilnoza · +998 93…</div></div><div class="mini" style="animation-delay:.15s"><div class="mh">hisob</div><div>…012 · mijoz 1 · UZS</div><div>…013 · mijoz 1 · USD</div><div>…014 · mijoz 2 · UZS</div></div><div class="mini" style="animation-delay:.3s"><div class="mh">filial</div><div>1 · Chilonzor · Bunyodkor 12</div><div>2 · Yunusobod · Amir Temur 5</div></div></div><div class="split" style="grid-template-columns:1fr"><div class="mini" style="animation-delay:.45s"><div class="mh">tranzaksiya</div><div>1 · hisob …012 · 50 000 · filial 1</div><div>2 · hisob …012 · 120 000 · filial 1</div><div>3 · hisob …013 · 30 · filial 2</div><div>4 · hisob …014 · 75 000 · filial 1</div></div></div>';
+  var nv=document.getElementById('normView'),nmEx=document.getElementById('nmEx');
+  var nsteps=[
+    function(){nv.innerHTML=wide;nmEx.innerHTML='<b>Bitta keng jadval.</b> Har tranzaksiyada mijoz nomi, telefoni, filial manzili takrorlanadi. Ko\'rinishda "oson", lekin…';},
+    function(){nv.innerHTML=wide;[].slice.call(nv.querySelectorAll('.d1')).forEach(function(t){t.classList.add('dup');});nmEx.innerHTML='<b>Takrorlanish (redundancy).</b> Otabekning telefoni 3 satrda. U raqamini o\'zgartirsa — 3 satrni yangilash kerak. Bittasi unutilsa — <b>update anomaliyasi</b>: bir mijoz, ikki telefon.';},
+    function(){nv.innerHTML=wide;[].slice.call(nv.querySelectorAll('.d2,.d3')).forEach(function(t){t.classList.add('dup');});nmEx.innerHTML='<b>Filial manzili</b> ham har satrda. Filial ko\'chsa — yuzlab satr. Yangi filial ochildi, lekin hali tranzaksiya yo\'q — uni qayerga yozasiz? <b>Insert anomaliyasi.</b> Oxirgi tranzaksiya o\'chsa filial "yo\'qoladi" — <b>delete anomaliyasi.</b>';},
+    function(){nv.innerHTML=split;nmEx.innerHTML='<b>Ajratdik (3NF).</b> Har fakt bir joyda: mijoz telefoni — faqat mijoz jadvalida. Jadvallar FK bilan bog\'langan. Yangilash — 1 satr. O\'qishda JOIN kerak — keyingi modul.';},
+    function(){nv.innerHTML=split;nmEx.innerHTML='<b>Qoida:</b> "Har ustun kalitga bog\'liq bo\'lsin — butun kalitga, va faqat kalitga" (1NF: atomar qiymat, ro\'yxat emas; 2NF: qisman bog\'liqlik yo\'q; 3NF: tranzitiv bog\'liqlik yo\'q). Hisobot uchun ataylab teskari — <b>denormalizatsiya</b> — alohida jadvalda.';}
+  ];
+  mkStepper('nm',nsteps.length,function(i){nsteps[i]();},3000);
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JavaScript Promise va async/await</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F8F6EC;--surface:#FFFFFF;--surface-2:#FCFBF4;--sunken:#F2EEDC;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E7E1C6;--border-strong:#D6CEA8;
+  --accent:#B08900;--accent-ink:#7A5E00;--accent-soft:#F6EDC6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#15130A;--surface:#201D12;--surface-2:#272316;--sunken:#1A170D;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#36301B;--border-strong:#4A4226;
+  --accent:#F0CF4A;--accent-ink:#F5DC78;--accent-soft:#2F2912;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+
+.pst{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:10px;flex-wrap:wrap}
+.pbox{width:170px;height:110px;border-radius:18px;border:3px dashed var(--amber);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;transition:.4s;background:var(--amber-soft)}
+.pbox b{font-size:20px;font-family:var(--font-display)}
+.pbox.ful{border:3px solid var(--teal);background:var(--teal-soft)}.pbox.rej{border:3px solid var(--coral);background:var(--coral-soft)}
+.pbox.pend{animation:pulse 1.2s infinite}
+.hlog{font-family:var(--font-mono);font-size:12px;min-height:60px;display:flex;flex-direction:column;gap:3px}
+.hlog div{animation:pop .3s}
+.hlog .ig{color:var(--ink-faint);text-decoration:line-through}
+/* chain */
+.chain2{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.lnk{display:grid;grid-template-columns:150px 1fr 150px;gap:8px;align-items:center;border:1.5px solid var(--border);border-radius:10px;padding:7px 10px;background:var(--surface-2);font-family:var(--font-mono);font-size:12px;transition:.35s}
+.lnk .v{text-align:right;font-size:11.5px;color:var(--ink-soft)}
+.lnk.run{border-color:var(--teal);background:var(--teal-soft)}.lnk.skip{opacity:.35}.lnk.err{border-color:var(--coral);background:var(--coral-soft)}.lnk.cat{border-color:var(--amber);background:var(--amber-soft)}
+.lnk.cur{box-shadow:0 0 0 3px var(--accent-soft);border-color:var(--accent)}
+/* race */
+.api{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.ar{display:grid;grid-template-columns:120px 1fr 80px;gap:8px;align-items:center;font-family:var(--font-mono);font-size:12px}
+.at{height:24px;background:var(--sunken);border-radius:6px;position:relative;overflow:hidden}
+.at i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;background:var(--accent)}
+.at i.ok{background:var(--teal)}.at i.no{background:var(--coral)}.at i.ab{background:#9AA3AE}
+.ar .r{text-align:right;font-size:11.5px}
+.resb{margin-top:10px;border:2px solid var(--border-strong);border-radius:12px;padding:10px 12px;font-family:var(--font-mono);font-size:12.5px;background:var(--surface);min-height:48px;transition:.3s;word-break:break-word}
+.resb.ok{border-color:var(--teal);background:var(--teal-soft)}.resb.no{border-color:var(--coral);background:var(--coral-soft)}
+/* seq vs par */
+.sp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.sp>div{min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface-2)}
+.sp h6{margin:0 0 6px;font-family:var(--font-mono);font-size:12px}
+.sp pre{margin:0 0 8px;font-family:var(--font-mono);font-size:11px;background:var(--sunken);border-radius:8px;padding:7px;white-space:pre-wrap}
+.gt{position:relative;height:74px}
+.gt i{position:absolute;height:18px;border-radius:5px;width:0;transition:width .5s linear;font-style:normal;font-size:10px;color:#fff;display:flex;align-items:center;padding-left:5px;overflow:hidden;white-space:nowrap}
+.tot{font-family:var(--font-mono);font-size:13px;margin-top:4px}
+@media (max-width:700px){.lnk{grid-template-columns:1fr}.lnk .v{text-align:left}.ar{grid-template-columns:90px 1fr 60px}.sp{grid-template-columns:1fr}}
+
+.btn.primary,.topic-pill.now,.yrs button.on{color:#1D1A0C!important}
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#B08900"></span> JavaScript · 7/10</span><span>· Kurs: 71/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>JavaScript · 71-modul · asinxronlik</span>
+    <h1>Promise va <span class="steam">async/await</span></h1>
+    <p class="lead"><code>fetch</code>, fayl o‘qish, taymer — hammasi <b>Promise</b> qaytaradi: "natija hozir yo‘q, keyin bo‘ladi" degan va’da. Java’dagi <code>CompletableFuture</code>ning JS’dagi ukasi. <code>async/await</code> esa Promise’larni oddiy ketma-ket kod kabi yozish imkonini beradi. Bu modulda holatlar, zanjirlar, parallel so‘rovlar va xatolarni ushlashni ko‘ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Promise holatlari</h2></div><p class="sec-sub">Promise faqat bir marta hal bo‘ladi: <b>pending → fulfilled</b> yoki <b>pending → rejected</b>. Undan keyingi resolve/reject chaqiruvlari e’tiborsiz qoldiriladi. Sinab ko‘ring.</p>
+    <div class="stage">
+      <div class="pst"><div class="pbox pend" id="pb"><span>holat</span><b>pending</b><span id="pv">—</span></div><div class="hlog" id="hl"></div></div>
+      <div class="ctrls"><button class="btn primary" id="pRes">resolve(12650)</button><button class="btn" id="pRej">reject(new Error("503"))</button><button class="btn" id="pNew">↺ yangi Promise</button></div>
+      <div class="explain" id="pEx">Promise yaratildi — hali natija yo‘q. <code>.then</code> va <code>.catch</code> handler’lari ro‘yxatga olingan.</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th></th><th>Java CompletableFuture</th><th>JS Promise</th></tr><tr><td>Yaratish</td><td><code>supplyAsync(() -&gt; …)</code></td><td><code>new Promise((res, rej) =&gt; …)</code>, yoki async funksiya</td></tr><tr><td>Keyingi qadam</td><td><code>thenApply</code> / <code>thenCompose</code></td><td><code>.then</code> (ikkalasini ham qiladi — Promise qaytarsa avtomatik "tekislaydi")</td></tr><tr><td>Xato</td><td><code>exceptionally</code></td><td><code>.catch</code></td></tr><tr><td>Hammasini kutish</td><td><code>allOf</code></td><td><code>Promise.all</code></td></tr><tr><td>Bloklab kutish</td><td><code>get()</code> / <code>join()</code></td><td><b>Yo‘q</b> — faqat await (asinxron)</td></tr><tr><td>Bekor qilish</td><td><code>cancel()</code></td><td>Promise’da yo‘q — AbortController bilan manba bekor qilinadi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Zanjir: qiymat va xato qanday oqadi</h2></div><p class="sec-sub"><code>fetch → json → hisobla → ko‘rsat → catch → finally</code>. Xato qaysi bosqichda bo‘lishini tanlang va "Oqim"ni bosing.</p>
+    <div class="stage">
+      <div class="seg" id="cseg"><button class="on" data-e="-1">Xatosiz</button><button data-e="0">fetch xato (tarmoq)</button><button data-e="2">hisobla() da throw</button></div>
+      <div class="chain2" id="ch"></div>
+      <div class="ctrls"><button class="btn primary" id="cGo">▶ Oqim</button></div>
+      <div class="explain" id="chEx"></div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠️ Eng ko‘p uchraydigan xato</div><code>.then(r =&gt; { r.json(); })</code> — figurali qavs bilan <code>return</code> unutilgan: keyingi .then <code>undefined</code> oladi. Arrow’ning qisqa shakli <code>r =&gt; r.json()</code> avtomatik qaytaradi. Va yana: <code>fetch</code> 404/500 da <b>reject qilmaydi</b> — faqat tarmoq xatosida. <code>if (!r.ok) throw …</code> o‘zingiz yozasiz (73-modul).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Parallel so‘rovlar: all, allSettled, race, any</h2></div><p class="sec-sub">Bosh sahifa uchun 3 ta API: kurs (300 ms), balans (800 ms), keshbek (500 ms). Kombinatorni tanlang, "balans xato beradi"ni yoqib-o‘chiring.</p>
+    <div class="stage">
+      <div class="seg" id="kseg"><button class="on" data-k="all">Promise.all</button><button data-k="allSettled">allSettled</button><button data-k="race">race</button><button data-k="any">any</button></div>
+      <div class="toggle-row" style="justify-content:flex-start;margin:10px 0 0"><button class="tog" id="fT" aria-label="Balans xato"></button><span class="tog-lbl">balans API 503 qaytaradi (400 ms da)</span><button class="btn primary" id="kGo" style="margin-left:auto">▶ Yuborish</button></div>
+      <div class="api" id="api"></div>
+      <div class="resb" id="res">—</div>
+      <div class="explain" id="kEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>await: ketma-ket yoki parallel?</h2></div><p class="sec-sub">Uchta mustaqil so‘rov (har biri ~500 ms). Ikki xil yozuvni solishtiring.</p>
+    <div class="stage">
+      <div class="sp">
+        <div><h6>❌ Ketma-ket</h6><pre>const kurs  = await getKurs();
+const bal   = await getBalans();
+const kesh  = await getKeshbek();</pre><div class="gt" id="gA"></div><div class="tot" id="tA"></div></div>
+        <div><h6>✅ Parallel</h6><pre>const [kurs, bal, kesh] = await Promise.all([
+  getKurs(), getBalans(), getKeshbek()
+]);</pre><div class="gt" id="gB"></div><div class="tot" id="tB"></div></div>
+      </div>
+      <div class="ctrls"><button class="btn primary" id="sGo">▶ Solishtirish</button></div>
+      <div class="explain" id="sEx">So‘rovlar bir-biriga bog‘liq bo‘lmasa (ikkinchisi birinchisining natijasini talab qilmasa) — parallel yuboring.</div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">api.js — async/await, xato, timeout, bekor qilish</span></div><pre class="code"><span class="k">async</span> <span class="k">function</span> bankSahifa(signal) {
+  <span class="k">try</span> {
+    <span class="k">const</span> [kurs, balans] = <span class="k">await</span> <span class="ty">Promise</span>.all([
+      getJson(<span class="st">"/api/kurslar"</span>, { signal }),
+      getJson(<span class="st">"/api/hisob/balans"</span>, { signal }),
+    ]);
+    <span class="k">return</span> { kurs, balans };
+  } <span class="k">catch</span> (e) {
+    <span class="k">if</span> (e.name === <span class="st">"AbortError"</span>) <span class="k">return</span> <span class="k">null</span>;       <span class="cm">// foydalanuvchi sahifadan chiqib ketdi</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="ty">Error</span>(<span class="st">"Bosh sahifa yuklanmadi"</span>, { cause: e });
+  } <span class="k">finally</span> {
+    spinner.hide();                                  <span class="cm">// har holda</span>
+  }
+}
+
+<span class="cm">// Timeout: 5 s dan keyin avtomatik bekor</span>
+<span class="k">const</span> data = <span class="k">await</span> bankSahifa(<span class="ty">AbortSignal</span>.timeout(<span class="nu">5000</span>));
+
+<span class="cm">// Qidiruv: yangi harf kiritilganda eski so'rovni bekor qilish</span>
+<span class="k">let</span> ctrl;
+input.oninput = <span class="k">async</span> () =&gt; {
+  ctrl?.abort();
+  ctrl = <span class="k">new</span> <span class="ty">AbortController</span>();
+  natija.value = <span class="k">await</span> getJson(<span class="st">`/api/mijoz?q=${input.value}`</span>, { signal: ctrl.signal }).<span class="k">catch</span>(() =&gt; <span class="k">null</span>);
+};</pre></div><div class="tbl-wrap"><table class="tbl"><tr><th>Xato</th><th>Oqibat</th><th>To‘g‘risi</th></tr><tr><td><code>await</code> unutildi</td><td>Promise obyekti ishlatiladi, xato ushlanmaydi</td><td>ESLint <code>no-floating-promises</code> (TS bilan)</td></tr><tr><td><code>arr.forEach(async x =&gt; await …)</code></td><td>forEach kutmaydi — funksiya darhol tugaydi</td><td><code>for…of</code> + await (ketma-ket) yoki <code>Promise.all(arr.map(…))</code></td></tr><tr><td><code>.catch</code> yo‘q</td><td><code>unhandledrejection</code> — konsolda xato, holat noma’lum</td><td>Har zanjir oxirida catch yoki global handler</td></tr><tr><td><code>new Promise(async (res) =&gt; …)</code></td><td>Ichidagi throw reject bo‘lmaydi</td><td>Oddiy async funksiya yozing</td></tr><tr><td>Mustaqil await’lar ketma-ket</td><td>Sekin sahifa</td><td>Promise.all</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Konsol: haqiqiy Promise’lar</h2></div><div class="repl"><textarea id="r1Code" spellcheck="false" aria-label="JavaScript kodi"></textarea><div class="ctrls"><button class="btn primary" id="r1Run">▶ Bajarish (Ctrl+Enter)</button></div><div class="out" id="r1Out"></div></div><div class="rex" id="r1Ex"></div><div class="explain" id="r1Exp">Misolni bosing yoki o‘zingiz yozing.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Promise nima va qanday holatlari bor?<span class="chev">›</span></summary><div class="iv-a">Kelajakdagi natija uchun obyekt: pending, fulfilled (qiymat bilan), rejected (sabab bilan). Bir marta hal bo‘ladi (settled) va o‘zgarmaydi. then/catch/finally handler’lari microtask sifatida chaqiriladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Promise.all, allSettled, race, any farqi?<span class="chev">›</span></summary><div class="iv-a">all — hammasi muvaffaqiyatli bo‘lsa natijalar massivi; bittasi reject bo‘lsa darhol reject (qolganlari to‘xtamaydi!). allSettled — hammasi tugashini kutadi, har birining holati va qiymati/sababi. race — birinchi hal bo‘lgan (muvaffaqiyat yoki xato). any — birinchi muvaffaqiyatli; hammasi xato bo‘lsa AggregateError.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>async/await va then farqi?<span class="chev">›</span></summary><div class="iv-a">Mexanizm bir xil — async funksiya Promise qaytaradi, await — then’ning sintaktik qulayligi. await bilan kod ketma-ket o‘qiladi, try/catch bilan xato ushlanadi, stack trace tushunarliroq. then bilan zanjirlar va kombinatorlar qulay. Ko‘pincha aralash ishlatiladi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Promise’ni bekor qilish mumkinmi?<span class="chev">›</span></summary><div class="iv-a">Promise’ning o‘zini — yo‘q. Manbani bekor qilish kerak: fetch va ko‘p API’lar AbortController signalini qabul qiladi; timeout uchun AbortSignal.timeout(ms). Aks holda natija kelsa ham e’tiborsiz qoldirish (flag).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Callback hell nima va Promise uni qanday hal qiladi?<span class="chev">›</span></summary><div class="iv-a">Ichma-ich callback’lar — o‘qish qiyin, xatolar har darajada alohida. Promise zanjiri tekis struktura va bitta catch beradi; async/await esa sinxron ko‘rinishdagi kod.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Promise.all’da bitta so‘rov xato bersa, qolganlari to‘xtaydimi?<span class="chev">›</span></summary><div class="iv-a">Yo‘q — ular davom etadi, faqat natijalari e’tiborga olinmaydi. Haqiqatan to‘xtatish uchun umumiy AbortController bilan qolganlarini abort qilish kerak.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>resolve(1) dan keyin reject(err) chaqirildi. Promise holati?</div><button class="opt">rejected</button><button class="opt">fulfilled (1) — ikkinchi chaqiruv e’tiborsiz</button><button class="opt">pending</button><div class="q-fb" data-ok="To‘g‘ri — bir marta hal bo‘ladi." data-no="Yo‘q. Settled Promise o‘zgarmaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Promise.all: bittasi reject. Natija?</div><button class="opt">Qolganlarini kutadi</button><button class="opt">Darhol reject — o‘sha xato bilan</button><button class="opt">Hammasini null qiladi</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. all &quot;fail-fast&quot;."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Hammasining natijasi (xato bo‘lsa ham) kerak. Qaysi?</div><button class="opt">all</button><button class="opt">allSettled</button><button class="opt">race</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. allSettled."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>fetch 404 qaytardi. Promise?</div><button class="opt">reject</button><button class="opt">fulfilled — response.ok = false</button><button class="opt">pending</button><div class="q-fb" data-ok="To‘g‘ri — HTTP xato uchun o‘zingiz tekshirasiz." data-no="Yo‘q. fetch faqat tarmoq xatosida reject qiladi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>3 ta mustaqil await ketma-ket (har biri 500 ms). Umumiy vaqt?</div><button class="opt">~500 ms</button><button class="opt">~1500 ms</button><button class="opt">~0</button><div class="q-fb" data-ok="To‘g‘ri — Promise.all bilan ~500 ms." data-no="Yo‘q. Ketma-ket await vaqtlar qo‘shiladi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · JavaScript</span>
+      <h3>DOM va hodisalar</h3>
+      <p>DOM daraxti, hodisaning capture/bubble yo‘li animatsiyada, delegatsiya va XSS’dan himoya.</p>
+      <div class="topics"><span class="topic-pill">65 · Qanday ishlaydi</span><span class="topic-pill">66 · Tiplar</span><span class="topic-pill">67 · Closure</span><span class="topic-pill">68 · Obyekt/massiv</span><span class="topic-pill">69 · Prototype</span><span class="topic-pill">70 · Event loop</span><span class="topic-pill now">71 · Promise</span><span class="topic-pill">72 · DOM</span><span class="topic-pill">73 · Modul/fetch</span><span class="topic-pill">74 · Suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="70-event-loop.html"><span class="cl">← Oldingi dars</span><span class="ct">70 · Event loop</span><span class="cs">🟨 JavaScript</span></a><a class="cn nx" href="72-dom-va-hodisalar.html"><span class="cl">Keyingi dars →</span><span class="ct">72 · DOM va hodisalar</span><span class="cs">🟨 JavaScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:80.7%"></i></div><span>71 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(71)<0)v.push(71);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','71');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(71)<0)D[t].push(71);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+window.mkRepl=function(pid,EX){var g=function(s){return document.getElementById(pid+s);};
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function show(v,d){d=d||0;if(typeof v==='string')return d?JSON.stringify(v):JSON.stringify(v);if(typeof v==='function')return 'ƒ '+(v.name||'anonymous')+'()';if(typeof v==='bigint')return v+'n';if(v===null||typeof v!=='object')return String(v);
+    if(d>3)return '…';if(v instanceof Error)return v.name+': '+v.message;if(v instanceof Date)return 'Date('+v.toISOString()+')';
+    if(v instanceof Map)return 'Map('+v.size+') {'+[...v].map(function(e){return show(e[0],d+1)+' => '+show(e[1],d+1);}).join(', ')+'}';
+    if(v instanceof Set)return 'Set('+v.size+') {'+[...v].map(function(e){return show(e,d+1);}).join(', ')+'}';
+    if(typeof v.then==='function')return 'Promise';
+    if(Array.isArray(v))return '['+v.map(function(e){return show(e,d+1);}).join(', ')+']';
+    var ks=Object.keys(v);var nm=v.constructor&&v.constructor!==Object&&v.constructor.name?v.constructor.name+' ':'';return nm+'{'+ks.map(function(k){return (/^[A-Za-z_$][\w$]*$/.test(k)?k:JSON.stringify(k))+': '+show(v[k],d+1);}).join(', ')+'}';}
+  var can=true;try{new Function('return 1')();}catch(e){can=false;}
+  function run(){var src=g('Code').value,out=[],pend=0,done=false;
+    var log=function(){var line='<span class="lg2">'+esc([].map.call(arguments,function(a){return typeof a==='string'?a:show(a);}).join(' '))+'</span>';if(done){g('Out').innerHTML+=(g('Out').innerHTML?'\n':'')+line;}else out.push(line);};
+    var con={log:log,error:log,warn:log,info:log};
+    try{var lines=src.replace(/\s+$/,'').split('\n'),last=lines.pop(),fn;
+      try{if(/^\s*(const|let|var|function|class|if|for|while|\/\/|})/.test(last)||!last.trim())throw 0;fn=new Function('console',lines.join('\n')+'\n;return ('+last.replace(/;\s*$/,'')+');');}catch(e){fn=new Function('console',src);}
+      var r=fn(con);if(r!==undefined){if(r&&typeof r.then==='function'){out.push('<span class="rv">← Promise {&lt;pending&gt;}</span>');r.then(function(v){log('✓ Promise resolved:',v);},function(e){log('✗ Promise rejected:',e&&e.message||e);});}else out.push('<span class="rv">← '+esc(show(r))+'</span>');}}
+    catch(e){out.push('<span class="er">✖ '+esc((e&&e.name)+': '+(e&&e.message))+'</span>');}
+    g('Out').innerHTML=out.join('\n')||'<span style="opacity:.6">undefined</span>';done=true;}
+  if(!can){g('Run').disabled=true;g('Run').textContent='Kod bajarish bu sahifada o‘chirilgan — ZIP versiyasida yoki brauzer konsolida (F12)';}
+  g('Run').addEventListener('click',run);g('Code').addEventListener('keydown',function(e){if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();run();}});
+  g('Ex').innerHTML=EX.map(function(x,i){return '<button class="btn" data-i="'+i+'">'+esc(x[0])+'</button>';}).join('');
+  g('Ex').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var x=EX[+b.dataset.i];g('Code').value=x[1];if(can)run();else g('Out').innerHTML=x[3]?esc(x[3]):'—';g('Exp').innerHTML=x[2];});
+  if(EX.length){g('Code').value=EX[0][1];if(can)run();else g('Out').innerHTML=EX[0][3]?esc(EX[0][3]):'';g('Exp').innerHTML=EX[0][2];}
+};
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* states */
+  var state='pending',hl=el('hl');
+  function logH(t,ig){hl.insertAdjacentHTML('beforeend','<div'+(ig?' class="ig"':'')+'>'+t+'</div>');}
+  function newP(){state='pending';var b=el('pb');b.className='pbox pend';b.innerHTML='<span>holat</span><b>pending</b><span id="pv">—</span>';hl.innerHTML='';el('pEx').innerHTML='Promise yaratildi — hali natija yo‘q. <code>.then</code> va <code>.catch</code> handler’lari ro‘yxatga olingan.';}
+  el('pRes').addEventListener('click',function(){if(state!=='pending'){logH('resolve(12650) — e’tiborsiz (allaqachon '+state+')',1);el('pEx').innerHTML='Promise allaqachon <b>'+state+'</b> — qayta hal bo‘lmaydi. Bu kafolat callback’larning ikki marta chaqirilmasligini ta’minlaydi.';return;}
+    state='fulfilled';var b=el('pb');b.className='pbox ful';b.innerHTML='<span>holat</span><b>fulfilled</b><span>qiymat: 12650</span>';logH('✓ .then(k =&gt; …) chaqirildi (microtask), k = 12650');el('pEx').innerHTML='Promise <b>fulfilled</b>. Endi <code>.then</code> handler’lari navbatga qo‘yildi. Keyin qo‘shilgan .then ham darhol shu qiymatni oladi.';});
+  el('pRej').addEventListener('click',function(){if(state!=='pending'){logH('reject(...) — e’tiborsiz (allaqachon '+state+')',1);el('pEx').innerHTML='Promise allaqachon <b>'+state+'</b>.';return;}
+    state='rejected';var b=el('pb');b.className='pbox rej';b.innerHTML='<span>holat</span><b>rejected</b><span>sabab: Error("503")</span>';logH('✗ .catch(e =&gt; …) chaqirildi, e.message = "503"');el('pEx').innerHTML='Promise <b>rejected</b>. <code>.then</code>ning muvaffaqiyat handler’i o‘tkazib yuboriladi, <code>.catch</code> ishlaydi. Catch bo‘lmasa — <code>unhandledrejection</code>.';});
+  el('pNew').addEventListener('click',newP);
+
+  /* chain */
+  var CH=[['fetch("/api/kurslar")','→ Response','Tarmoq so‘rovi.'],['.then(r => r.json())','→ { USD: 12650 }','Tanani JSON’ga aylantirish — yana Promise, zanjir uni kutadi.'],['.then(k => hisobla(k))','→ 1 265 000','100 USD so‘mda.'],['.then(s => korsat(s))','→ undefined','Ekranga chiqarish.'],['.catch(e => xatoKorsat(e))','—','Yuqoridagi istalgan bosqichdagi xato shu yerga tushadi.'],['.finally(() => spinner.hide())','—','Har holda (muvaffaqiyat yoki xato) ishlaydi.']];
+  var errAt=-1;
+  function drawCh(){el('ch').innerHTML=CH.map(function(c,i){return '<div class="lnk" id="l'+i+'"><span>'+c[0].replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span><span style="font-size:11.5px;color:var(--ink-soft)">'+c[2]+'</span><span class="v" id="v'+i+'"></span></div>';}).join('');}
+  el('cseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});errAt=+b.dataset.e;drawCh();el('chEx').innerHTML='"Oqim"ni bosing.';});
+  el('cGo').addEventListener('click',function(){drawCh();var failed=false,i=0;
+    (function st(){if(i>=CH.length){el('chEx').innerHTML=failed?'Xato bo‘lgan bosqichdan keyingi <b>.then’lar o‘tkazib yuborildi</b> (xira) — xato zanjir bo‘ylab birinchi <b>.catch</b>gacha "sakradi". catch’dan keyin zanjir yana normal davom etadi. finally — har doim.':'Har bir <b>.then</b> oldingisining qaytargan qiymatini oldi. <b>.catch</b> o‘tkazib yuborildi (xato yo‘q), <b>finally</b> ishladi.';return;}
+      var L=el('l'+i),v=el('v'+i);L.classList.add('cur');
+      setTimeout(function(){L.classList.remove('cur');
+        if(i===4){if(failed){L.classList.add('cat');v.textContent='ushladi ✓';}else{L.classList.add('skip');v.textContent='o‘tkazildi';}}
+        else if(i===5){L.classList.add('run');v.textContent='✓';}
+        else if(failed){L.classList.add('skip');v.textContent='o‘tkazildi';}
+        else if(i===errAt){failed=true;L.classList.add('err');v.textContent=i===0?'✗ TypeError: Failed to fetch':'✗ throw Error';}
+        else{L.classList.add('run');v.textContent=CH[i][1];}
+        i++;setTimeout(st,250);},550);})();});
+  drawCh();
+
+  /* race */
+  var APIS=[['getKurs()',300,'{USD: 12650}'],['getBalans()',800,'1 500 000'],['getKeshbek()',500,'32 000']],fail=false,kind='all';
+  el('fT').addEventListener('click',function(){fail=!fail;this.classList.toggle('on',fail);});
+  el('kseg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});kind=b.dataset.k;});
+  function drawApi(){el('api').innerHTML=APIS.map(function(a,i){return '<div class="ar"><span>'+a[0]+'</span><div class="at"><i id="ai'+i+'"></i></div><span class="r" id="ar'+i+'"></span></div>';}).join('');}
+  drawApi();
+  el('kGo').addEventListener('click',function(){drawApi();var res=el('res');res.className='resb';res.textContent='kutilmoqda…';var T0=performance.now(),D=[300,fail?400:800,500],settled=false,done=[false,false,false],S=[];
+    var SCALE=2.2,MAX=800;
+    APIS.forEach(function(a,i){var bar=el('ai'+i);bar.style.transition='width '+(D[i]*SCALE)+'ms linear';requestAnimationFrame(function(){bar.style.width=(D[i]/MAX*100)+'%';});
+      setTimeout(function(){var ok=!(i===1&&fail);done[i]=true;S[i]=ok?{status:'fulfilled',value:a[2]}:{status:'rejected',reason:'Error 503'};bar.className=ok?'ok':'no';el('ar'+i).textContent=(ok?'✓ ':'✗ ')+D[i]+'ms';
+        decide(i,ok);},D[i]*SCALE);});
+    function fin(cls,txt,ex){if(settled)return;settled=true;res.className='resb '+cls;res.innerHTML=txt;el('kEx').innerHTML=ex;}
+    function decide(i,ok){
+      if(kind==='all'){if(!ok)fin('no','✗ reject: Error 503 (t = '+D[i]+' ms)','<b>all</b> — "fail-fast": bitta xato — butun natija xato. Diqqat: boshqa so‘rovlar <b>to‘xtamadi</b> — ular tugashda davom etyapti, natijasi shunchaki tashlanadi. Bosh sahifada balans yo‘q bo‘lsa, kurslar ham ko‘rinmaydi.');
+        else if(done.every(Boolean))fin('ok','✓ ['+APIS.map(function(a){return a[2];}).join(', ')+'] (t = 800 ms — eng sekiniga qarab)','<b>all</b>: hammasi muvaffaqiyatli bo‘lganda — natijalar <b>kiritilgan tartibda</b>. Vaqt = eng sekin so‘rov.');}
+      if(kind==='allSettled'&&done.every(Boolean))fin('ok','✓ ['+S.map(function(s){return s.status==='fulfilled'?'{fulfilled: '+s.value+'}':'{rejected: '+s.reason+'}';}).join(', ')+']','<b>allSettled</b> hech qachon reject qilmaydi — har so‘rov holatini beradi. Bosh sahifa uchun ideal: balans xato bo‘lsa ham kurs va keshbek ko‘rinadi, balans o‘rnida "yuklanmadi" yozuvi.');
+      if(kind==='race')fin(ok?'ok':'no',(ok?'✓ ':'✗ ')+(ok?APIS[i][2]:'Error 503')+' (t = '+D[i]+' ms, '+APIS[i][0]+')','<b>race</b> — birinchi <b>hal bo‘lgan</b> (xato bo‘lsa ham) g‘olib. Asosiy qo‘llanish: timeout — <code>Promise.race([fetch(u), taymer(5000)])</code> (bugun AbortSignal.timeout yaxshiroq).');
+      if(kind==='any'){if(ok)fin('ok','✓ '+APIS[i][2]+' (t = '+D[i]+' ms)','<b>any</b> — birinchi <b>muvaffaqiyatli</b>. Xatolar e’tiborsiz, faqat hammasi xato bo‘lsa AggregateError. Qo‘llanish: bir xil ma’lumotni bir nechta zaxira manbadan (mirror) olish.');}}});
+
+  /* seq vs par */
+  el('sGo').addEventListener('click',function(){var C=['#C8372D','#2E6FA8','#2C8F68'],N=['kurs','balans','keshbek'];
+    el('gA').innerHTML=N.map(function(n,i){return '<i style="top:'+(i*24)+'px;left:'+(i*33.3)+'%;background:'+C[i]+'">'+n+'</i>';}).join('');
+    el('gB').innerHTML=N.map(function(n,i){return '<i style="top:'+(i*24)+'px;left:0;background:'+C[i]+'">'+n+'</i>';}).join('');el('tA').textContent='';el('tB').textContent='';
+    var a=el('gA').children,b=el('gB').children;
+    [0,1,2].forEach(function(i){setTimeout(function(){a[i].style.width='33%';},i*520+30);});
+    [0,1,2].forEach(function(i){setTimeout(function(){b[i].style.width='33%';},30);});
+    setTimeout(function(){el('tB').innerHTML='Jami: <b style="color:var(--teal-ink)">~500 ms</b>';},560);
+    setTimeout(function(){el('tA').innerHTML='Jami: <b style="color:var(--coral)">~1500 ms</b>';el('sEx').innerHTML='Ketma-ket await’da har so‘rov oldingisi tugashini <b>kutadi</b> — vaqtlar qo‘shiladi. Promise.all’da so‘rovlar bir vaqtda yuboriladi — vaqt = eng sekini. Bog‘liq so‘rovlar (ikkinchisi birinchisining ID’sini talab qilsa) — albatta ketma-ket.';},1600);});
+
+  mkRepl('r1',[
+   ['Promise yaratish','const kutish = (ms, v) => new Promise(res => setTimeout(() => res(v), ms));\nconsole.log("boshlandi");\nkutish(500, "kurs keldi").then(v => console.log(v));\n"(0.5 s kuting)"','Promise konstruktori callback asosidagi API’ni Promise’ga o‘raydi. Natija birozdan keyin chiqadi.','boshlandi\n← "(0.5 s kuting)"\nkurs keldi'],
+   ['async/await + try','const api = (ok) => new Promise((res, rej) => setTimeout(() => ok ? res({USD: 12650}) : rej(new Error("503")), 300));\nasync function sahifa(ok) {\n  try {\n    const k = await api(ok);\n    return "USD: " + k.USD;\n  } catch (e) {\n    return "Xato: " + e.message;\n  } finally {\n    console.log("spinner yashirildi");\n  }\n}\nsahifa(false).then(console.log);\nsahifa(true)','async funksiya har doim Promise qaytaradi; try/catch reject’ni ushlaydi.','← Promise {<pending>}\nspinner yashirildi\nXato: 503\nspinner yashirildi\n✓ Promise resolved: USD: 12650'],
+   ['allSettled','const f = (ms, ok, v) => new Promise((r, j) => setTimeout(() => ok ? r(v) : j(new Error(v)), ms));\nPromise.allSettled([f(100, true, "kurs"), f(200, false, "balans 503"), f(150, true, "keshbek")])\n  .then(r => console.log(r.map(x => x.status + ": " + (x.value ?? x.reason.message))))','Har natija holati bilan — qisman xatolarga chidamli UI uchun.','["fulfilled: kurs", "rejected: balans 503", "fulfilled: keshbek"]'],
+   ['forEach tuzog‘i','const kutish = ms => new Promise(r => setTimeout(r, ms));\nconst ids = [1, 2, 3];\nids.forEach(async id => { await kutish(100); console.log("forEach", id); });\nconsole.log("forEach tugadi?!");\n(async () => { for (const id of ids) { await kutish(100); console.log("for…of", id); } console.log("for…of haqiqatan tugadi"); })();\n"…"','forEach async callback’ni kutmaydi — "tugadi" darhol chiqadi. for…of + await ketma-ket kutadi.','forEach tugadi?!\n← "…"\nforEach 1\nforEach 2\nforEach 3\nfor…of 1\nfor…of 2\nfor…of 3\nfor…of haqiqatan tugadi'],
+   ['AbortController','const ctrl = new AbortController();\nconst uzoq = new Promise((res, rej) => {\n  const t = setTimeout(() => res("javob"), 2000);\n  ctrl.signal.addEventListener("abort", () => { clearTimeout(t); rej(ctrl.signal.reason); });\n});\nuzoq.then(console.log, e => console.log("bekor qilindi:", e.name));\nsetTimeout(() => ctrl.abort(), 300);\n"300 ms da abort"','Signal — bekor qilish xabari. fetch uni o‘zi tinglaydi; o‘z API’ingizda ham shunday qilish mumkin.','← "300 ms da abort"\nbekor qilindi: AbortError']]);
+})();
+
+</script>
+</body>
+</html>

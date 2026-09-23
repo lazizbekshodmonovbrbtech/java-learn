@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suhbat savol-javoblar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F2F0F7;--surface:#FFFFFF;--surface-2:#F8F7FB;--sunken:#EAE7F2;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#DDD9E8;--border-strong:#C9C3DA;
+  --accent:#6A4BB0;--accent-ink:#4E3488;--accent-soft:#EDE8F7;
+  --purple:#0F6E56;--purple-ink:#0A5443;--purple-soft:#DEF0EA;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#120F1A;--surface:#1B1726;--surface-2:#221D30;--sunken:#16121F;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2E2740;--border-strong:#3F3655;
+  --accent:#A99CE0;--accent-ink:#BCB2E8;--accent-soft:#221D33;--purple:#4FC29D;--purple-ink:#6FD1B2;--purple-soft:#14261F;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#120F1A;--surface:#1B1726;--surface-2:#221D30;--sunken:#16121F;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2E2740;--border-strong:#3F3655;
+  --accent:#A99CE0;--accent-ink:#BCB2E8;--accent-soft:#221D33;--purple:#4FC29D;--purple-ink:#6FD1B2;--purple-soft:#14261F;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+.cats{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.cat{border:1.5px solid var(--border);background:var(--surface-2);border-radius:999px;padding:6px 12px;cursor:pointer;font-family:var(--font-mono);font-size:12px;transition:.15s}
+.cat.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.cat b{color:var(--ink-faint);font-weight:400;margin-left:4px}
+/* flashcard */
+.fc-wrap{perspective:1200px;margin-top:14px}
+.fc{position:relative;min-height:230px;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.fc.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border:1.5px solid var(--border);border-radius:18px;padding:22px;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.face.back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent)}
+.face .tagl{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;display:flex;justify-content:space-between}
+.face .qt{font-family:var(--font-display);font-size:20px;font-weight:600;line-height:1.3;flex:1}
+.face .at{font-size:14.5px;line-height:1.6;flex:1;overflow:auto}
+.face .at code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+.face .hint{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:10px}
+.fcb{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.fcb .sp{flex:1}
+.btn.good{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}.btn.badb{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.prog{display:flex;gap:14px;font-family:var(--font-mono);font-size:12.5px;margin-top:10px;flex-wrap:wrap}
+.prog b.g{color:var(--teal-ink)}.prog b.r{color:var(--coral)}
+/* list mode */
+.qa-list{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+/* mock */
+.mock{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mq{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--surface-2)}
+.mq .mqq{font-family:var(--font-display);font-weight:600;font-size:15px}
+.mq .mqa{display:none;margin-top:8px;font-size:14px;color:var(--ink-soft);line-height:1.6}
+.mq.open .mqa{display:block}
+.mq .mqt{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);margin-top:6px;cursor:pointer}
+.timer{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--accent-ink)}
+/* map */
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:12px}
+.mm{display:flex;gap:10px;align-items:center;border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;background:var(--surface-2);text-decoration:none;color:var(--ink);transition:.15s;font-size:13.5px}
+.mm:hover{border-color:var(--accent);background:var(--accent-soft)}
+.mm .n{font-family:var(--font-mono);font-size:11.5px;width:26px;color:var(--accent-ink);font-weight:600}
+.mm.self{border-color:var(--accent);background:var(--accent-soft)}
+.trk{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:16px}
+.done-card{background:var(--surface);border:2px solid var(--teal);border-radius:20px;padding:30px 24px;box-shadow:var(--shadow-lift);text-align:center;margin-top:20px}
+.done-card h3{font-size:26px;margin-bottom:10px}.done-card p{color:var(--ink-soft);font-size:15px;max-width:58ch;margin:0 auto}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#6A4BB0"></span> Suhbatga tayyorgarlik · 3/3</span><span>· Kurs: 39/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Suhbat · 39-modul · yakuniy</span>
+    <h1>Suhbat <span class="steam">savol-javoblar</span></h1>
+    <p class="lead">38 modulning eng ko'p so'raladigan savollari — bitta to'plamda. <b>Flashcard</b> rejimida o'zingizni sinang, "bilmadim" deganlaringiz qayta keladi. <b>Mock suhbat</b> — tasodifiy 10 savol, taymer bilan. Pastda — butun kurs xaritasi.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Qanday javob berish — 4 qadam</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>1 · Ta'rif (1 jumla)</h4><p>"Optional — qiymat bor-yo'qligini aniq ifodalovchi konteyner." Uzun kirish yo'q.</p></div>
+      <div class="card"><h4>2 · Nega / muammo</h4><p>"NPE'ni oldini olish, null tekshiruv zanjirini yo'qotish." Suhbatdosh <i>tushunganingizni</i> shu yerda ko'radi.</p></div>
+      <div class="card"><h4>3 · Misol / tajriba</h4><p>"Bizda findById().orElseThrow(...) — 404 ga aylanadi." O'z loyihangizdan bitta aniq holat.</p></div>
+      <div class="card"><h4>4 · Tuzoq / chegara</h4><p>"Lekin maydon/parametr sifatida ishlatilmaydi." Chegarani bilish — senior belgisi.</p></div>
+    </div>
+    <div class="callout tip"><div class="ct">💡 Bilmasangiz</div>"Aniq bilmayman, lekin mantiqan … bo'lsa kerak, chunki …" — taxminni asoslang. "Bilmayman" + jim — yomon; "bilmayman" + fikrlash — yaxshi. Hech qachon uydirma aniq raqam aytmang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Flashcard — o'zingizni sinang</h2></div>
+    <p class="sec-sub">Kategoriyani tanlang. Kartaga bosing — javob. "Bildim / Bilmadim" — bilmaganlaringiz oxirida qayta keladi.</p>
+    <div class="cats" id="cats"></div>
+    <div class="stage">
+      <div class="fc-wrap"><div class="fc" id="fc"><div class="face front"><div class="tagl"><span id="fcCat"></span><span id="fcIdx"></span></div><div class="qt" id="fcQ"></div><div class="hint">bosing → javob</div></div><div class="face back"><div class="tagl"><span>Javob</span><span id="fcMod"></span></div><div class="at" id="fcA"></div></div></div></div>
+      <div class="fcb"><button class="btn badb" id="fcNo">✗ Bilmadim</button><button class="btn good" id="fcYes">✓ Bildim</button><span class="sp"></span><button class="btn" id="fcShuf">⇄ Aralashtir</button><button class="btn" id="fcReset">↺ Boshidan</button></div>
+      <div class="prog"><span>Qoldi: <b id="pLeft">0</b></span><span>Bildim: <b class="g" id="pYes">0</b></span><span>Bilmadim: <b class="r" id="pNo">0</b></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Mock suhbat — 10 tasodifiy savol, 15 daqiqa</h2></div>
+    <p class="sec-sub">Ovoz chiqarib javob bering (haqiqiy suhbatdagidek), keyin "javobni ko'r"ga bosib solishtiring.</p>
+    <div class="stage">
+      <div class="ctrls" style="margin-top:0"><button class="btn primary" id="mockGo">▶ Boshlash</button><span class="timer" id="timer">15:00</span></div>
+      <div class="mock" id="mock"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Barcha savollar ro'yxati</h2></div>
+    <p class="sec-sub">Kategoriya filtri yuqoridagi bilan bir xil. Takrorlash uchun.</p>
+    <div class="iv-list qa-list" id="qaList"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Kurs xaritasi — 49 modul</h2></div>
+    <p class="sec-sub">Har modul — alohida interaktiv sahifa. Bosing va o'ting. 40–49 — qo'shimcha Keycloak treki.</p>
+    <div id="cmap"></div>
+    <div class="done-card">
+      <span class="eyebrow" style="color:var(--teal-ink);display:block;margin-bottom:8px">Kurs yakunlandi</span>
+      <h3>39 / 39 🎉 <span style="font-size:16px;color:var(--ink-soft)">+ Keycloak treki (40–49)</span></h3>
+      <p>Java noldan JVM ichigacha, Spring Boot DI'dan Security'gacha, PostgreSQL jadvaldan MVCC'gacha, va suhbat tayyorgarligi. Endi eng muhimi — real loyiha: kichik bank API (mijoz, hisob, o'tkazma) yozing va har modulni unda qo'llang. Suhbatda omad!</p>
+    </div>
+  </section>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="38-solid-va-patternlar.html"><span class="cl">← Oldingi dars</span><span class="ct">38 · SOLID va pattern&#x27;lar</span><span class="cs">🎯 Suhbatga tayyorgarlik</span></a><a class="cn nx" href="40-keycloak-va-iam.html"><span class="cl">Keyingi dars →</span><span class="ct">40 · Keycloak va IAM</span><span class="cs">🔐 Keycloak</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:44.3%"></i></div><span>39 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(39)<0)v.push(39);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','39');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(39)<0)D[t].push(39);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  var Q=[
+   ['java','JVM, JRE, JDK farqi?','JVM — bytecode ijrochisi. JRE — JVM + standart kutubxonalar (ishga tushirish uchun). JDK — JRE + kompilyator va asboblar (yozish uchun). Java 11+ da alohida JRE tarqatilmaydi.',1],
+   ['java','Java "compile once, run anywhere" — qanday?','javac → bytecode (.class), platformadan mustaqil. Har OS uchun o\'z JVM\'i bytecode\'ni ishga tushiradi (interpretatsiya + JIT kompilyatsiya).',1],
+   ['java','int overflow bo\'lsa nima bo\'ladi?','Xato yo\'q — jimgina aylanadi: Integer.MAX_VALUE + 1 = Integer.MIN_VALUE. Pul uchun long yoki BigDecimal; Math.addExact — exception bilan.',3],
+   ['java','0.1 + 0.2 == 0.3 nega false?','double ikkilik kasr, 0.1 aniq ifodalanmaydi. Pul — BigDecimal (String konstruktor bilan!), taqqoslash — compareTo.',3],
+   ['java','String nega immutable?','Xavfsizlik (parametrlar o\'zgarmaydi), String pool (bir xil literal — bitta obyekt), thread-safe, hashCode cache (HashMap kaliti). O\'zgartirish — StringBuilder.',4],
+   ['java','== va equals farqi?','== — havola (bir xil obyektmi), equals — mazmun. String literal pool tufayli == ba\'zan true — ishonmang. Integer cache −128..127 ham shu tuzoq.',4],
+   ['java','Pass by value yoki reference?','Java doim pass-by-value. Obyekt uchun havola nusxasi uzatiladi: obyekt ichini o\'zgartirish ko\'rinadi, havolani qayta tayinlash — yo\'q.',7],
+   ['oop','Abstract class va interface farqi?','Abstract — holat (maydon), konstruktor, bitta meros; "nima ekan" munosabati. Interface — kontrakt, ko\'p implement, default/static metod, holat yo\'q; "nima qila oladi". Java 8+ farq kamaygan, lekin holat va konstruktor faqat abstract\'da.',11],
+   ['oop','equals/hashCode kontrakti?','equals teng → hashCode teng (aksi shart emas). Faqat equals override — HashMap\'da obyekt yo\'qoladi (boshqa bucket). Ikkalasi bir xil maydonlar bo\'yicha; record avtomatik.',12],
+   ['oop','Polimorfizm nima, qanday ishlaydi?','Bitta interfeys, turli xatti-harakat. Runtime\'da JVM obyektning haqiqiy klassiga qarab metodni tanlaydi (dynamic dispatch, vtable). Overloading — compile-time.',10],
+   ['oop','Encapsulation nega kerak?','Ichki holatni yashirish, invariantlarni himoya: private balans + yech() metodi manfiy bo\'lishga yo\'l qo\'ymaydi. Setter hamma joyda — encapsulation yo\'q degani.',9],
+   ['oop','Immutable klass qanday yoziladi?','final class, private final maydonlar, setter yo\'q, konstruktorda defensive copy, getter\'da mutable maydonni nusxalab qaytarish. Yoki record.',9],
+   ['coll','ArrayList vs LinkedList?','ArrayList: get O(1), oxiriga add amortized O(1), o\'rtaga O(n), cache-friendly. LinkedList: get O(n), iterator turgan joyga insert O(1), xotira ko\'p. Amalda ArrayList; queue — ArrayDeque.',14],
+   ['coll','HashMap qanday ishlaydi?','hashCode → bucket indeksi; collision → zanjir (8+ → daraxt). Load factor 0.75 da resize ×2. Kalit immutable, equals/hashCode to\'g\'ri. O(1) o\'rtacha. Thread-safe emas → ConcurrentHashMap.',14],
+   ['coll','ConcurrentModificationException qachon?','for-each ichida kolleksiyani o\'zgartirsangiz (fail-fast iterator). Yechim: iterator.remove(), removeIf, yoki nusxa ustida yurish.',14],
+   ['coll','Generics nima uchun, type erasure nima?','Compile-time tip xavfsizligi, cast yo\'q. Erasure — runtime\'da tip o\'chiriladi (List<String> → List), shuning uchun new T[] va instanceof List<String> mumkin emas. PECS: producer extends, consumer super.',15],
+   ['coll','Checked va unchecked exception?','Checked (IOException) — kompilyator ushlashga majburlaydi, tiklanadigan holatlar. Unchecked (RuntimeException) — dasturchi xatosi, majbur emas. Spring rollback default faqat unchecked\'da.',16],
+   ['coll','Stream: intermediate va terminal?','Intermediate (filter, map, sorted) — lazy, yangi stream qaytaradi. Terminal (collect, forEach, count) — ishga tushiradi. Stream bir marta ishlatiladi. Parallel stream — CPU-og\'ir, katta ma\'lumot, tartib muhim emas.',18],
+   ['coll','Optional qayerda ishlatilmaydi?','Maydon, parametr, kolleksiya elementi sifatida — yo\'q. Faqat return tipi. get() emas — orElse/orElseThrow/map. Optional.of(null) — NPE.',19],
+   ['conc','Thread-safe nima, race condition?','Bir vaqtda bir necha thread to\'g\'ri ishlaydi. Race: count++ (o\'qi-oshir-yoz) ikki thread\'da yo\'qoladi. Yechim: synchronized, AtomicInteger, lock, immutable, ConcurrentHashMap.',22],
+   ['conc','synchronized vs ReentrantLock vs Atomic?','synchronized — oddiy, JVM monitor, timeout yo\'q. ReentrantLock — tryLock, fair, condition, virtual thread\'da pinning yo\'q. Atomic — CAS, lock\'siz, bitta o\'zgaruvchi uchun eng tez.',22],
+   ['conc','volatile nima qiladi?','Ko\'rinuvchanlik: yozuv darhol boshqa thread\'larga ko\'rinadi (CPU cache emas). Atomiklikni bermaydi (count++ hali ham buziladi). Flag\'lar uchun.',22],
+   ['conc','ExecutorService va CompletableFuture?','Executor — thread pool, submit → Future. CompletableFuture — async zanjir: supplyAsync().thenApply().thenCombine(), exceptionally. Pool hajmi: CPU ish — yadro soni, I/O — ko\'proq yoki virtual thread.',22],
+   ['conc','Deadlock qanday oldini olasiz?','Lock\'larni doim bir tartibda olish, tryLock timeout, lock\'ni qisqa ushlash, bitta lock ostida tashqi chaqiriq qilmaslik. jstack bilan aniqlash.',22],
+   ['jvm','Heap va Stack farqi?','Stack — har thread\'ga, lokal o\'zgaruvchi va havolalar, avtomatik tozalanadi, StackOverflowError. Heap — obyektlar, GC tozalaydi, OutOfMemoryError. Metaspace — klass metadata.',23],
+   ['jvm','GC qanday ishlaydi (qisqa)?','Reachability: GC roots (stack, static) dan yetib bo\'lmaydigan obyektlar — axlat. Generational: young (Eden, Survivor) tez-tez, old kam. G1 default (region\'lar, pauza maqsadi), ZGC — ms\'dan kam pauza, katta heap.',23],
+   ['jvm','Memory leak Java\'da bo\'ladimi?','Ha — GC yetib boradigan lekin kerak bo\'lmagan obyektlar: static Map cache o\'smoqda, listener unregister qilinmagan, ThreadLocal tozalanmagan, yopilmagan resurslar. Heap dump + MAT bilan topish.',23],
+   ['jvm','record, sealed, var — qisqacha?','record — immutable DTO, equals/hashCode/toString avtomatik. sealed — permits bilan yopiq ierarxiya, switch exhaustive. var — lokal tip chiqarish (statik).',21],
+   ['jvm','Virtual thread nima?','Java 21: JVM boshqaradigan yengil thread, I/O\'da carrier\'ni bo\'shatadi, millionlab. Bloklovchi kod uslubi, reactive murakkabligisiz. CPU-og\'ir ishda foyda yo\'q.',21],
+   ['spring','IoC va DI nima?','IoC — obyekt yaratish/bog\'lashni container qiladi. DI — bog\'liqliklar tashqaridan beriladi (konstruktor orqali — tavsiya: final, testlash oson, aylana bog\'liqlik darhol bilinadi).',24],
+   ['spring','Bean scope\'lari?','singleton (default), prototype (har so\'rovda yangi), request, session, application (web). Prototype\'ni singleton\'ga inject — bir marta yaratiladi (ObjectProvider kerak).',24],
+   ['spring','@Component, @Service, @Repository, @Controller farqi?','Hammasi @Component. @Repository — exception translation (SQLException → DataAccessException). @Controller/@RestController — MVC handler. @Service — semantik. Auto-configuration: @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan.',24],
+   ['spring','Spring Boot auto-configuration qanday?','Classpath\'dagi kutubxonalarga qarab (@ConditionalOnClass, @ConditionalOnMissingBean) bean\'lar yaratiladi. Siz o\'z bean\'ingizni bersangiz — default chetlanadi. application.yml orqali sozlash, profillar.',25],
+   ['spring','@RestController so\'rov qanday bajariladi?','DispatcherServlet → HandlerMapping → interceptor → HandlerAdapter → controller metod (argument resolver: @PathVariable, @RequestBody Jackson) → return → HttpMessageConverter → JSON. Xato → @ControllerAdvice.',26],
+   ['spring','Validation va xato boshqaruvi?','@Valid + Jakarta annotatsiyalar (@NotNull, @Size, custom). MethodArgumentNotValidException → @RestControllerAdvice → ProblemDetail (RFC 7807), 400. Biznes xato → custom exception → 409/422.',27],
+   ['spring','@Transactional qanday ishlaydi?','Proxy: metod chaqirilganda tx boshlanadi, tugaganda commit, RuntimeException\'da rollback (checked\'da yo\'q — rollbackFor). Tuzoqlar: self-invocation, private metod, propagation (REQUIRES_NEW), readOnly optimallashtirish.',30],
+   ['spring','N+1 muammosi va yechimi?','Ro\'yxat olib, har element uchun lazy bog\'lanish alohida so\'rov. Yechim: JOIN FETCH, @EntityGraph, @BatchSize, DTO projection. Aniqlash: SQL log, Hibernate statistics.',29],
+   ['spring','Lazy vs Eager, LazyInitializationException?','Lazy — kerak bo\'lganda yuklash (default @OneToMany). Eager — darhol (default @ManyToOne — ko\'pincha lazy qiling). LazyInit — sessiya yopilgach lazy maydonga kirish; yechim: tranzaksiya ichida yuklash, fetch join, DTO. open-in-view=false.',29],
+   ['spring','Entity vs DTO, nega entity qaytarmaymiz?','Entity — persistence modeli (lazy proxy, ikki tomonlama bog\'lanish → JSON siklik, keraksiz maydon). DTO — API kontrakti. MapStruct bilan mapping.',28],
+   ['spring','Unit va integration test farqi? @MockBean?','Unit — bitta klass, Mockito, tez. Integration — @SpringBootTest, kontekst, Testcontainers bilan haqiqiy PostgreSQL. @WebMvcTest — faqat MVC qatlam. @MockBean — kontekstdagi bean\'ni mock bilan almashtirish.',31],
+   ['spring','Authentication va authorization; 401 vs 403?','Auth — kimsan (401 — noma\'lum). Authz — mumkinmi (403 — ma\'lum, ruxsat yo\'q). Filter chain: JwtFilter → SecurityContext → AuthorizationFilter.',32],
+   ['spring','JWT nima, xavflari?','Imzolangan token: header.payload.signature (HMAC/RSA). Stateless. Payload ochiq — maxfiy narsa yo\'q. Bekor qilib bo\'lmaydi — qisqa muddat + refresh. Kalit maxfiy, alg=none hujumi.',32],
+   ['pg','PRIMARY KEY vs UNIQUE; FK indeks?','PK — bitta, NOT NULL. UNIQUE — ko\'p, NULL mumkin. Ikkalasi avtomatik indeks. FK\'ga indeks avtomatik EMAS — qo\'lda yarating.',33],
+   ['pg','Pul uchun tip?','numeric(18,2) — aniq. float/double — yo\'q. Java: BigDecimal. Vaqt: timestamptz.',33],
+   ['pg','WHERE va HAVING; bajarilish tartibi?','FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT. WHERE satrlarni guruhlashdan oldin, HAVING guruhlarni agregat bilan keyin.',34],
+   ['pg','INNER vs LEFT JOIN; LEFT JOIN + WHERE tuzog\'i?','INNER — faqat mos. LEFT — chap hammasi, o\'ng NULL. LEFT JOIN\'dan keyin WHERE o\'ng jadval ustuni bo\'yicha — NULL satrlar tushib, INNER\'ga aylanadi; shartni ON ga qo\'ying.',34],
+   ['pg','Window funksiya vs GROUP BY?','GROUP BY satrlarni yig\'adi. Window (OVER PARTITION BY) — satrlar qoladi, yoniga hisob: ROW_NUMBER, RANK, running SUM, LAG/LEAD. "Har hisobning oxirgi tranzaksiyasi" — ROW_NUMBER … rn=1.',34],
+   ['pg','NULL bilan taqqoslash?','NULL = NULL → NULL (false emas). IS NULL / IS DISTINCT FROM. NOT IN (subquery NULL bilan) → bo\'sh natija; NOT EXISTS ishlating. COALESCE — default.',34],
+   ['pg','Indeks qanday ishlaydi, qachon ishlamaydi?','B-tree, O(log n). Ishlamaydi: ustunga funksiya/cast, LIKE \'%x\', composite chap ustun yo\'q, past selektivlik, kichik jadval, eskirgan statistika. EXPLAIN ANALYZE bilan tekshiring.',35],
+   ['pg','EXPLAIN ANALYZE\'da nimaga qaraysiz?','Seq Scan katta jadvalda, taxminiy vs actual rows farqi, loops, Filter (indeksdan keyin tashlangan satrlar), Buffers read, Sort/Hash xotira, Execution Time.',35],
+   ['pg','ACID va izolyatsiya darajalari?','Atomicity, Consistency, Isolation, Durability. PG default READ COMMITTED (non-repeatable read mumkin), REPEATABLE READ — snapshot, SERIALIZABLE — retry kerak. Dirty read PG\'da yo\'q.',36],
+   ['pg','MVCC nima?','UPDATE yangi satr versiyasi yaratadi; har tranzaksiya o\'z snapshot\'ini ko\'radi — o\'quvchi yozuvchini bloklamaydi. O\'lik versiyalar — VACUUM. Uzoq tranzaksiya — bloat.',36],
+   ['pg','Lost update\'ni qanday hal qilasiz?','Atomar UPDATE … WHERE balans >= x; SELECT FOR UPDATE (pessimistik); @Version (optimistik); yuqori izolyatsiya + retry.',36],
+   ['pg','Deadlock va yechimi?','Ikki tranzaksiya bir-birini kutadi; PG bittasini o\'ldiradi. Oldini olish: bir xil tartibda qulflash, qisqa tranzaksiya, retry.',36],
+   ['design','Big-O: HashMap, ArrayList.contains, binar qidiruv, sort?','HashMap get O(1) o\'rtacha; ArrayList.contains O(n); binar O(log n); sort O(n log n); ichma-ich sikl O(n²).',37],
+   ['design','SOLID bir jumladan?','S — bitta o\'zgarish sababi; O — kengaytir, o\'zgartirma; L — bola ota o\'rnida buzmasin; I — kichik interfeyslar; D — abstraksiyaga bog\'lan (DI).',38],
+   ['design','Spring\'dagi pattern\'lar?','Singleton (bean), Factory (@Bean, BeanFactory), Proxy (@Transactional, AOP), Template Method (JdbcTemplate), Observer (events), Strategy (interface + List inject), Builder, Chain of Responsibility (filter chain), Front Controller (DispatcherServlet).',38],
+   ['design','Idempotentlik nima, o\'tkazma API\'da qanday?','Bir so\'rovni qayta yuborish natijani o\'zgartirmaydi. Mijoz Idempotency-Key yuboradi, server kalit bo\'yicha natijani saqlaydi (UNIQUE), takrorda o\'sha javob. Tarmoq uzilganda ikki marta pul ketmasligi uchun.',26],
+   ['design','Monolit vs microservice — qachon qaysi?','Monolit: oddiy, bitta deploy, tranzaksiya oson — boshlash uchun. Microservice: mustaqil deploy/scale, jamoa avtonomiyasi; narxi — tarmoq, distributed tranzaksiya (saga/outbox), kuzatuv. Modulli monolit — o\'rta yo\'l.',38],
+   ['design','Cache qachon va qanday? Invalidatsiya?','O\'qish ko\'p, o\'zgarish kam, eskirishga chidamli ma\'lumot (kurs, spravochnik). @Cacheable + TTL, yozishda @CacheEvict. Muammo: eskirgan ma\'lumot, stampede. Redis — tarqoq cache.',38]
+  ];
+  var CATS={all:'Hammasi',java:'Java Core',oop:'OOP',coll:'Collections/Stream/Exc',conc:'Konkurentlik',jvm:'JVM & Zamonaviy',spring:'Spring',pg:'PostgreSQL',design:'Big-O & Dizayn'};
+  var cat='all',deck=[],ptr=0,yes=0,no=0,flipped=false;
+  var cats=document.getElementById('cats');
+  function counts(){var c={all:Q.length};Q.forEach(function(q){c[q[0]]=(c[q[0]]||0)+1;});return c;}
+  function drawCats(){var c=counts();cats.innerHTML=Object.keys(CATS).map(function(k){return '<span class="cat'+(k===cat?' on':'')+'" data-k="'+k+'">'+CATS[k]+'<b>'+(c[k]||0)+'</b></span>';}).join('');}
+  cats.addEventListener('click',function(e){var c=e.target.closest('.cat');if(!c)return;cat=c.dataset.k;drawCats();reset();drawList();});
+  function filtered(){return Q.map(function(q,i){return i;}).filter(function(i){return cat==='all'||Q[i][0]===cat;});}
+  function reset(){deck=filtered();ptr=0;yes=0;no=0;flipped=false;drawCard();}
+  function shuffle(){for(var i=deck.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=deck[i];deck[i]=deck[j];deck[j]=t;}ptr=0;flipped=false;drawCard();}
+  var fc=document.getElementById('fc');
+  function drawCard(){
+    fc.classList.toggle('flip',flipped);
+    document.getElementById('pLeft').textContent=Math.max(deck.length-ptr,0);document.getElementById('pYes').textContent=yes;document.getElementById('pNo').textContent=no;
+    if(ptr>=deck.length){document.getElementById('fcQ').textContent=deck.length?'Tugadi! '+yes+' bildingiz, '+no+' bilmadingiz. Bilmaganlar qayta kelishi uchun "Bilmadim" bosganlaringiz oxiriga qo\'shilgan edi — "Boshidan" bilan yana.':'Bu kategoriyada savol yo\'q.';document.getElementById('fcCat').textContent='';document.getElementById('fcIdx').textContent='';document.getElementById('fcA').textContent='';return;}
+    var q=Q[deck[ptr]];document.getElementById('fcCat').textContent=CATS[q[0]];document.getElementById('fcIdx').textContent=(ptr+1)+' / '+deck.length;document.getElementById('fcQ').textContent=q[1];document.getElementById('fcA').innerHTML=q[2];document.getElementById('fcMod').textContent=q[3]+'-modul';
+  }
+  fc.addEventListener('click',function(){if(ptr>=deck.length)return;flipped=!flipped;fc.classList.toggle('flip',flipped);});
+  document.getElementById('fcYes').addEventListener('click',function(){if(ptr>=deck.length)return;yes++;ptr++;flipped=false;drawCard();});
+  document.getElementById('fcNo').addEventListener('click',function(){if(ptr>=deck.length)return;no++;deck.push(deck[ptr]);ptr++;flipped=false;drawCard();});
+  document.getElementById('fcShuf').addEventListener('click',shuffle);document.getElementById('fcReset').addEventListener('click',reset);
+  document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;if(e.key===' '){e.preventDefault();fc.click();}if(e.key==='ArrowRight')document.getElementById('fcYes').click();if(e.key==='ArrowLeft')document.getElementById('fcNo').click();});
+  drawCats();reset();
+
+  /* list */
+  function drawList(){var el=document.getElementById('qaList');el.innerHTML=filtered().map(function(i){var q=Q[i];return '<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>'+q[1]+'<span class="chev">›</span></summary><div class="iv-a">'+q[2]+' <span style="color:var(--ink-faint);font-family:var(--font-mono);font-size:11px">· '+q[3]+'-modul</span></div></details>';}).join('');}
+  drawList();
+
+  /* mock */
+  var mt=null;
+  document.getElementById('mockGo').addEventListener('click',function(){
+    clearInterval(mt);var idx=Q.map(function(q,i){return i;});for(var i=idx.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=idx[i];idx[i]=idx[j];idx[j]=t;}
+    var pick=idx.slice(0,10);var m=document.getElementById('mock');
+    m.innerHTML=pick.map(function(i,k){var q=Q[i];return '<div class="mq"><div class="mqq">'+(k+1)+'. '+q[1]+'</div><div class="mqt">javobni ko\'r ▾</div><div class="mqa">'+q[2]+'</div></div>';}).join('');
+    [].slice.call(m.querySelectorAll('.mqt')).forEach(function(t){t.addEventListener('click',function(){t.parentNode.classList.toggle('open');});});
+    var s=15*60,tm=document.getElementById('timer');function tick(){var mm=Math.floor(s/60),ss=s%60;tm.textContent=(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;if(s<=0){clearInterval(mt);tm.textContent='Vaqt tugadi';}s--;}tick();mt=setInterval(tick,1000);
+  });
+
+  /* course map */
+  var M=[
+   ['Java asoslari',[[1,'Java qanday ishlaydi','01-java-qanday-ishlaydi.html'],[2,'Muhit sozlash va Maven','02-muhit-sozlash-va-maven.html'],[3,'Tiplar va operatorlar','03-tiplar-va-operatorlar.html'],[4,'String\'lar chuqur','04-stringlar-chuqur.html'],[5,'Massivlar','05-massivlar.html'],[6,'Shartlar va sikllar','06-shartlar-va-sikllar.html'],[7,'Metodlar','07-metodlar.html']]],
+   ['OOP',[[8,'Klass va obyekt','08-klass-va-obyekt.html'],[9,'Encapsulation','09-encapsulation.html'],[10,'Meros va polimorfizm','10-meros-va-polimorfizm.html'],[11,'Abstract va interface','11-abstract-va-interface.html'],[12,'equals va hashCode','12-equals-va-hashcode.html'],[13,'enum','13-enum.html']]],
+   ['Core',[[14,'Kolleksiyalar','14-kolleksiyalar.html'],[15,'Generics','15-generics.html'],[16,'Exceptions chuqur','16-exceptions-chuqur.html'],[17,'Lambda','17-lambda.html'],[18,'Stream API','18-stream-api.html'],[19,'Optional','19-optional.html'],[20,'Sana va vaqt','20-sana-va-vaqt.html']]],
+   ['Advanced',[[21,'Zamonaviy Java 8→21','21-zamonaviy-java-8-21.html'],[22,'Konkurentlik','22-konkurentlik.html'],[23,'Xotira va GC','23-xotira-va-gc.html']]],
+   ['Spring Boot',[[24,'Spring Boot va DI','24-spring-boot-va-di.html'],[25,'Konfiguratsiya va profillar','25-konfiguratsiya-va-profillar.html'],[26,'REST API chuqur','26-rest-api-chuqur.html'],[27,'Validation va xatolar','27-validation-va-xatolar.html'],[28,'Spring Data JPA','28-spring-data-jpa.html'],[29,'JPA bog\'lanishlar va N+1','29-jpa-boglanishlar-va-n-1.html'],[30,'@Transactional chuqur','30-transactional-chuqur.html'],[31,'Testlash','31-testlash.html'],[32,'Security va JWT','32-security-va-jwt.html']]],
+   ['PostgreSQL',[[33,'Asoslar va constraint\'lar','33-asoslar-va-constraintlar.html'],[34,'SQL chuqur','34-sql-chuqur.html'],[35,'Indeks va EXPLAIN','35-indeks-va-explain.html'],[36,'Tranzaksiya, ACID, lock','36-tranzaksiya-acid-lock.html']]],
+   ['Suhbat',[[37,'Big-O va tuzilmalar','37-big-o-va-tuzilmalar.html'],[38,'SOLID va pattern\'lar','38-solid-va-patternlar.html'],[39,'Savol-javoblar (shu sahifa)','']]],
+   ['Keycloak 🔐',[[40,'Keycloak va IAM','40-keycloak-va-iam.html'],[41,'O\'rnatish va birinchi realm','41-ornatish-va-birinchi-realm.html'],[42,'OAuth 2.0 va OIDC','42-oauth-2-0-va-oidc.html'],[43,'Grant flow\'lar va PKCE','43-grant-flowlar-va-pkce.html'],[44,'Token ichida: JWT, JWKS','44-token-ichida-jwt-jwks.html'],[45,'Rollar, guruhlar, mapper\'lar','45-rollar-guruhlar-mapperlar.html'],[46,'Spring Boot + Keycloak','46-spring-boot-keycloak.html'],[47,'Sessiya, SSO, logout','47-sessiya-sso-logout.html'],[48,'Kengaytirish va production','48-kengaytirish-va-production.html'],[49,'Keycloak suhbat savollari','49-keycloak-suhbat-savollari.html']]]
+  ];
+  document.getElementById('cmap').innerHTML=M.map(function(t){return '<div class="trk">'+t[0]+'</div><div class="map">'+t[1].map(function(m){return m[2]?'<a class="mm" href="'+m[2]+'"><span class="n">'+m[0]+'</span>'+m[1]+'</a>':'<span class="mm self"><span class="n">'+m[0]+'</span>'+m[1]+'</span>';}).join('')+'</div>';}).join('');
+})();
+
+</script>
+</body>
+</html>

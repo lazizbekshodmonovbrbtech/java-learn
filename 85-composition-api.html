@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Composition API va composable</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF6F2;--surface:#FFFFFF;--surface-2:#F6FBF8;--sunken:#E5F0EA;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D5E6DC;--border-strong:#BCD7C7;
+  --accent:#2C8F68;--accent-ink:#1E6B4D;--accent-soft:#DCF0E6;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C1511;--surface:#15211B;--surface-2:#1A2821;--sunken:#101A15;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#243A2F;--border-strong:#325040;
+  --accent:#5FCB9A;--accent-ink:#82D8B1;--accent-soft:#143025;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+/* options -> composition */
+.cx{position:relative;margin-top:10px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);overflow:hidden;transition:height .5s}
+.cx .ln{position:absolute;left:0;right:0;font-family:var(--font-mono);font-size:12px;height:22px;line-height:22px;padding:0 10px 0 14px;white-space:pre;overflow:hidden;text-overflow:ellipsis;transition:top .6s cubic-bezier(.3,.8,.3,1),left .6s cubic-bezier(.3,.8,.3,1),right .6s cubic-bezier(.3,.8,.3,1),opacity .4s,background .3s;border-left:4px solid transparent}
+.cx .ln.hd{color:var(--ink-faint);font-weight:700}
+.cx .ln.c0{border-left-color:#2E6FA8}.cx .ln.c1{border-left-color:#D9822B}.cx .ln.c2{border-left-color:#8B5CF6}
+.cx.f0 .ln:not(.c0):not(.hd),.cx.f1 .ln:not(.c1):not(.hd),.cx.f2 .ln:not(.c2):not(.hd){opacity:.25}
+.cx .ln.hid{opacity:0!important;pointer-events:none}
+.cx .ln.use{font-weight:700}
+.cx .fbox{position:absolute;border:2px dashed var(--border-strong);border-radius:10px;transition:.5s;opacity:0;pointer-events:none}
+.cx .fbox.on{opacity:1}
+.cx .fbox span{position:absolute;top:-10px;left:8px;background:var(--surface-2);padding:0 5px;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-faint)}
+.lg3{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lg3 button{font-family:var(--font-mono);font-size:12px;border:1.5px solid var(--border);border-radius:8px;padding:4px 10px;background:var(--surface);color:var(--ink);cursor:pointer}
+.lg3 button i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.lg3 button.on{border-color:var(--ink)}
+.seg{display:inline-flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--border);background:var(--surface-2);font-family:var(--font-mono);font-size:12.5px;padding:7px 12px;cursor:pointer;color:var(--ink)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent);color:#fff}
+/* debounce timeline */
+.srch{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.srch input{flex:1;min-width:180px;font-size:17px;padding:8px 12px;border-radius:10px;border:2px solid var(--border-strong);background:var(--surface);color:var(--ink);font-family:var(--font-mono)}
+.tl{margin-top:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:10px 10px 6px}
+.lane{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.lane>b{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink-soft)}
+.trk{position:relative;height:30px;border-radius:7px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.tk{position:absolute;top:4px;height:22px;min-width:16px;transform:translateX(-50%);border-radius:5px;background:var(--ink);color:var(--surface);font-family:var(--font-mono);font-size:11px;text-align:center;line-height:22px;padding:0 3px;animation:pop .25s}
+.rq{position:absolute;top:6px;height:18px;border-radius:5px;font-family:var(--font-mono);font-size:10px;line-height:18px;padding:0 4px;white-space:nowrap;overflow:hidden;color:#fff;transition:width .1s linear}
+.trk.tall{height:96px}.trk.tall .rq{height:11px;line-height:11px;font-size:8.5px;top:auto}.rq.a{background:#C8372D}.rq.b{background:#2C8F68}
+.rq.ab{background:repeating-linear-gradient(45deg,#9aa 0 4px,#bcc 4px 8px);color:#333}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.res>div{min-width:0;border:2px solid var(--border);border-radius:12px;padding:8px 10px;background:var(--surface);font-size:13px;transition:.3s}
+.res h6{margin:0 0 4px;font-family:var(--font-mono);font-size:11.5px}
+.res .bad{border-color:var(--coral);background:var(--coral-soft)}
+.res .n{font-family:var(--font-mono);font-size:22px;font-weight:700}
+@media (max-width:700px){.lane{grid-template-columns:1fr;gap:3px}.res{grid-template-columns:1fr}.cx .ln{font-size:10.5px;padding-left:8px}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#2C8F68"></span> Vue.js · 5/8</span><span>· Kurs: 85/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Vue.js · 85-modul · Composition API</span>
+    <h1><span class="steam">Composition API</span> va composable’lar</h1>
+    <p class="lead">Komponent kattalashgan sari Options API’da bitta vazifa kodi (qidiruv, sahifalash, kurs yangilanishi) <code>data</code>, <code>computed</code>, <code>methods</code>, <code>mounted</code> bo‘ylab tarqalib ketadi. Composition API bir vazifani <b>bir joyga</b> yig‘adi va uni <b>composable</b> — qayta ishlatiladigan <code>useXxx()</code> funksiyaga chiqarishga imkon beradi. Java tilida aytsak — mantiqni service’ga ajratish.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Tarqoq koddan — tartibli composable’larga</h2></div><p class="sec-sub">Bitta <code>MijozlarSahifasi.vue</code>. Rang — vazifa (qidiruv, sahifalash, valyuta kursi). Rejimlarni almashtirib, satrlar qanday qayta guruhlanishini kuzating; rangni bossangiz faqat o‘sha vazifa ajralib turadi.</p>
+    <div class="stage">
+      <div class="seg" id="cxSeg"><button class="on" data-m="0">Options API</button><button data-m="1">Composition</button><button data-m="2">Composable’larga ajratish</button></div>
+      <div class="lg3" id="lg3"><button data-f="0"><i style="background:#2E6FA8"></i>qidiruv</button><button data-f="1"><i style="background:#D9822B"></i>sahifalash</button><button data-f="2"><i style="background:#8B5CF6"></i>kurs (WebSocket)</button></div>
+      <div class="cx" id="cx"></div>
+      <div class="explain" id="cxEx"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>useDebounce + bekor qilish: jonli</h2></div><p class="sec-sub">Mijoz qidiruvi. Maydonga tez yozing (yoki "Avto" tugmasi). Yuqori qator — tugma bosishlar, pastda — serverga ketgan so‘rovlar. Qizil — har harfga so‘rov; yashil — 300 ms debounce + oldingisini bekor qilish (AbortController).</p>
+    <div class="stage">
+      <div class="srch"><input id="qIn" placeholder="mijoz ismi…" autocomplete="off"><button class="btn primary" id="qAuto">Avto: "karimov"</button><button class="btn" id="qR">↺</button></div>
+      <div class="tl">
+        <div class="lane"><b>klaviatura</b><div class="trk" id="lnK"></div></div>
+        <div class="lane"><b>debounce’siz <span style="font-weight:400">(✓N — javob kelish tartibi)</span></b><div class="trk tall" id="lnA"></div></div>
+        <div class="lane"><b>useDebounce 300ms</b><div class="trk" id="lnB"></div></div>
+      </div>
+      <div class="res"><div id="rsA"><h6>debounce’siz</h6>so‘rovlar: <span class="n" id="nA">0</span><div id="shA">ekranda: —</div></div><div id="rsB"><h6>useDebounce + abort</h6>so‘rovlar: <span class="n" id="nB">0</span><div id="shB">ekranda: —</div></div></div>
+      <div class="explain" id="qEx">Server javob vaqti tasodifiy (200–1000 ms) — xuddi haqiqiy tarmoqdagidek. Shuning uchun <b>eski so‘rov yangisidan keyin qaytishi</b> mumkin (race condition).</div>
+    </div>
+    <div class="grid2">
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">composables/useDebounce.ts</span></div><pre class="code"><span class="k">export</span> <span class="k">function</span> useDebounce&lt;T&gt;(src: <span class="ty">Ref</span>&lt;T&gt;, ms = <span class="nu">300</span>) {
+  <span class="k">const</span> out = ref(src.value) <span class="k">as</span> <span class="ty">Ref</span>&lt;T&gt;
+  <span class="k">let</span> t: <span class="k">number</span> | <span class="k">undefined</span>
+  watch(src, v =&gt; {
+    clearTimeout(t)
+    t = setTimeout(() =&gt; (out.value = v), ms)
+  })
+  onScopeDispose(() =&gt; clearTimeout(t))   <span class="cm">// tozalash!</span>
+  <span class="k">return</span> out
+}</pre></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">composables/useMijozQidiruv.ts</span></div><pre class="code"><span class="k">export</span> <span class="k">function</span> useMijozQidiruv() {
+  <span class="k">const</span> soz = ref(<span class="st">''</span>)
+  <span class="k">const</span> kechikkan = useDebounce(soz, <span class="nu">300</span>)
+  <span class="k">const</span> natija = ref&lt;<span class="ty">Mijoz</span>[]&gt;([])
+  <span class="k">const</span> yuklanmoqda = ref(<span class="k">false</span>)
+
+  watch(kechikkan, <span class="k">async</span> (q, _, onCleanup) =&gt; {
+    <span class="k">const</span> ctrl = <span class="k">new</span> <span class="ty">AbortController</span>()
+    onCleanup(() =&gt; ctrl.abort())      <span class="cm">// yangi q kelsa — eskisini bekor qil</span>
+    yuklanmoqda.value = <span class="k">true</span>
+    <span class="k">try</span> {
+      natija.value = <span class="k">await</span> api.get(<span class="st">'/clients'</span>, { params: { q }, signal: ctrl.signal })
+    } <span class="k">finally</span> { yuklanmoqda.value = <span class="k">false</span> }
+  })
+  <span class="k">return</span> { soz, natija, yuklanmoqda }
+}</pre></div>
+    </div>
+    <div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">MijozlarSahifasi.vue — natija</span></div><pre class="code">&lt;<span class="k">script</span> <span class="k">setup</span> lang=<span class="st">"ts"</span>&gt;
+<span class="k">const</span> { soz, natija, yuklanmoqda } = useMijozQidiruv()
+<span class="k">const</span> { sahifa, jami, keyingi } = useSahifalash(natija, <span class="nu">20</span>)
+<span class="k">const</span> { kurs } = useKurs(<span class="st">'USD'</span>)       <span class="cm">// ichida WebSocket + onUnmounted(close)</span>
+&lt;/<span class="k">script</span>&gt;</pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>watch va watchEffect</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th></th><th>watch</th><th>watchEffect</th></tr><tr><td>Manba</td><td>Aniq ko‘rsatiladi: <code>watch(soz, …)</code></td><td>Ichida o‘qilgan hamma narsa avtomatik</td></tr><tr><td>Birinchi ishga tushish</td><td>Faqat o‘zgarganda (<code>immediate: true</code> bo‘lmasa)</td><td>Darhol</td></tr><tr><td>Eski qiymat</td><td>Bor: <code>(yangi, eski)</code></td><td>Yo‘q</td></tr><tr><td>Tozalash</td><td><code>onCleanup</code> / <code>onWatcherCleanup</code> (3.5)</td><td>Xuddi shunday</td></tr><tr><td>Qachon</td><td>So‘rov yuborish, aniq nazorat</td><td>Tez yoziladigan sinxronlash</td></tr></table></div>
+    <div class="callout info"><div class="ct">Composable qoidalari</div>Nomi <code>use</code> bilan boshlanadi. <b>setup ichida sinxron</b> chaqiriladi (await’dan keyin emas — aks holda lifecycle hook’lar komponentga bog‘lanmaydi). Ref’lar qaytaradi (reactive emas — destructuring buzilmasin). O‘zi yaratgan timer/listener/socket’ni o‘zi tozalaydi. Tayyor to‘plam: <b>VueUse</b> (useDebounceFn, useLocalStorage, useIntervalFn…).</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Composition API nima uchun kerak, Options API’dan farqi?<span class="chev">›</span></summary><div class="iv-a">Options API kodni turi bo‘yicha (data, methods, computed) ajratadi — katta komponentda bitta vazifa kodi tarqalib ketadi. Composition API vazifa bo‘yicha guruhlaydi va mantiqni composable funksiyalarga chiqarishga imkon beradi. Qo‘shimcha: TypeScript bilan yaxshi tip chiqarish, mixin’lardagi nom to‘qnashuvi va "bu xossa qayerdan keldi?" muammosi yo‘q.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Composable nima? Mixin’dan nima ustunligi bor?<span class="chev">›</span></summary><div class="iv-a">Holatli mantiqni o‘z ichiga olgan funksiya (useXxx), ref’lar qaytaradi. Mixin’dan farqi: qaytgan qiymatlar aniq (destructuring bilan ko‘rinadi), nom to‘qnashuvi bo‘lsa qayta nomlash oson, parametr qabul qiladi, bir necha marta turli sozlamalar bilan ishlatish mumkin.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Qidiruvda debounce va race condition qanday hal qilinadi?<span class="chev">›</span></summary><div class="iv-a">Debounce — foydalanuvchi yozishni to‘xtatgandan keyin (300 ms) so‘rov. Race — watch’ning onCleanup’ida AbortController.abort() (yoki javob kelganda so‘rov ID’sini tekshirish), shunda eski javob yangisini ustidan yozmaydi. Server tomonda ham limit/rate limit.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>watch va watchEffect farqi?<span class="chev">›</span></summary><div class="iv-a">watch — aniq manba, lazy, eski/yangi qiymat beradi. watchEffect — darhol ishlaydi va ichida o‘qilganlarni avtomatik kuzatadi. Ikkalasi ham cleanup va flush (pre/post/sync) opsiyalariga ega.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Composable’ni await’dan keyin chaqirsa nima bo‘ladi?<span class="chev">›</span></summary><div class="iv-a">setup’dagi joriy komponent instansiyasi await’dan keyin yo‘qoladi — composable ichidagi onMounted/onUnmounted hech kimga bog‘lanmaydi (ogohlantirish), tozalash ishlamaydi. Composable’larni setup boshida sinxron chaqiring.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Composable nimani qaytarishi tavsiya etiladi?</div><button class="opt">reactive obyekt</button><button class="opt">ref’lardan iborat oddiy obyekt</button><button class="opt">DOM elementi</button><div class="q-fb" data-ok="To‘g‘ri — destructuring xavfsiz." data-no="Yo‘q. reactive destructuring’da reaktivlikni yo‘qotadi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>"karimov" tez yozildi (7 harf), debounce 300ms. Nechta so‘rov?</div><button class="opt">7</button><button class="opt">1</button><button class="opt">0</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Oxirgi harfdan 300 ms keyin bitta."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Eski javob yangisidan keyin keldi. Nima himoya qiladi?</div><button class="opt">v-once</button><button class="opt">watch onCleanup + AbortController</button><button class="opt">computed</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Oldingi so‘rovni bekor qilish kerak."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Composable ichida setInterval. Qayerda tozalanadi?</div><button class="opt">Kerak emas</button><button class="opt">onUnmounted / onScopeDispose</button><button class="opt">watch ichida</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Aks holda leak."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Darhol ishlashi va ichidagi hamma o‘qilgan narsani kuzatishi kerak?</div><button class="opt">watch</button><button class="opt">watchEffect</button><button class="opt">computed</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Bu watchEffect."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Vue.js</span>
+      <h3>Vue Router</h3>
+      <p>SPA navigatsiya, dinamik marshrutlar, lazy loading va Keycloak bilan himoyalangan guard’lar.</p>
+      <div class="topics"><span class="topic-pill">81 · Vue nima</span><span class="topic-pill">82 · Reaktivlik</span><span class="topic-pill">83 · Template</span><span class="topic-pill">84 · Komponent</span><span class="topic-pill now">85 · Composition</span><span class="topic-pill">86 · Router</span><span class="topic-pill">87 · Pinia + API</span><span class="topic-pill">88 · Deploy + suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="84-komponentlar.html"><span class="cl">← Oldingi dars</span><span class="ct">84 · Komponentlar</span><span class="cs">💚 Vue.js</span></a><a class="cn nx" href="86-vue-router.html"><span class="cl">Keyingi dars →</span><span class="ct">86 · Vue Router</span><span class="cs">💚 Vue.js</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:96.6%"></i></div><span>85 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(85)<0)v.push(85);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','85');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(85)<0)D[t].push(85);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* ---------- options -> composition ---------- */
+  // [text, concern(-1=header), layout positions per mode: [optIdx, compIdx, extractedIdx or -1 hidden]]
+  var L=[
+   ['export default {',-1],
+   ['  data() { return {',-1],
+   ['    soz: "", natija: [],',0],
+   ['    sahifa: 1, hajm: 20,',1],
+   ['    kurs: null, ws: null',2],
+   ['  }},',-1],
+   ['  computed: {',-1],
+   ['    korinadigan() { return this.natija.slice(…) },',1],
+   ['    jamiSahifa() { return Math.ceil(…) },',1],
+   ['  },',-1],
+   ['  watch: {',-1],
+   ['    soz: debounce(function() { this.qidir() }, 300),',0],
+   ['  },',-1],
+   ['  methods: {',-1],
+   ['    async qidir() { this.natija = await api.get(…) },',0],
+   ['    keyingi() { this.sahifa++ },',1],
+   ['  },',-1],
+   ['  mounted() {',-1],
+   ['    this.ws = new WebSocket("/kurs"); this.ws.onmessage = …',2],
+   ['  },',-1],
+   ['  unmounted() { this.ws.close() }',2],
+   ['}',-1]];
+  var C=[
+   ['<script setup>',-1],
+   ['// qidiruv',-1,0],
+   ['const soz = ref(""), natija = ref([])',0],
+   ['watch(useDebounce(soz), async q => natija.value = await api.get(…))',0],
+   ['// sahifalash',-1,1],
+   ['const sahifa = ref(1), hajm = 20',1],
+   ['const korinadigan = computed(() => natija.value.slice(…))',1],
+   ['const keyingi = () => sahifa.value++',1],
+   ['// kurs',-1,2],
+   ['const kurs = ref(null); let ws',2],
+   ['onMounted(() => { ws = new WebSocket("/kurs"); ws.onmessage = … })',2],
+   ['onUnmounted(() => ws.close())',2],
+   ['<\/script>',-1]];
+  var U=[
+   ['<script setup>',-1],
+   ['const { soz, natija } = useMijozQidiruv()',0],
+   ['const { korinadigan, keyingi } = useSahifalash(natija, 20)',1],
+   ['const { kurs } = useKurs("USD")',2],
+   ['<\/script>',-1]];
+  var cx=el('cx'),mode=0,nodes=[];
+  var TX=['Options API: <b>ko‘k</b> (qidiruv) satrlari data, watch, methods — 3 joyda; <b>binafsha</b> (kurs) — data, mounted, unmounted. Rangni bosing va qanchalik tarqalganini ko‘ring. 500 satrli komponentda bu — sarosimalik.',
+   'Composition API: xuddi o‘sha mantiq, lekin <b>vazifa bo‘yicha</b> guruhlangan. <code>this</code> yo‘q — oddiy o‘zgaruvchilar va funksiyalar. Endi har guruhni bitta funksiyaga ko‘chirish oson…',
+   'Har guruh <b>alohida faylga</b> (composable) ko‘chdi. Komponentda 3 satr qoldi — nima qilishi bir qarashda ko‘rinadi. <code>useKurs</code>ni boshqa sahifada ham ishlatish mumkin, test qilish ham oson (oddiy funksiya).'];
+  function build(){cx.innerHTML='';nodes=[];
+    ['0','1','2'].forEach(function(k){var f=document.createElement('div');f.className='fbox';f.id='fb'+k;f.innerHTML='<span>'+['useMijozQidiruv.ts','useSahifalash.ts','useKurs.ts'][k]+'</span>';cx.appendChild(f);});
+    function mk(txt,c,grp,key){var d=document.createElement('div');d.className='ln '+(c<0?'hd':'c'+c)+(grp==='U'?' use':'');d.textContent=txt;d._g=grp;d._c=c;cx.appendChild(d);nodes.push(d);return d;}
+    L.forEach(function(x){mk(x[0],x[1],'L');});C.forEach(function(x){var d=mk(x[0],x[1],'C');d._sec=x[2];});U.forEach(function(x){mk(x[0],x[1],'U');});}
+  var H=22;
+  function lay(m){mode=m;[].forEach.call(el('cxSeg').children,function(b,i){b.classList.toggle('on',i===m);});
+    var w=cx.clientWidth,narrow=w<560;
+    var byG={L:[],C:[],U:[]};nodes.forEach(function(d){byG[d._g].push(d);});
+    // Options lines: visible in mode0; in mode1/2 fade and move toward matching comp group
+    var y;
+    if(m===0){y=8;byG.L.forEach(function(d){d.classList.remove('hid');d.style.top=y+'px';d.style.left='0';d.style.right='0';y+=H;});
+      byG.C.forEach(function(d){d.classList.add('hid');});byG.U.forEach(function(d){d.classList.add('hid');});cx.style.height=(y+10)+'px';}
+    if(m===1){ // options lines slide to their concern group position then hide; comp lines appear
+      var pos={},yy=8;byG.C.forEach(function(d){d.classList.remove('hid');d.style.top=yy+'px';d.style.left='0';d.style.right='0';if(d._c>=0&&pos[d._c]==null)pos[d._c]=yy;yy+=H;});
+      byG.L.forEach(function(d){if(d._c>=0){d.style.top=pos[d._c]+'px';}d.classList.add('hid');});
+      byG.U.forEach(function(d){d.classList.add('hid');});cx.style.height=(yy+10)+'px';}
+    if(m===2){ // component lines at top; comp group lines move into file boxes below
+      var yy2=8;byG.U.forEach(function(d){d.classList.remove('hid');d.style.top=yy2+'px';d.style.left='0';d.style.right='0';yy2+=H;});
+      yy2+=22;var boxTop=yy2;
+      var groups=[[],[],[]];byG.C.forEach(function(d){if(d._c>=0)groups[d._c].push(d);else d.classList.add('hid');});
+      if(narrow){groups.forEach(function(g,k){var fb=el('fb'+k);fb.style.left='6px';fb.style.right='6px';fb.style.width='';fb.style.top=(yy2-6)+'px';fb.style.height=(g.length*H+14)+'px';fb.classList.add('on');
+          g.forEach(function(d,i){d.classList.remove('hid');d.style.top=(yy2+4+i*H)+'px';d.style.left='8px';d.style.right='8px';});yy2+=g.length*H+30;});cx.style.height=(yy2)+'px';}
+      else{var colW=(w-24)/3,maxh=0;groups.forEach(function(g,k){var x=8+k*(colW+4);var fb=el('fb'+k);fb.style.left=x+'px';fb.style.width=colW+'px';fb.style.right='';fb.style.top=(boxTop-6)+'px';fb.style.height=(g.length*H+14)+'px';fb.classList.add('on');
+          g.forEach(function(d,i){d.classList.remove('hid');d.style.top=(boxTop+4+i*H)+'px';d.style.left=(x+2)+'px';d.style.right=(w-x-colW+2)+'px';});maxh=Math.max(maxh,g.length*H);});cx.style.height=(boxTop+maxh+22)+'px';}
+    }else{[0,1,2].forEach(function(k){el('fb'+k).classList.remove('on');});}
+    el('cxEx').innerHTML=TX[m];}
+  build();lay(0);
+  el('cxSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(b)lay(+b.getAttribute('data-m'));});
+  var flt=-1;el('lg3').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var f=+b.getAttribute('data-f');flt=(flt===f)?-1:f;cx.className='cx'+(flt>=0?' f'+flt:'');[].forEach.call(el('lg3').children,function(x,i){x.classList.toggle('on',i===flt);});});
+  window.addEventListener('resize',function(){lay(mode);});
+
+  /* ---------- debounce timeline ---------- */
+  var doneOrd=0,WIN=3200,t0=null,nA=0,nB=0,deb=null,inflB=null,lastTyped='',shownA=null,shownB=null,seq=0,raf=null,live=[];
+  function now(){return performance.now();}
+  function X(t){return Math.min(100,(t-t0)/WIN*100);}
+  function reset(){doneOrd=0;['lnK','lnA','lnB'].forEach(function(i){el(i).innerHTML='';});t0=null;nA=nB=0;el('nA').textContent=0;el('nB').textContent=0;el('shA').innerHTML='ekranda: —';el('shB').innerHTML='ekranda: —';el('rsA').className='';el('rsB').className='';live=[];clearTimeout(deb);inflB=null;}
+  function ensure(){if(t0===null||now()-t0>WIN){reset();t0=now();}}
+  var LQ=[];function lat(lane){if(lane==='lnA'&&LQ.length)return LQ.shift();return 200+Math.random()*800;}
+  function req(lane,q,cls,onDone){var st=now(),L=lat(lane);var d=document.createElement('div');d.className='rq '+cls;if(lane==='lnA'){d.style.top=(3+(el(lane).children.length%7)*13)+'px';}d.style.left=X(st)+'%';d.style.width='0%';d.textContent=q;el(lane).appendChild(d);
+    var r={d:d,st:st,L:L,q:q,dead:false,done:false,onDone:onDone};live.push(r);tick();return r;}
+  function tick(){if(raf)return;raf=requestAnimationFrame(function loop(){raf=null;var t=now(),any=false;
+    live.forEach(function(r){if(r.done||r.dead)return;var end=Math.min(t,r.st+r.L);r.d.style.width=Math.max(.6,X(end)-X(r.st))+'%';if(t>=r.st+r.L){r.done=true;r.onDone(r);}else any=true;});
+    if(any)raf=requestAnimationFrame(loop);});}
+  function typed(v){ensure();var t=now();lastTyped=v;var ch=v.slice(-1)||'⌫';
+    var k=document.createElement('div');k.className='tk';k.style.left=X(t)+'%';k.textContent=ch;el('lnK').appendChild(k);
+    // A: request per keystroke, last-completed wins
+    nA++;el('nA').textContent=nA;
+    req('lnA',v,'a',function(r){shownA=r.q;var stale=r.q!==lastTyped;r.d.textContent=r.q+' ✓'+(++doneOrd);el('shA').innerHTML='ekranda: <b>"'+r.q+'"</b> natijasi'+(stale?' <span style="color:var(--coral)">⚠ eski!</span>':'');el('rsA').className=stale?'bad':'';check();});
+    // B: debounce + abort
+    clearTimeout(deb);deb=setTimeout(function(){if(inflB&&!inflB.done){inflB.dead=true;inflB.d.classList.add('ab');inflB.d.textContent='✕ '+inflB.q;}
+      nB++;el('nB').textContent=nB;inflB=req('lnB',v,'b',function(r){el('shB').innerHTML='ekranda: <b>"'+r.q+'"</b> natijasi ✓';el('rsB').className='';check();});},300);}
+  function check(){var stale=shownA!==null&&shownA!==lastTyped;
+    el('qEx').innerHTML=stale?'<b>Race condition!</b> Oxirgi yozilgan — "'+lastTyped+'", lekin chapda eski "'+shownA+'" natijasi turibdi: u so‘rov kechroq qaytdi va yangisini <b>ustidan yozdi</b>. O‘ngda: '+nB+' ta so‘rov, eskisi bekor qilingan (✕).':'Chapda '+nA+' ta so‘rov (har harfga — server yuki!), o‘ngda '+nB+' ta. Yana bir necha marta sinang — chapda ertami-kechmi <b>eski natija</b> ekranda qolib ketadi.';}
+  el('qIn').addEventListener('input',function(e){typed(e.target.value);});
+  el('qR').addEventListener('click',function(){reset();el('qIn').value='';lastTyped='';shownA=null;});
+  var auto=false;el('qAuto').addEventListener('click',function(){if(auto)return;auto=true;reset();t0=null;var w='karimov',i=0;el('qIn').value='';LQ=[600,900,400,300,700,1100,350];
+    (function nx(){if(i>=w.length){auto=false;return;}el('qIn').value=w.slice(0,++i);typed(el('qIn').value);setTimeout(nx,150);})();});
+})();
+
+</script>
+</body>
+</html>

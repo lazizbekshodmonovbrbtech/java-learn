@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spring Security va JWT</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+
+/* filter chain */
+.scen{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sc{border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:9px 13px;cursor:pointer;font-family:var(--font-mono);font-size:12.5px;transition:.2s}
+.sc.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.chainv{display:flex;flex-direction:column;gap:0;margin-top:16px;position:relative}
+.fl{display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;background:var(--surface-2);transition:.35s;position:relative}
+.fl .fn{font-family:var(--font-mono);font-size:12.5px;font-weight:600;min-width:210px;color:var(--ink-soft)}
+.fl .fd{font-size:13px;color:var(--ink-soft);flex:1}
+.fl.cur{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.02);box-shadow:var(--shadow-lift)}
+.fl.cur .fn{color:var(--accent-ink)}
+.fl.ok{border-color:var(--teal);background:var(--teal-soft)}
+.fl.stop{border-color:var(--coral);background:var(--coral-soft)}
+.fl.stop .fn{color:var(--coral)}
+.fl.dim{opacity:.35}
+.fl .st{font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--border)}
+.conn{width:2px;height:12px;background:var(--border-strong);margin-left:26px}
+.req{display:inline-flex;align-items:center;gap:8px;background:var(--purple-soft);border:1.5px solid var(--purple);color:var(--purple-ink);border-radius:10px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;margin-top:6px}
+.resp{margin-top:12px;font-family:var(--font-mono);font-size:15px;text-align:center;padding:10px;border-radius:12px;border:1.5px dashed var(--border);min-height:46px}
+.resp.ok{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}
+.resp.bad{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+/* jwt */
+.jwt{font-family:var(--font-mono);font-size:12px;word-break:break-all;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:12px;line-height:1.7}
+.jwt span{cursor:pointer;padding:1px 2px;border-radius:4px;transition:.15s}
+.jwt .h{color:#C0392B}.jwt .p{color:#8E44AD}.jwt .s{color:#2471A3}
+:root[data-theme="dark"] .jwt .h,:root:not([data-theme="light"]) .jwt .h{color:#F1948A}
+:root[data-theme="dark"] .jwt .p,:root:not([data-theme="light"]) .jwt .p{color:#C39BD3}
+:root[data-theme="dark"] .jwt .s,:root:not([data-theme="light"]) .jwt .s{color:#85C1E9}
+.jwt span.hl{outline:2px solid currentColor;outline-offset:1px}
+.jparts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.jp{border-radius:12px;padding:11px 13px;border:1.5px solid var(--border);background:var(--surface-2)}
+.jp h5{margin:0 0 6px;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.jp pre{margin:0;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;white-space:pre-wrap}
+.jp.h h5{color:#C0392B}.jp.p h5{color:#8E44AD}.jp.s h5{color:#2471A3}
+.jp input{width:100%;font-family:var(--font-mono);font-size:12.5px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);color:var(--ink);margin-top:4px}
+.verify{margin-top:12px;padding:10px 14px;border-radius:12px;font-family:var(--font-mono);font-size:13px;text-align:center;border:1.5px solid var(--border)}
+.verify.ok{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink)}
+.verify.bad{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+/* hash */
+.hashrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hashrow input{flex:1;min-width:180px;font-family:var(--font-mono);font-size:14px;padding:9px 11px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--ink)}
+.hout{margin-top:10px;font-family:var(--font-mono);font-size:12px;word-break:break-all;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:10px 12px;line-height:1.7}
+.hout .salt{color:var(--amber);font-weight:600}.hout .cost{color:var(--purple-ink);font-weight:600}.hout .hh{color:var(--teal-ink)}
+/* login flow */
+.lf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.lfb{border:1.5px solid var(--border);border-radius:12px;padding:10px;text-align:center;background:var(--surface-2);font-family:var(--font-mono);font-size:12px;transition:.3s;min-height:64px;display:flex;flex-direction:column;justify-content:center}
+.lfb.cur{border-color:var(--accent);background:var(--accent-soft);transform:scale(1.04);box-shadow:var(--shadow-lift)}
+.lfb.done{border-color:var(--teal);background:var(--teal-soft)}
+.lfb .em{font-size:20px}
+@media (max-width:560px){.fl{flex-wrap:wrap}.fl .fn{min-width:0}.lf{grid-template-columns:1fr 1fr}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 9/9</span><span>· Kurs: 32/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 32-modul · noldan</span>
+    <h1>Spring Security <span class="steam">va JWT</span></h1>
+    <p class="lead">Bank API'sida har so'rov "sen kimsan?" va "senga mumkinmi?" savolidan o'tadi. Spring Security buni <b>filter zanjiri</b> orqali qiladi. JWT — bu "men kimligimni tasdiqlovchi imzolangan pasport". Ikkalasini ham ko'z bilan ko'ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Ikki savol: Authentication va Authorization</h2></div>
+    <div class="grid2">
+      <div class="card"><h4>🪪 Authentication — "Sen kimsan?"</h4><p>Login+parol, JWT, OAuth2 orqali shaxsni <b>aniqlash</b>. Natija: <code>Authentication</code> obyekti (principal + authorities), <code>SecurityContextHolder</code>'da saqlanadi. Xato → <b>401 Unauthorized</b>.</p></div>
+      <div class="card"><h4>🔑 Authorization — "Senga mumkinmi?"</h4><p>Aniqlangan foydalanuvchining <b>huquqi</b> bormi: rol (ADMIN), authority (TRANSFER_CREATE), egalik (o'z hisobimi?). Xato → <b>403 Forbidden</b>.</p></div>
+    </div>
+    <div class="callout iv"><div class="ct">🎯 Suhbatda</div>"401 va 403 farqi?" — 401: <b>kim ekaningiz noma'lum</b> (token yo'q/yaroqsiz). 403: <b>kimligingiz ma'lum, lekin ruxsat yo'q</b>. Ko'pchilik chalkashtiradi — siz chalkashtirmang.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Filter zanjiri — so'rov qanday o'tadi</h2></div>
+    <p class="sec-sub">Spring Security controller'gacha bir qator <b>servlet filter</b> qo'yadi. So'rov har biridan navbat bilan o'tadi; istalgan filter uni to'xtatishi mumkin. Ssenariyni tanlab, "Yubor"ni bosing.</p>
+    <div class="stage">
+      <div class="scen" id="scen"><button class="sc on" data-s="0">Token yo'q → /api/hisob</button><button class="sc" data-s="1">USER token → /api/admin</button><button class="sc" data-s="2">ADMIN token → /api/admin</button><button class="sc" data-s="3">Muddati o'tgan token</button></div>
+      <div style="text-align:center"><span class="req" id="reqBox"></span></div>
+      <div class="chainv" id="chainv"></div>
+      <div class="resp" id="resp">Natija shu yerda</div>
+      <div class="ctrls"><button class="btn primary" id="fcGo">▶ Yubor</button><div class="bar"><div id="fcBar"></div></div></div>
+      <div class="explain" id="fcEx">So'rov yuqoridan pastga filter'lardan o'tadi. Yashil — o'tdi, qizil — shu yerda to'xtadi.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>JWT anatomiyasi — bosing, o'zgartiring, buzing</h2></div>
+    <p class="sec-sub">JWT = <span style="color:#C0392B">header</span>.<span style="color:#8E44AD">payload</span>.<span style="color:#2471A3">signature</span>. Header va payload — shunchaki Base64 (hech kim shifrlamagan — <b>hamma o'qiy oladi!</b>). Imzo — header+payload'ni maxfiy kalit bilan HMAC qilgan natija. Payload'dagi rolni o'zgartirib ko'ring — imzo mos kelmay qoladi.</p>
+    <div class="stage">
+      <div class="jwt" id="jwtStr"></div>
+      <div class="jparts">
+        <div class="jp h"><h5>Header</h5><pre id="jh"></pre></div>
+        <div class="jp p"><h5>Payload (claims)</h5><pre id="jpv"></pre><label style="font-size:11.5px;color:var(--ink-soft)">role ni o'zgartiring:<input id="roleIn" value="USER"></label></div>
+        <div class="jp s"><h5>Signature</h5><pre id="js"></pre><label style="font-size:11.5px;color:var(--ink-soft)">Server maxfiy kaliti:<input id="secretIn" value="bank-super-secret"></label></div>
+      </div>
+      <div class="verify" id="verify">…</div>
+      <div class="explain" id="jwtEx">Token asl holatda: server <code>bank-super-secret</code> bilan imzolagan. Tekshiruv: server yana o'zi imzolab, kelgan imzo bilan solishtiradi.</div>
+    </div>
+    <div class="callout warn"><div class="ct">⚠ Eng muhim 3 qoida</div>1) Payload'ga <b>parol, karta raqami</b> yozmang — u ochiq. 2) Token <b>qisqa muddatli</b> (5–15 min) + refresh token. 3) Maxfiy kalit uzun (≥256 bit), env/vault'da, kodda emas. JWT'ni "bekor qilib" bo'lmaydi — muddati tugaguncha yaroqli; shuning uchun qisqa muddat.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Login oqimi — token qayerdan keladi</h2></div>
+    <div class="stage">
+      <div class="lf" id="lf"></div>
+      <div class="ctrls"><button class="btn" id="lfPrev">‹</button><button class="btn primary" id="lfPlay">▶ Avto</button><button class="btn" id="lfNext">›</button><div class="bar"><div id="lfBar"></div></div></div>
+      <div class="explain" id="lfEx"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">SecurityConfig.java</span></div>
+      <pre class="code"><span class="k">@Configuration</span> <span class="k">@EnableMethodSecurity</span>
+<span class="k">public class</span> <span class="ty">SecurityConfig</span> {
+    <span class="k">@Bean</span>
+    <span class="ty">SecurityFilterChain</span> chain(<span class="ty">HttpSecurity</span> http, <span class="ty">JwtAuthFilter</span> jwt) <span class="k">throws</span> <span class="ty">Exception</span> {
+        <span class="k">return</span> http
+            .csrf(c -&gt; c.disable())                              <span class="cm">// stateless API — cookie yo'q, CSRF kerak emas</span>
+            .sessionManagement(s -&gt; s.sessionCreationPolicy(<span class="ty">STATELESS</span>))
+            .authorizeHttpRequests(a -&gt; a
+                .requestMatchers(<span class="st">"/api/auth/**"</span>).permitAll()       <span class="cm">// login ochiq</span>
+                .requestMatchers(<span class="st">"/api/admin/**"</span>).hasRole(<span class="st">"ADMIN"</span>)
+                .anyRequest().authenticated())                   <span class="cm">// qolgani — token shart</span>
+            .addFilterBefore(jwt, <span class="ty">UsernamePasswordAuthenticationFilter</span>.<span class="k">class</span>)
+            .build();
+    }
+    <span class="k">@Bean</span> <span class="ty">PasswordEncoder</span> encoder() { <span class="k">return new</span> <span class="ty">BCryptPasswordEncoder</span>(); }
+}
+
+<span class="cm">// JwtAuthFilter — har so'rovda bir marta</span>
+<span class="k">protected void</span> doFilterInternal(req, res, chain) {
+    <span class="ty">String</span> h = req.getHeader(<span class="st">"Authorization"</span>);
+    <span class="k">if</span> (h != <span class="k">null</span> &amp;&amp; h.startsWith(<span class="st">"Bearer "</span>)) {
+        <span class="ty">Claims</span> c = jwtService.parse(h.substring(<span class="nu">7</span>));   <span class="cm">// imzo + muddat tekshiriladi</span>
+        <span class="k">var</span> auth = <span class="k">new</span> <span class="ty">UsernamePasswordAuthenticationToken</span>(c.getSubject(), <span class="k">null</span>, rollar(c));
+        <span class="ty">SecurityContextHolder</span>.getContext().setAuthentication(auth);   <span class="cm">// "sen kimsan" javobi</span>
+    }
+    chain.doFilter(req, res);
+}</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Parol hech qachon ochiq saqlanmaydi</h2></div>
+    <p class="sec-sub">BCrypt — sekin, tuzlangan (salt) hash. Bir xil parol ikki marta — <b>ikki xil hash</b>. Yozib ko'ring, keyin "Qayta hash"ni bosing.</p>
+    <div class="stage">
+      <div class="hashrow"><input id="pwIn" value="parol123" aria-label="Parol"><button class="btn primary" id="rehash">Qayta hash</button></div>
+      <div class="hout" id="hout"></div>
+      <div class="explain"><b>$2a$</b> — BCrypt versiyasi · <b>10</b> — cost (2¹⁰ iteratsiya, ~100 ms; brute-force'ni sekinlashtiradi) · <b>22 belgi</b> salt · qolgani hash. Tekshiruv: <code>encoder.matches(kiritilgan, bazadagiHash)</code> — salt hash ichida, shuning uchun solishtira oladi. MD5/SHA-256 parol uchun <b>yaramaydi</b> — juda tez (GPU: milliardlab/soniya).</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Metod darajasida: @PreAuthorize</h2></div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">HisobService.java</span></div>
+      <pre class="code"><span class="k">@PreAuthorize</span>(<span class="st">"hasRole('ADMIN')"</span>)
+<span class="k">public void</span> hisobniBloklash(<span class="ty">Long</span> id) { ... }
+
+<span class="k">@PreAuthorize</span>(<span class="st">"hasAuthority('TRANSFER_CREATE') and #dto.summa &lt; 10000000"</span>)
+<span class="k">public void</span> otkazma(<span class="ty">OtkazmaDto</span> dto) { ... }             <span class="cm">// SpEL — parametrga kirish</span>
+
+<span class="k">@PreAuthorize</span>(<span class="st">"@hisobGuard.egasi(#id, authentication.name)"</span>)
+<span class="k">public</span> <span class="ty">Hisob</span> korish(<span class="ty">Long</span> id) { ... }   <span class="cm">// o'z hisobinimi? — custom bean tekshiradi</span>
+
+<span class="cm">// Controller'da joriy foydalanuvchi:</span>
+<span class="k">@GetMapping</span>(<span class="st">"/me"</span>) <span class="ty">UserDto</span> me(<span class="k">@AuthenticationPrincipal</span> <span class="ty">UserDetails</span> u) { ... }</pre>
+    </div>
+    <div class="grid2">
+      <div class="card"><h4>Rol vs Authority</h4><p><code>hasRole("ADMIN")</code> aslida <code>hasAuthority("ROLE_ADMIN")</code> — Spring <b>ROLE_</b> prefiksini o'zi qo'shadi. Rol — kim (ADMIN, OPERATOR). Authority — nima qila oladi (TRANSFER_CREATE). Katta tizimda authority'lar aniqroq.</p></div>
+      <div class="card"><h4>CORS vs CSRF</h4><p><b>CORS</b> — brauzer boshqa domen'dan so'rovga ruxsat beradimi (frontend localhost:3000 → api). <b>CSRF</b> — cookie-session'ga hujum; stateless JWT API'da (cookie yo'q) o'chiriladi. JWT cookie'da saqlansa — CSRF yana kerak!</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list">
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Spring Security qanday ishlaydi (yuqori darajada)?<span class="chev">›</span></summary><div class="iv-a">Servlet filter zanjiri: <code>DelegatingFilterProxy</code> → <code>FilterChainProxy</code> → <code>SecurityFilterChain</code> (bir nechta filter). Autentifikatsiya filter'i <code>Authentication</code> yaratib <code>SecurityContextHolder</code>'ga (ThreadLocal) qo'yadi. Oxirida <code>AuthorizationFilter</code> qoidalarni tekshiradi. Xatolar <code>ExceptionTranslationFilter</code>'da 401/403'ga aylanadi.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JWT nima, sessiyadan farqi?<span class="chev">›</span></summary><div class="iv-a">Session: server holatni saqlaydi (xotira/Redis), mijozda faqat ID (cookie). JWT: holat tokenning o'zida, imzolangan — server hech narsa saqlamaydi (stateless, gorizontal scaling oson). Kamchilik: bekor qilib bo'lmaydi (blacklist/qisqa muddat + refresh kerak), hajmi katta, payload ochiq.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>JWT imzosi nima kafolatlaydi? Shifrlaydimi?<span class="chev">›</span></summary><div class="iv-a">Faqat <b>butunlik</b> va <b>manba</b> — o'zgartirilmagan va bizning kalit bilan imzolangan. <b>Maxfiylikni emas</b> — payload Base64, hamma o'qiydi. Maxfiy ma'lumot kerak bo'lsa JWE (shifrlangan) yoki payload'ga yozmaslik.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Access va refresh token nima uchun ikkita?<span class="chev">›</span></summary><div class="iv-a">Access — qisqa (5–15 min), har so'rovda yuboriladi, o'g'irlansa zarar cheklangan. Refresh — uzoq (kunlar), faqat yangi access olish uchun, bazada saqlanadi va bekor qilinishi mumkin (logout, shubhali faoliyat). Ikkalasi bilan xavfsizlik + qulaylik.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nega BCrypt, SHA-256 emas?<span class="chev">›</span></summary><div class="iv-a">SHA-256 tez — GPU'da milliardlab urinish/soniya, lug'at hujumi oson. BCrypt/Argon2 ataylab sekin (cost) va salt'li — bir xil parol har xil hash, rainbow table ishlamaydi. Cost'ni vaqt o'tib oshirish mumkin.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>SecurityContextHolder qayerda saqlanadi? Async'da nima bo'ladi?<span class="chev">›</span></summary><div class="iv-a">Default — ThreadLocal, ya'ni joriy thread'da. <code>@Async</code> yoki yangi thread'da yo'qoladi. Yechim: <code>DelegatingSecurityContextExecutor</code> yoki <code>MODE_INHERITABLETHREADLOCAL</code>. Virtual thread'larda ham shu qoida.</div></details>
+      <details class="iv-item"><summary class="iv-q"><span class="qi">?</span>OAuth2 / OpenID Connect va JWT bog'liqligi?<span class="chev">›</span></summary><div class="iv-a">OAuth2 — <b>avtorizatsiya protokoli</b> (kimga qanday ruxsat), OIDC — uning ustida <b>autentifikatsiya</b> qatlami (id_token). JWT — token <b>formati</b>; OAuth2 access token ko'pincha JWT bo'ladi. Bankda: Keycloak kabi Authorization Server, Spring — Resource Server (<code>oauth2ResourceServer().jwt()</code>) — tokenni JWKS public key bilan tekshiradi.</div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz">
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Token to'g'ri, lekin USER roli /api/admin'ga kirdi. Javob kodi?</div>
+        <button class="opt">401</button><button class="opt">403</button><button class="opt">400</button>
+        <div class="q-fb" data-ok="To'g'ri. Kimligi ma'lum, ruxsat yo'q — 403 Forbidden." data-no="Yo'q. 401 — kimligi noma'lum. Bu yerda tanilgan, lekin ruxsat yo'q — 403."></div></div>
+      <div class="q" data-correct="0"><div class="q-txt"><span class="qn">2.</span>JWT payload'dagi ma'lumot…</div>
+        <button class="opt">Base64 — hamma o'qiy oladi</button><button class="opt">Shifrlangan, faqat server o'qiydi</button><button class="opt">Hash, qayta tiklab bo'lmaydi</button>
+        <div class="q-fb" data-ok="To'g'ri. Payload ochiq — maxfiy narsa yozilmaydi." data-no="Yo'q. Payload shunchaki Base64 — jwt.io'ga tashlasangiz o'qiladi."></div></div>
+      <div class="q" data-correct="2"><div class="q-txt"><span class="qn">3.</span>Payload'dagi role ni USER→ADMIN qilib o'zgartirsak?</div>
+        <button class="opt">Server ADMIN deb qabul qiladi</button><button class="opt">Token o'z-o'zidan yangilanadi</button><button class="opt">Imzo mos kelmaydi — rad etiladi</button>
+        <div class="q-fb" data-ok="To'g'ri. Imzo eski payload uchun; server qayta hisoblab farqni ko'radi." data-no="Yo'q. Imzo header+payload ustidan; o'zgarsa imzo mos kelmaydi — 401."></div></div>
+      <div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Parolni qanday saqlaymiz?</div>
+        <button class="opt">SHA-256 hash</button><button class="opt">BCrypt/Argon2 (sekin, salt'li)</button><button class="opt">AES bilan shifrlab</button>
+        <div class="q-fb" data-ok="To'g'ri." data-no="Yo'q. Parol uchun maxsus sekin hash: BCrypt, Argon2, scrypt."></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi trek · PostgreSQL</span>
+      <h3>PostgreSQL asoslari va constraint'lar</h3>
+      <p>Jadval, tiplar, PRIMARY/FOREIGN KEY, UNIQUE, CHECK, NOT NULL — ma'lumot butunligini baza o'zi qanday himoya qiladi. Bank sxemasi misolida.</p>
+      <div class="topics"><span class="topic-pill">31 · Testlash</span><span class="topic-pill now">32 · Security & JWT</span><span class="topic-pill">33 · PostgreSQL asoslari</span><span class="topic-pill">34 · SQL chuqur</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="31-testlash.html"><span class="cl">← Oldingi dars</span><span class="ct">31 · Testlash</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="33-asoslar-va-constraintlar.html"><span class="cl">Keyingi dars →</span><span class="ct">33 · Asoslar va constraint&#x27;lar</span><span class="cs">🐘 PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:36.4%"></i></div><span>32 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(32)<0)v.push(32);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','32');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(32)<0)D[t].push(32);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+  /* filter chain */
+  var filters=[
+    {n:'CorsFilter',d:'Boshqa domen\'dan so\'rovmi? Ruxsat berilgan origin\'mi?'},
+    {n:'CsrfFilter',d:'Stateless API\'da o\'chirilgan — o\'tkazib yuboradi.'},
+    {n:'JwtAuthFilter (bizniki)',d:'Authorization: Bearer … bormi? Imzo va muddat to\'g\'rimi? → SecurityContext\'ga qo\'yadi.'},
+    {n:'ExceptionTranslationFilter',d:'Keyingi bosqichdagi xatoni 401/403 javobiga aylantiradi.'},
+    {n:'AuthorizationFilter',d:'URL qoidasi: /api/admin/** → hasRole(ADMIN); anyRequest → authenticated.'},
+    {n:'Controller',d:'Biznes mantiq. Bu yergacha yetib kelsa — hammasi joyida.'}
+  ];
+  var scens=[
+    {req:'GET /api/hisob  (Authorization yo\'q)',stop:4,code:'401 Unauthorized',ex:'Token yo\'q → JwtAuthFilter hech narsa qo\'ymadi (anonim). AuthorizationFilter "authenticated kerak" dedi → AccessDeniedException → ExceptionTranslationFilter anonim ekanini ko\'rib <b>401</b> qaytardi ("avval kimligingni ayt").',jwtOk:true},
+    {req:'GET /api/admin  (Bearer …role=USER)',stop:4,code:'403 Forbidden',ex:'Token to\'g\'ri → SecurityContext\'da USER. AuthorizationFilter: /api/admin uchun ADMIN kerak → rad. Kimligi ma\'lum, ruxsat yo\'q → <b>403</b>.',jwtOk:true},
+    {req:'GET /api/admin  (Bearer …role=ADMIN)',stop:-1,code:'200 OK',ex:'Token to\'g\'ri, rol mos → hamma filter o\'tdi → Controller ishladi → <b>200</b>.',jwtOk:true},
+    {req:'GET /api/hisob  (Bearer … exp o\'tgan)',stop:2,code:'401 Unauthorized',ex:'JwtAuthFilter: <code>exp</code> claim o\'tgan → ExpiredJwtException → shu yerda to\'xtadi, <b>401</b>. Mijoz refresh token bilan yangi access olishi kerak.',jwtOk:false}
+  ];
+  var cur=0,scen=document.getElementById('scen'),cv=document.getElementById('chainv'),resp=document.getElementById('resp'),fcEx=document.getElementById('fcEx'),bar=document.getElementById('fcBar'),timer=null;
+  function drawChain(){cv.innerHTML=filters.map(function(f,i){return '<div class="fl" data-i="'+i+'"><span class="fn">'+f.n+'</span><span class="fd">'+f.d+'</span><span class="st">…</span></div>'+(i<filters.length-1?'<div class="conn"></div>':'');}).join('');document.getElementById('reqBox').textContent=scens[cur].req;resp.className='resp';resp.textContent='Natija shu yerda';bar.style.width='0';}
+  scen.addEventListener('click',function(e){if(e.target.dataset.s!==undefined){cur=+e.target.dataset.s;[].slice.call(scen.children).forEach(function(b){b.classList.toggle('on',b===e.target);});clearTimeout(timer);drawChain();fcEx.innerHTML='"Yubor"ni bosing.';}});
+  document.getElementById('fcGo').addEventListener('click',function(){
+    clearTimeout(timer);drawChain();var s=scens[cur],i=0,els=cv.querySelectorAll('.fl');
+    function step(){
+      if(i>0){var p=els[i-1];p.classList.remove('cur');}
+      if(i>=filters.length||(s.stop>=0&&i>s.stop)){resp.className='resp '+(s.stop<0?'ok':'bad');resp.textContent=s.code;fcEx.innerHTML=s.ex;bar.style.width='100%';return;}
+      var el=els[i];el.classList.add('cur');bar.style.width=((i+1)/filters.length*100)+'%';
+      var stopHere=s.stop===i;
+      timer=setTimeout(function(){el.classList.remove('cur');el.classList.add(stopHere?'stop':'ok');el.querySelector('.st').textContent=stopHere?'✗ to\'xtadi':'✓ o\'tdi';
+        if(stopHere){for(var k=i+1;k<els.length;k++)els[k].classList.add('dim');resp.className='resp bad';resp.textContent=s.code;fcEx.innerHTML=s.ex;bar.style.width='100%';return;}
+        i++;step();},650);
+    }
+    step();
+  });
+  drawChain();
+
+  /* JWT */
+  function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+  function b64ub(buf){var s='';new Uint8Array(buf).forEach(function(b){s+=String.fromCharCode(b);});return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+  async function hmac(key,msg){
+    if(window.crypto&&crypto.subtle){var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(key),{name:'HMAC',hash:'SHA-256'},false,['sign']);return b64ub(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(msg)));}
+    var h=0;for(var i=0;i<(key+msg).length;i++){h=(h*31+(key+msg).charCodeAt(i))|0;}return b64u(String(h));
+  }
+  var header={alg:'HS256',typ:'JWT'},origSecret='bank-super-secret',origRole='USER',origSig=null;
+  var roleIn=document.getElementById('roleIn'),secretIn=document.getElementById('secretIn');
+  async function drawJwt(){
+    var role=roleIn.value||'USER';var payload={sub:'otabek',role:role,iat:1710490800,exp:1710491700};
+    var h=b64u(JSON.stringify(header)),p=b64u(JSON.stringify(payload));
+    var sig=await hmac(secretIn.value,h+'.'+p);
+    if(origSig===null)origSig=sig;
+    // "kelgan" token imzosi — asl (server USER uchun yaratgan)
+    var incoming=origSig;
+    document.getElementById('jwtStr').innerHTML='<span class="h" data-p="h">'+h+'</span>.<span class="p" data-p="p">'+p+'</span>.<span class="s" data-p="s">'+incoming+'</span>';
+    document.getElementById('jh').textContent=JSON.stringify(header,null,2);
+    document.getElementById('jpv').textContent=JSON.stringify(payload,null,2);
+    document.getElementById('js').textContent='HMAC-SHA256(\n  base64(header) + "." + base64(payload),\n  secret\n)\n= '+sig.slice(0,20)+'…';
+    var v=document.getElementById('verify'),ex=document.getElementById('jwtEx');
+    var ok=sig===incoming;
+    v.className='verify '+(ok?'ok':'bad');
+    v.textContent=ok?'✓ Imzo mos — token haqiqiy, role='+role:'✗ Imzo mos emas — token rad etiladi (401)';
+    if(ok)ex.innerHTML='Server <code>'+secretIn.value+'</code> bilan header.payload\'ni qayta imzoladi: natija tokendagi imzo bilan <b>bir xil</b>. Demak token o\'zgartirilmagan va bizniki.';
+    else if(role!==origRole)ex.innerHTML='Siz payload\'ni <b>'+origRole+' → '+role+'</b> qildingiz. Tokendagi imzo eski payload uchun edi. Server qayta hisobladi — <b>boshqa imzo chiqdi</b>. Kalitni bilmasdan to\'g\'ri imzo yasab bo\'lmaydi. Shuning uchun payload ochiq bo\'lsa ham xavfsiz.';
+    else ex.innerHTML='Kalit o\'zgardi — boshqa kalit bilan imzolangan token bu serverda yaroqsiz. Shu sababli kalit sirlanadi va rotatsiya qilinganda eski tokenlar o\'ladi.';
+  }
+  roleIn.addEventListener('input',drawJwt);secretIn.addEventListener('input',drawJwt);
+  document.getElementById('jwtStr').addEventListener('click',function(e){var p=e.target.dataset.p;if(!p)return;[].slice.call(this.children).forEach(function(x){x.classList.toggle('hl',x===e.target);});var ex=document.getElementById('jwtEx');ex.innerHTML=p==='h'?'<b>Header</b>: algoritm (HS256 = HMAC-SHA256, yoki RS256 = RSA public/private) va tip. Base64url.':p==='p'?'<b>Payload</b>: claim\'lar. <code>sub</code> — kim, <code>exp</code> — muddat (Unix soniya), <code>iat</code> — berilgan vaqt, <code>role</code> — bizning claim. Ochiq matn!':'<b>Signature</b>: HMAC(header.payload, secret). Kalitsiz yasab bo\'lmaydi, kalit bilan tekshiriladi.';});
+  drawJwt();
+
+  /* login flow */
+  var steps=[
+    {e:'📱',t:'POST /api/auth/login\n{login, parol}',x:'Mijoz login va parolni <b>faqat shu bir marta</b> yuboradi (HTTPS shart).'},
+    {e:'🔍',t:'UserDetailsService\nloadUserByUsername',x:'Bazadan foydalanuvchi va uning BCrypt hash\'i olinadi. Topilmasa — 401 (lekin "login yo\'q" deb aytmang — "login yoki parol noto\'g\'ri").'},
+    {e:'🔐',t:'PasswordEncoder\n.matches(parol, hash)',x:'Kiritilgan parol hash\'dagi salt bilan qayta hash\'lanadi va solishtiriladi. Mos kelmasa — 401.'},
+    {e:'🎫',t:'JwtService.generate\n(sub, role, exp=15m)',x:'Server maxfiy kalit bilan access token (15 min) va refresh token (7 kun, bazada) yaratadi.'},
+    {e:'💾',t:'Mijoz saqlaydi\n(memory / secure storage)',x:'Brauzerda localStorage — XSS xavfi; httpOnly cookie — CSRF himoyasi kerak. Mobil — Keychain/Keystore.'},
+    {e:'➡️',t:'Har so\'rov:\nAuthorization: Bearer <token>',x:'Endi parol yuborilmaydi. JwtAuthFilter har so\'rovda tokenni tekshiradi (imzo + exp), SecurityContext to\'ldiradi.'}
+  ];
+  var lf=document.getElementById('lf');lf.innerHTML=steps.map(function(s){return '<div class="lfb"><span class="em">'+s.e+'</span><span style="white-space:pre-line">'+s.t+'</span></div>';}).join('');
+  mkStepper('lf',steps.length,function(i){[].slice.call(lf.children).forEach(function(el,k){el.classList.toggle('cur',k===i);el.classList.toggle('done',k<i);});document.getElementById('lfEx').innerHTML='<b>'+(i+1)+'/'+steps.length+'</b> — '+steps[i].x;},2400);
+
+  /* bcrypt-like demo */
+  var A='./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  function rnd(n){var s='';for(var i=0;i<n;i++)s+=A[Math.floor(Math.random()*64)];return s;}
+  async function fakeHash(pw,salt){var msg=salt+pw;var out='';if(window.crypto&&crypto.subtle){var d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(msg));new Uint8Array(d).forEach(function(b){out+=A[b%64];});return out.slice(0,31);}var h=0;for(var i=0;i<msg.length;i++)h=(h*31+msg.charCodeAt(i))|0;return (String(Math.abs(h))+rnd(31)).slice(0,31);}
+  var pw=document.getElementById('pwIn'),hout=document.getElementById('hout'),prev=[];
+  async function doHash(){var salt=rnd(22);var h=await fakeHash(pw.value,salt);var line='<span class="cost">$2a$10$</span><span class="salt">'+salt+'</span><span class="hh">'+h+'</span>';prev.unshift(line);prev=prev.slice(0,3);hout.innerHTML=prev.map(function(l,i){return (i===0?'→ ':'&nbsp;&nbsp;&nbsp;')+l;}).join('<br>')+'<br><span style="color:var(--ink-faint)">bir xil parol "'+pw.value+'" — har safar boshqa salt → boshqa hash (demo; haqiqiy BCrypt ~100 ms oladi)</span>';}
+  pw.addEventListener('input',function(){prev=[];doHash();});document.getElementById('rehash').addEventListener('click',doHash);doHash();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TypeScript tiplari va narrowing</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF3F9;--surface:#FFFFFF;--surface-2:#F6F9FC;--sunken:#E6ECF5;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D7E0EC;--border-strong:#C0CDDF;
+  --accent:#3178C6;--accent-ink:#235A98;--accent-soft:#E0EBF8;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0C121A;--surface:#162030;--surface-2:#1B2638;--sunken:#111925;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#26344A;--border-strong:#35465F;
+  --accent:#6AA6EA;--accent-ink:#8DBBF0;--accent-soft:#16263D;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0C121A;--surface:#162030;--surface-2:#1B2638;--sunken:#111925;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#26344A;--border-strong:#35465F;
+  --accent:#6AA6EA;--accent-ink:#8DBBF0;--accent-soft:#16263D;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+
+.inf{font-family:var(--font-mono);font-size:13px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;line-height:1.95;white-space:pre;overflow-x:auto;margin-top:10px}
+.inf .h{border-bottom:2px dotted var(--accent);cursor:pointer;border-radius:3px;padding:0 1px}
+.inf .h:hover,.inf .h.on{background:var(--accent-soft)}
+.tt{margin-top:8px;font-family:var(--font-mono);font-size:13px;padding:10px 12px;border-radius:10px;background:#141A24;color:#DDE6F2;min-height:22px}
+.tt .k2{color:#8DBBF0}.tt .s2{color:#F5DC78}
+/* narrowing */
+.nar{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:10px}
+.nar>div{min-width:0}
+.ncode{font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:10px 0;line-height:1.9;overflow-x:auto}
+.ncode div{padding:0 12px;white-space:pre;border-left:3px solid transparent;transition:.25s}
+.ncode div.cur{background:var(--accent-soft);border-left-color:var(--accent)}
+.ncode div.dead{opacity:.35}
+.tset{border:2px solid var(--border-strong);border-radius:14px;padding:12px;background:var(--surface)}
+.tset h6{margin:0 0 8px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft)}
+.tset .chips{display:flex;gap:6px;flex-wrap:wrap;min-height:40px}
+.tset .chips span{font-family:var(--font-mono);font-size:13px;font-weight:700;padding:6px 12px;border-radius:9px;color:#fff;transition:all .45s}
+.tset .chips span.out{opacity:.12;transform:scale(.8);filter:grayscale(1)}
+.tset .never{font-family:var(--font-mono);font-size:13px;color:var(--coral);font-weight:700;margin-top:6px;min-height:20px}
+.tset .ops{margin-top:10px;font-size:12.5px;color:var(--ink-soft)}
+.tset .ops code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+@media (max-width:700px){.nar{grid-template-columns:1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#3178C6"></span> TypeScript · 2/6</span><span>· Kurs: 76/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>TypeScript · 76-modul · tiplar</span>
+    <h1>Asosiy tiplar va <span class="steam">narrowing</span></h1>
+    <p class="lead">TypeScript’ning kuchi uch narsada: kuchli <b>tip chiqarish</b> (inference — ko‘p joyda tipni yozmaysiz), <b>union va literal tiplar</b> (qiymatlar to‘plami bilan modellashtirish) va <b>narrowing</b> — kompilyator kod oqimini kuzatib, <code>if</code>dan keyin tipni o‘zi toraytiradi. Oxirgisi Java’da yo‘q — shuning uchun animatsiyada ko‘ramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Tip chiqarish: IDE nimani ko‘radi?</h2></div><p class="sec-sub">Nuqtali tagi chizilgan identifikatorni bosing — IDE hover’ida ko‘rinadigan tip chiqadi. Deyarli hech qayerda tipni qo‘lda yozmadik.</p>
+    <div class="stage">
+      <div class="inf" id="inf"></div>
+      <div class="tt" id="tt">← identifikatorni bosing</div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Tip</th><th>Misol</th><th>Izoh</th></tr><tr><td><code>string</code>, <code>number</code>, <code>boolean</code>, <code>bigint</code></td><td><code>let n: number = 5</code></td><td>int/double farqi yo‘q</td></tr><tr><td><code>T[]</code> / <code>Array&lt;T&gt;</code></td><td><code>string[]</code></td><td><code>readonly string[]</code> — o‘zgartirib bo‘lmaydi</td></tr><tr><td>Tuple</td><td><code>[string, number]</code></td><td>Qat’iy uzunlik va pozitsiya tiplari: <code>useState</code>ga o‘xshash</td></tr><tr><td>Literal</td><td><code>"ACTIVE"</code>, <code>42</code>, <code>true</code></td><td>Qiymatning o‘zi tip</td></tr><tr><td>Union</td><td><code>string | null</code>, <code>"UZS" | "USD"</code></td><td>"yoki" — Java’da to‘g‘ridan-to‘g‘ri yo‘q</td></tr><tr><td><code>unknown</code> / <code>any</code></td><td></td><td>xavfsiz noma’lum / tekshiruvni o‘chirish</td></tr><tr><td><code>never</code></td><td></td><td>Bo‘lishi mumkin bo‘lmagan qiymat (bo‘sh to‘plam)</td></tr><tr><td><code>void</code></td><td></td><td>Funksiya hech narsa qaytarmaydi</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Literal va union tiplar</h2></div><p class="sec-sub">Karta holati — 3 ta aniq qiymatdan biri. Java’da enum yozardik; TS’da — literal union (yoki <code>as const</code> obyekt). Tekshiring.</p><div class="tsv" id="u1"><div class="bar"><span class="fn">📄 karta.ts</span><button class="btn primary" id="u1Chk" style="padding:5px 12px;font-size:12px">▶ tsc --noEmit</button><span class="st" id="u1St">tekshirilmagan</span></div><pre id="u1Pre"></pre><div class="errs" id="u1Errs"></div><div class="tip" id="u1Tip">Tekshirish tugmasini bosing.</div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Narrowing: tip qanday torayadi</h2></div><p class="sec-sub"><code>x: string | number | null</code>. Qadamlarni bosing — o‘ngda <b>shu qatorda</b> kompilyator x ni qanday tip deb biladi.</p>
+    <div class="stage">
+      <div class="nar"><div class="ncode" id="nc"></div><div class="tset"><h6>x ning tipi shu nuqtada:</h6><div class="chips" id="ts"></div><div class="never" id="nv"></div><div class="ops" id="ops"></div></div></div>
+      <div class="ctrls"><button class="btn" id="nrPrev">◀</button><button class="btn primary" id="nrPlay">▶ Avto</button><button class="btn" id="nrNext">▶</button><div class="bar"><div id="nrBar"></div></div></div>
+      <div class="explain" id="nrEx"></div>
+    </div>
+    <div class="tbl-wrap"><table class="tbl"><tr><th>Toraytirish usuli</th><th>Misol</th></tr><tr><td><code>typeof</code></td><td><code>if (typeof x === "string")</code></td></tr><tr><td>Truthiness / null tekshiruv</td><td><code>if (x)</code>, <code>if (x != null)</code>, <code>x ?? def</code></td></tr><tr><td><code>instanceof</code></td><td><code>if (e instanceof HttpError)</code></td></tr><tr><td><code>in</code></td><td><code>if ("xato" in natija)</code></td></tr><tr><td>Diskriminant maydon</td><td><code>switch (n.tur)</code> (4-bo‘lim)</td></tr><tr><td>Tenglik</td><td><code>if (holat === "BLOCKED")</code></td></tr><tr><td>Foydalanuvchi guard’i</td><td><code>function isKarta(x: unknown): x is Karta</code></td></tr><tr><td>Assertion funksiya</td><td><code>function assert(c): asserts c</code></td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Discriminated union + exhaustiveness</h2></div><p class="sec-sub">API javobi uch xil bo‘lishi mumkin. Umumiy <code>tur</code> maydoni — "diskriminant". <code>switch</code>da har holat to‘g‘ri toraytiriladi, <code>never</code> esa unutilgan holatni kompilyatsiyada ushlaydi. Tahlilchi yangi "PENDING" holatini qo‘shdi — tekshiring.</p><div class="tsv" id="d1"><div class="bar"><span class="fn">📄 tolov-natija.ts</span><button class="btn primary" id="d1Chk" style="padding:5px 12px;font-size:12px">▶ tsc --noEmit</button><span class="st" id="d1St">tekshirilmagan</span></div><pre id="d1Pre"></pre><div class="errs" id="d1Errs"></div><div class="tip" id="d1Tip">Tekshirish tugmasini bosing.</div></div>
+    <div class="ctrls"><button class="btn" id="dFix">✏️ PENDING case’ini qo‘shish</button><button class="btn" id="dBack">↺</button></div>
+    <div class="callout iv"><div class="ct">🎯 Java’dagi analogi</div>Java 21: <code>sealed interface Natija permits Ok, Xato, Kutilmoqda</code> + <code>switch</code> pattern matching — kompilyator ham exhaustiveness’ni tekshiradi. G‘oya bir xil: holatlar yopiq to‘plam, har biri o‘z maydonlari bilan.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Narrowing nima?<span class="chev">›</span></summary><div class="iv-a">Kompilyatorning control flow tahlili: typeof, instanceof, in, tenglik, truthiness tekshiruvlari va return/throw’dan keyin o‘zgaruvchining tipini toraytiradi. Masalan, if (x !== null) blokida x: string.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Union va intersection tiplar?<span class="chev">›</span></summary><div class="iv-a">Union A | B — qiymat A yoki B (ishlatishdan oldin toraytirish kerak). Intersection A & B — qiymat ikkalasining ham xossalariga ega (obyektlarni birlashtirish).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Discriminated union nima va nega foydali?<span class="chev">›</span></summary><div class="iv-a">Umumiy literal maydonli (tur: "ok" | "xato") union. switch/if bilan har variant aniq toraytiriladi, never bilan hamma holatlar ko‘rib chiqilganini kompilyator kafolatlaydi. API javoblari, holat mashinalari, Redux action’lari uchun.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>never tipi qayerda ishlatiladi?<span class="chev">›</span></summary><div class="iv-a">Bo‘sh tip: hech qachon qaytmaydigan funksiya (throw), toraytirishdan keyin qolgan "imkonsiz" holat (exhaustiveness check), conditional tiplarda filtrlash.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>enum yoki union literal?<span class="chev">›</span></summary><div class="iv-a">Union literal ("UZS" | "USD") — runtime kodi yo‘q, tree-shake, JSON bilan to‘g‘ridan-to‘g‘ri mos. enum — runtime obyekt, raqamli enum’lar xavfli (har qanday son mos keladi). Ko‘p jamoalar union yoki as const obyektni afzal ko‘radi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>as (type assertion) qachon xavfli?<span class="chev">›</span></summary><div class="iv-a">as — kompilyatorga "menga ishon" deyish, runtime tekshiruv yo‘q. Noto‘g‘ri bo‘lsa xato keyin, boshqa joyda chiqadi. Imkon qadar narrowing yoki validator; as const va as unknown as T — faqat ongli holda.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>const holat = "ACTIVE"; — holat ning tipi?</div><button class="opt">string</button><button class="opt">"ACTIVE" (literal)</button><button class="opt">any</button><div class="q-fb" data-ok="To‘g‘ri — const literal tipni saqlaydi." data-no="Yo‘q. const bilan literal; let bilan string."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>let x: string | null. if (!x) return; dan keyin x tipi?</div><button class="opt">string | null</button><button class="opt">string</button><button class="opt">never</button><div class="q-fb" data-ok="To‘g‘ri — null (va bo‘sh satr) chiqib ketdi." data-no="Yo‘q. Truthiness narrowing null’ni olib tashlaydi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>switch’da barcha holatlar ko‘rib chiqilganini qanday kafolatlaysiz?</div><button class="opt">default: break</button><button class="opt">default’da const _: never = x</button><button class="opt">try/catch</button><div class="q-fb" data-ok="To‘g‘ri — yangi holat qo‘shilsa kompilyatsiya xatosi." data-no="Yo‘q. never bilan exhaustiveness check."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>type Valyuta = "UZS" | "USD"; const v: Valyuta = "RUB";</div><button class="opt">OK</button><button class="opt">Xato: "RUB" mos emas</button><button class="opt">Ogohlantirish</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Literal union — yopiq to‘plam."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>[string, number] nima?</div><button class="opt">Massiv</button><button class="opt">Tuple: 2 elementli, pozitsiya tiplari aniq</button><button class="opt">Union</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Yo‘q. Bu tuple."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · TypeScript</span>
+      <h3>Interface va type, strukturaviy tiplash</h3>
+      <p>Java’dagi implements’siz moslik, excess property check, readonly va optional — Java dasturchini eng ko‘p hayratlantiradigan joy.</p>
+      <div class="topics"><span class="topic-pill">75 · Nega TS</span><span class="topic-pill now">76 · Tiplar</span><span class="topic-pill">77 · Interface</span><span class="topic-pill">78 · Generics</span><span class="topic-pill">79 · Amaliyot</span><span class="topic-pill">80 · Suhbat</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="75-nega-typescript.html"><span class="cl">← Oldingi dars</span><span class="ct">75 · Nega TypeScript</span><span class="cs">🔷 TypeScript</span></a><a class="cn nx" href="77-interface-va-type.html"><span class="cl">Keyingi dars →</span><span class="ct">77 · Interface va type</span><span class="cs">🔷 TypeScript</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:86.4%"></i></div><span>76 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(76)<0)v.push(76);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','76');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(76)<0)D[t].push(76);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+window.mkTs=function(pid,src,errs,opts){opts=opts||{};var g=function(s){return document.getElementById(pid+s);};var root=document.getElementById(pid);
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var KWS=' const let var function return if else interface type class extends implements new import export from async await readonly keyof typeof in as satisfies never unknown any string number boolean void null undefined true false enum private public infer throw switch case default for of ';
+  function hl(s){var out='',re=/(\/\/.*$)|("[^"]*"|'[^']*'|`[^`]*`)|([A-Za-z_$][\w$]*)|([\s\S])/g,m;while((m=re.exec(s))){if(m[1])out+='<span class="cm">'+esc(m[1])+'</span>';else if(m[2])out+='<span class="st">'+esc(m[2])+'</span>';else if(m[3])out+=KWS.indexOf(' '+m[3]+' ')>=0?'<span class="k">'+m[3]+'</span>':(/^[A-Z]/.test(m[3])?'<span class="ty">'+m[3]+'</span>':m[3]);else out+=esc(m[4]);}return out;}
+  function render(src){var lines=src.split('\n');g('Pre').innerHTML=lines.map(function(l,i){var out='',re=/⟦(\w+)⟧([\s\S]*?)⟦\/⟧/g,last=0,m,has=false;
+      while((m=re.exec(l))){out+=hl(l.slice(last,m.index));out+='<span class="sq" data-e="'+m[1]+'">'+hl(m[2])+'</span>';last=re.lastIndex;has=true;}out+=hl(l.slice(last));
+      return '<span class="l'+(has?' el':'')+'" data-line="'+(i+1)+'"><span class="ln">'+(i+1)+'</span>'+out+'</span>';}).join('');}
+  var cur=src;render(cur);
+  function lineOf(id){var sq=root.querySelector('.sq[data-e="'+id+'"]');return sq?sq.closest('.l').dataset.line:'?';}
+  function check(){var ids=Object.keys(errs).filter(function(id){return root.querySelector('.sq[data-e="'+id+'"]');});root.classList.add('on');
+    g('Errs').innerHTML=ids.map(function(id){return '<div data-e="'+id+'"><span class="ic">✖</span><span class="lc">'+opts.file+':'+lineOf(id)+'</span><span>'+errs[id][0]+'</span></div>';}).join('');
+    var st=g('St');st.className='st '+(ids.length?'er':'ok');st.textContent=ids.length?ids.length+' ta xato':'✓ 0 xato';
+    g('Tip').innerHTML=ids.length?(opts.onErr||'Xatoni bosing — izoh va tuzatish ko‘rinadi.'):(opts.onOk||'Kompilyatsiya muvaffaqiyatli.');}
+  function pick(id){[].forEach.call(root.querySelectorAll('.hl'),function(x){x.classList.remove('hl');});[].forEach.call(root.querySelectorAll('[data-e="'+id+'"]'),function(x){x.classList.add('hl');});g('Tip').innerHTML='<b>'+errs[id][0]+'</b><br>'+errs[id][1];}
+  opts.file=opts.file||'app.ts';
+  g('Chk').addEventListener('click',check);
+  root.addEventListener('click',function(e){var t=e.target.closest('[data-e]');if(t&&root.classList.contains('on'))pick(t.dataset.e);});
+  return {set:function(s){cur=s;root.classList.remove('on');g('St').className='st';g('St').textContent='tekshirilmagan';g('Errs').innerHTML='';render(s);g('Tip').innerHTML='Tekshirish tugmasini bosing.';},check:check};
+};
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  /* inference */
+  var H={a:['kurs','const kurs: 12650','<span class="k2">const</span> + son → literal tip <span class="s2">12650</span> (o‘zgarmaydi).'],b:['summa','let summa: number','<span class="k2">let</span> → kengaytirilgan tip <span class="s2">number</span> (keyin boshqa son bo‘lishi mumkin).'],
+    c:['valyutalar','const valyutalar: string[]','Massiv literalidan <span class="s2">string[]</span>.'],d:['VAL','const VAL: readonly ["UZS", "USD", "EUR"]','<span class="k2">as const</span> — o‘zgarmas tuple, literal tiplar bilan.'],
+    e:['tanlangan','let tanlangan: "UZS" | "USD" | "EUR"','<span class="s2">(typeof VAL)[number]</span> — massivdan union tip chiqarildi. Bitta manba — ham qiymat, ham tip.'],
+    f:['hisobla','function hisobla(s: number, k: number): number','Qaytish tipi <span class="s2">number</span> tanadan chiqarildi.'],
+    g:['natija','const natija: number','Funksiya qaytish tipidan.'],h:['kartalar','const kartalar: { id: string; faol: boolean; }[]','Obyekt literallari massividan tuzilma chiqarildi.'],
+    i:['faollar','const faollar: { id: string; faol: boolean; }[]','filter shu tipni saqlaydi.'],j:['k','(parameter) k: { id: string; faol: boolean; }','Callback parametri — kontekstdan (contextual typing).'],
+    l:['birinchi','const birinchi: { id: string; faol: boolean; } | undefined','<span class="k2">find</span> topmasligi mumkin → <span class="s2">| undefined</span>. Java’dagi Optional o‘rniga.']};
+  var CODE='const ⟦a⟧ = 12650;\nlet ⟦b⟧ = 150000;\nconst ⟦c⟧ = ["UZS", "USD"];\nconst ⟦d⟧ = ["UZS", "USD", "EUR"] as const;\nlet ⟦e⟧: (typeof VAL)[number] = "UZS";\n\nfunction ⟦f⟧(s: number, k: number) {\n  return s * k / 100;\n}\nconst ⟦g⟧ = hisobla(summa, 0.5);\n\nconst ⟦h⟧ = [{ id: "8600…12", faol: true }, { id: "9860…34", faol: false }];\nconst ⟦i⟧ = kartalar.filter(⟦j⟧ => k.faol);\nconst ⟦l⟧ = kartalar.find(k => k.id === "x");';
+  el('inf').innerHTML=CODE.replace(/</g,'&lt;').replace(/⟦(\w)⟧/g,function(m,k){return '<span class="h" data-k="'+k+'">'+H[k][0]+'</span>';});
+  el('inf').addEventListener('click',function(e){var s=e.target.closest('.h');if(!s)return;[].forEach.call(this.querySelectorAll('.h'),function(x){x.classList.toggle('on',x===s);});var h=H[s.dataset.k];el('tt').innerHTML='<b>'+h[1].replace(/</g,'&lt;')+'</b><br><span style="opacity:.8">'+h[2]+'</span>';});
+
+  /* union */
+  mkTs('u1','type KartaHolati = "ACTIVE" | "BLOCKED" | "EXPIRED";\n\ninterface Karta { id: string; holat: KartaHolati; limit: number }\n\nfunction blokla(k: Karta): Karta {\n  return { ...k, holat: "BLOCKED" };\n}\nconst k: Karta = { id: "8600…1234", holat: ⟦a⟧"DELETED"⟦/⟧, limit: 5_000_000 };\n\nfunction rang(h: KartaHolati) {\n  if (h === "ACTIVE") return "yashil";\n  if (h === ⟦b⟧"BLOKED"⟦/⟧) return "qizil";\n  return "kulrang";\n}',
+   {a:['TS2322: Type \'"DELETED"\' is not assignable to type \'KartaHolati\'.','Faqat 3 ta qiymat ruxsat. Backend yangi holat qo‘shsa — frontend kompilyatsiyada biladi (agar tiplar OpenAPI’dan generatsiya qilinsa).'],
+    b:['TS2367: This comparison appears to be unintentional because the types \'"BLOCKED" | "EXPIRED"\' and \'"BLOKED"\' have no overlap.','Imlo xatosi — JS’da bu shart hech qachon true bo‘lmasdi va hech kim bilmasdi. Qarang: kompilyator birinchi if’dan keyin h ni allaqachon "BLOCKED" | "EXPIRED" ga toraytirgan.']},{file:'karta.ts'});
+
+  /* narrowing */
+  var NC=['function formatla(x: string | number | null) {','  if (x === null) {','    return "—";','  }','  if (typeof x === "string") {','    return x.trim().toUpperCase();','  }','  return x.toLocaleString("ru-RU");','}'];
+  var ALL=[['string','#2E6FA8'],['number','#A9660D'],['null','#8C8578']];
+  var NS=[[0,['string','number','null'],'','Parametr — uch tipning uniyasi. Shu holatda <code>x.trim()</code> yozsangiz — xato: number’da trim yo‘q.','ishlatish mumkin: faqat umumiy narsalar'],
+    [1,['string','number','null'],'','<code>x === null</code> tekshiruvi…',''],
+    [2,['null'],'','<b>if ichida</b> x faqat <b>null</b>.','—'],
+    [4,['string','number'],'','if <b>return</b> bilan tugadi → bu yerga null <b>yetib kela olmaydi</b>. Kompilyator null’ni olib tashladi (control flow analysis).',''],
+    [5,['string'],'','typeof x === "string" ichida — faqat string: <code>trim()</code>, <code>toUpperCase()</code> xavfsiz.','<code>.trim()</code> <code>.toUpperCase()</code> <code>.length</code>'],
+    [7,['number'],'','Ikkala if ham return qildi → qolgani faqat <b>number</b>. <code>toLocaleString</code> — son metodi, xavfsiz.','<code>.toFixed()</code> <code>.toLocaleString()</code>'],
+    [8,[],'never','Agar oxirida yana bir tarmoq bo‘lsa, u yerda x: <b>never</b> — hamma imkoniyat tugagan. Exhaustiveness check aynan shunga asoslanadi.','']];
+  el('nc').innerHTML=NC.map(function(l){return '<div>'+l.replace(/</g,'&lt;')+'</div>';}).join('');
+  mkStepper('nr',NS.length,function(i){var s=NS[i];[].forEach.call(el('nc').children,function(d,k){d.className=k===s[0]?'cur':'';});
+    el('ts').innerHTML=ALL.map(function(t){return '<span style="background:'+t[1]+'" class="'+(s[1].indexOf(t[0])<0?'out':'')+'">'+t[0]+'</span>';}).join('');
+    el('nv').textContent=s[2]?'x: never':'';el('ops').innerHTML=s[4]?'Ruxsat etilgan: '+s[4]:'';el('nrEx').innerHTML=s[3];},2400);
+
+  /* discriminated */
+  var D0='type Natija =\n  | { tur: "OK"; id: string; summa: number }\n  | { tur: "XATO"; kod: number; xabar: string }\n  | { tur: "PENDING"; qayta: number };          // yangi holat qo‘shildi\n\nfunction korsat(n: Natija): string {\n  switch (n.tur) {\n    case "OK":   return `✓ ${n.id}: ${n.summa}`;      // n: {tur:"OK"…}\n    case "XATO": return `✗ ${n.kod} ${n.xabar}`;     // n: {tur:"XATO"…}\n    default: {\n      const _tekshir: never = ⟦a⟧n⟦/⟧;                  // exhaustiveness\n      return _tekshir;\n    }\n  }\n}\nconst summaOl = (n: Natija) => ⟦b⟧n.summa⟦/⟧;          // toraytirilmagan!';
+  var D1=D0.replace('    default: {','    case "PENDING": return `⏳ ${n.qayta} s dan keyin`;\n    default: {').replace('⟦a⟧n⟦/⟧','n');
+  var dts=mkTs('d1',D0,{a:['TS2322: Type \'{ tur: "PENDING"; qayta: number; }\' is not assignable to type \'never\'.','Default’ga yetib kelgan n endi never emas — PENDING ko‘rib chiqilmagan! Kompilyator bu joyni <b>deploy’dan oldin</b> ko‘rsatdi. "PENDING case’ini qo‘shish"ni bosing.'],b:['TS2339: Property \'summa\' does not exist on type \'Natija\'. Property \'summa\' does not exist on type \'{ tur: "XATO"; … }\'.','Toraytirilmagan union’da faqat <b>umumiy</b> maydonlar (tur) ishlatiladi.']},{file:'tolov-natija.ts'});
+  el('dFix').addEventListener('click',function(){dts.set(D1);dts.check();});el('dBack').addEventListener('click',function(){dts.set(D0);});
+})();
+
+</script>
+</body>
+</html>

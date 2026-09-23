@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Konfiguratsiya va profillar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5EE;--surface:#FFFFFF;--surface-2:#F8FAF3;--sunken:#ECF0E4;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#E5DFD3;--border-strong:#D6CFC0;
+  --accent:#5A9E2F;--accent-ink:#3E7020;--accent-soft:#E6F0DA;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0E7C7B;--teal-ink:#0A5A59;--teal-soft:#DBF0EF;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(30,36,26,.05),0 8px 24px rgba(30,36,26,.06);
+  --shadow-lift:0 2px 4px rgba(30,36,26,.08),0 16px 40px rgba(30,36,26,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#12160E;--surface:#1C2116;--surface-2:#222719;--sunken:#161B10;--ink:#E7EDDC;--ink-soft:#AEB49E;--ink-faint:#7D836E;--border:#2C331F;--border-strong:#3C452B;
+  --accent:#8FD35F;--accent-ink:#A5DC7A;--accent-soft:#1F2A13;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#3FB6B4;--teal-ink:#5FC9C7;--teal-soft:#132625;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* layers */
+.layers{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.lay{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:9px 12px;transition:.3s;font-family:var(--font-mono);font-size:12.5px}
+.lay.off{opacity:.4}
+.lay.win{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow-lift)}
+.lay .pr{font-weight:700;color:var(--ink-faint);font-size:11px}
+.lay .src{color:var(--ink)}.lay .src small{display:block;color:var(--ink-faint);font-size:10.5px;font-family:var(--font-body)}
+.lay .val{color:var(--accent-ink);font-weight:600}
+.lay input{accent-color:var(--accent);width:16px;height:16px}
+.lay label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.resolved{margin-top:14px;background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-family:var(--font-mono);font-size:14px;text-align:center}
+.resolved b{color:var(--accent-ink);font-size:18px}
+
+/* profile */
+.profs{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.prof{border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;background:var(--surface);cursor:pointer;font-family:var(--font-mono);font-size:13px;transition:.2s}
+.prof.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.pcol{background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;padding:12px}
+.pcol h4{font-family:var(--font-mono);font-size:12px;margin:0 0 8px;color:var(--ink-soft)}
+.pitem{font-family:var(--font-mono);font-size:12px;padding:6px 9px;border-radius:8px;border:1px solid var(--border);margin-bottom:5px;background:var(--surface);transition:.3s;display:flex;justify-content:space-between;gap:8px}
+.pitem.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink)}
+.pitem.off{opacity:.35;text-decoration:line-through}
+.pitem small{color:var(--ink-faint);font-size:10.5px}
+
+/* yml map */
+.ymap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.ycol{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:var(--font-mono);font-size:12px;line-height:1.8}
+.yl{display:block;padding:0 6px;border-radius:6px;cursor:pointer;transition:.2s}
+.yl:hover{background:var(--accent-soft)}.yl.hl{background:var(--accent);color:#fff}
+.yl .yk{color:var(--purple-ink)}.yl.hl .yk{color:#fff}.yl .yv{color:var(--accent-ink)}.yl.hl .yv{color:#fff}
+.jl{display:block;padding:0 6px;border-radius:6px;transition:.2s}
+.jl.hl{background:var(--accent);color:#fff}.jl.hl *{color:#fff!important}
+
+/* relaxed */
+.rel{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
+.rel span{font-family:var(--font-mono);font-size:12.5px;border:1.5px solid var(--teal);background:var(--teal-soft);color:var(--teal-ink);border-radius:9px;padding:6px 10px}
+.rel .eq{border:0;background:none;color:var(--ink-faint);font-size:18px;padding:0 2px}
+@media (max-width:560px){.pgrid,.ymap{grid-template-columns:1fr}.lay{grid-template-columns:1fr auto}.lay .pr{display:none}}
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+/* shared widgets */
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px 20px;margin-top:20px}
+.demo-note{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px;min-height:44px;line-height:1.55}
+.demo-note b{color:var(--accent-ink)}
+.controls{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ctl{background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:.15s;padding:0;font-size:14px}
+button.ctl:hover{background:var(--surface-2);border-color:var(--accent)}button.ctl svg{width:18px;height:18px}
+button.ctl.primary{background:var(--accent);border-color:var(--accent);color:#fff;width:auto;padding:0 18px;gap:8px;font-weight:500;font-size:14px}
+button.ctl.wide{width:auto;padding:0 14px;font-weight:500}
+.prog{flex:1;min-width:100px;height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;margin-left:4px}
+.prog .bar{height:100%;background:var(--accent);width:0;transition:width .3s}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:11px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 13px;font-size:13.5px;font-family:var(--font-mono);color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+.tap{cursor:pointer;border-radius:5px;padding:1px 3px;transition:background .15s}
+.tap:hover{background:var(--accent-soft)}.tap.sel{background:var(--accent);border-radius:5px}.tap.sel *{color:#fff!important}
+.anno{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;min-height:60px;box-shadow:var(--shadow)}
+.anno .at{font-family:var(--font-mono);font-size:12.5px;color:var(--accent-ink);font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-mono);font-size:13px;margin:0 0 8px;color:var(--accent-ink)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+.card pre{margin:0;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;color:var(--ink)}
+.card .why{font-size:12.5px;color:var(--ink-soft);margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);background:var(--surface-2)}
+.tbl tr:last-child td{border-bottom:0}.tbl code{color:var(--accent-ink)}
+.tblwrap{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:999px;padding:3px 10px;background:var(--surface-2);color:var(--ink-soft)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:16px}
+.m{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;box-shadow:var(--shadow);font-family:var(--font-mono);font-size:12.5px}
+.m .mn{color:var(--accent-ink);font-weight:600}.m .md{color:var(--ink-soft);font-size:11.5px;margin-top:3px;font-family:var(--font-body)}
+@keyframes pop{from{transform:scale(.6)}to{transform:none}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.an{color:var(--accent-ink);font-weight:500}
+
+</style>
+<style>
+.cnav-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-soft,#555)}
+.cnav-top a{color:var(--ink,#222);text-decoration:none;border:1px solid var(--border,#ddd);background:var(--surface,#fff);border-radius:9px;padding:6px 11px}
+.cnav-top a:hover{border-color:var(--accent,#888)}
+.cnav-top .cnav-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.cnav{max-width:820px;margin:8px auto 64px;padding-inline:20px;box-sizing:border-box}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink,#222);background:var(--surface,#fff);border:1.5px solid var(--border,#ddd);border-radius:16px;padding:16px 18px;min-height:92px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--accent,#888);transform:translateY(-2px)}
+.cnav a.cn:focus-visible{outline:2px solid var(--accent,#888);outline-offset:2px}
+.cnav .cl{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint,#888)}
+.cnav .ct{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.cnav .cs{font-size:12.5px;color:var(--ink-soft,#666)}
+.cnav a.nx{text-align:right;align-items:flex-end;border-color:var(--accent,#888)}
+.cnav a.nx .ct{color:var(--accent-ink,#333)}
+.cnav .empty{border:1.5px dashed var(--border,#ddd);border-radius:16px;min-height:92px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint,#888);padding:12px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:12px;margin-top:14px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-soft,#666)}
+.cnav-foot a{color:var(--ink,#222)}
+.cnav-bar{flex:1;height:6px;border-radius:3px;background:var(--sunken,#eee);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--accent,#888)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style></head>
+<body>
+<div class="wrap">
+<nav class="cnav-top" aria-label="Kurs navigatsiyasi"><a href="index.html">← Barcha darslar</a><span><span class="cnav-dot" style="background:#5A9E2F"></span> Spring Boot · 2/9</span><span>· Kurs: 25/88</span></nav>
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>Spring Boot · 25-modul · noldan</span>
+    <h1>Konfiguratsiya va <span class="steam">profillar</span></h1>
+    <p class="lead">Bitta jar — uch muhit: dasturchi noutbuki, test stendi, prod. Kod bir xil, sozlamalar har xil. Bu modulda "qaysi sozlama kimni yengadi" degan savolga jonli javob olasiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Sozlamalar ustunligi: kim kimni yengadi?</h2></div>
+    <p class="sec-sub">Bitta xususiyat — <code>bank.limit</code> — 5 joyda berilgan bo'lishi mumkin. Spring aniq tartibda o'qiydi: <b>yuqoridagi pastdagini yengadi</b>. Qatlamlarni o'chirib-yoqing, natijani kuzating.</p>
+    <div class="demo">
+      <div class="layers" id="layers"></div>
+      <div class="resolved">bank.limit = <b id="resVal">—</b> <span id="resSrc" style="color:var(--ink-faint);font-size:12px"></span></div>
+      <div class="demo-note" id="layNote"></div>
+    </div>
+    <div class="callout tip"><div class="ct">Amaliy qoida</div>Kodga (yml) — <b>defaultlar</b>; muhitga (env var, Kubernetes ConfigMap/Secret) — <b>farqlar va sirlar</b>. Parolni hech qachon yml'ga yozmang — <code>${DB_PASSWORD}</code> placeholder qo'ying, qiymatni muhit beradi.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Profillar: dev / test / prod</h2></div>
+    <p class="sec-sub">Profil — nomlangan sozlamalar to'plami + shartli bean'lar. <code>application-{profil}.yml</code> fayli avtomatik yuklanadi, <code>@Profile("prod")</code> bean'lari faqat shu profilda yaratiladi. Profilni tanlang:</p>
+    <div class="demo">
+      <div class="profs" id="profs"><div class="prof on" data-p="dev">dev</div><div class="prof" data-p="test">test</div><div class="prof" data-p="prod">prod</div></div>
+      <div class="pgrid">
+        <div class="pcol"><h4>Yuklanadigan fayllar</h4><div id="pfiles"></div></div>
+        <div class="pcol"><h4>Yaratiladigan bean'lar</h4><div id="pbeans"></div></div>
+      </div>
+      <div class="demo-note" id="pNote"></div>
+    </div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">SmsConfig.java · faollashtirish</span></div>
+      <pre class="code"><span class="an">@Bean</span> <span class="an">@Profile</span>(<span class="st">"prod"</span>)          <span class="ty">SmsYuboruvchi</span> real()  { <span class="k">return new</span> PlaynetSms(); }
+<span class="an">@Bean</span> <span class="an">@Profile</span>(<span class="st">"!prod"</span>)         <span class="ty">SmsYuboruvchi</span> soxta() { <span class="k">return</span> xabar -&gt; log.info(<span class="st">"SMS: {}"</span>, xabar); }
+
+<span class="cm">// Faollashtirish (ustunlik tartibida):</span>
+<span class="cm">// java -jar app.jar --spring.profiles.active=prod</span>
+<span class="cm">// SPRING_PROFILES_ACTIVE=prod  (Docker/K8s — odatiy usul)</span>
+<span class="cm">// application.yml: spring.profiles.active: dev  (faqat lokal default uchun)</span>
+<span class="cm">// Test: @ActiveProfiles("test")</span>
+<span class="cm">// Bir nechta: prod,metrics — ikkalasi ham faol</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>YAML → Java: @ConfigurationProperties</h2></div>
+    <p class="sec-sub"><code>@Value("${...}")</code> — bitta qiymat uchun. Guruh sozlamalar uchun <b>tipli</b> klass: validatsiya, IDE yordami, refaktoring. YAML qatorini bosing — Java'da qayerga tushishini ko'ring.</p>
+    <div class="ymap">
+      <div class="ycol" id="ycol">
+        <span class="yl" data-f="0"><span class="yk">bank:</span></span>
+        <span class="yl" data-f="1">&nbsp;&nbsp;<span class="yk">limit-max:</span> <span class="yv">50000000</span></span>
+        <span class="yl" data-f="2">&nbsp;&nbsp;<span class="yk">valyuta:</span> <span class="yv">UZS</span></span>
+        <span class="yl" data-f="3">&nbsp;&nbsp;<span class="yk">sms:</span></span>
+        <span class="yl" data-f="4">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yk">url:</span> <span class="yv">https://sms.uz/api</span></span>
+        <span class="yl" data-f="5">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yk">timeout:</span> <span class="yv">3s</span></span>
+        <span class="yl" data-f="6">&nbsp;&nbsp;<span class="yk">ruxsat-ip:</span> <span class="yv">[10.0.0.1, 10.0.0.2]</span></span>
+      </div>
+      <div class="ycol" id="jcol">
+        <span class="jl" data-f="0"><span class="an">@ConfigurationProperties</span>(prefix = <span class="st">"bank"</span>)</span>
+        <span class="jl" data-f="0"><span class="an">@Validated</span> <span class="k">public record</span> <span class="ty">BankProps</span>(</span>
+        <span class="jl" data-f="1">&nbsp;&nbsp;<span class="an">@Positive</span> <span class="k">long</span> limitMax,</span>
+        <span class="jl" data-f="2">&nbsp;&nbsp;<span class="an">@NotBlank</span> <span class="ty">String</span> valyuta,</span>
+        <span class="jl" data-f="3">&nbsp;&nbsp;<span class="ty">Sms</span> sms,</span>
+        <span class="jl" data-f="6">&nbsp;&nbsp;<span class="ty">List</span>&lt;String&gt; ruxsatIp</span>
+        <span class="jl">) {</span>
+        <span class="jl" data-f="3">&nbsp;&nbsp;<span class="k">record</span> <span class="ty">Sms</span>(<span class="jl" data-f="4" style="display:inline"><span class="ty">URI</span> url</span>, <span class="jl" data-f="5" style="display:inline"><span class="ty">Duration</span> timeout</span>) {}</span>
+        <span class="jl">}</span>
+      </div>
+    </div>
+    <div class="demo-note" id="yNote">Bosing. <code>limit-max</code> (kebab) → <code>limitMax</code> (camel) — "relaxed binding". <code>3s</code> → Duration, ro'yxat → List. Xato bo'lsa startup'da yiqiladi — prod'da noto'g'ri sozlama bilan ishlab ketmaydi.</div>
+    <div class="code-block">
+      <div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Ishlatish</span></div>
+      <pre class="code"><span class="an">@SpringBootApplication</span>
+<span class="an">@ConfigurationPropertiesScan</span>          <span class="cm">// yoki @EnableConfigurationProperties(BankProps.class)</span>
+<span class="k">class</span> <span class="ty">App</span> {}
+
+<span class="an">@Service</span>
+<span class="k">class</span> <span class="ty">TolovService</span> {
+    <span class="k">private final</span> <span class="ty">BankProps</span> props;              <span class="cm">// oddiy bean kabi inject</span>
+    <span class="k">boolean</span> ruxsat(<span class="k">long</span> s) { <span class="k">return</span> s &lt;= props.limitMax(); }
+}
+
+<span class="cm">// @Value — bitta qiymat, default bilan:</span>
+<span class="an">@Value</span>(<span class="st">"${bank.valyuta:UZS}"</span>) <span class="ty">String</span> valyuta;
+<span class="cm">// Fark: @Value — string, validatsiya yo'q, IDE yordam bermaydi, sochilib ketadi.</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Relaxed binding va muhit o'zgaruvchilari</h2></div>
+    <p class="sec-sub">Muhit o'zgaruvchisida nuqta va tire bo'lmaydi. Spring bularni bir xil deb tushunadi:</p>
+    <div class="rel"><span>bank.limit-max</span><span class="eq">=</span><span>bank.limitMax</span><span class="eq">=</span><span>bank.limit_max</span><span class="eq">=</span><span>BANK_LIMITMAX</span><span class="eq">=</span><span>BANK_LIMIT_MAX</span></div>
+    <div class="grid2">
+      <div class="card good"><h4>Sirlar (secrets) — to'g'ri</h4><pre>spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:5432/bank
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+<span class="cm"># qiymat: K8s Secret / Vault / .env (gitignore)</span></pre><div class="why">Placeholder yml'da, qiymat muhitda. Spring Cloud Vault / AWS Secrets Manager bilan avtomatik.</div></div>
+      <div class="card bad"><h4>Noto'g'ri</h4><pre>password: Qwerty123!   <span class="cm"># git'da!</span>
+<span class="cm"># application-prod.yml'ga prod parolini yozish</span>
+<span class="cm"># @Value("${password}") ni log'ga chiqarish</span></pre><div class="why">Git tarixidan o'chirib bo'lmaydi. Parol sizib chiqdi deb hisoblang — almashtiring.</div></div>
+    </div>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>Sozlama</th><th>Nima</th></tr>
+      <tr><td><code>server.port: 8081</code></td><td>Port. <code>0</code> — tasodifiy (testda).</td></tr>
+      <tr><td><code>spring.jpa.open-in-view: false</code></td><td>OSIV o'chirish — tavsiya (29-modul).</td></tr>
+      <tr><td><code>spring.jackson.default-property-inclusion: non_null</code></td><td>JSON'da null maydonlar chiqmaydi.</td></tr>
+      <tr><td><code>logging.level.uz.bank: DEBUG</code></td><td>Paket bo'yicha log darajasi.</td></tr>
+      <tr><td><code>management.endpoints.web.exposure.include: health,metrics</code></td><td>Actuator endpointlari.</td></tr>
+      <tr><td><code>spring.config.import: optional:file:.env[.properties]</code></td><td>Lokal .env faylini o'qish.</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Suhbat savollari</h2></div>
+    <div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Spring Boot sozlamalarni qaysi tartibda o'qiydi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Yuqoridan pastga ustunlik: buyruq qatori argumentlari → SPRING_APPLICATION_JSON → JVM -D → OS muhit o'zgaruvchilari → application-{profile}.yml/properties (jar tashqarisidagi, keyin ichidagi) → application.yml → @PropertySource → default. Xuddi shu kalit yuqoridagida bo'lsa, pastdagi ustidan yoziladi. Profil fayli oddiy fayldan ustun.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>@Value va @ConfigurationProperties farqi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@Value — bitta kalit, SpEL qo'llaydi, string→tip oddiy konvertatsiya, validatsiya yo'q, sozlamalar kod bo'ylab sochiladi. @ConfigurationProperties — prefiks bo'yicha butun guruh tipli klass/record'ga, relaxed binding, nested obyekt/ro'yxat, Duration/DataSize, @Validated bilan startup validatsiya, IDE metadata (spring-boot-configuration-processor). Guruh sozlamalar uchun — ikkinchisi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Profil nima? Qanday faollashtiriladi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Muhitga mos sozlama to'plami va shartli bean'lar. application-{name}.yml avtomatik, @Profile('x')/@Profile('!x') bean'lar. Faollashtirish: spring.profiles.active (yml'da faqat lokal default), SPRING_PROFILES_ACTIVE env, --spring.profiles.active=, testda @ActiveProfiles. Bir nechta profil vergul bilan; spring.profiles.group bilan guruhlash; 'default' profil hech biri berilmaganda.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Sirlarni (parol, token) qanday saqlaysiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Yml'da placeholder: <code>${DB_PASSWORD}</code>. Qiymat — muhit o'zgaruvchisi (Docker secret, K8s Secret mounted env), yoki Spring Cloud Vault / AWS Secrets Manager / Azure Key Vault (spring.config.import=vault://). Git'ga hech qachon. Log'ga chiqmasin (Actuator /env sanitize qiladi). Prod parol lokalga tushmasin.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Relaxed binding nima?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Bitta xususiyatni turli yozuvda berish mumkinligi: bank.limit-max (yml, tavsiya), bank.limitMax, bank.limit_max, BANK_LIMITMAX / BANK_LIMIT_MAX (env). Env var'da nuqta va tire bo'lmagani uchun kerak. Ro'yxat: BANK_HOSTS_0, BANK_HOSTS_1.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>application.properties va yml farqi? Ikkalasi bo'lsa?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Sintaksis: properties — kalit=qiymat, tekis; yml — ierarxik, ro'yxatlar qulay, lekin bo'shliqqa sezgir va bir faylda '---' bilan bir nechta hujjat (profil bo'yicha) bo'lishi mumkin. Ikkalasi bo'lsa properties yml'dan ustun. Jamoada bittasini tanlang.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Sozlama o'zgarganda restart'siz qo'llash mumkinmi?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">Oddiy Boot'da yo'q — startup'da o'qiladi. Spring Cloud Config + @RefreshScope (actuator/refresh) yoki Consul/Kubernetes ConfigMap watcher bilan. @ConfigurationProperties bean'lari @RefreshScope'siz ham Cloud Config'da qayta bog'lanadi. Bank tizimida odatda deploy orqali — o'zgarish audit qilinadi.</div></details>
+<details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Testda konfiguratsiyani qanday o'zgartirasiz?<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></summary><div class="iv-a">@SpringBootTest(properties = "bank.limit=100"), @TestPropertySource, @ActiveProfiles("test") + application-test.yml, @DynamicPropertySource (Testcontainers port kabi dinamik qiymatlar uchun), @MockBean bilan bean almashtirish.</div></details></div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>O'zingizni tekshiring</h2></div>
+    <div class="quiz" id="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>application.yml'da bank.limit=10000, muhitda BANK_LIMIT=70000. Qiymat?</div><button class="opt">10000</button><button class="opt">70000</button><button class="opt">Xato — konflikt</button><button class="opt">Ikkalasi</button><div class="q-fb" data-ok="To'g'ri. Env var yml'dan ustun." data-no="70000. Muhit o'zgaruvchisi jar ichidagi yml'ni yengadi — shuning uchun deploy'da o'zgartirish oson."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Prod parolini qayerga yozish kerak?</div><button class="opt">application-prod.yml</button><button class="opt">Muhit o'zgaruvchisi / Secret manager, yml'da ${…} placeholder</button><button class="opt">Kodga konstanta</button><button class="opt">README</button><div class="q-fb" data-ok="To'g'ri." data-no="Faqat muhit/secret manager. Yml git'da — parol git'da bo'lmasin."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>@Profile("!prod") bean qachon yaratiladi?</div><button class="opt">Faqat prod'da</button><button class="opt">prod faol bo'lmagan har qanday holatda</button><button class="opt">Hech qachon</button><button class="opt">Faqat dev'da</button><div class="q-fb" data-ok="To'g'ri. ! — inkor." data-no="prod'dan tashqari hamma profilda (dev, test, default)."></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>Ro'yxatni env var orqali berish?</div><button class="opt">BANK_HOSTS=a,b</button><button class="opt">BANK_HOSTS_0=a BANK_HOSTS_1=b</button><button class="opt">BANK.HOSTS[0]=a</button><button class="opt">Mumkin emas</button><div class="q-fb" data-ok="To'g'ri. Indeks bilan. (Vergulli string ham List<String>'ga ishlaydi — ikkisi ham to'g'ri, lekin indeksli usul rasmiy.)" data-no="BANK_HOSTS_0, BANK_HOSTS_1 — indeksli relaxed binding. (Vergul bilan berilgan string ham ko'p holatda List'ga aylanadi.)"></div></div>
+<div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>@ConfigurationProperties'da @Positive long limitMax, yml'da -5. Nima bo'ladi?</div><button class="opt">Ishlaydi, -5 bo'ladi</button><button class="opt">@Validated bo'lsa — startup xatosi</button><button class="opt">0 ga aylanadi</button><button class="opt">Runtime'da xato</button><div class="q-fb" data-ok="To'g'ri. Fail-fast: noto'g'ri sozlama bilan ilova ishga tushmaydi." data-no="@Validated bilan startup'da 'Binding to target failed'. Bu yaxshi — prod'da noto'g'ri sozlama bilan ishlab ketmaydi."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi modul · Spring</span>
+      <h3>REST API chuqur</h3>
+      <p>HTTP so'rov Tomcat'dan controller'gacha qanday yo'l bosadi — filter, DispatcherServlet, handler, Jackson. Status kodlar, DTO, ResponseEntity, idempotentlik, API dizayn qoidalari.</p>
+      <div class="topics"><span class="topic-pill">24 · Spring DI</span><span class="topic-pill now">25 · Konfiguratsiya</span><span class="topic-pill">26 · REST</span><span class="topic-pill">27 · Validation</span><span class="topic-pill">…</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish"><div class="cnav-grid"><a class="cn pv" href="24-spring-boot-va-di.html"><span class="cl">← Oldingi dars</span><span class="ct">24 · Spring Boot va DI</span><span class="cs">🍃 Spring Boot</span></a><a class="cn nx" href="26-rest-api-chuqur.html"><span class="cl">Keyingi dars →</span><span class="ct">26 · REST API chuqur</span><span class="cs">🍃 Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">☰ Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:28.4%"></i></div><span>25 / 88</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(25)<0)v.push(25);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','25');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(25)<0)D[t].push(25);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement,tb=document.getElementById('themeBtn');
+  function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+  [].slice.call(document.querySelectorAll('#quiz .q')).forEach(function(q){
+    var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+    opts.forEach(function(o,k){o.addEventListener('click',function(){
+      if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+      var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+      fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+  });
+
+
+  /* layers */
+  var L=[
+    {pr:1,src:'Buyruq qatori',sub:'java -jar app.jar --bank.limit=90000',val:'90000',on:false},
+    {pr:2,src:'Muhit o\'zgaruvchisi',sub:'BANK_LIMIT=70000 (Docker/K8s)',val:'70000',on:false},
+    {pr:3,src:'application-prod.yml',sub:'profil fayli (prod faol bo\'lsa)',val:'50000',on:true},
+    {pr:4,src:'application.yml',sub:'jar ichida, default',val:'10000',on:true},
+    {pr:5,src:'Kod: @Value("${bank.limit:5000}")',sub:'oxirgi chora — default',val:'5000',on:true}
+  ];
+  var layers=document.getElementById('layers');
+  function renderL(){layers.innerHTML=L.map(function(l,i){return '<div class="lay'+(l.on?'':' off')+'" data-i="'+i+'"><span class="pr">#'+l.pr+'</span><span class="src">'+l.src+'<small>'+l.sub+'</small></span><label><span class="val">'+l.val+'</span><input type="checkbox" '+(l.on?'checked':'')+' data-i="'+i+'" aria-label="yoq/och"></label></div>';}).join('');
+    var w=L.findIndex(function(l){return l.on;});[].slice.call(layers.children).forEach(function(c,i){c.classList.toggle('win',i===w);});
+    document.getElementById('resVal').textContent=w>=0?L[w].val:'???';document.getElementById('resSrc').textContent=w>=0?'← '+L[w].src:'';
+    var below=L.filter(function(l,i){return l.on&&i>w;}).map(function(l){return l.src;});
+    document.getElementById('layNote').innerHTML=w<0?'Hech qayerda yo\'q → <b>startup xatosi</b>: Could not resolve placeholder \'bank.limit\'.':'<b>'+L[w].src+'</b> yutdi (eng yuqori ustunlik). '+(below.length?'Pastdagilar ('+below.join(', ')+') o\'qildi, lekin <b>ustidan yozildi</b>.':'')+' Yuqoridagi qatlamlarni yoqib ko\'ring — prod\'da "nega sozlamam ishlamayapti?" deganda javob shu ro\'yxatda.';
+    [].slice.call(layers.querySelectorAll('input')).forEach(function(inp){inp.addEventListener('change',function(){L[+inp.dataset.i].on=inp.checked;renderL();});});}
+  renderL();
+
+  /* profiles */
+  var P={dev:{files:[['application.yml',1],['application-dev.yml',1],['application-test.yml',0],['application-prod.yml',0]],beans:[['H2 in-memory DataSource',1,'@Profile("dev")'],['PostgreSQL DataSource',0,'@Profile("!dev")'],['Soxta SmsYuboruvchi (log)',1,'@Profile("!prod")'],['Real SmsYuboruvchi',0,'@Profile("prod")'],['Swagger UI',1,'@Profile("!prod")'],['DevTools hot reload',1,'dev']],note:'<b>dev</b>: noutbukda tez ishga tushadi — H2 baza xotirada, SMS faqat log\'ga, Swagger ochiq. Hech qanday tashqi servis kerak emas.'},
+    test:{files:[['application.yml',1],['application-dev.yml',0],['application-test.yml',1],['application-prod.yml',0]],beans:[['H2 in-memory DataSource',0,'@Profile("dev")'],['PostgreSQL DataSource (Testcontainers)',1,'@Profile("!dev")'],['Soxta SmsYuboruvchi (log)',1,'@Profile("!prod")'],['Real SmsYuboruvchi',0,'@Profile("prod")'],['Swagger UI',1,'@Profile("!prod")'],['DevTools hot reload',0,'dev']],note:'<b>test</b>: CI\'da. Real Postgres (Docker\'da Testcontainers) — prod\'ga yaqin, lekin SMS yuborilmaydi. @ActiveProfiles("test") bilan.'},
+    prod:{files:[['application.yml',1],['application-dev.yml',0],['application-test.yml',0],['application-prod.yml',1]],beans:[['H2 in-memory DataSource',0,'@Profile("dev")'],['PostgreSQL DataSource',1,'@Profile("!dev")'],['Soxta SmsYuboruvchi (log)',0,'@Profile("!prod")'],['Real SmsYuboruvchi',1,'@Profile("prod")'],['Swagger UI',0,'@Profile("!prod")'],['DevTools hot reload',0,'dev']],note:'<b>prod</b>: real baza (parol muhitdan), real SMS, Swagger yopiq. Faollashtirish: <code>SPRING_PROFILES_ACTIVE=prod</code>. Xato profil bilan prod\'ga chiqish — klassik falokat, CI\'da tekshiring.'}};
+  function renderP(p){var d=P[p];document.getElementById('pfiles').innerHTML=d.files.map(function(f){return '<div class="pitem '+(f[1]?'on':'off')+'"><span>'+f[0]+'</span></div>';}).join('');document.getElementById('pbeans').innerHTML=d.beans.map(function(b){return '<div class="pitem '+(b[1]?'on':'off')+'"><span>'+b[0]+'</span><small>'+b[2]+'</small></div>';}).join('');document.getElementById('pNote').innerHTML=d.note;}
+  [].slice.call(document.querySelectorAll('.prof')).forEach(function(b){b.addEventListener('click',function(){[].slice.call(document.querySelectorAll('.prof')).forEach(function(x){x.classList.toggle('on',x===b);});renderP(b.dataset.p);});});renderP('dev');
+
+  /* yml map */
+  var YN={0:'prefix "bank" → butun record. Startup\'da yml o\'qilib, BankProps yaratiladi va bean sifatida konteynerga qo\'yiladi.',1:'limit-max → limitMax (relaxed binding). @Positive: 0 yoki manfiy bo\'lsa — ilova ishga tushmaydi: "Binding to target failed".',2:'valyuta → String. @NotBlank — bo\'sh bo\'lsa xato.',3:'sms: — ichki record Sms\'ga mapping (nested).',4:'url → java.net.URI — noto\'g\'ri format bo\'lsa startup\'da xato, runtime\'da emas.',5:'"3s" → Duration.ofSeconds(3). "500ms", "2m", "1h" ham ishlaydi. Xotira: "10MB" → DataSize.',6:'YAML ro\'yxati → List<String>. Env var orqali: BANK_RUXSATIP_0=10.0.0.1'};
+  [].slice.call(document.querySelectorAll('.yl')).forEach(function(y){y.addEventListener('click',function(){var f=y.dataset.f;[].slice.call(document.querySelectorAll('.yl')).forEach(function(x){x.classList.toggle('hl',x===y);});[].slice.call(document.querySelectorAll('.jl')).forEach(function(x){x.classList.toggle('hl',x.dataset.f===f);});document.getElementById('yNote').innerHTML=YN[f];});});
+
+})();
+</script>
+</body>
+</html>
