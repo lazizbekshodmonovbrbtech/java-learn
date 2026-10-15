@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sekin so‘rovlarni tuzatish</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐘</text></svg>">
+
+
+
+<style>
+:root{
+  --bg:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F8FB;--sunken:#E6ECF2;
+  --ink:#182430;--ink-soft:#4C5866;--ink-faint:#7C8896;--border:#D8E0E9;--border-strong:#C3CDD8;
+  --accent:#2E6FA8;--accent-ink:#1F5183;--accent-soft:#E1EDF7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+.trc-in{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-family:var(--font-mono);font-size:12.5px}
+.trc-in input{flex:1;min-width:150px;font-family:var(--font-mono);font-size:13px;padding:7px 10px;border:1.5px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--ink)}
+.trc-in .chip2{border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:4px 10px;cursor:pointer;font-family:var(--font-mono);font-size:11.5px;color:var(--ink)}
+.trc-in .chip2:hover{border-color:var(--accent)}
+.trc-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:14px}.trc-g>div{min-width:0}
+.trc-code{border:1px solid var(--border);border-radius:12px;background:var(--sunken);overflow:hidden;align-self:start}
+.trc-code .code-bar{padding:7px 12px}
+.trc-code ol{list-style:none;margin:0;padding:6px 0;font-family:var(--font-mono);font-size:12.3px;line-height:1.75;counter-reset:ln;overflow-x:auto}
+.trc-code li{counter-increment:ln;padding:0 12px 0 40px;position:relative;white-space:pre;transition:background .2s}
+.trc-code li:before{content:counter(ln);position:absolute;left:8px;width:22px;text-align:right;color:var(--ink-faint);font-size:11px}
+.trc-code li.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.trc-code li.on:after{content:"◀";position:absolute;right:8px;color:var(--accent);font-size:10px}
+.trc-viz{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:12px;min-height:150px;position:relative;overflow:hidden}
+.trc-vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.trc-vars span{font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface);transition:background .3s}
+.trc-vars span.ch{background:var(--accent-soft);border-color:var(--accent)}
+.trc-vars b{font-weight:700}
+.trc-cnt{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;font-family:var(--font-mono);font-size:12px}
+.trc-cnt span{border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface)}
+.trc-cnt b{font-size:14px}
+.trc-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.trc-ctl input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+.trc-ctl select{font-family:var(--font-mono);font-size:12px;border:1.5px solid var(--border);border-radius:9px;padding:6px;background:var(--surface-2);color:var(--ink)}
+.trc-step{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);min-width:84px}
+@media (max-width:760px){.trc-g{grid-template-columns:1fr}.trc-code ol{font-size:11.5px}.trc-viz{min-height:0}}
+/* array viz */
+.av{position:relative;margin:4px auto 0;max-width:100%}
+.av .c{position:absolute;bottom:22px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid var(--border-strong);background:var(--surface);font-family:var(--font-mono);font-weight:700;font-size:13px;transition:left .45s cubic-bezier(.3,.8,.3,1),height .35s,background .25s,border-color .25s,transform .25s,opacity .3s;box-sizing:border-box}
+.av .c.ok{background:var(--accent-soft);border-color:var(--accent)}
+.av.bars .c{align-items:flex-end;padding-bottom:3px;font-size:11px}
+.av .c.cmp{background:#FFF2C2;border-color:#D9A400;transform:translateY(-6px)}
+.av .c.sw{background:#FFD9CF;border-color:#D9534F;transform:translateY(-10px)}
+.av .c.dim{opacity:.35}
+.av .c.key{background:#DCEBFF;border-color:#2E6FA8;transform:translateY(-14px)}
+.av .c.hit{background:var(--accent);border-color:var(--accent);color:#fff}
+.av .ix{position:absolute;bottom:4px;font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);text-align:center;transition:left .45s}
+.av .pt{position:absolute;top:0;font-family:var(--font-mono);font-size:11px;font-weight:700;text-align:center;transition:left .4s cubic-bezier(.3,.8,.3,1);color:var(--accent-ink);white-space:nowrap}
+.av .pt i{display:block;font-style:normal;line-height:1}
+.av .rg{position:absolute;bottom:16px;border:2px dashed var(--accent);border-radius:12px;background:color-mix(in srgb,var(--accent) 9%,transparent);z-index:0;transition:left .4s cubic-bezier(.3,.8,.3,1),width .4s cubic-bezier(.3,.8,.3,1)}.av .c{z-index:1}
+:root[data-theme="dark"] .av .c.cmp{background:#4A3B06}:root[data-theme="dark"] .av .c.sw{background:#4A1D16}:root[data-theme="dark"] .av .c.key{background:#14243A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .av .c.cmp{background:#4A3B06}:root:not([data-theme="light"]) .av .c.sw{background:#4A1D16}:root:not([data-theme="light"]) .av .c.key{background:#14243A}}
+/* grid viz (DP) */
+.gv{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:var(--font-mono);font-size:12px}
+.gv td,.gv th{min-width:30px;height:30px;text-align:center;border-radius:6px;transition:background .25s,transform .25s}
+.gv th{color:var(--ink-faint);font-weight:500;font-size:11px}
+.gv td{background:var(--surface);border:1px solid var(--border)}
+.gv td.e{color:transparent}
+.gv td.cur{background:var(--accent);color:#fff;transform:scale(1.12)}
+.gv td.src{background:#FFF2C2;border-color:#D9A400}
+.gv td.fin{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+:root[data-theme="dark"] .gv td.src{background:#4A3B06}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gv td.src{background:#4A3B06}}
+/* graph/tree viz */
+.gr{width:100%;display:block}
+.gr line,.gr path.ed{stroke:var(--border-strong);stroke-width:2;transition:stroke .3s,stroke-width .3s}
+.gr .ed.on{stroke:var(--accent);stroke-width:4}
+.gr .ed.dim{opacity:.25}
+.gr .ew{font-family:var(--font-mono);font-size:11px;fill:var(--ink-soft)}
+.gr circle{fill:var(--surface);stroke:var(--border-strong);stroke-width:2;transition:fill .3s,stroke .3s}
+.gr .nd.q circle{fill:#FFF2C2;stroke:#D9A400}
+.gr .nd.cur circle{fill:var(--accent);stroke:var(--accent)}
+.gr .nd.cur text{fill:#fff}.gr .nd text.lab,.gr .nd.cur text.lab{fill:var(--accent-ink)}
+.gr .nd.vis circle{fill:var(--accent-soft);stroke:var(--accent)}
+.gr .nd.bad circle{fill:#FFD9CF;stroke:#D9534F}
+.gr .nd.nw circle{fill:#DFF3E8;stroke:#2C8F68;stroke-width:3}
+.gr text{font-family:var(--font-mono);font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.gr .lab{font-size:10.5px;font-weight:500;fill:var(--accent-ink)}
+
+.sq-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sq-top button{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--ink)}
+.sq-top button:hover{border-color:var(--accent)}
+.sq-top button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sq-g{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:12px}
+.sq-ed textarea{width:100%;box-sizing:border-box;min-height:130px;font-family:var(--font-mono);font-size:13px;line-height:1.6;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border-strong);background:#14171C;color:#E8EDF2;resize:vertical;tab-size:2}
+.sq-ed textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.sq-sch{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:8px;font-family:var(--font-mono);font-size:11.5px;max-height:240px;overflow-y:auto}
+.sq-sch details{margin-bottom:4px}.sq-sch summary{cursor:pointer;font-weight:700;padding:2px 4px;border-radius:6px}
+.sq-sch summary:hover{background:var(--surface)}
+.sq-sch div{padding-left:14px;color:var(--ink-soft);line-height:1.6}
+.sq-sch .pk{color:var(--accent-ink);font-weight:700}
+.sq-out{margin-top:10px;border:1px solid var(--border);border-radius:12px;overflow:auto;max-height:340px;background:var(--surface)}
+.sq-out table{border-collapse:collapse;font-family:var(--font-mono);font-size:12px;min-width:100%}
+.sq-out th{position:sticky;top:0;background:var(--surface-2);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+.sq-out td{padding:5px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.sq-out td.n{text-align:right}.sq-out td.nl{color:var(--ink-faint);font-style:italic}
+.sq-out tr{animation:pop .3s both}
+.sq-msg{padding:10px 12px;font-family:var(--font-mono);font-size:12.5px}
+.sq-msg.er{color:var(--coral);background:var(--coral-soft)}
+.sq-meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+@media (max-width:760px){.sq-g{grid-template-columns:1fr}.sq-sch{max-height:150px}}
+
+.qf-t{font:700 12px var(--font-mono);color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.qf-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:14px;align-items:start}
+.qf-g>*{min-width:0}
+.qf.ws .qf-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.qf-sql{margin:0;background:#12161B;color:#D6DDE6;border-radius:12px;padding:12px 8px;font:12.5px/1.75 var(--font-mono);white-space:pre-wrap;word-break:break-word;position:sticky;top:10px}
+.qf-sql .ln{display:block;padding:0 8px;border-radius:6px;opacity:.38;transition:opacity .3s,background .3s}
+.qf-sql .ln.done{opacity:.8}
+.qf-sql .ln.on{opacity:1;background:rgba(255,255,255,.09);box-shadow:inset 3px 0 0 #6FA8FF}
+.qf-sql .kw,.sqlh .kw{color:#7FB4F5;font-weight:700}.qf-sql .st,.sqlh .st{color:#9BD3A0}.qf-sql .cm,.sqlh .cm{color:#7D8794;font-style:italic}.qf-sql .fn,.sqlh .fn{color:#E9B96E}
+.qf-board{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;min-height:280px}
+.qf-grp{flex:1 1 100%;border:1.5px solid var(--border-strong);border-radius:12px;background:var(--surface);overflow-x:auto;overflow-y:hidden;max-width:100%}
+.qf-board.many .qf-grp{flex:1 1 calc(50% - 10px)}
+.qf-gh{font:700 11.5px var(--font-mono);padding:5px 10px 5px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:6px}
+.qf-gh span{color:var(--ink-faint);font-weight:500}
+.qf-r{display:grid;font:12px var(--font-mono);border-bottom:1px solid var(--border);position:relative;background:var(--surface);transition:background .3s,opacity .3s}
+.qf-r:last-child{border-bottom:0}
+.qf-r>span{padding:4px 7px 4px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qf-r.hd{color:var(--ink-faint);font-size:10.5px;background:var(--surface)}
+.qf-r.out{background:var(--coral-soft);opacity:.55}.qf-r.out>span{text-decoration:line-through}
+.qf-r.hit{background:var(--accent-soft)}
+.qf-r.new{animation:pop .45s}
+.qf-r .qs{position:absolute;left:0;top:0;bottom:0;width:4px}
+.qf-r span.agg{color:var(--accent-ink);font-weight:700}
+.qf-r span.cc{background:rgba(217,130,43,.13);font-weight:700}
+.qf-r i.n0{color:var(--ink-faint);font-style:italic;opacity:.8}
+@media (max-width:760px){.qf-g{grid-template-columns:1fr}.qf-sql{position:static}.qf-board{min-height:0}.qf-board.many .qf-grp{flex:1 1 100%}}
+
+.sx-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sx-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.sx-tabs button{min-width:36px;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface-2);font:600 13px var(--font-mono);color:var(--ink);cursor:pointer}
+.sx-tabs button.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sx-tabs button.ok{background:var(--teal-soft);color:var(--teal-ink);border-color:transparent}
+.sx-tabs button.ok.on{border-color:var(--accent)}
+.sx textarea{width:100%;box-sizing:border-box;background:#12161B;color:#E6EDF3;border:1.5px solid var(--border-strong);border-radius:12px;padding:12px;font:13px/1.6 var(--font-mono);resize:vertical}
+.sx .sq-out:empty{display:none}
+.sx-cnt{font:12px var(--font-mono);color:var(--ink-faint)}
+.sx-txt{font-size:15px;line-height:1.6;margin-bottom:10px}
+.sx-fb{display:none;margin-top:12px;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.6}
+.sx-fb.ok{display:block;background:var(--teal-soft);color:var(--teal-ink)}
+.sx-fb.no{display:block;background:var(--coral-soft);color:var(--coral)}
+.sx-fb .btn{margin-left:8px;padding:4px 10px}
+.sx-h{margin-top:6px;color:var(--ink-soft,var(--ink))}
+
+.pbox{border:1.5px solid var(--border-strong);border-radius:14px;overflow:hidden;background:#12161B;margin-top:12px;min-width:0}
+.phead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.ptitle{font:700 12.5px var(--font-mono);color:var(--ink)}
+.ptag{font:700 11px var(--font-mono);padding:2px 8px;border-radius:6px}.ptag.good{background:var(--teal-soft);color:var(--teal-ink)}.ptag.bad{background:var(--coral-soft);color:var(--coral)}
+.pchips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.pchip{font:700 11.5px var(--font-mono);padding:2px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--border)}
+.pchip.t{color:var(--accent-ink)}.pchip.b{color:var(--amber)}
+.pln{margin:0;padding:10px 12px;color:#C9D3DD;font:11.5px/1.6 var(--font-mono);white-space:pre;overflow-x:auto}
+.pbox.nc .pc{display:none}
+.pln .pn{font-weight:800}.pln .pn.bad{color:#FF8E7A}.pln .pn.good{color:#6FE0B4}.pln .pn.mid{color:#8EC2FF}
+.pln .pt{color:#FFD479;font-weight:700}.pln .pc{color:#6B7785}.pln .pr{color:#FF8E7A}.pln .pb{color:#E9B96E}.pln .pg0{color:#6FE0B4;font-weight:700}.pln .ps{color:#C9A7FF}
+.pln .px{color:#fff;background:rgba(255,255,255,.12);padding:0 5px;border-radius:4px}
+.pnote{padding:9px 12px;background:var(--surface);border-top:1px solid var(--border);font-size:13.5px;line-height:1.6;color:var(--ink)}
+.pcmp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.pverd{margin-top:10px;padding:10px 14px;border-radius:12px;background:var(--teal-soft);color:var(--teal-ink);font-weight:600;font-size:14.5px}
+@media (max-width:860px){.pcmp{grid-template-columns:1fr}}
+
+.ptr-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);padding:8px}
+.ptr-wrap svg{display:block;margin:0 auto}
+.ptr .pe{fill:none;stroke:var(--border-strong);transition:stroke .3s,opacity .3s}
+.ptr .pe.on{stroke:var(--accent);stroke-dasharray:7 6;animation:pflow .7s linear infinite}
+.ptr .pe.done{stroke:var(--accent);opacity:.55}
+@keyframes pflow{to{stroke-dashoffset:-13}}
+.ptr .pel{font:700 10.5px var(--font-mono);fill:var(--ink-faint)}
+.ptr .pel.on{fill:var(--accent-ink)}
+.ptr .pnd rect{stroke:var(--border-strong);stroke-width:1.5;transition:stroke .25s,stroke-width .25s}
+.ptr .pnd.on rect{stroke:var(--accent);stroke-width:3.5}
+.ptr .pnd text{font:11px var(--font-mono);fill:var(--ink)}
+.ptr .pnd .t1{font-weight:800;font-size:12px}
+.ptr .pnd .mis{fill:var(--coral);font-weight:800}
+.ptr .pnd{cursor:pointer}
+.ptr-info{margin-top:10px;font:12.5px/1.6 var(--font-mono);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ptr-info div{border:1px solid var(--border);border-radius:10px;padding:6px 10px;background:var(--surface);min-width:0}
+.ptr-info b{display:block;font-size:15px;color:var(--accent-ink)}
+@media (max-width:760px){.ptr-info{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+.cs-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.cs-tabs button{border:1.5px solid var(--border);background:var(--surface-2);border-radius:10px;padding:7px 11px;font:700 12.5px var(--font-mono);color:var(--ink);cursor:pointer;display:flex;gap:6px;align-items:center}
+.cs-tabs button .g{font-size:11px;padding:1px 6px;border-radius:6px;background:var(--teal-soft);color:var(--teal-ink)}
+.cs-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cs-tabs button.on .g{background:rgba(255,255,255,.2);color:#fff}
+.csx{display:none;margin-top:14px}
+.csx.on{display:block;animation:pop .3s}
+.csx h3{margin:0 0 6px;font-size:19px}
+.csx .prob{font-size:15px;line-height:1.65;margin-bottom:8px}
+.gain{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;padding:12px 16px;border-radius:14px;background:var(--teal-soft);color:var(--teal-ink)}
+.gain b{font:800 26px var(--font-mono)}
+.gain span{font-size:14.5px;line-height:1.5;flex:1;min-width:220px}
+.sbox{margin-top:10px;min-width:0}
+.sbox .lbl{font:700 11.5px var(--font-mono);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.sbox .lbl.b{color:var(--coral)}.sbox .lbl.a{color:var(--teal-ink)}
+.algo{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.algo div{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface);font-size:12.5px;min-width:0}
+.algo b{display:block;font:800 18px var(--font-mono);color:var(--accent-ink)}
+@media (max-width:760px){.algo{grid-template-columns:1fr 1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"><style id="ky-skin">
+:root{--font-display:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F7F7F7;--sunken:#F2F2F2;--ink:#111111;--ink-soft:#555555;--ink-faint:#8C8C8C;--border:#ECECEC;--border-strong:#DCDCDC;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);--ky-ok:#16A34A;--ky-ov:rgba(0,0,0,.28)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-feature-settings:"cv11","ss01"}
+h1,h2,h3,h4{letter-spacing:-.022em;text-wrap:balance}
+h1{letter-spacing:-.035em}
+.theme-btn{display:none!important}
+.hero{padding-block:36px 28px!important}
+
+/* top bar */
+.ky-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--border);font-family:var(--font-body);font-size:14px;line-height:1.3}
+@supports (backdrop-filter:blur(1px)){.ky-bar{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px)}}
+.ky-in{max-width:828px;margin:0 auto;height:54px;display:flex;align-items:center;gap:6px;padding-inline:14px;box-sizing:border-box}
+.ky-ib{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:0;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:none;padding:0}
+.ky-ib:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ib:focus-visible,.ky-ls a:focus-visible,.cnav a:focus-visible{outline:2px solid var(--tc);outline-offset:1px}
+.ky-ib svg{width:18px;height:18px}
+.ky-ib[aria-disabled="true"]{opacity:.3;pointer-events:none}
+.ky-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;letter-spacing:-.02em;flex:none;margin-right:6px}
+.ky-logo i{font-style:normal;font-family:var(--font-mono);font-size:12px;font-weight:500;background:var(--ink);color:var(--bg);border-radius:7px;padding:3px 7px}
+.ky-crumb{min-width:0;flex:1;display:flex;align-items:center;gap:8px;color:var(--ink-soft);padding-left:4px}
+.ky-crumb b{font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ky-crumb .num{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);flex:none}
+.ky-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--tc)}
+.ky-sep{width:1px;height:20px;background:var(--border);margin-inline:4px;flex:none}
+.ky-prog{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--tc);transform-origin:0 50%;transform:scaleX(0)}
+.theme-ic .mo{display:none}
+:root[data-theme="dark"] .theme-ic .su{display:none}:root[data-theme="dark"] .theme-ic .mo{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-ic .su{display:none}:root:not([data-theme="light"]) .theme-ic .mo{display:block}}
+
+/* sidebar */
+.ky-side{position:fixed;top:0;left:0;bottom:0;width:292px;max-width:86vw;z-index:50;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;font-family:var(--font-body);transform:translateX(-102%);transition:transform .28s cubic-bezier(.3,.8,.3,1);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;visibility:hidden}
+.ky-side.on{transform:none;visibility:visible;box-shadow:0 0 60px rgba(0,0,0,.2)}
+.ky-sh{display:flex;align-items:center;height:54px;padding-inline:16px 8px;border-bottom:1px solid var(--border);flex:none}
+.ky-sh .ky-x{margin-left:auto}
+.ky-tr{padding:18px 18px 10px;flex:none}
+.ky-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.ky-tn{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;margin-top:6px;letter-spacing:-.02em;color:var(--ink)}
+.ky-tn .ky-dot{width:10px;height:10px}
+.ky-pg{display:flex;align-items:center;gap:10px;margin-top:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint)}
+.ky-pg i{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}.ky-pg i b{display:block;height:100%;width:0;background:var(--tc);transition:width .6s}
+.ky-ls{flex:1;overflow-y:auto;padding:4px 10px 18px;overscroll-behavior:contain}
+.ky-ls a{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--ink-soft);font-size:13.5px;line-height:1.4}
+.ky-ls a:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ls a .n{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-right:7px}
+.ky-st{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:1px;box-sizing:border-box;display:grid;place-items:center}
+.ky-st svg{width:10px;height:10px;display:none}
+.ky-ls a.done .ky-st{background:var(--tc);border-color:var(--tc);color:#fff}.ky-ls a.done .ky-st svg{display:block}
+.ky-ls a.cur{background:var(--surface-2);color:var(--ink);font-weight:600}
+.ky-ls a.cur .ky-st{border:5px solid var(--tc);background:none}.ky-ls a.cur .ky-st svg{display:none}
+.ky-oth{margin-top:14px;border-top:1px solid var(--border);padding-top:8px}
+.ky-oth summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border-radius:10px}
+.ky-oth summary:hover{background:var(--surface-2)}
+.ky-oth summary::-webkit-details-marker{display:none}
+.ky-oth summary svg{width:14px;height:14px;color:var(--ink-faint);transition:transform .2s}
+.ky-oth[open] summary svg{transform:rotate(180deg)}
+.ky-oth a{grid-template-columns:18px 1fr auto}
+.ky-oth a .ky-dot{margin:5px 0 0 4px}
+.ky-oth a .c{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);padding-top:2px}
+.ky-sf{flex:none;border-top:1px solid var(--border);padding:12px}
+.ky-sf a{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:12px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600;font-size:14px}
+.ky-sf a svg{width:16px;height:16px}
+.ky-ov{position:fixed;inset:0;background:var(--ky-ov);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
+.ky-ov.on{opacity:1;pointer-events:auto}
+@media (min-width:1200px){.ky-side{transform:none;visibility:visible;box-shadow:none!important}body{padding-left:292px}.ky-menu,.ky-ov,.ky-x,.ky-bar .ky-logo,.ky-bar .ky-sep{display:none!important}}
+@media (max-width:560px){.ky-hs{display:none!important}.ky-in{padding-inline:8px}}
+
+/* bottom prev/next */
+.cnav{max-width:820px;margin:64px auto 72px;padding-inline:20px;box-sizing:border-box;font-family:var(--font-body)}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:6px;min-width:0;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 20px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cnav .cl{font-size:12.5px;color:var(--ink-faint);font-weight:500}
+.cnav .ct{font-weight:650;font-size:16.5px;line-height:1.3;letter-spacing:-.015em}
+.cnav .ct .n{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--ink-faint);margin-right:6px}
+.cnav .cs{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.cnav a.nx{background:var(--ink);border-color:var(--ink);color:var(--bg);text-align:right;align-items:flex-end}
+.cnav a.nx:hover{border-color:var(--ink)}
+.cnav a.nx .cl,.cnav a.nx .cs,.cnav a.nx .ct .n{color:color-mix(in srgb,var(--bg) 62%,var(--ink))}
+.cnav .empty{border:1px dashed var(--border-strong);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint);padding:18px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:14px;margin-top:18px;font-size:13px;color:var(--ink-soft)}
+.cnav-foot a{color:var(--ink);font-weight:600;text-decoration:none}.cnav-foot a:hover{text-decoration:underline}
+.cnav-bar{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--ink)}
+.cnav-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{order:-1;text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><header class="ky-bar" style="--tc:#2E6FA8"><div class="ky-in">
+<button type="button" class="ky-ib ky-menu" onclick="kySide(1)" aria-label="Mavzular ro'yxati" title="Mavzular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+<a class="ky-logo ky-hs" href="index.html"><i>{}</i>kod yo'li</a><span class="ky-sep ky-hs"></span>
+<div class="ky-crumb"><span class="ky-dot"></span><b>PostgreSQL</b><span class="num">13/15</span></div>
+<a class="ky-ib ky-hs" href="119-statistika-va-planer.html" aria-label="Oldingi dars" title="Oldingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a><a class="ky-ib ky-hs" href="121-partitsiya-vacuum-pool.html" aria-label="Keyingi dars" title="Keyingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+<button type="button" class="ky-ib" onclick="kyTheme()" aria-label="Yorug'/qorong'u rejim" title="Rejim"><svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><g class="su"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1 1M17.4 17.4l1 1M5.6 18.4l1-1M17.4 6.6l1-1"/></g><path class="mo" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+<a class="ky-ib " href="index.html" aria-label="Barcha darslar" title="Barcha darslar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></a>
+</div><i class="ky-prog" id="kyProg"></i></header>
+<div class="wrap">
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>PostgreSQL · 120-dars</span>
+    <h1>Sekin so‘rovlar: <span class="steam">8 ta haqiqiy “oldin / keyin”</span></h1>
+    <p class="lead">Production’dagi sekinlikning 90% i bir xil o‘nlab sabablardan. Har holatda: muammo, sekin so‘rov va uning haqiqiy rejasi, tuzatilgan variant va uning rejasi, natija — 1 mln tranzaksiyali bank bazasida PostgreSQL 18’da o‘lchangan.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Algoritm: sekin so‘rovni qanday tuzatish kerak</h2></div>
+    <div class="algo">
+      <div><b>1</b>pg_stat_statements: <b>total</b> vaqt bo‘yicha top-10</div>
+      <div><b>2</b>EXPLAIN (ANALYZE, BUFFERS) — haqiqiy parametrlar bilan</div>
+      <div><b>3</b>Eng og‘ir tugun + taxmin/haqiqat farqi</div>
+      <div><b>4</b>Bitta o‘zgarish: indeks, so‘rov, statistika</div>
+      <div><b>5</b>Qayta o‘lchash. Yozishga ta’sirini ham!</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Holatlar</h2></div><p class="sec-sub">Tabni tanlang.</p><div class="cs-tabs" id="csT"><button class="on" data-i="0">1. Chuqur sahifalash <span class="g">5 539×</span></button><button class="" data-i="1">2. COUNT(*) katta jadvalda <span class="g">22×</span></button><button class="" data-i="2">3. OR turli ustunlarda <span class="g">316×</span></button><button class="" data-i="3">4. NOT IN → NOT EXISTS <span class="g">42×</span></button><button class="" data-i="4">5. SELECT ichidagi subquery <span class="g">12 656×</span></button><button class="" data-i="5">6. LIKE '%…%' <span class="g">6.2×</span></button><button class="" data-i="6">7. N+1 → bitta so‘rov <span class="g">0.0×</span></button><button class="" data-i="7">8. Og‘ir hisobot → materialized view <span class="g">3 236×</span></button></div><div class="csx on" id="cs0"><h3>1. Chuqur sahifalash</h3><div class="prob">Mobil ilovada tranzaksiyalar tarixi “yana yuklash” bilan. 25 000-sahifada har so‘rov sekinlashadi: <code>OFFSET 500000</code> — baza 500 020 qatorni o‘qib, 500 000 tasini tashlaydi.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">OFFSET</span></div><pre class="code"><span class="k">SELECT</span> id, hisob_id, summa, sana
+<span class="k">FROM</span> tranzaksiyalar
+<span class="k">ORDER</span> <span class="k">BY</span> sana <span class="k">DESC</span>, id <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="nu">20</span> <span class="k">OFFSET</span> <span class="nu">500000</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">OFFSET</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 371.141 ms</span><span class="pchip b">📄 135 873 sahifa</span></span></div><pre class="pln"><b class="pn mid">Limit</b>  <span class="pc">(cost=31894.67..31895.95 rows=20 width=32)</span> (actual time=371.092..<span class="pt">371.111</span> rows=20.00 loops=1)
+  <span class="pb">Buffers: shared hit=135873</span>
+  -&gt;  <b class="pn good">Index Scan</b> using tx_sana_id on tranzaksiyalar  <span class="pc">(cost=0.42..63788.93 rows=1000000 width=32)</span> (actual time=0.020..<span class="pt">266.939</span> rows=500020.00 loops=1)
+        <span class="pb">Buffers: shared hit=135873</span>
+Execution Time: <b class="px">371.141 ms</b></pre><div class="pnote">Indeks bor, lekin u faqat tartibni beradi — 500 020 qadam yurish baribir kerak.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Keyset (seek)</span></div><pre class="code"><span class="k">SELECT</span> id, hisob_id, summa, sana
+<span class="k">FROM</span> tranzaksiyalar
+<span class="k">WHERE</span> (sana, id) &lt; (:oxirgiSana, :oxirgiId)
+<span class="k">ORDER</span> <span class="k">BY</span> sana <span class="k">DESC</span>, id <span class="k">DESC</span>
+<span class="k">LIMIT</span> <span class="nu">20</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Keyset (seek)</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 0.067 ms</span><span class="pchip b">📄 10 sahifa</span></span></div><pre class="pln"><b class="pn mid">Limit</b>  <span class="pc">(cost=0.42..2.29 rows=20 width=32)</span> (actual time=0.021..<span class="pt">0.042</span> rows=20.00 loops=1)
+  <span class="pb">Buffers: shared hit=10</span>
+  -&gt;  <b class="pn good">Index Scan</b> using tx_sana_id on tranzaksiyalar  <span class="pc">(cost=0.42..45190.54 rows=485510 width=32)</span> (actual time=0.020..<span class="pt">0.032</span> rows=20.00 loops=1)
+        Index Cond: (ROW(sana, id) &lt; ROW(&#x27;2024-11-08 10:00:00+05&#x27;::timestamp with time zone, 300000))
+        <span class="pb">Buffers: shared hit=10</span>
+Execution Time: <b class="px">0.067 ms</b></pre><div class="pnote">Indeksda kerakli nuqtaga sakrab, 20 qator o‘qiladi. Har sahifa bir xil tez.</div></div></div></div><div class="gain"><b>5 539×</b><span>371.141 ms → 0.067 ms. Mijoz uchun “cheksiz lenta” — faqat keyset. Klient oxirgi qatorning (sana, id) sini keyingi so‘rovga yuboradi.</span></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Java / Spring</span></div><pre class="code"><span class="cm">// Spring Data 3.1+: Window + KeysetScrollPosition</span>
+<span class="ty">Window</span>&lt;<span class="ty">Tx</span>&gt; sahifa = repo.findFirst20ByHisobIdOrderBySanaDescIdDesc(hisobId, <span class="ty">ScrollPosition</span>.keyset());
+<span class="cm">// keyingi: sahifa.positionAt(sahifa.size() - 1) → keyingi so‘rovga</span></pre></div></div><div class="csx" id="cs1"><h3>2. COUNT(*) katta jadvalda</h3><div class="prob">Admin panel: “Jami: 1 000 000 tranzaksiya · 50 000 sahifa”. Har sahifa ochilganda <code>count(*)</code> — butun jadval o‘qiladi (MVCC sababli PostgreSQL’da count “tekin” emas).</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">count(*)</span></div><pre class="code"><span class="k">SELECT</span> <span class="k">count</span>(*) <span class="k">FROM</span> tranzaksiyalar;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">count(*)</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 567.808 ms</span><span class="pchip b">📄 14 441 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=26941.00..26941.01 rows=1 width=8)</span> (actual time=567.757..<span class="pt">567.760</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=6281 read=8160</span>
+  -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar  <span class="pc">(cost=0.00..24441.00 rows=1000000 width=0)</span> (actual time=0.070..<span class="pt">312.988</span> rows=1000000.00 loops=1)
+        <span class="pb">Buffers: shared hit=6281 read=8160</span>
+Execution Time: <b class="px">567.808 ms</b></pre><div class="pnote">1 mln qator, 14 441 sahifa — har safar.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Chegaralangan count</span></div><pre class="code"><span class="k">SELECT</span> <span class="k">count</span>(*) <span class="k">FROM</span> (
+  <span class="k">SELECT</span> <span class="nu">1</span> <span class="k">FROM</span> tranzaksiyalar
+  <span class="k">WHERE</span> holat = <span class="st">'kutmoqda'</span>
+  <span class="k">LIMIT</span> <span class="nu">1001</span>
+) x;   <span class="cm">-- “1000+” deb ko‘rsatish</span></pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Chegaralangan count</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 25.529 ms</span><span class="pchip b">📄 1 371 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=3185.21..3185.22 rows=1 width=8)</span> (actual time=25.004..<span class="pt">25.007</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=12 read=1359</span>
+  -&gt;  <b class="pn mid">Limit</b>  <span class="pc">(cost=0.00..3172.70 rows=1001 width=4)</span> (actual time=0.026..<span class="pt">24.668</span> rows=1001.00 loops=1)
+        <span class="pb">Buffers: shared hit=12 read=1359</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar  <span class="pc">(cost=0.00..26941.00 rows=8500 width=4)</span> (actual time=0.024..<span class="pt">24.150</span> rows=1001.00 loops=1)
+              Filter: (holat = &#x27;kutmoqda&#x27;::text)
+              <span class="pr">Rows Removed by Filter: 111362</span>
+              <span class="pb">Buffers: shared hit=12 read=1359</span>
+Execution Time: <b class="px">25.529 ms</b></pre><div class="pnote">1001 tasini topishi bilan to‘xtaydi. Aniq son kerak bo‘lmasa — <code>pg_class.reltuples</code> (taxmin, darhol): 1000000.</div></div></div></div><div class="gain"><b>22×</b><span>567.808 ms → 25.529 ms. “1000+ natija” yoki taxminiy son. Spring Data’da <code>Page</code> o‘rniga <code>Slice</code> — count so‘rovi umuman yo‘q.</span></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Java / Spring</span></div><pre class="code"><span class="cm">// ❌ Page&lt;T&gt; — har safar qo‘shimcha SELECT count(*)</span>
+<span class="ty">Page</span>&lt;<span class="ty">Tx</span>&gt; findByHisobId(<span class="ty">Long</span> id, <span class="ty">Pageable</span> p);
+<span class="cm">// ✅ Slice&lt;T&gt; — faqat “keyingi sahifa bormi” (LIMIT n+1)</span>
+<span class="ty">Slice</span>&lt;<span class="ty">Tx</span>&gt; findByHisobId(<span class="ty">Long</span> id, <span class="ty">Pageable</span> p);</pre></div></div><div class="csx" id="cs2"><h3>3. OR turli ustunlarda</h3><div class="prob">Qidiruv: “telefon yoki email bo‘yicha mijoz”. Faqat telefonda indeks bor — OR’ning bitta qismi indekssiz bo‘lsa, butun shart Seq Scan.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Bitta indeks</span></div><pre class="code"><span class="k">SELECT</span> id, ism <span class="k">FROM</span> mijozlar
+<span class="k">WHERE</span> telefon = <span class="st">'+998900004242'</span>
+   <span class="k">OR</span> email = <span class="st">'user777@mail.uz'</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Bitta indeks</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 21.173 ms</span><span class="pchip b">📄 2 980 sahifa</span></span></div><pre class="pln"><b class="pn bad">Seq Scan</b> on mijozlar  <span class="pc">(cost=0.00..4480.00 rows=2 width=14)</span> (actual time=2.205..<span class="pt">21.136</span> rows=1.00 loops=1)
+  Filter: ((telefon = &#x27;+998900004242&#x27;::text) OR (email = &#x27;user777@mail.uz&#x27;::text))
+  <span class="pr">Rows Removed by Filter: 99999</span>
+  <span class="pb">Buffers: shared hit=2980</span>
+Execution Time: <b class="px">21.173 ms</b></pre><div class="pnote">OR — “yoki”: ikkinchi shartni tekshirish uchun baribir hamma qator kerak.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Ikkala ustunda indeks → BitmapOr</span></div><pre class="code"><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> mijozlar (email);
+<span class="cm">-- so‘rov o‘zgarmaydi</span></pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Ikkala ustunda indeks → BitmapOr</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 0.067 ms</span><span class="pchip b">📄 7 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on mijozlar  <span class="pc">(cost=8.85..16.73 rows=2 width=14)</span> (actual time=0.038..<span class="pt">0.041</span> rows=1.00 loops=1)
+  Recheck Cond: ((telefon = &#x27;+998900004242&#x27;::text) OR (email = &#x27;user777@mail.uz&#x27;::text))
+  Heap Blocks: exact=1
+  <span class="pb">Buffers: shared hit=7</span>
+  -&gt;  <b class="pn good">BitmapOr</b>  <span class="pc">(cost=8.85..8.85 rows=2 width=0)</span> (actual time=0.023..<span class="pt">0.024</span> rows=0.00 loops=1)
+        <span class="pb">Buffers: shared hit=6</span>
+        -&gt;  <b class="pn good">Bitmap Index Scan</b> on mj_tel  <span class="pc">(cost=0.00..4.43 rows=1 width=0)</span> (actual time=0.014..<span class="pt">0.015</span> rows=1.00 loops=1)
+              Index Cond: (telefon = &#x27;+998900004242&#x27;::text)
+              <span class="pb">Buffers: shared hit=3</span>
+        -&gt;  <b class="pn good">Bitmap Index Scan</b> on mj_email  <span class="pc">(cost=0.00..4.43 rows=1 width=0)</span> (actual time=0.007..<span class="pt">0.007</span> rows=0.00 loops=1)
+              Index Cond: (email = &#x27;user777@mail.uz&#x27;::text)
+              <span class="pb">Buffers: shared hit=3</span>
+Execution Time: <b class="px">0.067 ms</b></pre><div class="pnote">Ikki indeksdan ikki bitmap → OR bilan birlashtiriladi. Muqobil: <code>… WHERE telefon = ? UNION SELECT … WHERE email = ?</code>.</div></div></div></div><div class="gain"><b>316×</b><span>21.173 ms → 0.067 ms. OR’ning <b>har bir</b> qismi indeks bilan qoplangan bo‘lishi kerak.</span></div></div><div class="csx" id="cs3"><h3>4. NOT IN → NOT EXISTS</h3><div class="prob">“Sentabrda tranzaksiyasi bo‘lmagan hisoblar”. NOT IN subquery natijasi xotiraga sig‘masa (yoki NULL bo‘lishi mumkin bo‘lsa) PostgreSQL uni anti-join’ga aylantira olmaydi — har tashqi qator uchun ro‘yxatni boshidan ko‘rib chiqadi.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">NOT IN</span></div><pre class="code"><span class="k">SELECT</span> <span class="k">count</span>(*) <span class="k">FROM</span> hisoblar h
+<span class="k">WHERE</span> h.id &lt;= <span class="nu">300</span>
+  <span class="k">AND</span> h.id <span class="k">NOT</span> <span class="k">IN</span> (<span class="k">SELECT</span> hisob_id <span class="k">FROM</span> tranzaksiyalar
+                   <span class="k">WHERE</span> sana &gt;= <span class="st">'2025-09-01'</span>);</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">NOT IN</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 7787.92 ms</span><span class="pchip b">📄 40 240 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=3914827.56..3914827.57 rows=1 width=8)</span> (actual time=7787.399..<span class="pt">7787.402</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=6679 read=7766, temp read=25795 written=100</span>
+  -&gt;  <b class="pn good">Index Only Scan</b> using hisoblar_pkey on hisoblar h  <span class="pc">(cost=0.42..3914827.20 rows=143 width=0)</span> (actual time=221.461..<span class="pt">7786.512</span> rows=217.00 loops=1)
+        Index Cond: (id &lt;= 300)
+        Filter: (NOT (ANY (id = (SubPlan 1).col1)))
+        <span class="pr">Rows Removed by Filter: 83</span>
+        <span class="pg0">Heap Fetches: 0</span>
+        <span class="pb">Buffers: shared hit=6679 read=7766, temp read=25795 written=100</span>
+        SubPlan 1
+          -&gt;  <b class="pn mid">Materialize</b>  <span class="pc">(cost=0.00..27355.92 rows=46583 width=8)</span> (actual time=0.337..<span class="pt">13.813</span> rows=39210.63 loops=300)
+                Storage: Disk  Maximum Storage: 800kB
+                <span class="pb">Buffers: shared hit=6675 read=7766, temp read=25795 written=100</span>
+                -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar  <span class="pc">(cost=0.00..26941.00 rows=46583 width=8)</span> (actual time=97.823..<span class="pt">171.819</span> rows=45489.00 loops=1)
+                      Filter: (sana &gt;= &#x27;2025-09-01 00:00:00+05&#x27;::timestamp with time zone)
+                      <span class="pr">Rows Removed by Filter: 954511</span>
+                      <span class="pb">Buffers: shared hit=6675 read=7766</span>
+Planning:
+  <span class="pb">Buffers: shared hit=4</span>
+Execution Time: <b class="px">7787.922 ms</b></pre><div class="pnote"><b>SubPlan</b>, Materialize <b>loops=300</b> — 300 × ~39 000 solishtirish, diskdan (temp read). Faqat 300 hisob uchun!</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">NOT EXISTS</span></div><pre class="code"><span class="k">SELECT</span> <span class="k">count</span>(*) <span class="k">FROM</span> hisoblar h
+<span class="k">WHERE</span> h.id &lt;= <span class="nu">300</span>
+  <span class="k">AND</span> <span class="k">NOT</span> <span class="k">EXISTS</span> (<span class="k">SELECT</span> <span class="nu">1</span> <span class="k">FROM</span> tranzaksiyalar t
+                  <span class="k">WHERE</span> t.hisob_id = h.id
+                    <span class="k">AND</span> t.sana &gt;= <span class="st">'2025-09-01'</span>);</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">NOT EXISTS</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 186.093 ms</span><span class="pchip b">📄 14 445 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=27241.64..27241.65 rows=1 width=8)</span> (actual time=186.032..<span class="pt">186.035</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=6875 read=7570</span>
+  -&gt;  <b class="pn mid">Hash Right Anti</b> Join  <span class="pc">(cost=16.97..27241.15 rows=197 width=0)</span> (actual time=185.913..<span class="pt">185.975</span> rows=217.00 loops=1)
+        Hash Cond: (t.hisob_id = h.id)
+        <span class="pb">Buffers: shared hit=6875 read=7570</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar t  <span class="pc">(cost=0.00..26941.00 rows=46583 width=8)</span> (actual time=105.488..<span class="pt">173.354</span> rows=45489.00 loops=1)
+              Filter: (sana &gt;= &#x27;2025-09-01 00:00:00+05&#x27;::timestamp with time zone)
+              <span class="pr">Rows Removed by Filter: 954511</span>
+              <span class="pb">Buffers: shared hit=6871 read=7570</span>
+        -&gt;  <b class="pn mid">Hash</b>  <span class="pc">(cost=13.41..13.41 rows=285 width=8)</span> (actual time=0.392..<span class="pt">0.393</span> rows=300.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 14kB
+              <span class="pb">Buffers: shared hit=4</span>
+              -&gt;  <b class="pn good">Index Only Scan</b> using hisoblar_pkey on hisoblar h  <span class="pc">(cost=0.42..13.41 rows=285 width=8)</span> (actual time=0.027..<span class="pt">0.237</span> rows=300.00 loops=1)
+                    Index Cond: (id &lt;= 300)
+                    <span class="pg0">Heap Fetches: 0</span>
+                    <span class="pb">Buffers: shared hit=4</span>
+Planning:
+  <span class="pb">Buffers: shared hit=13</span>
+Execution Time: <b class="px">186.093 ms</b></pre><div class="pnote"><b>Hash Anti Join</b> — bir o‘tish. Va NULL tuzog‘i ham yo‘q (112-dars).</div></div></div></div><div class="gain"><b>42×</b><span>7787.92 ms → 186.093 ms. Inkor uchun har doim NOT EXISTS (yoki LEFT JOIN … IS NULL).</span></div></div><div class="csx" id="cs4"><h3>5. SELECT ichidagi subquery</h3><div class="prob">“Har hisob va uning oxirgi tranzaksiya sanasi”. SELECT ro‘yxatidagi korrelyatsion subquery har qator uchun alohida bajariladi (SubPlan). Indeks bo‘lmasa — har biri Seq Scan.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">SubPlan, indekssiz</span></div><pre class="code"><span class="k">SELECT</span> h.id,
+  (<span class="k">SELECT</span> <span class="k">max</span>(t.sana) <span class="k">FROM</span> tranzaksiyalar t
+   <span class="k">WHERE</span> t.hisob_id = h.id) <span class="k">AS</span> oxirgi
+<span class="k">FROM</span> hisoblar h
+<span class="k">WHERE</span> h.mijoz_id &lt;= <span class="nu">15</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">SubPlan, indekssiz</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 2037.65 ms</span><span class="pchip b">📄 202 191 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on hisoblar h  <span class="pc">(cost=4.59..592787.26 rows=22 width=16)</span> (actual time=134.110..<span class="pt">2037.581</span> rows=14.00 loops=1)
+  Recheck Cond: (mijoz_id &lt;= 15)
+  Heap Blocks: exact=14
+  <span class="pb">Buffers: shared hit=97583 read=104608</span>
+  -&gt;  <b class="pn good">Bitmap Index Scan</b> on h_mijoz  <span class="pc">(cost=0.00..4.58 rows=22 width=0)</span> (actual time=0.143..<span class="pt">0.144</span> rows=14.00 loops=1)
+        Index Cond: (mijoz_id &lt;= 15)
+        <span class="pb">Buffers: shared hit=3</span>
+  SubPlan 1
+    -&gt;  <b class="pn mid">Aggregate</b>  <span class="pc">(cost=26941.02..26941.03 rows=1 width=8)</span> (actual time=145.490..<span class="pt">145.491</span> rows=1.00 loops=14)
+          <span class="pb">Buffers: shared hit=97566 read=104608</span>
+          -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar t  <span class="pc">(cost=0.00..26941.00 rows=8 width=8)</span> (actual time=34.378..<span class="pt">145.352</span> rows=5.36 loops=14)
+                Filter: (hisob_id = h.id)
+                <span class="pr">Rows Removed by Filter: 999995</span>
+                <span class="pb">Buffers: shared hit=97566 read=104608</span>
+Planning:
+  <span class="pb">Buffers: shared hit=21 read=4</span>
+Execution Time: <b class="px">2037.655 ms</b></pre><div class="pnote">14 hisob → <b>14 marta</b> 1 mln qatorli Seq Scan (loops=14). 1000 hisob bo‘lsa — 2.5 daqiqa.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Indeks (hisob_id, sana)</span></div><pre class="code"><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> tranzaksiyalar (hisob_id, sana);
+<span class="cm">-- so‘rov o‘zgarmaydi</span></pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Indeks (hisob_id, sana)</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 0.161 ms</span><span class="pchip b">📄 60 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on hisoblar h  <span class="pc">(cost=4.59..127.55 rows=22 width=16)</span> (actual time=0.032..<span class="pt">0.134</span> rows=14.00 loops=1)
+  Recheck Cond: (mijoz_id &lt;= 15)
+  Heap Blocks: exact=14
+  <span class="pb">Buffers: shared hit=60</span>
+  -&gt;  <b class="pn good">Bitmap Index Scan</b> on h_mijoz  <span class="pc">(cost=0.00..4.58 rows=22 width=0)</span> (actual time=0.005..<span class="pt">0.006</span> rows=14.00 loops=1)
+        Index Cond: (mijoz_id &lt;= 15)
+        <span class="pb">Buffers: shared hit=3</span>
+  SubPlan 2
+    -&gt;  <b class="pn mid">Result</b>  <span class="pc">(cost=1.94..1.95 rows=1 width=8)</span> (actual time=0.006..<span class="pt">0.006</span> rows=1.00 loops=14)
+          <span class="pb">Buffers: shared hit=43</span>
+          InitPlan 1
+            -&gt;  <b class="pn mid">Limit</b>  <span class="pc">(cost=0.42..1.94 rows=1 width=8)</span> (actual time=0.004..<span class="pt">0.005</span> rows=1.00 loops=14)
+                  <span class="pb">Buffers: shared hit=43</span>
+                  -&gt;  <b class="pn good">Index Only Scan Backward</b> using tx_hisob_sana on tranzaksiyalar t  <span class="pc">(cost=0.42..12.56 rows=8 width=8)</span> (actual time=0.004..<span class="pt">0.004</span> rows=1.00 loops=14)
+                        Index Cond: (hisob_id = h.id)
+                        <span class="pg0">Heap Fetches: 0</span>
+                        <span class="pb">Buffers: shared hit=43</span>
+Planning:
+  <span class="pb">Buffers: shared hit=4</span>
+Execution Time: <b class="px">0.161 ms</b></pre><div class="pnote">Planer max()’ni “indeksdan oxirgisini olish”ga aylantirdi (Limit 1 Backward) — har hisob uchun 3 sahifa.</div></div></div></div><div class="gain"><b>12 656×</b><span>2037.65 ms → 0.161 ms. Indeksiz holatda JOIN + GROUP BY (556 ms, bitta o‘tish) ham SubPlan’dan 3.7× tez — lekin to‘g‘ri indeks hammasidan yaxshi.</span></div></div><div class="csx" id="cs5"><h3>6. LIKE '%…%'</h3><div class="prob">Operator ekrani: familiyaning bir qismi bo‘yicha qidiruv. B-tree faqat prefiks (<code>'Tosh%'</code>) uchun; o‘rtadan qidiruv — butun jadval.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">B-tree foydasiz</span></div><pre class="code"><span class="k">SELECT</span> id, ism, familiya <span class="k">FROM</span> mijozlar
+<span class="k">WHERE</span> familiya ILIKE <span class="st">'%mato%'</span> <span class="k">AND</span> ism = <span class="st">'Aziz'</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">B-tree foydasiz</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 132.007 ms</span><span class="pchip b">📄 2 980 sahifa</span></span></div><pre class="pln"><b class="pn bad">Seq Scan</b> on mijozlar  <span class="pc">(cost=0.00..4480.00 rows=1000 width=22)</span> (actual time=0.996..<span class="pt">130.967</span> rows=2083.00 loops=1)
+  Filter: ((familiya ~~* &#x27;%mato%&#x27;::text) AND (ism = &#x27;Aziz&#x27;::text))
+  <span class="pr">Rows Removed by Filter: 97917</span>
+  <span class="pb">Buffers: shared hit=2980</span>
+Execution Time: <b class="px">132.007 ms</b></pre><div class="pnote">100 000 qator, har birida ILIKE.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">pg_trgm + GIN</span></div><pre class="code"><span class="k">CREATE</span> EXTENSION pg_trgm;
+<span class="k">CREATE</span> <span class="k">INDEX</span> <span class="k">ON</span> mijozlar <span class="k">USING</span> gin (familiya gin_trgm_ops);</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">pg_trgm + GIN</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 21.131 ms</span><span class="pchip b">📄 1 622 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on mijozlar  <span class="pc">(cost=119.57..3344.41 rows=1000 width=22)</span> (actual time=2.238..<span class="pt">20.566</span> rows=2083.00 loops=1)
+  Recheck Cond: (familiya ~~* &#x27;%mato%&#x27;::text)
+  Filter: (ism = &#x27;Aziz&#x27;::text)
+  <span class="pr">Rows Removed by Filter: 14583</span>
+  Heap Blocks: exact=1609
+  <span class="pb">Buffers: shared hit=1622</span>
+  -&gt;  <b class="pn good">Bitmap Index Scan</b> on mj_fam_trgm  <span class="pc">(cost=0.00..119.32 rows=16323 width=0)</span> (actual time=1.909..<span class="pt">1.910</span> rows=16666.00 loops=1)
+        Index Cond: (familiya ~~* &#x27;%mato%&#x27;::text)
+        <span class="pb">Buffers: shared hit=13</span>
+Planning:
+  <span class="pb">Buffers: shared hit=1</span>
+Execution Time: <b class="px">21.131 ms</b></pre><div class="pnote">Trigram indeks: “mat”, “ato” uchliklari bo‘yicha nomzodlar, keyin tekshirish. ILIKE va % bilan ishlaydi.</div></div></div></div><div class="gain"><b>6.2×</b><span>132.007 ms → 21.131 ms. Matn ichidan qidiruv — pg_trgm; so‘zlar bo‘yicha — full-text search (tsvector + GIN).</span></div></div><div class="csx" id="cs6"><h3>7. N+1 → bitta so‘rov</h3><div class="prob">Ekranda 100 ta hisob, har biriga tranzaksiyalar alohida so‘rov bilan (ORM LAZY loading). Har so‘rov tez (0.06 ms), lekin har biri tarmoq aylanishi (≈ 0.3–1 ms) + ulanishni band qilish.</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">100 × bitta hisob</span></div><pre class="code"><span class="cm">-- 100 marta:</span>
+<span class="k">SELECT</span> id, summa, sana <span class="k">FROM</span> tranzaksiyalar
+<span class="k">WHERE</span> hisob_id = ?;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">100 × bitta hisob</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 0.061 ms</span><span class="pchip b">📄 12 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on tranzaksiyalar  <span class="pc">(cost=4.49..36.02 rows=8 width=24)</span> (actual time=0.028..<span class="pt">0.039</span> rows=9.00 loops=1)
+  Recheck Cond: (hisob_id = 4242)
+  Heap Blocks: exact=9
+  <span class="pb">Buffers: shared hit=12</span>
+  -&gt;  <b class="pn good">Bitmap Index Scan</b> on tx_hisob_sana  <span class="pc">(cost=0.00..4.48 rows=8 width=0)</span> (actual time=0.011..<span class="pt">0.012</span> rows=9.00 loops=1)
+        Index Cond: (hisob_id = 4242)
+        <span class="pb">Buffers: shared hit=3</span>
+Execution Time: <b class="px">0.061 ms</b></pre><div class="pnote">Bitta so‘rov 0.06 ms — lekin 100 tasi + 100 ta tarmoq aylanishi ≈ 50–100 ms.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Bitta so‘rov: = ANY(…)</span></div><pre class="code"><span class="k">SELECT</span> hisob_id, id, summa, sana
+<span class="k">FROM</span> tranzaksiyalar
+<span class="k">WHERE</span> hisob_id = ANY (:ids);   <span class="cm">-- 100 ta id massivi</span></pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Bitta so‘rov: = ANY(…)</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 2.099 ms</span><span class="pchip b">📄 610 sahifa</span></span></div><pre class="pln"><b class="pn good">Bitmap Heap Scan</b> on tranzaksiyalar  <span class="pc">(cost=46.89..339.75 rows=77 width=32)</span> (actual time=0.325..<span class="pt">1.911</span> rows=620.00 loops=1)
+  Recheck Cond: (hisob_id = ANY ((InitPlan 1).col1))
+  Heap Blocks: exact=605
+  <span class="pb">Buffers: shared hit=610</span>
+  InitPlan 1
+    -&gt;  <b class="pn mid">Result</b>  <span class="pc">(cost=0.00..2.02 rows=100 width=8)</span> (actual time=0.005..<span class="pt">0.082</span> rows=100.00 loops=1)
+          -&gt;  <b class="pn mid">ProjectSet</b>  <span class="pc">(cost=0.00..0.52 rows=100 width=4)</span> (actual time=0.003..<span class="pt">0.034</span> rows=100.00 loops=1)
+                -&gt;  <b class="pn mid">Result</b>  <span class="pc">(cost=0.00..0.01 rows=1 width=0)</span> (actual time=0.001..<span class="pt">0.002</span> rows=1.00 loops=1)
+  -&gt;  <b class="pn good">Bitmap Index Scan</b> on tx_hisob_sana  <span class="pc">(cost=0.00..44.85 rows=77 width=0)</span> (actual time=0.225..<span class="pt">0.225</span> rows=620.00 loops=1)
+        Index Cond: (hisob_id = ANY ((InitPlan 1).col1))
+        <span class="pb">Buffers: shared hit=5</span>
+Execution Time: <b class="px">2.099 ms</b></pre><div class="pnote">Bitta aylanish, bitta reja, 2 ms.</div></div></div></div><div class="gain"><b>0.0×</b><span>0.061 ms → 2.099 ms. JOIN FETCH, @EntityGraph, @BatchSize yoki <code>= ANY(?)</code> bilan bitta so‘rov.</span></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Java / Spring</span></div><pre class="code"><span class="cm">// JDBC: massiv parametr</span>
+jdbc.query(<span class="st">"SELECT hisob_id, id, summa FROM tranzaksiyalar WHERE hisob_id = ANY (?)"</span>,
+    ps -&gt; ps.setArray(<span class="nu">1</span>, ps.getConnection().createArrayOf(<span class="st">"bigint"</span>, ids.toArray())), mapper);
+<span class="cm">// Hibernate: @BatchSize(size = 100) yoki hibernate.default_batch_fetch_size=100</span></pre></div></div><div class="csx" id="cs7"><h3>8. Og‘ir hisobot → materialized view</h3><div class="prob">Bosh sahifadagi “oylik xarajatlar” grafigi har ochilganda 800 ming qatorni guruhlaydi (va saralash diskka chiqadi).</div><div class="pcmp"><div class="sbox"><div class="lbl b">✗ Oldin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Har safar hisoblash</span></div><pre class="code"><span class="k">SELECT</span> date_trunc(<span class="st">'month'</span>, sana) <span class="k">AS</span> oy, kategoriya,
+       <span class="k">count</span>(*), <span class="k">sum</span>(summa)
+<span class="k">FROM</span> tranzaksiyalar <span class="k">WHERE</span> tur = <span class="st">'chiqim'</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="nu">1</span>, <span class="nu">2</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="nu">1</span>, <span class="nu">2</span>;</pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Har safar hisoblash</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 2032.34 ms</span><span class="pchip b">📄 18 076 sahifa</span></span></div><pre class="pln"><b class="pn mid">GroupAggregate</b>  <span class="pc">(cost=126724.77..148766.93 rows=801533 width=58)</span> (actual time=1230.053..<span class="pt">2028.909</span> rows=210.00 loops=1)
+  Group Key: (date_trunc(&#x27;month&#x27;::text, sana)), kategoriya
+  <span class="pb">Buffers: shared hit=7715 read=6726, temp read=3635 written=3647</span>
+  -&gt;  <b class="pn mid">Sort</b>  <span class="pc">(cost=126724.77..128728.60 rows=801533 width=26)</span> (actual time=1224.728..<span class="pt">1565.363</span> rows=799537.00 loops=1)
+        Sort Key: (date_trunc(&#x27;month&#x27;::text, sana)), kategoriya
+        <span class="ps">Sort Method: external merge  Disk: 29080kB</span>
+        <span class="pb">Buffers: shared hit=7715 read=6726, temp read=3635 written=3647</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar  <span class="pc">(cost=0.00..28944.83 rows=801533 width=26)</span> (actual time=0.036..<span class="pt">653.860</span> rows=799537.00 loops=1)
+              Filter: (tur = &#x27;chiqim&#x27;::text)
+              <span class="pr">Rows Removed by Filter: 200463</span>
+              <span class="pb">Buffers: shared hit=7715 read=6726</span>
+Execution Time: <b class="px">2032.340 ms</b></pre><div class="pnote">2 s, 29 MB disk — har bir foydalanuvchi uchun.</div></div></div><div class="sbox"><div class="lbl a">✓ Keyin</div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Materialized view</span></div><pre class="code"><span class="k">CREATE</span> <span class="k">MATERIALIZED</span> <span class="k">VIEW</span> oylik_xarajat <span class="k">AS</span>
+  <span class="k">SELECT</span> date_trunc(<span class="st">'month'</span>, sana) <span class="k">AS</span> oy, kategoriya,
+         <span class="k">count</span>(*) <span class="k">AS</span> soni, <span class="k">sum</span>(summa) <span class="k">AS</span> jami
+  <span class="k">FROM</span> tranzaksiyalar <span class="k">WHERE</span> tur = <span class="st">'chiqim'</span>
+  <span class="k">GROUP</span> <span class="k">BY</span> <span class="nu">1</span>, <span class="nu">2</span>;
+<span class="k">CREATE</span> <span class="k">UNIQUE</span> <span class="k">INDEX</span> <span class="k">ON</span> oylik_xarajat (oy, kategoriya);
+<span class="cm">-- har kecha: REFRESH MATERIALIZED VIEW CONCURRENTLY oylik_xarajat;</span></pre></div><div class="pbox nc"><div class="phead"><span class="ptitle">Materialized view</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 0.628 ms</span><span class="pchip b">📄 2 sahifa</span></span></div><pre class="pln"><b class="pn mid">Sort</b>  <span class="pc">(cost=12.20..12.72 rows=210 width=36)</span> (actual time=0.354..<span class="pt">0.455</span> rows=210.00 loops=1)
+  Sort Key: oy, kategoriya
+  <span class="ps">Sort Method: quicksort  Memory: 29kB</span>
+  <span class="pb">Buffers: shared hit=2</span>
+  -&gt;  <b class="pn bad">Seq Scan</b> on oylik_xarajat  <span class="pc">(cost=0.00..4.10 rows=210 width=36)</span> (actual time=0.028..<span class="pt">0.123</span> rows=210.00 loops=1)
+        <span class="pb">Buffers: shared hit=2</span>
+Execution Time: <b class="px">0.628 ms</b></pre><div class="pnote">210 qatorli tayyor jadval.</div></div></div></div><div class="gain"><b>3 236×</b><span>2032.34 ms → 0.628 ms. Ma’lumot bir necha soat eskirsa bo‘ladigan hisobotlar uchun. Aniq real-time kerak bo‘lsa — trigger yoki ilovada yig‘iladigan “agregat jadval”.</span></div><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">Java / Spring</span></div><pre class="code"><span class="k">@Scheduled</span>(cron = <span class="st">"0 15 2 * * *"</span>)       <span class="cm">// har kecha 02:15</span>
+<span class="k">@Transactional</span>
+<span class="k">public</span> <span class="k">void</span> yangilash() {
+    jdbc.execute(<span class="st">"REFRESH MATERIALIZED VIEW CONCURRENTLY oylik_xarajat"</span>); <span class="cm">// o‘qishni bloklamaydi (UNIQUE indeks shart)</span>
+}</pre></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Yana tez-tez uchraydigan sabablar</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Belgi</th><th>Sabab</th><th>Yechim</th></tr><tr><td>Ustunga funksiya: <code>date(sana) = …</code></td><td>Indeks ishlatilmaydi</td><td>Oraliq shart yoki ifoda indeksi (116-dars)</td></tr><tr><td><code>SELECT *</code> + katta jsonb/text</td><td>Ortiqcha I/O, TOAST o‘qish</td><td>Faqat kerakli ustunlar; covering indeks</td></tr><tr><td>Ilova va DB orasida ko‘p aylanish</td><td>Sikl ichida INSERT/UPDATE</td><td>Batch: <code>INSERT … VALUES (…),(…)</code>, JDBC <code>reWriteBatchedInserts=true</code>, <code>COPY</code></td></tr><tr><td>Uzoq tranzaksiya, “idle in transaction”</td><td>Lock’lar, VACUUM to‘siladi, bloat</td><td>Qisqa tranzaksiya, <code>idle_in_transaction_session_timeout</code></td></tr><tr><td>Katta UPDATE/DELETE birdaniga</td><td>Uzoq lock, WAL portlashi, replika kechikishi</td><td>10 000 talik bo‘laklar bilan, har birida COMMIT</td></tr><tr><td>Implicit tip o‘zgarishi</td><td><code>varchar</code> ustun, <code>numeric</code> parametr</td><td>Parametr tipini ustun tipiga moslash</td></tr><tr><td>Ko‘p qisqa ulanishlar</td><td>Har ulanish — yangi process (~10 MB)</td><td>Pool (HikariCP), PgBouncer — 121-dars</td></tr><tr><td>Planer “kutilmaganda” yomon reja</td><td>Eskirgan statistika, generic plan</td><td>ANALYZE, CREATE STATISTICS, plan_cache_mode (119-dars)</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Production’da sekin so‘rovni qanday topasiz va tuzatasiz?<span class="chev">›</span></summary><div class="iv-a">pg_stat_statements’dan total_exec_time bo‘yicha top so‘rovlar; auto_explain yoki qo‘lda EXPLAIN (ANALYZE, BUFFERS) haqiqiy parametrlar bilan; rejada eng og‘ir tugun, taxmin xatosi, Seq Scan, diskka saralash; bitta o‘zgarish (indeks/so‘rov/statistika) va qayta o‘lchash; yozish yukiga ta’sirini tekshirish; CONCURRENTLY bilan indeks.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>OFFSET pagination muammosi va yechimi?<span class="chev">›</span></summary><div class="iv-a">OFFSET N — N qator o‘qib tashlanadi, chuqur sahifalar chiziqli sekinlashadi; qatorlar qo‘shilsa takror/tushib qolish. Keyset: WHERE (sana, id) < (:s, :i) ORDER BY sana DESC, id DESC LIMIT n va (sana, id) indeksi — har sahifa O(log n).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nega PostgreSQL’da count(*) sekin?<span class="chev">›</span></summary><div class="iv-a">MVCC: qaysi qator versiyasi joriy tranzaksiyaga ko‘rinishini bilish uchun qatorlarni (yoki visibility map + index only scan) tekshirish kerak; umumiy hisoblagich yo‘q. Yechimlar: taxmin (pg_class.reltuples), chegaralangan count (LIMIT), Slice, alohida hisoblagich jadval (trigger).</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>NOT IN nega xavfli?<span class="chev">›</span></summary><div class="iv-a">Semantik: subquery’da NULL bo‘lsa natija bo‘sh. Ishlash: subquery natijasi work_mem’ga sig‘masa hashed subplan bo‘lmaydi — har tashqi qator uchun chiziqli qidiruv (O(N×M)). NOT EXISTS — anti join, NULL muammosiz.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Materialized view qachon to‘g‘ri tanlov?<span class="chev">›</span></summary><div class="iv-a">Og‘ir agregatsiya, natija kichik, ma’lumot biroz eskirsa mumkin (kunlik/soatlik hisobot, dashboard). REFRESH CONCURRENTLY UNIQUE indeks talab qiladi va o‘qishni bloklamaydi. Real-time kerak bo‘lsa — trigger bilan yangilanadigan agregat jadval yoki ilovada event asosida.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Batch insert’ni qanday tezlashtirasiz?<span class="chev">›</span></summary><div class="iv-a">JDBC addBatch + reWriteBatchedInserts=true (bitta multi-row INSERT), Hibernate hibernate.jdbc.batch_size va IDENTITY o‘rniga SEQUENCE (allocationSize), juda katta hajm uchun COPY (CopyManager). Indekslar va FK’lar yozishni sekinlashtiradi — katta yuklashda vaqtincha o‘chirib, keyin yaratish.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="1"><div class="q-txt"><span class="qn">1.</span>Lentada 10 000-sahifa sekin. Eng yaxshi yechim?</div><button class="opt">OFFSET indeksi</button><button class="opt">Keyset pagination</button><button class="opt">LIMIT ni kamaytirish</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Keyset — chuqurlikdan qat’i nazar bir xil tez."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span><code>WHERE a = ? OR b = ?</code>, faqat a’da indeks. Reja?</div><button class="opt">Index Scan a</button><button class="opt">Seq Scan</button><button class="opt">BitmapOr</button><div class="q-fb" data-ok="To‘g‘ri — OR’ning ikkinchi qismi indekssiz." data-no="Seq Scan: b’ni tekshirish uchun hamma qator kerak."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>SELECT’dagi korrelyatsion subquery 10 000 qator uchun, ichida indekssiz Seq Scan. Nima bo‘ladi?</div><button class="opt">Bir marta bajariladi</button><button class="opt">10 000 marta Seq Scan</button><div class="q-fb" data-ok="To‘g‘ri — SubPlan loops=10000." data-no="Har qator uchun alohida."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span>“1 247 853 ta natija” yozuvi har sahifada sekin. Biznes aniq son talab qilmaydi.</div><button class="opt">Indeks qo‘shish</button><button class="opt">“1000+” yoki taxmin ko‘rsatish / Slice</button><button class="opt">work_mem</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Aniq count kerak bo‘lmasa — hisoblamang."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>100 hisob, har biri uchun alohida SELECT. Asosiy yo‘qotish qayerda?</div><button class="opt">Har so‘rovning rejasi</button><button class="opt">Tarmoq aylanishlari va so‘rovlar soni</button><div class="q-fb" data-ok="To‘g‘ri — N+1." data-no="Tarmoq aylanishlari."></div></div><div class="q" data-correct="0"><div class="q-txt"><span class="qn">6.</span>Bosh sahifadagi oylik grafik 2 s, ma’lumot kuniga bir yangilansa bo‘ladi.</div><button class="opt">Materialized view + kechki REFRESH</button><button class="opt">Kattaroq server</button><button class="opt">Har so‘rovga work_mem</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Materialized view."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi dars · PostgreSQL</span>
+      <h3>Partitsiyalash, VACUUM, ulanishlar puli</h3>
+      <p>Milliardlik jadvallarni bo‘laklash, MVCC “axlati”ni tozalash, PgBouncer va HikariCP — production PostgreSQL’ning “gigiyenasi”.</p>
+      <div class="topics"><span class="topic-pill">115 · Tranzaksiya, MVCC</span><span class="topic-pill">116 · Indekslar</span><span class="topic-pill">117 · EXPLAIN</span><span class="topic-pill">118 · Join algoritmlari</span><span class="topic-pill">119 · Planner</span><span class="topic-pill now">120 · Sekin so‘rovlar</span><span class="topic-pill">121 · Partition, VACUUM</span><span class="topic-pill">122 · Praktikum</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish" style="--tc:#2E6FA8"><div class="cnav-grid"><a class="cn pv" href="119-statistika-va-planer.html"><span class="cl">← Oldingi</span><span class="ct"><span class="n">119</span>Statistika va planer</span><span class="cs"><span class="ky-dot" style="background:#2E6FA8"></span>PostgreSQL</span></a><a class="cn nx" href="121-partitsiya-vacuum-pool.html"><span class="cl">Keyingi dars →</span><span class="ct"><span class="n">121</span>Partitsiya, VACUUM, pool</span><span class="cs"><span class="ky-dot" style="background:#2E6FA8"></span>PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:101.7%"></i></div><span>120 / 118</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(120)<0)v.push(120);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','120');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(120)<0)D[t].push(120);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script><aside class="ky-side" id="kySide" style="--tc:#2E6FA8" aria-label="Yo'nalish mavzulari">
+<div class="ky-sh"><a class="ky-logo" href="index.html"><i>{}</i>kod yo'li</a><button type="button" class="ky-ib ky-x" onclick="kySide(0)" aria-label="Yopish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="ky-tr"><div class="ky-lbl">Yo'nalish</div><div class="ky-tn"><span class="ky-dot"></span>PostgreSQL</div><div class="ky-pg"><i><b id="kyBar"></b></i><span id="kyCnt"></span></div></div>
+<nav class="ky-ls"><a href="108-ma-lumotlar-bazasi-nima.html" data-n="108"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">108</span>Ma’lumotlar bazasi nima</span></a><a href="109-select-where-order-by-null.html" data-n="109"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">109</span>SELECT, WHERE, ORDER BY, NULL</span></a><a href="110-group-by-having-agregatlar.html" data-n="110"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">110</span>GROUP BY, HAVING, agregatlar</span></a><a href="111-join-lar.html" data-n="111"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">111</span>JOIN’lar</span></a><a href="112-subquery-exists-cte-rekursiya.html" data-n="112"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">112</span>Subquery, EXISTS, CTE, rekursiya</span></a><a href="113-window-funksiyalar.html" data-n="113"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">113</span>Window funksiyalar</span></a><a href="114-bajarilish-tartibi-va-sql-tuzoqlari.html" data-n="114"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">114</span>Bajarilish tartibi va SQL tuzoqlari</span></a><a href="115-tranzaksiya-acid-mvcc-lock-lar.html" data-n="115"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">115</span>Tranzaksiya, ACID, MVCC, lock’lar</span></a><a href="116-indekslar.html" data-n="116"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">116</span>Indekslar</span></a><a href="117-explain-analyze.html" data-n="117"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">117</span>EXPLAIN ANALYZE</span></a><a href="118-join-algoritmlari.html" data-n="118"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">118</span>JOIN algoritmlari</span></a><a href="119-statistika-va-planer.html" data-n="119"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">119</span>Statistika va planer</span></a><a href="120-sekin-so-rovlarni-tuzatish.html" data-n="120" class="cur" aria-current="page"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">120</span>Sekin so‘rovlarni tuzatish</span></a><a href="121-partitsiya-vacuum-pool.html" data-n="121"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">121</span>Partitsiya, VACUUM, pool</span></a><a href="122-praktikum-va-suhbat.html" data-n="122"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">122</span>Praktikum va suhbat</span></a><details class="ky-oth"><summary><span class="ky-lbl">Boshqa yo'nalishlar</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary><a href="01-java-qanday-ishlaydi.html" data-ns="1,2,3,4,5,6,7"><span class="ky-dot" style="background:#B5622A"></span><span>Java asoslari</span><span class="c">7</span></a><a href="08-klass-va-obyekt.html" data-ns="8,9,10,11,12,13"><span class="ky-dot" style="background:#9A5B2E"></span><span>OOP</span><span class="c">6</span></a><a href="14-kolleksiyalar.html" data-ns="14,15,16,17,18,19,20"><span class="ky-dot" style="background:#8A6A1E"></span><span>Java Core</span><span class="c">7</span></a><a href="21-zamonaviy-java-8-21.html" data-ns="21,22,23"><span class="ky-dot" style="background:#7A4B8C"></span><span>Advanced Java</span><span class="c">3</span></a><a href="89-algoritmik-fikrlash.html" data-ns="89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107"><span class="ky-dot" style="background:#0E7490"></span><span>DSA va algoritmlar</span><span class="c">19</span></a><a href="24-spring-boot-va-di.html" data-ns="24,25,26,27,28,29,30,31,32"><span class="ky-dot" style="background:#5A9E2F"></span><span>Spring Boot</span><span class="c">9</span></a><a href="37-big-o-va-tuzilmalar.html" data-ns="37,38,39"><span class="ky-dot" style="background:#6A4BB0"></span><span>Suhbatga tayyorgarlik</span><span class="c">3</span></a><a href="40-keycloak-va-iam.html" data-ns="40,41,42,43,44,45,46,47,48,49"><span class="ky-dot" style="background:#A3344A"></span><span>Keycloak</span><span class="c">10</span></a><a href="50-redis-nima-va-nega-tez.html" data-ns="50,51,52,53,54,55,56"><span class="ky-dot" style="background:#C8372D"></span><span>Redis</span><span class="c">7</span></a><a href="57-nega-kafka.html" data-ns="57,58,59,60,61,62,63,64"><span class="ky-dot" style="background:#334155"></span><span>Kafka</span><span class="c">8</span></a><a href="65-js-qanday-ishlaydi.html" data-ns="65,66,67,68,69,70,71,72,73,74"><span class="ky-dot" style="background:#B08900"></span><span>JavaScript</span><span class="c">10</span></a><a href="75-nega-typescript.html" data-ns="75,76,77,78,79,80"><span class="ky-dot" style="background:#3178C6"></span><span>TypeScript</span><span class="c">6</span></a><a href="81-vue-nima.html" data-ns="81,82,83,84,85,86,87,88"><span class="ky-dot" style="background:#2C8F68"></span><span>Vue.js</span><span class="c">8</span></a></details></nav>
+<div class="ky-sf"><a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Barcha darslar</a></div></aside>
+<div class="ky-ov" id="kyOv" onclick="kySide(0)"></div>
+<script>function kySide(o){var s=document.getElementById('kySide');s.classList.toggle('on',!!o);document.getElementById('kyOv').classList.toggle('on',!!o);if(o){var c=s.querySelector('a.cur');if(c)c.scrollIntoView({block:'center'});}}
+function kyTheme(){var r=document.documentElement,t=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.setAttribute('data-theme',t==='dark'?'light':'dark');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')kySide(0);});
+(function(){var v=[];try{v=JSON.parse(localStorage.getItem('kodyoli:v')||'[]');}catch(e){}if(v.indexOf(120)<0)v.push(120);
+var as=document.querySelectorAll('.ky-ls > a[data-n]'),d=0;[].forEach.call(as,function(a){if(v.indexOf(+a.getAttribute('data-n'))>=0){d++;if(!a.classList.contains('cur'))a.classList.add('done');}});
+document.getElementById('kyCnt').textContent=d+'/'+as.length;document.getElementById('kyBar').style.width=(d/as.length*100)+'%';
+[].forEach.call(document.querySelectorAll('.ky-oth a[data-ns]'),function(a){var ns=a.getAttribute('data-ns').split(','),k=0;ns.forEach(function(n){if(v.indexOf(+n)>=0)k++;});a.querySelector('.c').textContent=k+'/'+ns.length;});
+if(innerWidth>=1200){var c=document.querySelector('.ky-ls a.cur');if(c)c.scrollIntoView({block:'center'});window.scrollTo(0,0);}
+var p=document.getElementById('kyProg'),q=0;function u(){q=0;var h=document.documentElement.scrollHeight-innerHeight;p.style.transform='scaleX('+(h>0?Math.min(1,scrollY/h):0)+')';}
+addEventListener('scroll',function(){if(!q){q=1;requestAnimationFrame(u);}},{passive:true});u();})();</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+
+
+
+
+(function(){var T=document.getElementById('csT');
+  T.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var i=b.getAttribute('data-i');
+    [].forEach.call(T.children,function(x){x.classList.toggle('on',x===b);});
+    [].forEach.call(document.querySelectorAll('.csx'),function(c){c.classList.toggle('on',c.id==='cs'+i);});});})();
+
+</script>
+</body>
+</html>

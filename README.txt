@@ -1,4 +1,4 @@
-Kod Yo'li — Java · Spring Boot · PostgreSQL · Keycloak, 88 ta interaktiv dars (o'zbek tilida)
+Kod Yo'li — Java · Spring Boot · PostgreSQL · Keycloak, 118 ta interaktiv dars (o'zbek tilida)
 
 1) index.html ni brauzerda oching (ikki marta bosing). Server kerak emas.
 2) Har dars oxirida 'Oldingi / Keyingi dars' tugmalari bor, tepada '← Barcha darslar'.

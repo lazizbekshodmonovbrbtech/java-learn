@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSA suhbat pattern’lari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
+
+
+
+<style>
+:root{
+  --bg:#EEF5F7;--surface:#FFFFFF;--surface-2:#F6FAFB;--sunken:#E4EFF2;
+  --ink:#241F18;--ink-soft:#5C554A;--ink-faint:#8C8578;--border:#D3E3E8;--border-strong:#B9D1D9;
+  --accent:#0E7490;--accent-ink:#0B5A70;--accent-soft:#DBEFF4;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0B1417;--surface:#142024;--surface-2:#19282D;--sunken:#0F191C;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#22363C;--border-strong:#2F4A52;
+  --accent:#4FC0DB;--accent-ink:#7DD3E6;--accent-soft:#12303A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0B1417;--surface:#142024;--surface-2:#19282D;--sunken:#0F191C;--ink:#EDE7DA;--ink-soft:#B4AC9C;--ink-faint:#847C6C;--border:#22363C;--border-strong:#2F4A52;
+  --accent:#4FC0DB;--accent-ink:#7DD3E6;--accent-soft:#12303A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+.trc-in{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-family:var(--font-mono);font-size:12.5px}
+.trc-in input{flex:1;min-width:150px;font-family:var(--font-mono);font-size:13px;padding:7px 10px;border:1.5px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--ink)}
+.trc-in .chip2{border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:4px 10px;cursor:pointer;font-family:var(--font-mono);font-size:11.5px;color:var(--ink)}
+.trc-in .chip2:hover{border-color:var(--accent)}
+.trc-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:14px}.trc-g>div{min-width:0}
+.trc-code{border:1px solid var(--border);border-radius:12px;background:var(--sunken);overflow:hidden;align-self:start}
+.trc-code .code-bar{padding:7px 12px}
+.trc-code ol{list-style:none;margin:0;padding:6px 0;font-family:var(--font-mono);font-size:12.3px;line-height:1.75;counter-reset:ln;overflow-x:auto}
+.trc-code li{counter-increment:ln;padding:0 12px 0 40px;position:relative;white-space:pre;transition:background .2s}
+.trc-code li:before{content:counter(ln);position:absolute;left:8px;width:22px;text-align:right;color:var(--ink-faint);font-size:11px}
+.trc-code li.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.trc-code li.on:after{content:"◀";position:absolute;right:8px;color:var(--accent);font-size:10px}
+.trc-viz{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:12px;min-height:150px;position:relative;overflow:hidden}
+.trc-vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.trc-vars span{font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface);transition:background .3s}
+.trc-vars span.ch{background:var(--accent-soft);border-color:var(--accent)}
+.trc-vars b{font-weight:700}
+.trc-cnt{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;font-family:var(--font-mono);font-size:12px}
+.trc-cnt span{border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface)}
+.trc-cnt b{font-size:14px}
+.trc-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.trc-ctl input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+.trc-ctl select{font-family:var(--font-mono);font-size:12px;border:1.5px solid var(--border);border-radius:9px;padding:6px;background:var(--surface-2);color:var(--ink)}
+.trc-step{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);min-width:84px}
+@media (max-width:760px){.trc-g{grid-template-columns:1fr}.trc-code ol{font-size:11.5px}.trc-viz{min-height:0}}
+/* array viz */
+.av{position:relative;margin:4px auto 0;max-width:100%}
+.av .c{position:absolute;bottom:22px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid var(--border-strong);background:var(--surface);font-family:var(--font-mono);font-weight:700;font-size:13px;transition:left .45s cubic-bezier(.3,.8,.3,1),height .35s,background .25s,border-color .25s,transform .25s,opacity .3s;box-sizing:border-box}
+.av .c.ok{background:var(--accent-soft);border-color:var(--accent)}
+.av.bars .c{align-items:flex-end;padding-bottom:3px;font-size:11px}
+.av .c.cmp{background:#FFF2C2;border-color:#D9A400;transform:translateY(-6px)}
+.av .c.sw{background:#FFD9CF;border-color:#D9534F;transform:translateY(-10px)}
+.av .c.dim{opacity:.35}
+.av .c.key{background:#DCEBFF;border-color:#2E6FA8;transform:translateY(-14px)}
+.av .c.hit{background:var(--accent);border-color:var(--accent);color:#fff}
+.av .ix{position:absolute;bottom:4px;font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);text-align:center;transition:left .45s}
+.av .pt{position:absolute;top:0;font-family:var(--font-mono);font-size:11px;font-weight:700;text-align:center;transition:left .4s cubic-bezier(.3,.8,.3,1);color:var(--accent-ink);white-space:nowrap}
+.av .pt i{display:block;font-style:normal;line-height:1}
+.av .rg{position:absolute;bottom:16px;border:2px dashed var(--accent);border-radius:12px;background:color-mix(in srgb,var(--accent) 9%,transparent);z-index:0;transition:left .4s cubic-bezier(.3,.8,.3,1),width .4s cubic-bezier(.3,.8,.3,1)}.av .c{z-index:1}
+:root[data-theme="dark"] .av .c.cmp{background:#4A3B06}:root[data-theme="dark"] .av .c.sw{background:#4A1D16}:root[data-theme="dark"] .av .c.key{background:#14243A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .av .c.cmp{background:#4A3B06}:root:not([data-theme="light"]) .av .c.sw{background:#4A1D16}:root:not([data-theme="light"]) .av .c.key{background:#14243A}}
+/* grid viz (DP) */
+.gv{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:var(--font-mono);font-size:12px}
+.gv td,.gv th{min-width:30px;height:30px;text-align:center;border-radius:6px;transition:background .25s,transform .25s}
+.gv th{color:var(--ink-faint);font-weight:500;font-size:11px}
+.gv td{background:var(--surface);border:1px solid var(--border)}
+.gv td.e{color:transparent}
+.gv td.cur{background:var(--accent);color:#fff;transform:scale(1.12)}
+.gv td.src{background:#FFF2C2;border-color:#D9A400}
+.gv td.fin{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+:root[data-theme="dark"] .gv td.src{background:#4A3B06}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gv td.src{background:#4A3B06}}
+/* graph/tree viz */
+.gr{width:100%;display:block}
+.gr line,.gr path.ed{stroke:var(--border-strong);stroke-width:2;transition:stroke .3s,stroke-width .3s}
+.gr .ed.on{stroke:var(--accent);stroke-width:4}
+.gr .ed.dim{opacity:.25}
+.gr .ew{font-family:var(--font-mono);font-size:11px;fill:var(--ink-soft)}
+.gr circle{fill:var(--surface);stroke:var(--border-strong);stroke-width:2;transition:fill .3s,stroke .3s}
+.gr .nd.q circle{fill:#FFF2C2;stroke:#D9A400}
+.gr .nd.cur circle{fill:var(--accent);stroke:var(--accent)}
+.gr .nd.cur text{fill:#fff}.gr .nd text.lab,.gr .nd.cur text.lab{fill:var(--accent-ink)}
+.gr .nd.vis circle{fill:var(--accent-soft);stroke:var(--accent)}
+.gr .nd.bad circle{fill:#FFD9CF;stroke:#D9534F}
+.gr .nd.nw circle{fill:#DFF3E8;stroke:#2C8F68;stroke-width:3}
+.gr text{font-family:var(--font-mono);font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.gr .lab{font-size:10.5px;font-weight:500;fill:var(--accent-ink)}
+
+.sq-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sq-top button{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--ink)}
+.sq-top button:hover{border-color:var(--accent)}
+.sq-top button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sq-g{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:12px}
+.sq-ed textarea{width:100%;box-sizing:border-box;min-height:130px;font-family:var(--font-mono);font-size:13px;line-height:1.6;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border-strong);background:#14171C;color:#E8EDF2;resize:vertical;tab-size:2}
+.sq-ed textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.sq-sch{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:8px;font-family:var(--font-mono);font-size:11.5px;max-height:240px;overflow-y:auto}
+.sq-sch details{margin-bottom:4px}.sq-sch summary{cursor:pointer;font-weight:700;padding:2px 4px;border-radius:6px}
+.sq-sch summary:hover{background:var(--surface)}
+.sq-sch div{padding-left:14px;color:var(--ink-soft);line-height:1.6}
+.sq-sch .pk{color:var(--accent-ink);font-weight:700}
+.sq-out{margin-top:10px;border:1px solid var(--border);border-radius:12px;overflow:auto;max-height:340px;background:var(--surface)}
+.sq-out table{border-collapse:collapse;font-family:var(--font-mono);font-size:12px;min-width:100%}
+.sq-out th{position:sticky;top:0;background:var(--surface-2);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+.sq-out td{padding:5px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.sq-out td.n{text-align:right}.sq-out td.nl{color:var(--ink-faint);font-style:italic}
+.sq-out tr{animation:pop .3s both}
+.sq-msg{padding:10px 12px;font-family:var(--font-mono);font-size:12.5px}
+.sq-msg.er{color:var(--coral);background:var(--coral-soft)}
+.sq-meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+@media (max-width:760px){.sq-g{grid-template-columns:1fr}.sq-sch{max-height:150px}}
+
+
+.fc-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fc-top button{font-family:var(--font-mono);font-size:11.5px}
+.fc-top button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card3{perspective:1200px;margin-top:12px;cursor:pointer}
+.card3 .in{position:relative;min-height:230px;transition:transform .6s;transform-style:preserve-3d}
+.card3.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;border:2px solid var(--border-strong);padding:20px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);box-shadow:var(--shadow)}
+.face.back{transform:rotateY(180deg);background:var(--accent-soft);border-color:var(--accent);justify-content:flex-start;overflow-y:auto}
+.face .tp{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:8px}
+.face .qq{font-family:var(--font-display);font-size:21px;font-weight:600;line-height:1.3}
+.face .aa{font-size:14.5px;line-height:1.65}
+.face .aa code{background:var(--surface);padding:1px 5px;border-radius:5px}
+.fc-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.fc-nav .cnt{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);margin-left:auto}
+.prog2{height:6px;border-radius:3px;background:var(--sunken);overflow:hidden;margin-top:8px}
+.prog2>div{height:100%;background:var(--teal);transition:width .3s}
+.q-txt pre{margin:8px 0 2px;font-family:var(--font-mono);font-size:12.5px;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:10px;white-space:pre;overflow-x:auto;font-weight:400}
+.mock{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.mq{font-family:var(--font-display);font-size:20px;font-weight:600;padding:18px;border-radius:14px;border:2px solid var(--border-strong);background:var(--surface);min-height:90px;display:flex;align-items:center}
+.timer{font-family:var(--font-mono);font-size:30px;font-weight:700;text-align:center;color:var(--accent-ink)}
+.timer.low{color:var(--coral)}
+.hint2{font-size:13.5px;color:var(--ink-soft)}
+
+.ptr{border:1px solid var(--border);border-radius:16px;padding:14px;background:var(--surface-2)}
+.ptr .pq{font-size:15.5px;line-height:1.55;min-height:70px}
+.ptr .pq small{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-bottom:4px}
+.ptr .po{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.ptr .po button{text-align:left;font-family:var(--font-mono);font-size:12.5px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer}
+.ptr .po button.ok{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ptr .po button.no{background:var(--coral-soft);border-color:var(--coral)}
+.ptr .pe{margin-top:10px;font-size:14px;min-height:22px}
+.ptr .pn{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-family:var(--font-mono);font-size:12px}
+.um{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.um div{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--surface);font-size:12.5px}
+.um b{display:block;font-family:var(--font-mono);font-size:18px;color:var(--accent-ink)}
+@media (max-width:760px){.ptr .po{grid-template-columns:1fr}.um{grid-template-columns:1fr 1fr}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"><style id="ky-skin">
+:root{--font-display:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F7F7F7;--sunken:#F2F2F2;--ink:#111111;--ink-soft:#555555;--ink-faint:#8C8C8C;--border:#ECECEC;--border-strong:#DCDCDC;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);--ky-ok:#16A34A;--ky-ov:rgba(0,0,0,.28)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-feature-settings:"cv11","ss01"}
+h1,h2,h3,h4{letter-spacing:-.022em;text-wrap:balance}
+h1{letter-spacing:-.035em}
+.theme-btn{display:none!important}
+.hero{padding-block:36px 28px!important}
+
+/* top bar */
+.ky-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--border);font-family:var(--font-body);font-size:14px;line-height:1.3}
+@supports (backdrop-filter:blur(1px)){.ky-bar{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px)}}
+.ky-in{max-width:828px;margin:0 auto;height:54px;display:flex;align-items:center;gap:6px;padding-inline:14px;box-sizing:border-box}
+.ky-ib{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:0;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:none;padding:0}
+.ky-ib:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ib:focus-visible,.ky-ls a:focus-visible,.cnav a:focus-visible{outline:2px solid var(--tc);outline-offset:1px}
+.ky-ib svg{width:18px;height:18px}
+.ky-ib[aria-disabled="true"]{opacity:.3;pointer-events:none}
+.ky-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;letter-spacing:-.02em;flex:none;margin-right:6px}
+.ky-logo i{font-style:normal;font-family:var(--font-mono);font-size:12px;font-weight:500;background:var(--ink);color:var(--bg);border-radius:7px;padding:3px 7px}
+.ky-crumb{min-width:0;flex:1;display:flex;align-items:center;gap:8px;color:var(--ink-soft);padding-left:4px}
+.ky-crumb b{font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ky-crumb .num{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);flex:none}
+.ky-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--tc)}
+.ky-sep{width:1px;height:20px;background:var(--border);margin-inline:4px;flex:none}
+.ky-prog{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--tc);transform-origin:0 50%;transform:scaleX(0)}
+.theme-ic .mo{display:none}
+:root[data-theme="dark"] .theme-ic .su{display:none}:root[data-theme="dark"] .theme-ic .mo{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-ic .su{display:none}:root:not([data-theme="light"]) .theme-ic .mo{display:block}}
+
+/* sidebar */
+.ky-side{position:fixed;top:0;left:0;bottom:0;width:292px;max-width:86vw;z-index:50;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;font-family:var(--font-body);transform:translateX(-102%);transition:transform .28s cubic-bezier(.3,.8,.3,1);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;visibility:hidden}
+.ky-side.on{transform:none;visibility:visible;box-shadow:0 0 60px rgba(0,0,0,.2)}
+.ky-sh{display:flex;align-items:center;height:54px;padding-inline:16px 8px;border-bottom:1px solid var(--border);flex:none}
+.ky-sh .ky-x{margin-left:auto}
+.ky-tr{padding:18px 18px 10px;flex:none}
+.ky-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.ky-tn{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;margin-top:6px;letter-spacing:-.02em;color:var(--ink)}
+.ky-tn .ky-dot{width:10px;height:10px}
+.ky-pg{display:flex;align-items:center;gap:10px;margin-top:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint)}
+.ky-pg i{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}.ky-pg i b{display:block;height:100%;width:0;background:var(--tc);transition:width .6s}
+.ky-ls{flex:1;overflow-y:auto;padding:4px 10px 18px;overscroll-behavior:contain}
+.ky-ls a{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--ink-soft);font-size:13.5px;line-height:1.4}
+.ky-ls a:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ls a .n{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-right:7px}
+.ky-st{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:1px;box-sizing:border-box;display:grid;place-items:center}
+.ky-st svg{width:10px;height:10px;display:none}
+.ky-ls a.done .ky-st{background:var(--tc);border-color:var(--tc);color:#fff}.ky-ls a.done .ky-st svg{display:block}
+.ky-ls a.cur{background:var(--surface-2);color:var(--ink);font-weight:600}
+.ky-ls a.cur .ky-st{border:5px solid var(--tc);background:none}.ky-ls a.cur .ky-st svg{display:none}
+.ky-oth{margin-top:14px;border-top:1px solid var(--border);padding-top:8px}
+.ky-oth summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border-radius:10px}
+.ky-oth summary:hover{background:var(--surface-2)}
+.ky-oth summary::-webkit-details-marker{display:none}
+.ky-oth summary svg{width:14px;height:14px;color:var(--ink-faint);transition:transform .2s}
+.ky-oth[open] summary svg{transform:rotate(180deg)}
+.ky-oth a{grid-template-columns:18px 1fr auto}
+.ky-oth a .ky-dot{margin:5px 0 0 4px}
+.ky-oth a .c{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);padding-top:2px}
+.ky-sf{flex:none;border-top:1px solid var(--border);padding:12px}
+.ky-sf a{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:12px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600;font-size:14px}
+.ky-sf a svg{width:16px;height:16px}
+.ky-ov{position:fixed;inset:0;background:var(--ky-ov);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
+.ky-ov.on{opacity:1;pointer-events:auto}
+@media (min-width:1200px){.ky-side{transform:none;visibility:visible;box-shadow:none!important}body{padding-left:292px}.ky-menu,.ky-ov,.ky-x,.ky-bar .ky-logo,.ky-bar .ky-sep{display:none!important}}
+@media (max-width:560px){.ky-hs{display:none!important}.ky-in{padding-inline:8px}}
+
+/* bottom prev/next */
+.cnav{max-width:820px;margin:64px auto 72px;padding-inline:20px;box-sizing:border-box;font-family:var(--font-body)}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:6px;min-width:0;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 20px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cnav .cl{font-size:12.5px;color:var(--ink-faint);font-weight:500}
+.cnav .ct{font-weight:650;font-size:16.5px;line-height:1.3;letter-spacing:-.015em}
+.cnav .ct .n{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--ink-faint);margin-right:6px}
+.cnav .cs{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.cnav a.nx{background:var(--ink);border-color:var(--ink);color:var(--bg);text-align:right;align-items:flex-end}
+.cnav a.nx:hover{border-color:var(--ink)}
+.cnav a.nx .cl,.cnav a.nx .cs,.cnav a.nx .ct .n{color:color-mix(in srgb,var(--bg) 62%,var(--ink))}
+.cnav .empty{border:1px dashed var(--border-strong);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint);padding:18px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:14px;margin-top:18px;font-size:13px;color:var(--ink-soft)}
+.cnav-foot a{color:var(--ink);font-weight:600;text-decoration:none}.cnav-foot a:hover{text-decoration:underline}
+.cnav-bar{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--ink)}
+.cnav-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{order:-1;text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><header class="ky-bar" style="--tc:#0E7490"><div class="ky-in">
+<button type="button" class="ky-ib ky-menu" onclick="kySide(1)" aria-label="Mavzular ro'yxati" title="Mavzular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+<a class="ky-logo ky-hs" href="index.html"><i>{}</i>kod yo'li</a><span class="ky-sep ky-hs"></span>
+<div class="ky-crumb"><span class="ky-dot"></span><b>DSA va algoritmlar</b><span class="num">19/19</span></div>
+<a class="ky-ib ky-hs" href="106-trie-va-bit-operatsiyalari.html" aria-label="Oldingi dars" title="Oldingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a><a class="ky-ib ky-hs" href="24-spring-boot-va-di.html" aria-label="Keyingi dars" title="Keyingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+<button type="button" class="ky-ib" onclick="kyTheme()" aria-label="Yorug'/qorong'u rejim" title="Rejim"><svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><g class="su"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1 1M17.4 17.4l1 1M5.6 18.4l1-1M17.4 6.6l1-1"/></g><path class="mo" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+<a class="ky-ib " href="index.html" aria-label="Barcha darslar" title="Barcha darslar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></a>
+</div><i class="ky-prog" id="kyProg"></i></header>
+<div class="wrap">
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>DSA · 107-dars · suhbat</span>
+    <h1>14 ta <span class="steam">pattern</span>: masalani ko‘rib usulni tanish</h1>
+    <p class="lead">Suhbatdagi algoritm masalalari minglab, lekin ularning orqasida ~14 ta naqsh turadi. Tajribali dasturchi masalani o‘qiganda <b>belgilar</b>ni ko‘radi: "saralangan massiv" → binary search yoki two pointers; "eng qisqa yo‘l" → BFS; "necha usulda" → DP. Bu dars — shu ko‘nikmani mashq qilish: naqsh trenajyori, xarita, flashcard’lar va vaqtli mock.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Naqsh trenajyori</h2></div><p class="sec-sub">Masala shartini o‘qing va qaysi usul eng mosligini tanlang. Kod yozish shart emas — avval usulni "ko‘rish" o‘rganiladi.</p>
+    <div class="stage"><div class="ptr"><div class="pq" id="pq"></div><div class="po" id="po"></div><div class="pe" id="pe"></div><div class="pn"><span id="ps"></span><button class="btn" id="pnx">Keyingisi →</button></div></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Naqshlar xaritasi</h2></div><div class="tbl-wrap"><table class="tbl"><tr><th>Belgi (masalada)</th><th>Naqsh</th><th>Murakkablik</th><th>Dars</th></tr><tr><td>Saralangan massiv, juft/uchlik, palindrom</td><td>Two pointers</td><td>O(n)</td><td>91</td></tr><tr><td>Ketma-ket qism (subarray/substring), "eng uzun/qisqa oraliq"</td><td>Sliding window</td><td>O(n)</td><td>91</td></tr><tr><td>Ko‘p oraliq yig‘indisi so‘rovlari</td><td>Prefix sum (+ HashMap)</td><td>O(n) + O(1)</td><td>90</td></tr><tr><td>"Bormi?", juftini topish, sanash, guruhlash</td><td>HashMap / HashSet</td><td>O(n)</td><td>97</td></tr><tr><td>Saralangan, "minimal X ki…", monoton shart</td><td>Binary search (javob bo‘yicha ham)</td><td>O(log n)</td><td>95</td></tr><tr><td>Qavslar, "keyingi kattaroq element", undo</td><td>Stek (monoton stek)</td><td>O(n)</td><td>96</td></tr><tr><td>Bog‘langan ro‘yxat: sikl, o‘rta, teskari</td><td>Sekin/tez ko‘rsatkich, 3 ko‘rsatkich</td><td>O(n), O(1)</td><td>96</td></tr><tr><td>Daraxt xossasi (balandlik, LCA, yo‘l)</td><td>DFS rekursiya (post-order)</td><td>O(n)</td><td>98</td></tr><tr><td>Qavatlar, eng kam qadam (og‘irliksiz)</td><td>BFS</td><td>O(V + E)</td><td>98, 101</td></tr><tr><td>Og‘irlikli eng qisqa yo‘l</td><td>Dijkstra (heap)</td><td>O(E log V)</td><td>102</td></tr><tr><td>Bog‘liqliklar tartibi, kurs rejasi</td><td>Topologik saralash</td><td>O(V + E)</td><td>102</td></tr><tr><td>Top-K, median, K ta ro‘yxatni birlashtirish</td><td>Heap</td><td>O(n log K)</td><td>100</td></tr><tr><td>"Necha usulda", "eng kam/ko‘p", tanlovlar ketma-ketligi</td><td>Dinamik dasturlash</td><td>holatlar × o‘tish</td><td>103, 104</td></tr><tr><td>"Barcha variantlar", kombinatsiyalar, sudoku</td><td>Backtracking</td><td>eksponensial</td><td>105</td></tr><tr><td>Prefiks bo‘yicha qidiruv, lug‘at</td><td>Trie</td><td>O(L)</td><td>106</td></tr><tr><td>Guruhlar birlashadi, "bog‘langanmi?"</td><td>Union-Find</td><td>≈ O(1)</td><td>102</td></tr></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Suhbatda qanday gapirish: 6 qadam</h2></div>
+    <div class="um">
+      <div><b>1</b>Shartni o‘z so‘zlaringiz bilan qaytaring, chegaralarni so‘rang (n qancha? manfiylar? dublikat?)</div>
+      <div><b>2</b>2–3 misol + burchak holatlar (bo‘sh, bitta, hammasi bir xil)</div>
+      <div><b>3</b>Brute force + uning murakkabligi — ovoz chiqarib</div>
+      <div><b>4</b>Naqshni ayting va nega mosligini tushuntiring</div>
+      <div><b>5</b>Toza kod: aniq nomlar, kichik funksiyalar</div>
+      <div><b>6</b>Misolni kod bo‘yicha "qo‘lda yurib" tekshiring, vaqt/xotira</div>
+    </div>
+    <div class="callout info"><div class="ct">Eng ko‘p qilinadigan xato</div>Jim o‘tirib kod yozish. Suhbatdosh fikrlash jarayonini baholaydi: noto‘g‘ri yo‘lga ketsangiz ham, gapirib borsangiz, u sizga ishora beradi. Yechim to‘liq bo‘lmasa ham, brute force + to‘g‘ri murakkablik + yaxshilash g‘oyasi — ko‘pincha "o‘tdi".</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Flashcard’lar</h2></div><p class="sec-sub">Kartani bosing — javob. "Bilaman" — to‘plamdan chiqadi.</p><div class="stage">
+      <div class="fc-top" id="fcT"></div>
+      <div class="card3" id="fc"><div class="in"><div class="face"><div class="tp" id="fcTp"></div><div class="qq" id="fcQ"></div><div class="hint2" style="margin-top:10px">👆 bosing — javob</div></div><div class="face back"><div class="tp">Javob</div><div class="aa" id="fcA"></div></div></div></div>
+      <div class="fc-nav"><button class="btn" id="fcPrev">◀</button><button class="btn" id="fcAgain">🔁 Takrorlash</button><button class="btn primary" id="fcKnow">✓ Bilaman</button><button class="btn" id="fcNext">▶</button><button class="btn" id="fcShuf">🔀</button><span class="cnt" id="fcC"></span></div>
+      <div class="prog2"><div id="fcP"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Mock suhbat</h2></div><p class="sec-sub">Tasodifiy masala + 2 daqiqa: usulni va murakkablikni ovoz chiqarib ayting.</p><div class="stage"><div class="mock">
+      <div class="mq" id="mq">"Boshlash"ni bosing</div>
+      <div class="timer" id="tm">2:00</div>
+      <div class="ctrls" style="justify-content:center"><button class="btn primary" id="mGo">▶ Boshlash</button><button class="btn" id="mNext">Keyingi savol</button></div>
+      <div class="hint2" id="mh"></div>
+    </div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi dars · DSA</span>
+      <h3>DSA yo‘nalishi tugadi 🎉</h3>
+      <p>Endi PostgreSQL: jadvaldan EXPLAIN ANALYZE’gacha — ma’lumotlar bazasi ichida ham xuddi shu algoritmlar (B-tree, hash join, merge, saralash) ishlaydi.</p>
+      <div class="topics"><span class="topic-pill">100 · Heap</span><span class="topic-pill">101 · Graf: BFS/DFS</span><span class="topic-pill">102 · Dijkstra, topo</span><span class="topic-pill">103 · DP I</span><span class="topic-pill">104 · DP II</span><span class="topic-pill">105 · Greedy, backtracking</span><span class="topic-pill">106 · Trie, bitlar</span><span class="topic-pill now">107 · Suhbat pattern’lari</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish" style="--tc:#0E7490"><div class="cnav-grid"><a class="cn pv" href="106-trie-va-bit-operatsiyalari.html"><span class="cl">← Oldingi</span><span class="ct"><span class="n">106</span>Trie va bit operatsiyalari</span><span class="cs"><span class="ky-dot" style="background:#0E7490"></span>DSA va algoritmlar</span></a><a class="cn nx" href="24-spring-boot-va-di.html"><span class="cl">Keyingi dars →</span><span class="ct"><span class="n">24</span>Spring Boot va DI</span><span class="cs"><span class="ky-dot" style="background:#5A9E2F"></span>Spring Boot</span></a></div><div class="cnav-foot"><a href="index.html">Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:90.7%"></i></div><span>107 / 118</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(107)<0)v.push(107);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','107');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(107)<0)D[t].push(107);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script><aside class="ky-side" id="kySide" style="--tc:#0E7490" aria-label="Yo'nalish mavzulari">
+<div class="ky-sh"><a class="ky-logo" href="index.html"><i>{}</i>kod yo'li</a><button type="button" class="ky-ib ky-x" onclick="kySide(0)" aria-label="Yopish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="ky-tr"><div class="ky-lbl">Yo'nalish</div><div class="ky-tn"><span class="ky-dot"></span>DSA va algoritmlar</div><div class="ky-pg"><i><b id="kyBar"></b></i><span id="kyCnt"></span></div></div>
+<nav class="ky-ls"><a href="89-algoritmik-fikrlash.html" data-n="89"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">89</span>Algoritmik fikrlash</span></a><a href="90-massiv-va-xotira.html" data-n="90"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">90</span>Massiv va xotira</span></a><a href="91-two-pointers-va-sliding-window.html" data-n="91"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">91</span>Two pointers va sliding window</span></a><a href="92-rekursiya-va-call-stack.html" data-n="92"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">92</span>Rekursiya va call stack</span></a><a href="93-oddiy-saralashlar.html" data-n="93"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">93</span>Oddiy saralashlar</span></a><a href="94-merge-sort-quick-sort-arrays-sort.html" data-n="94"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">94</span>Merge sort, quick sort, Arrays.sort</span></a><a href="95-binary-search.html" data-n="95"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">95</span>Binary search</span></a><a href="96-linked-list-stack-queue.html" data-n="96"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">96</span>Linked list, stack, queue</span></a><a href="97-hash-table-va-hashmap.html" data-n="97"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">97</span>Hash table va HashMap</span></a><a href="98-daraxtlar-va-aylanib-chiqish.html" data-n="98"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">98</span>Daraxtlar va aylanib chiqish</span></a><a href="99-bst-balans-va-treemap.html" data-n="99"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">99</span>BST, balans va TreeMap</span></a><a href="100-heap-va-priorityqueue.html" data-n="100"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">100</span>Heap va PriorityQueue</span></a><a href="101-graf-bfs-va-dfs.html" data-n="101"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">101</span>Graf: BFS va DFS</span></a><a href="102-dijkstra-topo-union-find.html" data-n="102"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">102</span>Dijkstra, topo, Union-Find</span></a><a href="103-dinamik-dasturlash-i.html" data-n="103"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">103</span>Dinamik dasturlash I</span></a><a href="104-dp-ii-lcs-edit-distance-knapsack.html" data-n="104"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">104</span>DP II: LCS, edit distance, knapsack</span></a><a href="105-greedy-va-backtracking.html" data-n="105"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">105</span>Greedy va backtracking</span></a><a href="106-trie-va-bit-operatsiyalari.html" data-n="106"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">106</span>Trie va bit operatsiyalari</span></a><a href="107-dsa-suhbat-pattern-lari.html" data-n="107" class="cur" aria-current="page"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">107</span>DSA suhbat pattern’lari</span></a><details class="ky-oth"><summary><span class="ky-lbl">Boshqa yo'nalishlar</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary><a href="01-java-qanday-ishlaydi.html" data-ns="1,2,3,4,5,6,7"><span class="ky-dot" style="background:#B5622A"></span><span>Java asoslari</span><span class="c">7</span></a><a href="08-klass-va-obyekt.html" data-ns="8,9,10,11,12,13"><span class="ky-dot" style="background:#9A5B2E"></span><span>OOP</span><span class="c">6</span></a><a href="14-kolleksiyalar.html" data-ns="14,15,16,17,18,19,20"><span class="ky-dot" style="background:#8A6A1E"></span><span>Java Core</span><span class="c">7</span></a><a href="21-zamonaviy-java-8-21.html" data-ns="21,22,23"><span class="ky-dot" style="background:#7A4B8C"></span><span>Advanced Java</span><span class="c">3</span></a><a href="24-spring-boot-va-di.html" data-ns="24,25,26,27,28,29,30,31,32"><span class="ky-dot" style="background:#5A9E2F"></span><span>Spring Boot</span><span class="c">9</span></a><a href="108-ma-lumotlar-bazasi-nima.html" data-ns="108,109,110,111,112,113,114,115,116,117,118,119,120,121,122"><span class="ky-dot" style="background:#2E6FA8"></span><span>PostgreSQL</span><span class="c">15</span></a><a href="37-big-o-va-tuzilmalar.html" data-ns="37,38,39"><span class="ky-dot" style="background:#6A4BB0"></span><span>Suhbatga tayyorgarlik</span><span class="c">3</span></a><a href="40-keycloak-va-iam.html" data-ns="40,41,42,43,44,45,46,47,48,49"><span class="ky-dot" style="background:#A3344A"></span><span>Keycloak</span><span class="c">10</span></a><a href="50-redis-nima-va-nega-tez.html" data-ns="50,51,52,53,54,55,56"><span class="ky-dot" style="background:#C8372D"></span><span>Redis</span><span class="c">7</span></a><a href="57-nega-kafka.html" data-ns="57,58,59,60,61,62,63,64"><span class="ky-dot" style="background:#334155"></span><span>Kafka</span><span class="c">8</span></a><a href="65-js-qanday-ishlaydi.html" data-ns="65,66,67,68,69,70,71,72,73,74"><span class="ky-dot" style="background:#B08900"></span><span>JavaScript</span><span class="c">10</span></a><a href="75-nega-typescript.html" data-ns="75,76,77,78,79,80"><span class="ky-dot" style="background:#3178C6"></span><span>TypeScript</span><span class="c">6</span></a><a href="81-vue-nima.html" data-ns="81,82,83,84,85,86,87,88"><span class="ky-dot" style="background:#2C8F68"></span><span>Vue.js</span><span class="c">8</span></a></details></nav>
+<div class="ky-sf"><a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Barcha darslar</a></div></aside>
+<div class="ky-ov" id="kyOv" onclick="kySide(0)"></div>
+<script>function kySide(o){var s=document.getElementById('kySide');s.classList.toggle('on',!!o);document.getElementById('kyOv').classList.toggle('on',!!o);if(o){var c=s.querySelector('a.cur');if(c)c.scrollIntoView({block:'center'});}}
+function kyTheme(){var r=document.documentElement,t=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.setAttribute('data-theme',t==='dark'?'light':'dark');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')kySide(0);});
+(function(){var v=[];try{v=JSON.parse(localStorage.getItem('kodyoli:v')||'[]');}catch(e){}if(v.indexOf(107)<0)v.push(107);
+var as=document.querySelectorAll('.ky-ls > a[data-n]'),d=0;[].forEach.call(as,function(a){if(v.indexOf(+a.getAttribute('data-n'))>=0){d++;if(!a.classList.contains('cur'))a.classList.add('done');}});
+document.getElementById('kyCnt').textContent=d+'/'+as.length;document.getElementById('kyBar').style.width=(d/as.length*100)+'%';
+[].forEach.call(document.querySelectorAll('.ky-oth a[data-ns]'),function(a){var ns=a.getAttribute('data-ns').split(','),k=0;ns.forEach(function(n){if(v.indexOf(+n)>=0)k++;});a.querySelector('.c').textContent=k+'/'+ns.length;});
+if(innerWidth>=1200){var c=document.querySelector('.ky-ls a.cur');if(c)c.scrollIntoView({block:'center'});window.scrollTo(0,0);}
+var p=document.getElementById('kyProg'),q=0;function u(){q=0;var h=document.documentElement.scrollHeight-innerHeight;p.style.transform='scaleX('+(h>0?Math.min(1,scrollY/h):0)+')';}
+addEventListener('scroll',function(){if(!q){q=1;requestAnimationFrame(u);}},{passive:true});u();})();</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+
+
+
+
+window.mkQA=function(C,MQ){var el=function(id){return document.getElementById(id);};
+  var topics=['Hammasi'].concat(C.map(function(c){return c[0];}).filter(function(t,i,a){return a.indexOf(t)===i;})),tp='Hammasi',known=[],deck=[],pos=0;
+  function build(){deck=C.map(function(c,i){return i;}).filter(function(i){return (tp==='Hammasi'||C[i][0]===tp)&&known.indexOf(i)<0;});pos=Math.min(pos,Math.max(0,deck.length-1));show();}
+  function show(){var fl=el('fc').classList.contains('flip');el('fc').classList.remove('flip');var tot=C.filter(function(c){return tp==='Hammasi'||c[0]===tp;}).length,kn=known.filter(function(i){return tp==='Hammasi'||C[i][0]===tp;}).length;
+    el('fcP').style.width=(tot?kn/tot*100:0)+'%';
+    if(!deck.length){el('fcTp').textContent='🎉';el('fcQ').textContent='Bu mavzudagi hamma kartani bilasiz!';el('fcA').innerHTML='';el('fcC').textContent=kn+' / '+tot+' bilaman';return;}
+    var c=C[deck[pos]];setTimeout(function(){el('fcTp').textContent=c[0];el('fcQ').textContent=c[1];el('fcA').innerHTML=c[2];},fl?300:0);
+    el('fcC').textContent=(pos+1)+' / '+deck.length+' · bilaman: '+kn+'/'+tot;}
+  el('fcT').innerHTML=topics.map(function(t){return '<button class="btn'+(t===tp?' on':'')+'">'+t+'</button>';}).join('');
+  el('fcT').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('on',x===b);});tp=b.textContent;pos=0;build();});
+  el('fc').addEventListener('click',function(){if(deck.length)this.classList.toggle('flip');});
+  el('fcNext').addEventListener('click',function(){if(deck.length){pos=(pos+1)%deck.length;show();}});
+  el('fcPrev').addEventListener('click',function(){if(deck.length){pos=(pos-1+deck.length)%deck.length;show();}});
+  el('fcKnow').addEventListener('click',function(){if(!deck.length)return;known.push(deck[pos]);build();});
+  el('fcAgain').addEventListener('click',function(){if(!deck.length)return;var x=deck.splice(pos,1)[0];deck.push(x);if(pos>=deck.length)pos=0;show();});
+  el('fcShuf').addEventListener('click',function(){deck.sort(function(){return Math.random()-.5;});pos=0;show();});
+  build();
+  var mt=null,left=120,mi=-1;
+  function tick(){left--;var m=Math.floor(left/60),s=left%60;el('tm').textContent=m+':'+(s<10?'0':'')+s;el('tm').className='timer'+(left<=20?' low':'');if(left<=0){clearInterval(mt);mt=null;el('mh').innerHTML='⏰ Vaqt tugadi. Qayta ko‘rish: <b>'+MQ[mi][1]+'-modul</b>.';}}
+  function next(){mi=(mi+1+Math.floor(Math.random()*(MQ.length-1)))%MQ.length;el('mq').textContent=MQ[mi][0];left=120;el('tm').textContent='2:00';el('tm').className='timer';el('mh').innerHTML='Tuzilma: ta’rif → qanday ishlaydi → misol (bankdan) → tuzoq/cheklov.';clearInterval(mt);mt=setInterval(tick,1000);}
+  el('mGo').addEventListener('click',next);el('mNext').addEventListener('click',next);
+};
+
+
+
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  var T=[
+   ['Saralangan to‘lovlar ro‘yxatida yig‘indisi aniq X bo‘lgan ikkita to‘lovni toping. Qo‘shimcha xotira — O(1).',['Two pointers','HashMap','DP','Heap'],0,'Saralangan + juft + O(1) xotira → ikki uchdan yuruvchi ko‘rsatkichlar. (HashMap ham ishlaydi, lekin O(n) xotira.)'],
+   ['Satrda takrorlanmaydigan belgilardan iborat eng uzun ketma-ket qism uzunligi.',['Backtracking','Sliding window','Binary search','Trie'],1,'Ketma-ket qism + "eng uzun" + shart (takrorlanmaslik) → o‘zgaruvchan oyna + oxirgi indekslar xaritasi.'],
+   ['Metro xaritasida A bekatdan B ga eng kam bekat orqali qanday borish mumkin?',['DFS','BFS','Dijkstra','Topologik'],1,'Og‘irliksiz graf + eng kam qadam → BFS.'],
+   ['1 mln tranzaksiyadan eng katta 100 tasini toping, xotira cheklangan.',['To‘liq saralash','Min-heap (o‘lchami 100)','HashSet','Prefix sum'],1,'Top-K → o‘lchami K bo‘lgan min-heap: O(n log K), xotira O(K).'],
+   ['Banknotlar to‘plami va summa berilgan. Eng kam banknot soni?',['Greedy','Dinamik dasturlash','BFS','Two pointers'],1,'"Eng kam" + ixtiyoriy nominallar → DP (ochko‘z usul ba’zi to‘plamlarda xato).'],
+   ['Mikroservislar bir-biriga bog‘liq. Qaysi tartibda ishga tushirish kerak? Sikl bo‘lsa xabar bering.',['Topologik saralash','Dijkstra','Heap','Union-Find'],0,'Bog‘liqliklar tartibi + sikl → Kahn algoritmi.'],
+   ['"Ab" yozilganda shu bilan boshlanadigan barcha mijoz ismlarini tez ko‘rsatish.',['HashMap','Trie','Stek','DP'],1,'Prefiks bo‘yicha qidiruv → trie (yoki TreeSet.subSet).'],
+   ['Kodda qavslar to‘g‘ri yopilganini tekshiring: ( [ { } ] ).',['Navbat','Stek','Heap','Graf'],1,'Oxirgi ochilgan birinchi yopilishi kerak → LIFO stek.'],
+   ['To‘lovlarni K kunda o‘tkazish uchun minimal kunlik limit (tartib o‘zgarmaydi).',['Javob bo‘yicha binary search','Heap','Backtracking','BFS'],0,'"Minimal X ki shart bajarilsin" + monoton → limit bo‘yicha binary search + ochko‘z tekshiruv.'],
+   ['Hisoblar umumiy telefon raqami orqali bog‘lanadi. Nechta "bir egalik" guruh bor? Bog‘lanishlar oqim bo‘lib keladi.',['Union-Find','Sliding window','Trie','DP'],0,'Dinamik birlashadigan guruhlar → Union-Find (yoki statik bo‘lsa DFS bilan komponentlar).'],
+   ['{1,2,3,4} sonlaridan yig‘indisi 5 bo‘lgan barcha kombinatsiyalarni chiqaring.',['DP','Backtracking','Two pointers','Heap'],1,'"Barcha variantlar" → backtracking (tanla → chuqurlash → bekor qil).'],
+   ['Ikki ism qanchalik o‘xshash? (qo‘shish/o‘chirish/almashtirish soni)',['LCS / edit distance DP','Hash','BFS','Greedy'],0,'Levenshtein — 2D DP jadvali.']];
+  var order=T.map(function(_,i){return i;}).sort(function(){return Math.random()-.5;}),k=0,score=0,answered=false;
+  function show(){var t=T[order[k]];answered=false;el('pq').innerHTML='<small>Masala '+(k+1)+'/'+T.length+'</small>'+t[0];el('po').innerHTML=t[1].map(function(o,i){return '<button data-i="'+i+'">'+o+'</button>';}).join('');el('pe').innerHTML='';el('ps').textContent='to‘g‘ri: '+score+' / '+k;}
+  el('po').addEventListener('click',function(e){var b=e.target.closest('button');if(!b||answered)return;answered=true;var t=T[order[k]],i=+b.getAttribute('data-i');
+    [].forEach.call(el('po').children,function(x,j){if(j===t[2])x.classList.add('ok');else if(j===i)x.classList.add('no');});if(i===t[2])score++;
+    el('pe').innerHTML=(i===t[2]?'✅ ':'❌ ')+t[3];el('ps').textContent='to‘g‘ri: '+score+' / '+(k+1);});
+  el('pnx').addEventListener('click',function(){k++;if(k>=T.length){el('pq').innerHTML='<b>Natija: '+score+' / '+T.length+'</b>. '+(score>=10?'Zo‘r — naqshlarni ko‘ryapsiz!':'Xaritani qayta ko‘ring va yana urinib ko‘ring.');el('po').innerHTML='';el('pe').innerHTML='';k=-1;order.sort(function(){return Math.random()-.5;});score=0;el('pnx').textContent='Qaytadan →';return;}el('pnx').textContent='Keyingisi →';show();});
+  show();
+})();
+mkQA([
+ ['Murakkablik','Big-O nimani o‘lchaydi?','Kirish o‘sganda ish hajmi o‘sish shaklini (konstantalarsiz), odatda eng yomon holat.'],
+ ['Murakkablik','Amortizatsiyalangan O(1)?','Ba’zi amallar qimmat, lekin uzun ketma-ketlikda o‘rtacha o‘zgarmas (ArrayList.add, HashMap resize).'],
+ ['Massiv','ArrayList va LinkedList?','ArrayList: get O(1), keshga mos — deyarli doim. LinkedList: o‘rtadan iterator bilan O(1), lekin xotira ko‘p.'],
+ ['Massiv','Prefix sum?','p[i+1] = p[i] + a[i]; sum(l..r) = p[r+1] − p[l] — O(1) so‘rov.'],
+ ['Ko‘rsatkichlar','Two pointers qachon?','Saralangan yoki monoton: ikki uchdan (juft yig‘indi) yoki sekin/tez (joyida filtrlash, sikl).'],
+ ['Ko‘rsatkichlar','Sliding window sharti?','Oyna kengayganda shart monoton buziladi (musbat yig‘indi, noyob belgilar).'],
+ ['Rekursiya','StackOverflowError sababi?','Asosiy holat yo‘q yoki rekursiya juda chuqur; iteratsiya/aniq stek bilan tuzatiladi.'],
+ ['Saralash','Merge va quick farqi?','Merge: doim n log n, barqaror, O(n) xotira. Quick: o‘rtacha tezroq, joyida, eng yomon n², barqaror emas.'],
+ ['Saralash','Java Arrays.sort ichida?','Primitivlar — dual-pivot quicksort; obyektlar va List.sort — barqaror TimSort.'],
+ ['Qidiruv','Binary search sharti va xatolar?','Saralangan/monoton; mid = lo + (hi−lo)/2; yopiq/yarim ochiq oraliqni aniq belgilash.'],
+ ['Hash','HashMap ichi?','Savatlar massivi, hash ^ (hash>>>16), & (n−1), zanjir → daraxt (≥8), 0.75 da 2× resize.'],
+ ['Hash','equals/hashCode shartnomasi?','equals true → hashCode teng bo‘lishi shart; aks holda HashMap topa olmaydi.'],
+ ['Daraxt','Pre/in/post qachon?','Pre — nusxa/serializatsiya; In — BST’da saralangan; Post — bolalar natijasidan (balandlik, hajm).'],
+ ['Daraxt','BST eng yomon holati?','Saralangan tartibda qo‘shilsa zanjir — O(n). Shuning uchun muvozanatli (qizil-qora, AVL).'],
+ ['Heap','Top-K uchun nega min-heap?','Tepada top-K ning eng kichigi — yangi element u bilan solishtiriladi; O(n log K).'],
+ ['Graf','BFS vs DFS?','BFS — navbat, qavatlar, og‘irliksiz eng qisqa yo‘l. DFS — stek/rekursiya, komponentlar, sikl, backtracking.'],
+ ['Graf','Dijkstra cheklovi?','Og‘irliklar ≥ 0. Manfiy — Bellman-Ford.'],
+ ['Graf','Topologik saralash va sikl?','Kahn: in-degree 0 navbat; hammasi chiqmasa — sikl bor.'],
+ ['DP','DP qachon?','Qism-masalalar takrorlanadi + optimal qism-tuzilma. Memo (yuqoridan) yoki jadval (pastdan).'],
+ ['DP','DP retsepti?','Holat → o‘tish → boshlang‘ich → tartib → javob joyi (+ xotirani qisqartirish).'],
+ ['Strategiya','Greedy qachon to‘g‘ri?','Ochko‘z tanlov xossasi isbotlansa (intervallar — eng erta tugash). Aks holda qarshi misol qidiring.'],
+ ['Strategiya','Backtracking qadamlari?','Tanla → chuqurlash → bekor qil; shart buzilsa shoxni kesish (pruning).'],
+ ['Maxsus','Trie qachon?','Prefiks so‘rovlari: avto-to‘ldirish, lug‘at; O(L).'],
+ ['Maxsus','x & (x−1)?','Eng kichik 1 bitni o‘chiradi: 2 darajasini tekshirish, bitlarni sanash.']],
+ [['Saralanmagan massivda ikki son yig‘indisi = target. Brute force va optimal?','97'],['Takrorlanmas belgilardan eng uzun substring.','91'],['Bog‘langan ro‘yxatni teskari aylantiring.','96'],['Ro‘yxatda sikl bormi? Sikl boshi qayerda?','96'],['Daraxt balandligi va diametri.','98'],['BST to‘g‘riligini tekshiring.','99'],['Eng katta K ta element — usul va murakkablik.','100'],['Orollar soni.','101'],['Kurslar jadvali: barcha kurslarni o‘tish mumkinmi?','102'],['Coin change — eng kam tanga.','103'],['Edit distance.','104'],['Barcha qism-to‘plamlar.','105'],['Aylantirilgan saralangan massivda qidirish.','95'],['LRU kesh dizayni.','97']]);
+
+</script>
+</body>
+</html>

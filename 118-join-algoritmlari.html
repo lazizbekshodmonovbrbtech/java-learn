@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JOIN algoritmlari</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐘</text></svg>">
+
+
+
+<style>
+:root{
+  --bg:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F8FB;--sunken:#E6ECF2;
+  --ink:#182430;--ink-soft:#4C5866;--ink-faint:#7C8896;--border:#D8E0E9;--border-strong:#C3CDD8;
+  --accent:#2E6FA8;--accent-ink:#1F5183;--accent-soft:#E1EDF7;
+  --purple:#534AB7;--purple-ink:#3C3489;--purple-soft:#ECEAF9;
+  --teal:#0F6E56;--teal-ink:#0A5443;--teal-soft:#DEF0EA;
+  --amber:#A9660D;--amber-soft:#F8ECD6;--coral:#B4471F;--coral-soft:#F7E5DC;
+  --shadow:0 1px 2px rgba(40,32,20,.05),0 8px 24px rgba(40,32,20,.06);
+  --shadow-lift:0 2px 4px rgba(40,32,20,.08),0 16px 40px rgba(40,32,20,.12);
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif;--font-body:"IBM Plex Sans",system-ui,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+:root:not([data-theme="light"]){@media (prefers-color-scheme:dark){
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}}
+:root[data-theme="dark"]{
+  --bg:#0E141A;--surface:#18212B;--surface-2:#1E2833;--sunken:#131A21;--ink:#DEE6EE;--ink-soft:#A3AEB9;--ink-faint:#727E8A;--border:#28323D;--border-strong:#394552;
+  --accent:#5EA0DA;--accent-ink:#7DB5E8;--accent-soft:#14243A;--purple:#A79FF0;--purple-ink:#BCB5F5;--purple-soft:#241F33;
+  --teal:#4FC29D;--teal-ink:#6FD1B2;--teal-soft:#14261F;--amber:#E0A64B;--amber-soft:#2C2213;--coral:#E38156;--coral-soft:#2E1C12;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.34);--shadow-lift:0 2px 4px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.5);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}a{color:var(--accent-ink)}code{font-family:var(--font-mono);font-size:.9em}
+.eyebrow{font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lead{color:var(--ink-soft);font-size:18px}
+header.hero{padding-block:56px 36px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);box-shadow:var(--shadow)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+header.hero h1{font-size:clamp(36px,7.5vw,58px);margin:22px 0 16px;font-weight:700}
+header.hero h1 .steam{color:var(--accent)}header.hero .lead{max-width:62ch}
+section{padding-block:30px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .n{font-family:var(--font-mono);font-size:13px;color:var(--accent-ink);font-weight:500}
+.sec-head h2{font-size:clamp(23px,4.4vw,30px)}
+.sec-sub{color:var(--ink-soft);max-width:66ch;margin-top:6px;font-size:16.5px}
+.divider{height:1px;background:var(--border);border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button{font-family:var(--font-body)}
+.callout{border-radius:0 12px 12px 0;padding:13px 16px;margin-top:16px;font-size:14.5px;line-height:1.6}
+.callout .ct{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.callout.tip{background:var(--teal-soft);border-left:4px solid var(--teal)}.callout.tip .ct{color:var(--teal-ink)}
+.callout.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}.callout.warn .ct{color:var(--amber)}
+.callout.iv{background:var(--purple-soft);border-left:4px solid var(--purple)}.callout.iv .ct{color:var(--purple-ink)}
+.callout code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px}
+:root[data-theme="dark"] .callout code,:root:not([data-theme="light"]) .callout code{background:rgba(255,255,255,.08)}
+.code-block{background:var(--sunken);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:18px;box-shadow:var(--shadow)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.code-bar .fname{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft)}
+.code-bar .tl{width:11px;height:11px;border-radius:50%}
+pre.code{margin:0;padding:18px;overflow-x:auto;font-family:var(--font-mono);font-size:13.5px;line-height:1.9;color:var(--ink)}
+.k{color:var(--purple-ink);font-weight:500}.ty{color:var(--teal-ink)}.st{color:var(--accent-ink)}.nu{color:var(--coral)}.cm{color:var(--ink-faint);font-style:italic}
+
+
+/* stepper */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;margin-top:20px}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;color:var(--ink);font-family:var(--font-mono);transition:.15s}
+.btn:hover{border-color:var(--border-strong);background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{height:5px;background:var(--sunken);border-radius:3px;overflow:hidden;flex:1;min-width:80px}
+.bar>div{height:100%;background:var(--accent);width:0;transition:width .4s}
+.explain{background:var(--sunken);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14.5px;min-height:52px;line-height:1.6}
+.explain b{color:var(--accent-ink)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.tag.p{background:var(--purple-soft);color:var(--purple-ink)}.tag.t{background:var(--teal-soft);color:var(--teal-ink)}.tag.a{background:var(--amber-soft);color:var(--amber)}.tag.c{background:var(--coral-soft);color:var(--coral)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.card h4{font-family:var(--font-display);font-size:15px;margin:0 0 6px}
+.card p{font-size:13.5px;color:var(--ink-soft)}
+.card.bad h4{color:var(--coral)}.card.good h4{color:var(--teal-ink)}
+table.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.tbl th{background:var(--surface-2);font-family:var(--font-mono);font-size:12px;color:var(--ink-soft)}
+.tbl code{background:var(--sunken);padding:1px 5px;border-radius:5px}
+.tap{cursor:pointer;border-bottom:1.5px dashed var(--accent);padding:0 2px;border-radius:3px;transition:.15s}
+.tap:hover,.tap.hl{background:var(--accent-soft)}
+.tap-note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:12px 15px;margin-top:12px;font-size:14px;min-height:46px}
+.tap-note b{font-family:var(--font-mono);color:var(--accent-ink)}
+.tog{position:relative;width:46px;height:25px;background:var(--border-strong);border-radius:13px;cursor:pointer;transition:.2s;flex-shrink:0;border:0;padding:0}
+.tog.on{background:var(--teal)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on::after{transform:translateX(21px)}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tog-lbl{font-family:var(--font-mono);font-size:13px;color:var(--ink-soft)}
+.seg{display:inline-flex;background:var(--sunken);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;border-radius:8px;padding:7px 12px;font-family:var(--font-mono);font-size:12.5px;cursor:pointer;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow);font-weight:600}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px var(--accent-soft)}}
+.pulse{animation:pulse 1.2s infinite}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+
+mark.hx{background:var(--accent-soft);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--accent) inset}
+.tbl-wrap{overflow-x:auto}
+.q-txt,.opt,.iv-a,.explain,.tap-note{overflow-wrap:anywhere}
+
+.repl{background:#1C1A12;color:#F2EDDC;border-radius:14px;padding:12px;font-family:var(--font-mono);font-size:13px;margin-top:10px}
+.repl textarea{width:100%;min-height:80px;background:transparent;border:1px solid #4A4226;border-radius:8px;color:#fff;font-family:var(--font-mono);font-size:13px;padding:8px;resize:vertical;box-sizing:border-box}
+.repl .out{margin-top:8px;white-space:pre-wrap;min-height:34px;line-height:1.6;word-break:break-word}
+.repl .out .lg2{color:#F5DC78}.repl .out .er{color:#FF8A7A}.repl .out .rv{color:#9BE3BE}
+.rex{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.rex button{font-family:var(--font-mono);font-size:11.5px}
+
+.tsv{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--sunken)}
+.tsv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;flex-wrap:wrap}
+.tsv .bar .fn{color:var(--ink-soft)}
+.tsv .bar .st{margin-left:auto;font-size:11.5px;padding:2px 8px;border-radius:6px}
+.tsv .bar .st.ok{background:var(--teal-soft);color:var(--teal-ink)}.tsv .bar .st.er{background:var(--coral-soft);color:var(--coral)}
+.tsv pre{margin:0;padding:12px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.tsv pre .l{display:block;padding:0 14px;white-space:pre}
+.tsv pre .l.el{background:rgba(200,55,45,.07)}
+.tsv pre .ln{display:inline-block;width:22px;color:var(--ink-faint);user-select:none}
+.tsv .sq{border-radius:2px;transition:.2s}
+.tsv.on .sq{text-decoration:underline wavy var(--coral);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help;background:rgba(200,55,45,.08)}
+.tsv.on .sq.hl{background:var(--coral-soft);outline:1.5px solid var(--coral)}
+.tsv .hint{text-decoration:underline dotted var(--teal);text-underline-offset:4px;cursor:help}
+.tsv .errs{border-top:1px solid var(--border);background:var(--surface);max-height:0;overflow:hidden;transition:max-height .4s}
+.tsv.on .errs{max-height:600px}
+.tsv .errs div{padding:7px 12px;font-family:var(--font-mono);font-size:12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:8px}
+.tsv .errs div:hover,.tsv .errs div.hl{background:var(--coral-soft)}
+.tsv .errs .ic{color:var(--coral);font-weight:700}
+.tsv .errs .lc{color:var(--ink-faint);white-space:nowrap}
+.tsv .tip{padding:8px 12px;font-size:13px;background:var(--surface);border-top:1px solid var(--border);min-height:20px}
+
+.trc-in{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-family:var(--font-mono);font-size:12.5px}
+.trc-in input{flex:1;min-width:150px;font-family:var(--font-mono);font-size:13px;padding:7px 10px;border:1.5px solid var(--border-strong);border-radius:9px;background:var(--surface);color:var(--ink)}
+.trc-in .chip2{border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:4px 10px;cursor:pointer;font-family:var(--font-mono);font-size:11.5px;color:var(--ink)}
+.trc-in .chip2:hover{border-color:var(--accent)}
+.trc-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:14px}.trc-g>div{min-width:0}
+.trc-code{border:1px solid var(--border);border-radius:12px;background:var(--sunken);overflow:hidden;align-self:start}
+.trc-code .code-bar{padding:7px 12px}
+.trc-code ol{list-style:none;margin:0;padding:6px 0;font-family:var(--font-mono);font-size:12.3px;line-height:1.75;counter-reset:ln;overflow-x:auto}
+.trc-code li{counter-increment:ln;padding:0 12px 0 40px;position:relative;white-space:pre;transition:background .2s}
+.trc-code li:before{content:counter(ln);position:absolute;left:8px;width:22px;text-align:right;color:var(--ink-faint);font-size:11px}
+.trc-code li.on{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.trc-code li.on:after{content:"◀";position:absolute;right:8px;color:var(--accent);font-size:10px}
+.trc-viz{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:12px;min-height:150px;position:relative;overflow:hidden}
+.trc-vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.trc-vars span{font-family:var(--font-mono);font-size:12px;border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface);transition:background .3s}
+.trc-vars span.ch{background:var(--accent-soft);border-color:var(--accent)}
+.trc-vars b{font-weight:700}
+.trc-cnt{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;font-family:var(--font-mono);font-size:12px}
+.trc-cnt span{border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface)}
+.trc-cnt b{font-size:14px}
+.trc-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.trc-ctl input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+.trc-ctl select{font-family:var(--font-mono);font-size:12px;border:1.5px solid var(--border);border-radius:9px;padding:6px;background:var(--surface-2);color:var(--ink)}
+.trc-step{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);min-width:84px}
+@media (max-width:760px){.trc-g{grid-template-columns:1fr}.trc-code ol{font-size:11.5px}.trc-viz{min-height:0}}
+/* array viz */
+.av{position:relative;margin:4px auto 0;max-width:100%}
+.av .c{position:absolute;bottom:22px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid var(--border-strong);background:var(--surface);font-family:var(--font-mono);font-weight:700;font-size:13px;transition:left .45s cubic-bezier(.3,.8,.3,1),height .35s,background .25s,border-color .25s,transform .25s,opacity .3s;box-sizing:border-box}
+.av .c.ok{background:var(--accent-soft);border-color:var(--accent)}
+.av.bars .c{align-items:flex-end;padding-bottom:3px;font-size:11px}
+.av .c.cmp{background:#FFF2C2;border-color:#D9A400;transform:translateY(-6px)}
+.av .c.sw{background:#FFD9CF;border-color:#D9534F;transform:translateY(-10px)}
+.av .c.dim{opacity:.35}
+.av .c.key{background:#DCEBFF;border-color:#2E6FA8;transform:translateY(-14px)}
+.av .c.hit{background:var(--accent);border-color:var(--accent);color:#fff}
+.av .ix{position:absolute;bottom:4px;font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);text-align:center;transition:left .45s}
+.av .pt{position:absolute;top:0;font-family:var(--font-mono);font-size:11px;font-weight:700;text-align:center;transition:left .4s cubic-bezier(.3,.8,.3,1);color:var(--accent-ink);white-space:nowrap}
+.av .pt i{display:block;font-style:normal;line-height:1}
+.av .rg{position:absolute;bottom:16px;border:2px dashed var(--accent);border-radius:12px;background:color-mix(in srgb,var(--accent) 9%,transparent);z-index:0;transition:left .4s cubic-bezier(.3,.8,.3,1),width .4s cubic-bezier(.3,.8,.3,1)}.av .c{z-index:1}
+:root[data-theme="dark"] .av .c.cmp{background:#4A3B06}:root[data-theme="dark"] .av .c.sw{background:#4A1D16}:root[data-theme="dark"] .av .c.key{background:#14243A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .av .c.cmp{background:#4A3B06}:root:not([data-theme="light"]) .av .c.sw{background:#4A1D16}:root:not([data-theme="light"]) .av .c.key{background:#14243A}}
+/* grid viz (DP) */
+.gv{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:var(--font-mono);font-size:12px}
+.gv td,.gv th{min-width:30px;height:30px;text-align:center;border-radius:6px;transition:background .25s,transform .25s}
+.gv th{color:var(--ink-faint);font-weight:500;font-size:11px}
+.gv td{background:var(--surface);border:1px solid var(--border)}
+.gv td.e{color:transparent}
+.gv td.cur{background:var(--accent);color:#fff;transform:scale(1.12)}
+.gv td.src{background:#FFF2C2;border-color:#D9A400}
+.gv td.fin{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+:root[data-theme="dark"] .gv td.src{background:#4A3B06}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gv td.src{background:#4A3B06}}
+/* graph/tree viz */
+.gr{width:100%;display:block}
+.gr line,.gr path.ed{stroke:var(--border-strong);stroke-width:2;transition:stroke .3s,stroke-width .3s}
+.gr .ed.on{stroke:var(--accent);stroke-width:4}
+.gr .ed.dim{opacity:.25}
+.gr .ew{font-family:var(--font-mono);font-size:11px;fill:var(--ink-soft)}
+.gr circle{fill:var(--surface);stroke:var(--border-strong);stroke-width:2;transition:fill .3s,stroke .3s}
+.gr .nd.q circle{fill:#FFF2C2;stroke:#D9A400}
+.gr .nd.cur circle{fill:var(--accent);stroke:var(--accent)}
+.gr .nd.cur text{fill:#fff}.gr .nd text.lab,.gr .nd.cur text.lab{fill:var(--accent-ink)}
+.gr .nd.vis circle{fill:var(--accent-soft);stroke:var(--accent)}
+.gr .nd.bad circle{fill:#FFD9CF;stroke:#D9534F}
+.gr .nd.nw circle{fill:#DFF3E8;stroke:#2C8F68;stroke-width:3}
+.gr text{font-family:var(--font-mono);font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.gr .lab{font-size:10.5px;font-weight:500;fill:var(--accent-ink)}
+
+.sq-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sq-top button{font-family:var(--font-mono);font-size:11.5px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--ink)}
+.sq-top button:hover{border-color:var(--accent)}
+.sq-top button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sq-g{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:12px}
+.sq-ed textarea{width:100%;box-sizing:border-box;min-height:130px;font-family:var(--font-mono);font-size:13px;line-height:1.6;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border-strong);background:#14171C;color:#E8EDF2;resize:vertical;tab-size:2}
+.sq-ed textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.sq-sch{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:8px;font-family:var(--font-mono);font-size:11.5px;max-height:240px;overflow-y:auto}
+.sq-sch details{margin-bottom:4px}.sq-sch summary{cursor:pointer;font-weight:700;padding:2px 4px;border-radius:6px}
+.sq-sch summary:hover{background:var(--surface)}
+.sq-sch div{padding-left:14px;color:var(--ink-soft);line-height:1.6}
+.sq-sch .pk{color:var(--accent-ink);font-weight:700}
+.sq-out{margin-top:10px;border:1px solid var(--border);border-radius:12px;overflow:auto;max-height:340px;background:var(--surface)}
+.sq-out table{border-collapse:collapse;font-family:var(--font-mono);font-size:12px;min-width:100%}
+.sq-out th{position:sticky;top:0;background:var(--surface-2);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+.sq-out td{padding:5px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.sq-out td.n{text-align:right}.sq-out td.nl{color:var(--ink-faint);font-style:italic}
+.sq-out tr{animation:pop .3s both}
+.sq-msg{padding:10px 12px;font-family:var(--font-mono);font-size:12.5px}
+.sq-msg.er{color:var(--coral);background:var(--coral-soft)}
+.sq-meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+@media (max-width:760px){.sq-g{grid-template-columns:1fr}.sq-sch{max-height:150px}}
+
+.qf-t{font:700 12px var(--font-mono);color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.qf-g{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:14px;align-items:start}
+.qf-g>*{min-width:0}
+.qf.ws .qf-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.qf-sql{margin:0;background:#12161B;color:#D6DDE6;border-radius:12px;padding:12px 8px;font:12.5px/1.75 var(--font-mono);white-space:pre-wrap;word-break:break-word;position:sticky;top:10px}
+.qf-sql .ln{display:block;padding:0 8px;border-radius:6px;opacity:.38;transition:opacity .3s,background .3s}
+.qf-sql .ln.done{opacity:.8}
+.qf-sql .ln.on{opacity:1;background:rgba(255,255,255,.09);box-shadow:inset 3px 0 0 #6FA8FF}
+.qf-sql .kw,.sqlh .kw{color:#7FB4F5;font-weight:700}.qf-sql .st,.sqlh .st{color:#9BD3A0}.qf-sql .cm,.sqlh .cm{color:#7D8794;font-style:italic}.qf-sql .fn,.sqlh .fn{color:#E9B96E}
+.qf-board{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;min-height:280px}
+.qf-grp{flex:1 1 100%;border:1.5px solid var(--border-strong);border-radius:12px;background:var(--surface);overflow-x:auto;overflow-y:hidden;max-width:100%}
+.qf-board.many .qf-grp{flex:1 1 calc(50% - 10px)}
+.qf-gh{font:700 11.5px var(--font-mono);padding:5px 10px 5px 12px;background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:6px}
+.qf-gh span{color:var(--ink-faint);font-weight:500}
+.qf-r{display:grid;font:12px var(--font-mono);border-bottom:1px solid var(--border);position:relative;background:var(--surface);transition:background .3s,opacity .3s}
+.qf-r:last-child{border-bottom:0}
+.qf-r>span{padding:4px 7px 4px 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qf-r.hd{color:var(--ink-faint);font-size:10.5px;background:var(--surface)}
+.qf-r.out{background:var(--coral-soft);opacity:.55}.qf-r.out>span{text-decoration:line-through}
+.qf-r.hit{background:var(--accent-soft)}
+.qf-r.new{animation:pop .45s}
+.qf-r .qs{position:absolute;left:0;top:0;bottom:0;width:4px}
+.qf-r span.agg{color:var(--accent-ink);font-weight:700}
+.qf-r span.cc{background:rgba(217,130,43,.13);font-weight:700}
+.qf-r i.n0{color:var(--ink-faint);font-style:italic;opacity:.8}
+@media (max-width:760px){.qf-g{grid-template-columns:1fr}.qf-sql{position:static}.qf-board{min-height:0}.qf-board.many .qf-grp{flex:1 1 100%}}
+
+.sx-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sx-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.sx-tabs button{min-width:36px;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface-2);font:600 13px var(--font-mono);color:var(--ink);cursor:pointer}
+.sx-tabs button.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sx-tabs button.ok{background:var(--teal-soft);color:var(--teal-ink);border-color:transparent}
+.sx-tabs button.ok.on{border-color:var(--accent)}
+.sx textarea{width:100%;box-sizing:border-box;background:#12161B;color:#E6EDF3;border:1.5px solid var(--border-strong);border-radius:12px;padding:12px;font:13px/1.6 var(--font-mono);resize:vertical}
+.sx .sq-out:empty{display:none}
+.sx-cnt{font:12px var(--font-mono);color:var(--ink-faint)}
+.sx-txt{font-size:15px;line-height:1.6;margin-bottom:10px}
+.sx-fb{display:none;margin-top:12px;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.6}
+.sx-fb.ok{display:block;background:var(--teal-soft);color:var(--teal-ink)}
+.sx-fb.no{display:block;background:var(--coral-soft);color:var(--coral)}
+.sx-fb .btn{margin-left:8px;padding:4px 10px}
+.sx-h{margin-top:6px;color:var(--ink-soft,var(--ink))}
+
+.pbox{border:1.5px solid var(--border-strong);border-radius:14px;overflow:hidden;background:#12161B;margin-top:12px;min-width:0}
+.phead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.ptitle{font:700 12.5px var(--font-mono);color:var(--ink)}
+.ptag{font:700 11px var(--font-mono);padding:2px 8px;border-radius:6px}.ptag.good{background:var(--teal-soft);color:var(--teal-ink)}.ptag.bad{background:var(--coral-soft);color:var(--coral)}
+.pchips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.pchip{font:700 11.5px var(--font-mono);padding:2px 8px;border-radius:6px;background:var(--surface);border:1px solid var(--border)}
+.pchip.t{color:var(--accent-ink)}.pchip.b{color:var(--amber)}
+.pln{margin:0;padding:10px 12px;color:#C9D3DD;font:11.5px/1.6 var(--font-mono);white-space:pre;overflow-x:auto}
+.pbox.nc .pc{display:none}
+.pln .pn{font-weight:800}.pln .pn.bad{color:#FF8E7A}.pln .pn.good{color:#6FE0B4}.pln .pn.mid{color:#8EC2FF}
+.pln .pt{color:#FFD479;font-weight:700}.pln .pc{color:#6B7785}.pln .pr{color:#FF8E7A}.pln .pb{color:#E9B96E}.pln .pg0{color:#6FE0B4;font-weight:700}.pln .ps{color:#C9A7FF}
+.pln .px{color:#fff;background:rgba(255,255,255,.12);padding:0 5px;border-radius:4px}
+.pnote{padding:9px 12px;background:var(--surface);border-top:1px solid var(--border);font-size:13.5px;line-height:1.6;color:var(--ink)}
+.pcmp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.pverd{margin-top:10px;padding:10px 14px;border-radius:12px;background:var(--teal-soft);color:var(--teal-ink);font-weight:600;font-size:14.5px}
+@media (max-width:860px){.pcmp{grid-template-columns:1fr}}
+
+.ptr-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);padding:8px}
+.ptr-wrap svg{display:block;margin:0 auto}
+.ptr .pe{fill:none;stroke:var(--border-strong);transition:stroke .3s,opacity .3s}
+.ptr .pe.on{stroke:var(--accent);stroke-dasharray:7 6;animation:pflow .7s linear infinite}
+.ptr .pe.done{stroke:var(--accent);opacity:.55}
+@keyframes pflow{to{stroke-dashoffset:-13}}
+.ptr .pel{font:700 10.5px var(--font-mono);fill:var(--ink-faint)}
+.ptr .pel.on{fill:var(--accent-ink)}
+.ptr .pnd rect{stroke:var(--border-strong);stroke-width:1.5;transition:stroke .25s,stroke-width .25s}
+.ptr .pnd.on rect{stroke:var(--accent);stroke-width:3.5}
+.ptr .pnd text{font:11px var(--font-mono);fill:var(--ink)}
+.ptr .pnd .t1{font-weight:800;font-size:12px}
+.ptr .pnd .mis{fill:var(--coral);font-weight:800}
+.ptr .pnd{cursor:pointer}
+.ptr-info{margin-top:10px;font:12.5px/1.6 var(--font-mono);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ptr-info div{border:1px solid var(--border);border-radius:10px;padding:6px 10px;background:var(--surface);min-width:0}
+.ptr-info b{display:block;font-size:15px;color:var(--accent-ink)}
+@media (max-width:760px){.ptr-info{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+.jz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px}
+.jz>div{min-width:0}
+.jz h5{margin:0 0 4px;font:700 11px var(--font-mono);color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em}
+.jr{display:flex;justify-content:space-between;gap:6px;border:1.5px solid var(--border);border-radius:8px;padding:4px 8px;margin-bottom:4px;font:12px var(--font-mono);background:var(--surface);transition:background .2s,border-color .2s,opacity .2s}
+.jr.cur{background:var(--accent);border-color:var(--accent);color:#fff}
+.jr.cmp{background:#FFF2C2;border-color:#D9A400}
+.jr.hit{background:var(--teal-soft);border-color:var(--teal);font-weight:800}
+.jr.no{opacity:.45}
+.jr .pt2{font-weight:900;color:var(--accent-ink)}
+.jmap{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.jmap div{display:flex;gap:6px;align-items:center;font:12px var(--font-mono)}
+.jmap b{min-width:46px;padding:3px 6px;border-radius:6px;background:var(--sunken);text-align:center}
+.jmap span{padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface)}
+.jmap div.hl b{background:var(--accent);color:#fff}
+.jres{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:26px}
+.jres span{font:11.5px var(--font-mono);padding:3px 7px;border-radius:6px;background:var(--teal-soft);color:var(--teal-ink);animation:pop .3s}
+.algo3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.algo3>div{border:1.5px solid var(--border);border-radius:14px;padding:12px;background:var(--surface);font-size:13.5px;min-width:0}
+.algo3 b{display:block;font:800 14px var(--font-mono);color:var(--accent-ink);margin-bottom:4px}
+.algo3 .bo{font:700 12px var(--font-mono);color:var(--amber);margin:4px 0}
+.rbar{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.rbar div{display:grid;grid-template-columns:120px 1fr 90px;gap:8px;align-items:center;font:12px var(--font-mono)}
+.rbar i{display:block;height:16px;border-radius:4px;background:var(--coral)}
+.rbar div.w i{background:var(--teal)}
+@media (max-width:760px){.algo3{grid-template-columns:1fr}.rbar div{grid-template-columns:96px 1fr 76px}}
+
+
+/* interview */
+.iv-list{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.iv-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.iv-q{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;font-family:var(--font-display);font-weight:600;font-size:15px;list-style:none}
+.iv-q::-webkit-details-marker{display:none}
+.iv-q .qi{width:24px;height:24px;border-radius:7px;background:var(--purple-soft);color:var(--purple-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.iv-q .chev{margin-left:auto;transition:.2s;color:var(--ink-faint)}
+.iv-item[open] .iv-q .chev{transform:rotate(90deg)}
+.iv-a{padding:0 16px 15px 51px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.iv-a code{background:var(--sunken);padding:1px 5px;border-radius:5px;color:var(--accent-ink)}.iv-a b{color:var(--ink)}
+
+/* quiz */
+.quiz{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 20px;margin-top:22px;box-shadow:var(--shadow)}
+.q+.q{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.q-txt{font-weight:600;font-size:16px;margin-bottom:12px;font-family:var(--font-display)}
+.q-txt .qn{color:var(--accent-ink);font-family:var(--font-mono);font-size:14px;margin-right:6px}
+.opt{display:block;width:100%;text-align:left;background:var(--surface-2);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-size:14.5px;color:var(--ink);transition:.15s}
+.opt:hover{border-color:var(--border-strong);background:var(--sunken)}
+.opt.correct{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);font-weight:500}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft);color:var(--coral)}.opt:disabled{cursor:default}
+.q-fb{font-size:14px;margin-top:6px;padding:10px 12px;border-radius:9px;display:none}
+.q-fb.show{display:block}.q-fb.ok{background:var(--teal-soft);color:var(--teal-ink)}.q-fb.no{background:var(--coral-soft);color:var(--coral)}
+footer{padding-block:34px 60px}
+.next{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px 22px;box-shadow:var(--shadow)}
+.next .eyebrow{margin-bottom:8px;display:block}.next h3{font-size:22px;margin-bottom:8px}
+.next p{color:var(--ink-soft);font-size:15px;max-width:56ch}
+.topics{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.topic-pill{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--ink-soft)}
+.topic-pill.now{background:var(--accent);border-color:var(--accent);color:#fff}
+.theme-btn{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);float:right;margin-top:14px;z-index:20;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);box-shadow:var(--shadow)}
+.theme-btn svg{width:18px;height:18px}
+@media (max-width:560px){.dd{grid-template-columns:1fr}.cstep{flex-direction:column;align-items:flex-start}.cstep .cn{min-width:0}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"><style id="ky-skin">
+:root{--font-display:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--bg:#FFFFFF;--surface:#FFFFFF;--surface-2:#F7F7F7;--sunken:#F2F2F2;--ink:#111111;--ink-soft:#555555;--ink-faint:#8C8C8C;--border:#ECECEC;--border-strong:#DCDCDC;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px rgba(0,0,0,.06);--ky-ok:#16A34A;--ky-ov:rgba(0,0,0,.28)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0B0B;--surface:#111111;--surface-2:#161616;--sunken:#1A1A1A;--ink:#F2F2F2;--ink-soft:#A8A8A8;--ink-faint:#6E6E6E;--border:#1F1F1F;--border-strong:#2E2E2E;--shadow:none;--ky-ok:#4ADE80;--ky-ov:rgba(0,0,0,.6);color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-feature-settings:"cv11","ss01"}
+h1,h2,h3,h4{letter-spacing:-.022em;text-wrap:balance}
+h1{letter-spacing:-.035em}
+.theme-btn{display:none!important}
+.hero{padding-block:36px 28px!important}
+
+/* top bar */
+.ky-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--border);font-family:var(--font-body);font-size:14px;line-height:1.3}
+@supports (backdrop-filter:blur(1px)){.ky-bar{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px)}}
+.ky-in{max-width:828px;margin:0 auto;height:54px;display:flex;align-items:center;gap:6px;padding-inline:14px;box-sizing:border-box}
+.ky-ib{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:0;background:none;color:var(--ink-soft);cursor:pointer;text-decoration:none;padding:0}
+.ky-ib:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ib:focus-visible,.ky-ls a:focus-visible,.cnav a:focus-visible{outline:2px solid var(--tc);outline-offset:1px}
+.ky-ib svg{width:18px;height:18px}
+.ky-ib[aria-disabled="true"]{opacity:.3;pointer-events:none}
+.ky-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;letter-spacing:-.02em;flex:none;margin-right:6px}
+.ky-logo i{font-style:normal;font-family:var(--font-mono);font-size:12px;font-weight:500;background:var(--ink);color:var(--bg);border-radius:7px;padding:3px 7px}
+.ky-crumb{min-width:0;flex:1;display:flex;align-items:center;gap:8px;color:var(--ink-soft);padding-left:4px}
+.ky-crumb b{font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ky-crumb .num{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);flex:none}
+.ky-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--tc)}
+.ky-sep{width:1px;height:20px;background:var(--border);margin-inline:4px;flex:none}
+.ky-prog{position:absolute;left:0;bottom:-1px;height:2px;width:100%;background:var(--tc);transform-origin:0 50%;transform:scaleX(0)}
+.theme-ic .mo{display:none}
+:root[data-theme="dark"] .theme-ic .su{display:none}:root[data-theme="dark"] .theme-ic .mo{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-ic .su{display:none}:root:not([data-theme="light"]) .theme-ic .mo{display:block}}
+
+/* sidebar */
+.ky-side{position:fixed;top:0;left:0;bottom:0;width:292px;max-width:86vw;z-index:50;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;font-family:var(--font-body);transform:translateX(-102%);transition:transform .28s cubic-bezier(.3,.8,.3,1);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;visibility:hidden}
+.ky-side.on{transform:none;visibility:visible;box-shadow:0 0 60px rgba(0,0,0,.2)}
+.ky-sh{display:flex;align-items:center;height:54px;padding-inline:16px 8px;border-bottom:1px solid var(--border);flex:none}
+.ky-sh .ky-x{margin-left:auto}
+.ky-tr{padding:18px 18px 10px;flex:none}
+.ky-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.ky-tn{display:flex;align-items:center;gap:9px;font-weight:700;font-size:17px;margin-top:6px;letter-spacing:-.02em;color:var(--ink)}
+.ky-tn .ky-dot{width:10px;height:10px}
+.ky-pg{display:flex;align-items:center;gap:10px;margin-top:12px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint)}
+.ky-pg i{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}.ky-pg i b{display:block;height:100%;width:0;background:var(--tc);transition:width .6s}
+.ky-ls{flex:1;overflow-y:auto;padding:4px 10px 18px;overscroll-behavior:contain}
+.ky-ls a{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--ink-soft);font-size:13.5px;line-height:1.4}
+.ky-ls a:hover{background:var(--surface-2);color:var(--ink)}
+.ky-ls a .n{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-right:7px}
+.ky-st{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:1px;box-sizing:border-box;display:grid;place-items:center}
+.ky-st svg{width:10px;height:10px;display:none}
+.ky-ls a.done .ky-st{background:var(--tc);border-color:var(--tc);color:#fff}.ky-ls a.done .ky-st svg{display:block}
+.ky-ls a.cur{background:var(--surface-2);color:var(--ink);font-weight:600}
+.ky-ls a.cur .ky-st{border:5px solid var(--tc);background:none}.ky-ls a.cur .ky-st svg{display:none}
+.ky-oth{margin-top:14px;border-top:1px solid var(--border);padding-top:8px}
+.ky-oth summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border-radius:10px}
+.ky-oth summary:hover{background:var(--surface-2)}
+.ky-oth summary::-webkit-details-marker{display:none}
+.ky-oth summary svg{width:14px;height:14px;color:var(--ink-faint);transition:transform .2s}
+.ky-oth[open] summary svg{transform:rotate(180deg)}
+.ky-oth a{grid-template-columns:18px 1fr auto}
+.ky-oth a .ky-dot{margin:5px 0 0 4px}
+.ky-oth a .c{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);padding-top:2px}
+.ky-sf{flex:none;border-top:1px solid var(--border);padding:12px}
+.ky-sf a{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:12px;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:600;font-size:14px}
+.ky-sf a svg{width:16px;height:16px}
+.ky-ov{position:fixed;inset:0;background:var(--ky-ov);z-index:45;opacity:0;pointer-events:none;transition:opacity .2s}
+.ky-ov.on{opacity:1;pointer-events:auto}
+@media (min-width:1200px){.ky-side{transform:none;visibility:visible;box-shadow:none!important}body{padding-left:292px}.ky-menu,.ky-ov,.ky-x,.ky-bar .ky-logo,.ky-bar .ky-sep{display:none!important}}
+@media (max-width:560px){.ky-hs{display:none!important}.ky-in{padding-inline:8px}}
+
+/* bottom prev/next */
+.cnav{max-width:820px;margin:64px auto 72px;padding-inline:20px;box-sizing:border-box;font-family:var(--font-body)}
+.cnav-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cnav a.cn{display:flex;flex-direction:column;gap:6px;min-width:0;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 20px;transition:border-color .15s,transform .15s}
+.cnav a.cn:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cnav .cl{font-size:12.5px;color:var(--ink-faint);font-weight:500}
+.cnav .ct{font-weight:650;font-size:16.5px;line-height:1.3;letter-spacing:-.015em}
+.cnav .ct .n{font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--ink-faint);margin-right:6px}
+.cnav .cs{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.cnav a.nx{background:var(--ink);border-color:var(--ink);color:var(--bg);text-align:right;align-items:flex-end}
+.cnav a.nx:hover{border-color:var(--ink)}
+.cnav a.nx .cl,.cnav a.nx .cs,.cnav a.nx .ct .n{color:color-mix(in srgb,var(--bg) 62%,var(--ink))}
+.cnav .empty{border:1px dashed var(--border-strong);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-faint);padding:18px;text-align:center}
+.cnav-foot{display:flex;align-items:center;gap:14px;margin-top:18px;font-size:13px;color:var(--ink-soft)}
+.cnav-foot a{color:var(--ink);font-weight:600;text-decoration:none}.cnav-foot a:hover{text-decoration:underline}
+.cnav-bar{flex:1;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden}
+.cnav-bar i{display:block;height:100%;background:var(--ink)}
+.cnav-foot span{font-family:var(--font-mono);font-size:12px;color:var(--ink-faint)}
+@media (max-width:560px){.cnav-grid{grid-template-columns:1fr}.cnav a.nx{order:-1;text-align:left;align-items:flex-start}}
+@media (max-width:640px){pre,pre.code,.code{overflow-x:auto;max-width:100%}table{display:block;overflow-x:auto;max-width:100%}.stage,.callout{overflow-x:auto}code{overflow-wrap:anywhere}h1,h2,h3{overflow-wrap:anywhere}img,svg{max-width:100%}.wrap div{min-width:0}.grid2{grid-template-columns:1fr!important}.wrap p,.wrap button,.wrap li,.wrap span,.wrap td{overflow-wrap:anywhere}.http,.demo{overflow-x:auto}.incs{flex-wrap:wrap}html,body{overflow-x:clip}}
+</style><header class="ky-bar" style="--tc:#2E6FA8"><div class="ky-in">
+<button type="button" class="ky-ib ky-menu" onclick="kySide(1)" aria-label="Mavzular ro'yxati" title="Mavzular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+<a class="ky-logo ky-hs" href="index.html"><i>{}</i>kod yo'li</a><span class="ky-sep ky-hs"></span>
+<div class="ky-crumb"><span class="ky-dot"></span><b>PostgreSQL</b><span class="num">11/15</span></div>
+<a class="ky-ib ky-hs" href="117-explain-analyze.html" aria-label="Oldingi dars" title="Oldingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a><a class="ky-ib ky-hs" href="119-statistika-va-planer.html" aria-label="Keyingi dars" title="Keyingi dars"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a>
+<button type="button" class="ky-ib" onclick="kyTheme()" aria-label="Yorug'/qorong'u rejim" title="Rejim"><svg class="theme-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><g class="su"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1 1M17.4 17.4l1 1M5.6 18.4l1-1M17.4 6.6l1-1"/></g><path class="mo" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+<a class="ky-ib " href="index.html" aria-label="Barcha darslar" title="Barcha darslar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg></a>
+</div><i class="ky-prog" id="kyProg"></i></header>
+<div class="wrap">
+  <button class="theme-btn" id="themeBtn" aria-label="Rejimni almashtirish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/><circle cx="12" cy="12" r="4"/></svg></button>
+  <header class="hero">
+    <span class="badge"><span class="dot"></span>PostgreSQL · 118-dars</span>
+    <h1>JOIN ichkaridan: <span class="steam">uchta algoritm</span></h1>
+    <p class="lead">SQL’da siz faqat <code>JOIN … ON</code> yozasiz. Baza esa uni uch xil usulda bajarishi mumkin — va to‘g‘ri tanlov 10 ms bilan 600 ms orasidagi farq. Har birini Java’da yozib, qadamlab ko‘ramiz; keyin haqiqiy PostgreSQL bir xil so‘rovda uchalasini qanday bajarishini solishtiramiz.</p>
+  </header>
+  <hr class="divider">
+
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Nested Loop: ichma-ich sikl</h2></div><p class="sec-sub">Eng oddiy: har tashqi qator uchun ichki ro‘yxatni boshidan oxirigacha aylanib chiqish. Hisoblagichga qarang. Kirishni o‘zgartirib ko‘ring: <code>hisob id’lari | tranzaksiyalarning hisob_id’si</code>.</p><div class="stage" id="nl"><div class="trc-in"><span>Kirish:</span><input id="nlIn" value="3, 7, 9 | 7, 3, 12, 7, 9, 3" spellcheck="false" aria-label="Kirish ma’lumoti"><button class="btn" id="nlGo">Qo‘llash</button><button class="chip2" data-v="3, 7, 9 | 7, 3, 12, 7, 9, 3">Asosiy</button><button class="chip2" data-v="2, 5 | 5, 1, 8, 2, 9, 4, 5, 7, 2, 6">Katta ichki</button><button class="chip2" data-v="1, 2 | 8, 9, 10">Juft yo‘q</button></div><div class="trc-g"><div class="trc-code"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">NestedLoop.java</span></div><ol id="nlCode"><li><span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; nestedLoop(<span class="ty">List</span>&lt;<span class="ty">Hisob</span>&gt; H, <span class="ty">List</span>&lt;<span class="ty">Tx</span>&gt; T) {</li><li>    <span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; res = <span class="k">new</span> <span class="ty">ArrayList</span>&lt;&gt;();</li><li>    <span class="k">for</span> (<span class="ty">Hisob</span> h : H) {                  <span class="cm">// tashqi</span></li><li>        <span class="k">for</span> (<span class="ty">Tx</span> t : T) {                 <span class="cm">// ichki — har h uchun TO‘LIQ</span></li><li>            <span class="k">if</span> (t.hisobId == h.id)       <span class="cm">// ON sharti</span></li><li>                res.add(<span class="k">new</span> <span class="ty">Juft</span>(h, t));</li><li>        }</li><li>    }</li><li>    <span class="k">return</span> res;</li><li>}</li></ol></div><div><div class="trc-viz" id="nlViz"></div><div class="trc-vars" id="nlVars"></div></div></div><div class="trc-ctl"><button class="btn" id="nlPrev" aria-label="Oldingi qadam">◀</button><button class="btn primary" id="nlPlay">▶ Avto</button><button class="btn" id="nlNext" aria-label="Keyingi qadam">▶</button><input type="range" id="nlRng" min="0" max="0" value="0" aria-label="Qadam"><span class="trc-step" id="nlSt"></span><select id="nlSp" aria-label="Tezlik"><option value="1600">0.5×</option><option value="900" selected>1×</option><option value="450">2×</option><option value="180">4×</option></select></div><div class="trc-ctl"><div class="trc-cnt" id="nlCnt" style="margin-left:0"></div></div><div class="explain" id="nlEx"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Hash Join: avval HashMap, keyin qidirish</h2></div><p class="sec-sub">Ikki bosqich: kichik tomondan HashMap quriladi (BUILD), katta tomonning har qatori uchun O(1) qidiruv (PROBE). Xuddi 97-darsdagi “ikki son yig‘indisi”.</p><div class="stage" id="hj"><div class="trc-in"><span>Kirish:</span><input id="hjIn" value="3, 7, 9 | 7, 3, 12, 7, 9, 3" spellcheck="false" aria-label="Kirish ma’lumoti"><button class="btn" id="hjGo">Qo‘llash</button><button class="chip2" data-v="3, 7, 9 | 7, 3, 12, 7, 9, 3">Asosiy</button><button class="chip2" data-v="2, 5 | 5, 1, 8, 2, 9, 4, 5, 7, 2, 6">Katta ichki</button><button class="chip2" data-v="1, 2 | 8, 9, 10">Juft yo‘q</button></div><div class="trc-g"><div class="trc-code"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">HashJoin.java</span></div><ol id="hjCode"><li><span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; hashJoin(<span class="ty">List</span>&lt;<span class="ty">Hisob</span>&gt; H, <span class="ty">List</span>&lt;<span class="ty">Tx</span>&gt; T) {</li><li>    <span class="ty">Map</span>&lt;<span class="ty">Long</span>, <span class="ty">Hisob</span>&gt; map = <span class="k">new</span> <span class="ty">HashMap</span>&lt;&gt;();   <span class="cm">// 1) BUILD</span></li><li>    <span class="k">for</span> (<span class="ty">Hisob</span> h : H)</li><li>        map.put(h.id, h);</li><li>    <span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; res = <span class="k">new</span> <span class="ty">ArrayList</span>&lt;&gt;();</li><li>    <span class="k">for</span> (<span class="ty">Tx</span> t : T) {                          <span class="cm">// 2) PROBE</span></li><li>        <span class="ty">Hisob</span> h = map.get(t.hisobId);         <span class="cm">// O(1)</span></li><li>        <span class="k">if</span> (h != <span class="k">null</span>)</li><li>            res.add(<span class="k">new</span> <span class="ty">Juft</span>(h, t));</li><li>    }</li><li>    <span class="k">return</span> res;</li><li>}</li></ol></div><div><div class="trc-viz" id="hjViz"></div><div class="trc-vars" id="hjVars"></div></div></div><div class="trc-ctl"><button class="btn" id="hjPrev" aria-label="Oldingi qadam">◀</button><button class="btn primary" id="hjPlay">▶ Avto</button><button class="btn" id="hjNext" aria-label="Keyingi qadam">▶</button><input type="range" id="hjRng" min="0" max="0" value="0" aria-label="Qadam"><span class="trc-step" id="hjSt"></span><select id="hjSp" aria-label="Tezlik"><option value="1600">0.5×</option><option value="900" selected>1×</option><option value="450">2×</option><option value="180">4×</option></select></div><div class="trc-ctl"><div class="trc-cnt" id="hjCnt" style="margin-left:0"></div></div><div class="explain" id="hjEx"></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Merge Join: fermuar</h2></div><p class="sec-sub">Ikkala ro‘yxat ham kalit bo‘yicha tartiblangan bo‘lsa — ikkita ko‘rsatkich bilan bir marta yurish (91-darsdagi two pointers). Tartiblash kerak bo‘lsa — avval O(n log n) saralash.</p><div class="stage" id="mj"><div class="trc-in"><span>Kirish:</span><input id="mjIn" value="3, 7, 9 | 7, 3, 12, 7, 9, 3" spellcheck="false" aria-label="Kirish ma’lumoti"><button class="btn" id="mjGo">Qo‘llash</button><button class="chip2" data-v="3, 7, 9 | 7, 3, 12, 7, 9, 3">Asosiy</button><button class="chip2" data-v="2, 5 | 5, 1, 8, 2, 9, 4, 5, 7, 2, 6">Katta ichki</button><button class="chip2" data-v="1, 2 | 8, 9, 10">Juft yo‘q</button></div><div class="trc-g"><div class="trc-code"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">MergeJoin.java</span></div><ol id="mjCode"><li><span class="cm">// H va T ikkalasi ham id bo‘yicha TARTIBLANGAN</span></li><li><span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; mergeJoin(<span class="ty">List</span>&lt;<span class="ty">Hisob</span>&gt; H, <span class="ty">List</span>&lt;<span class="ty">Tx</span>&gt; T) {</li><li>    <span class="ty">List</span>&lt;<span class="ty">Juft</span>&gt; res = <span class="k">new</span> <span class="ty">ArrayList</span>&lt;&gt;();</li><li>    <span class="k">int</span> i = <span class="nu">0</span>, j = <span class="nu">0</span>;</li><li>    <span class="k">while</span> (i &lt; H.size() &amp;&amp; j &lt; T.size()) {</li><li>        <span class="k">long</span> a = H.get(i).id, b = T.get(j).hisobId;</li><li>        <span class="k">if</span> (a &lt; b) i++;                  <span class="cm">// chap orqada — oldinga</span></li><li>        <span class="k">else</span> <span class="k">if</span> (a &gt; b) j++;             <span class="cm">// o‘ng orqada — oldinga</span></li><li>        <span class="k">else</span> { res.add(<span class="k">new</span> <span class="ty">Juft</span>(H.get(i), T.get(j))); j++; }</li><li>    }</li><li>    <span class="k">return</span> res;</li><li>}</li></ol></div><div><div class="trc-viz" id="mjViz"></div><div class="trc-vars" id="mjVars"></div></div></div><div class="trc-ctl"><button class="btn" id="mjPrev" aria-label="Oldingi qadam">◀</button><button class="btn primary" id="mjPlay">▶ Avto</button><button class="btn" id="mjNext" aria-label="Keyingi qadam">▶</button><input type="range" id="mjRng" min="0" max="0" value="0" aria-label="Qadam"><span class="trc-step" id="mjSt"></span><select id="mjSp" aria-label="Tezlik"><option value="1600">0.5×</option><option value="900" selected>1×</option><option value="450">2×</option><option value="180">4×</option></select></div><div class="trc-ctl"><div class="trc-cnt" id="mjCnt" style="margin-left:0"></div></div><div class="explain" id="mjEx"></div></div>
+    <div class="algo3">
+      <div><b>Nested Loop</b><div class="bo">O(N × M) · indeks bilan O(N × log M)</div>Tashqi tomon <b>kichik</b> va ichki tomonda <b>indeks</b> bor bo‘lsa — eng tez. Birinchi qatorlarni darhol beradi (LIMIT bilan ajoyib). Xotira kerak emas. Har qanday shart (&lt;, &gt;, LIKE) bilan ishlaydi.</div>
+      <div><b>Hash Join</b><div class="bo">O(N + M) · xotira: kichik tomon</div>Ikkala tomon <b>katta</b>, indeks yo‘q yoki foydasiz bo‘lsa. Faqat tenglik (=) sharti. Kichik tomon work_mem’ga sig‘masa — batch’larga bo‘linib diskka chiqadi.</div>
+      <div><b>Merge Join</b><div class="bo">O(N + M) + saralash</div>Ikkala tomon <b>allaqachon tartiblangan</b> (indeks yoki oldingi ORDER BY) bo‘lsa. Juda katta jadvallar, natija ham tartibli kerak bo‘lganda.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Haqiqiy PostgreSQL: kichik so‘rov</h2></div><p class="sec-sub"><code>hisoblar JOIN tranzaksiyalar WHERE h.mijoz_id &lt;= 300</code> — 458 hisob × 1 mln tranzaksiya. Planer <b>Nested Loop</b>ni tanladi. Qolgan ikkitasini majburlab (<code>SET enable_nestloop = off</code>) solishtiramiz.</p><div class="rbar"><div class="w"><span>Nested Loop ✓</span><i style="width:1.0%"></i><span>10.021 ms</span></div><div class=""><span>Hash Join</span><i style="width:39.6%"></i><span>641.57 ms</span></div><div class=""><span>Merge Join</span><i style="width:100.0%"></i><span>1622.11 ms</span></div></div><div class="pbox nc"><div class="phead"><span class="ptitle">Nested Loop (planer tanlovi)</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 10.021 ms</span><span class="pchip b">📄 4 776 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=15778.37..15778.38 rows=1 width=40)</span> (actual time=9.962..<span class="pt">9.965</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=4776</span>
+  -&gt;  <b class="pn mid">Nested</b> Loop  <span class="pc">(cost=12.41..15763.03 rows=3067 width=8)</span> (actual time=0.206..<span class="pt">8.578</span> rows=2999.00 loops=1)
+        <span class="pb">Buffers: shared hit=4776</span>
+        -&gt;  <b class="pn good">Bitmap Heap Scan</b> on hisoblar h  <span class="pc">(cost=11.98..970.36 rows=460 width=8)</span> (actual time=0.190..<span class="pt">0.935</span> rows=458.00 loops=1)
+              Recheck Cond: (mijoz_id &lt;= 300)
+              Heap Blocks: exact=400
+              <span class="pb">Buffers: shared hit=404</span>
+              -&gt;  <b class="pn good">Bitmap Index Scan</b> on h_mijoz  <span class="pc">(cost=0.00..11.87 rows=460 width=0)</span> (actual time=0.098..<span class="pt">0.098</span> rows=458.00 loops=1)
+                    Index Cond: (mijoz_id &lt;= 300)
+                    <span class="pb">Buffers: shared hit=4</span>
+        -&gt;  <b class="pn good">Index Scan</b> using tx_hisob on tranzaksiyalar t  <span class="pc">(cost=0.42..32.08 rows=8 width=16)</span> (actual time=0.004..<span class="pt">0.012</span> rows=6.55 loops=458)
+              Index Cond: (hisob_id = h.id)
+              <span class="pb">Buffers: shared hit=4372</span>
+Planning:
+  <span class="pb">Buffers: shared hit=20</span>
+Execution Time: <b class="px">10.021 ms</b></pre><div class="pnote">458 marta (loops=458) indeks bo‘yicha sakrash — har biri ~6.5 qator. Jami 4776 sahifa.</div></div><div class="pcmp"><div class="pbox nc"><div class="phead"><span class="ptitle">Hash Join (majburan)</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 641.57 ms</span><span class="pchip b">📄 13 704 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=26916.52..26916.53 rows=1 width=40)</span> (actual time=641.486..<span class="pt">641.491</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=3282 read=10422</span>
+  -&gt;  <b class="pn mid">Hash</b> Join  <span class="pc">(cost=976.11..26901.18 rows=3067 width=8)</span> (actual time=2.202..<span class="pt">638.639</span> rows=2999.00 loops=1)
+        Hash Cond: (t.hisob_id = h.id)
+        <span class="pb">Buffers: shared hit=3282 read=10422</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar t  <span class="pc">(cost=0.00..23300.00 rows=1000000 width=16)</span> (actual time=0.038..<span class="pt">326.752</span> rows=1000000.00 loops=1)
+              <span class="pb">Buffers: shared hit=2878 read=10422</span>
+        -&gt;  <b class="pn mid">Hash</b>  <span class="pc">(cost=970.36..970.36 rows=460 width=8)</span> (actual time=1.672..<span class="pt">1.675</span> rows=458.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 19kB
+              <span class="pb">Buffers: shared hit=404</span>
+              -&gt;  <b class="pn good">Bitmap Heap Scan</b> on hisoblar h  <span class="pc">(cost=11.98..970.36 rows=460 width=8)</span> (actual time=0.194..<span class="pt">1.266</span> rows=458.00 loops=1)
+                    Recheck Cond: (mijoz_id &lt;= 300)
+                    Heap Blocks: exact=400
+                    <span class="pb">Buffers: shared hit=404</span>
+                    -&gt;  <b class="pn good">Bitmap Index Scan</b> on h_mijoz  <span class="pc">(cost=0.00..11.87 rows=460 width=0)</span> (actual time=0.102..<span class="pt">0.103</span> rows=458.00 loops=1)
+                          Index Cond: (mijoz_id &lt;= 300)
+                          <span class="pb">Buffers: shared hit=4</span>
+Planning:
+  <span class="pb">Buffers: shared hit=20</span>
+Execution Time: <b class="px">641.570 ms</b></pre><div class="pnote">Xesh-jadval kichik (458 qator, 19 kB), lekin PROBE tomon — <b>butun 1 mln qatorli jadval</b> Seq Scan.</div></div><div class="pbox nc"><div class="phead"><span class="ptitle">Merge Join (majburan)</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 1622.11 ms</span><span class="pchip b">📄 999 399 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=76910.35..76910.36 rows=1 width=40)</span> (actual time=1622.029..<span class="pt">1622.034</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=999399</span>
+  -&gt;  <b class="pn mid">Merge</b> Join  <span class="pc">(cost=995.83..76895.01 rows=3067 width=8)</span> (actual time=2.603..<span class="pt">1618.869</span> rows=2999.00 loops=1)
+        Merge Cond: (t.hisob_id = h.id)
+        <span class="pb">Buffers: shared hit=999399</span>
+        -&gt;  <b class="pn good">Index Scan</b> using tx_hisob on tranzaksiyalar t  <span class="pc">(cost=0.42..73372.33 rows=1000000 width=16)</span> (actual time=0.012..<span class="pt">1281.543</span> rows=997976.00 loops=1)
+              <span class="pb">Buffers: shared hit=998995</span>
+        -&gt;  <b class="pn mid">Sort</b>  <span class="pc">(cost=990.70..991.85 rows=460 width=8)</span> (actual time=0.866..<span class="pt">1.490</span> rows=458.00 loops=1)
+              Sort Key: h.id
+              <span class="ps">Sort Method: quicksort  Memory: 17kB</span>
+              <span class="pb">Buffers: shared hit=404</span>
+              -&gt;  <b class="pn good">Bitmap Heap Scan</b> on hisoblar h  <span class="pc">(cost=11.98..970.36 rows=460 width=8)</span> (actual time=0.149..<span class="pt">0.726</span> rows=458.00 loops=1)
+                    Recheck Cond: (mijoz_id &lt;= 300)
+                    Heap Blocks: exact=400
+                    <span class="pb">Buffers: shared hit=404</span>
+                    -&gt;  <b class="pn good">Bitmap Index Scan</b> on h_mijoz  <span class="pc">(cost=0.00..11.87 rows=460 width=0)</span> (actual time=0.066..<span class="pt">0.066</span> rows=458.00 loops=1)
+                          Index Cond: (mijoz_id &lt;= 300)
+                          <span class="pb">Buffers: shared hit=4</span>
+Planning:
+  <span class="pb">Buffers: shared hit=20</span>
+Execution Time: <b class="px">1622.107 ms</b></pre><div class="pnote">Tranzaksiyalarni indeks bo‘yicha <b>to‘liq</b> tartibda yurish — 1 mln tasodifiy sahifa.</div></div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Haqiqiy PostgreSQL: katta so‘rov</h2></div><p class="sec-sub">Endi filtrsiz: 150 ming hisob × 1 mln tranzaksiya — hamma qator kerak. Vaziyat teskari.</p><div class="rbar"><div class="w"><span>Hash Join ✓</span><i style="width:59.0%"></i><span>1785.79 ms</span></div><div class=""><span>Merge Join</span><i style="width:91.1%"></i><span>2759.04 ms</span></div><div class=""><span>Nested Loop</span><i style="width:100.0%"></i><span>3029.03 ms</span></div></div><div class="pbox nc"><div class="phead"><span class="ptitle">Hash Join (planer tanlovi)</span><span class="ptag good">✓ yaxshi</span><span class="pchips"><span class="pchip t">⏱ 1785.79 ms</span><span class="pchip b">📄 14 702 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=35702.08..35702.09 rows=1 width=40)</span> (actual time=1785.675..<span class="pt">1785.680</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=13958 read=744</span>
+  -&gt;  <b class="pn mid">Hash</b> Join  <span class="pc">(cost=4777.00..30702.08 rows=1000000 width=8)</span> (actual time=134.730..<span class="pt">1375.924</span> rows=1000000.00 loops=1)
+        Hash Cond: (t.hisob_id = h.id)
+        <span class="pb">Buffers: shared hit=13958 read=744</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on tranzaksiyalar t  <span class="pc">(cost=0.00..23300.00 rows=1000000 width=16)</span> (actual time=0.027..<span class="pt">292.538</span> rows=1000000.00 loops=1)
+              <span class="pb">Buffers: shared hit=12556 read=744</span>
+        -&gt;  <b class="pn mid">Hash</b>  <span class="pc">(cost=2902.00..2902.00 rows=150000 width=8)</span> (actual time=134.579..<span class="pt">134.581</span> rows=150000.00 loops=1)
+              Buckets: 262144  Batches: 1  Memory Usage: 5712kB
+              <span class="pb">Buffers: shared hit=1402</span>
+              -&gt;  <b class="pn bad">Seq Scan</b> on hisoblar h  <span class="pc">(cost=0.00..2902.00 rows=150000 width=8)</span> (actual time=0.018..<span class="pt">51.552</span> rows=150000.00 loops=1)
+                    <span class="pb">Buffers: shared hit=1402</span>
+Planning:
+  <span class="pb">Buffers: shared hit=16</span>
+Execution Time: <b class="px">1785.788 ms</b></pre><div class="pnote">Kichik tomon (hisoblar, 150 ming) xesh-jadvalga — 5.7 MB; katta tomon bir marta ketma-ket o‘qiladi.</div></div><div class="pbox nc"><div class="phead"><span class="ptitle">Nested Loop (majburan)</span><span class="ptag bad">✗ sekin</span><span class="pchips"><span class="pchip t">⏱ 3029.03 ms</span><span class="pchip b">📄 1 451 136 sahifa</span></span></div><pre class="pln"><b class="pn mid">Aggregate</b>  <span class="pc">(cost=163024.00..163024.01 rows=1 width=40)</span> (actual time=3028.988..<span class="pt">3028.990</span> rows=1.00 loops=1)
+  <span class="pb">Buffers: shared hit=1451136</span>
+  -&gt;  <b class="pn mid">Nested</b> Loop  <span class="pc">(cost=0.42..158024.00 rows=1000000 width=8)</span> (actual time=0.036..<span class="pt">2570.617</span> rows=1000000.00 loops=1)
+        <span class="pb">Buffers: shared hit=1451136</span>
+        -&gt;  <b class="pn bad">Seq Scan</b> on hisoblar h  <span class="pc">(cost=0.00..2902.00 rows=150000 width=8)</span> (actual time=0.016..<span class="pt">51.394</span> rows=150000.00 loops=1)
+              <span class="pb">Buffers: shared hit=1402</span>
+        -&gt;  <b class="pn good">Index Scan</b> using tx_hisob on tranzaksiyalar t  <span class="pc">(cost=0.42..0.95 rows=8 width=16)</span> (actual time=0.003..<span class="pt">0.012</span> rows=6.67 loops=150000)
+              Index Cond: (hisob_id = h.id)
+              <span class="pb">Buffers: shared hit=1449734</span>
+Execution Time: <b class="px">3029.034 ms</b></pre><div class="pnote"><b>loops=150000</b> — har hisob uchun alohida indeks qidiruvi. Har biri arzon (0.012 ms), lekin 150 ming marta, 1.45 mln sahifa.</div></div><div class="callout info"><div class="ct">Xulosa</div>Bitta va o‘sha <code>JOIN … ON</code> — kichik natijada Nested Loop 64× tez, katta natijada Hash Join 1.7× tez. Planer buni <b>taxminiy qatorlar soni</b>ga qarab hal qiladi. Shuning uchun statistika (keyingi dars) — butun optimizatsiyaning poydevori.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Planer qachon xato qiladi</h2></div><p class="sec-sub">Klassik falokat: planer tashqi tomonni “10 qator” deb o‘ylaydi → Nested Loop tanlaydi; aslida 100 000 qator → 100 000 ta loop. EXPLAIN’da belgisi: <code>rows=10</code> (taxmin) va <code>rows=100000</code> (haqiqat) Nested Loop ostida. Sabab va yechim — 119-darsda. Tez diagnostika uchun (faqat sessiyada, production kodida emas!):</p><div class="code-block"><div class="code-bar"><span class="tl" style="background:#E8735A"></span><span class="tl" style="background:#E0A64B"></span><span class="tl" style="background:#4FBF9B"></span><span class="fname">diagnostika.sql</span></div><pre class="code"><span class="k">SET</span> enable_nestloop = off;       <span class="cm">-- Hash/Merge bilan tezlashdimi? → taxmin muammosi</span>
+<span class="k">EXPLAIN</span> (<span class="k">ANALYZE</span>, <span class="k">BUFFERS</span>) ...;
+RESET enable_nestloop;
+<span class="cm">-- Doimiy yechim: ANALYZE, CREATE STATISTICS, indeks, so‘rovni qayta yozish — enable_* EMAS</span></pre></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Suhbat savollari</h2></div><div class="iv-list"><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>PostgreSQL qanday JOIN algoritmlarini ishlatadi?<span class="chev">›</span></summary><div class="iv-a">Nested Loop (ichki tomonda indeks bilan — Index Nested Loop), Hash Join (kichik tomondan xesh-jadval, katta tomon bilan probe), Merge Join (ikkala tomon kalit bo‘yicha tartiblangan). Planer cost’ga qarab tanlaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Qachon Nested Loop eng yaxshi?<span class="chev">›</span></summary><div class="iv-a">Tashqi tomon kichik (o‘nlab-yuzlab qator) va ichki tomonda join kaliti bo‘yicha indeks bor; LIMIT bilan birinchi qatorlar tez kerak; tenglik bo‘lmagan shartlar (BETWEEN, &lt;) bilan.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Hash Join qanday ishlaydi va cheklovlari?<span class="chev">›</span></summary><div class="iv-a">Build: kichik (inner) tomondan xesh-jadval work_mem’da. Probe: outer tomonning har qatori uchun xesh bo‘yicha qidiruv. O(N+M). Faqat tenglik sharti. Xesh-jadval sig‘masa — batch’larga bo‘linadi (disk). Birinchi qator build tugaguncha chiqmaydi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Merge Join qachon tanlanadi?<span class="chev">›</span></summary><div class="iv-a">Ikkala kirish ham join kaliti bo‘yicha tartiblangan bo‘lsa (indeks, oldingi saralash) yoki natija shu tartibda kerak bo‘lsa. Saralash kerak bo‘lsa — narxi oshadi. Juda katta, tartiblangan ma’lumotlar uchun, xotira kam ishlatadi.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>Nested Loop sekinligining belgisi rejada?<span class="chev">›</span></summary><div class="iv-a">Ichki tugunda loops juda katta (10⁵+), tashqi tugunda taxmin va haqiqat keskin farq qiladi (rows=1 vs rows=50000). Sabab ko‘pincha noto‘g‘ri taxmin — statistika.</div></details><details class="iv-item"><summary class="iv-q"><span class="qi">?</span>enable_nestloop = off ni production’da ishlatish mumkinmi?<span class="chev">›</span></summary><div class="iv-a">Global — yo‘q: boshqa so‘rovlarni buzadi. Diagnostika uchun sessiyada. Doimiy yechim — statistikani tuzatish (ANALYZE, CREATE STATISTICS), indeks, so‘rovni qayta yozish; o‘ta holatda pg_hint_plan kengaytmasi.</div></details></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>O‘zingizni tekshiring</h2></div><div class="quiz"><div class="q" data-correct="0"><div class="q-txt"><span class="qn">1.</span>Tashqi 20 qator, ichki jadval 10 mln qator, join ustunida indeks bor. Eng yaxshi?</div><button class="opt">Nested Loop</button><button class="opt">Hash Join</button><button class="opt">Merge Join</button><div class="q-fb" data-ok="To‘g‘ri — 20 ta indeks qidiruvi." data-no="20 ta indeks qidiruvi — Nested Loop."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">2.</span>Ikkala jadval 5 mln qator, filtrsiz, tenglik sharti, indeks yo‘q.</div><button class="opt">Nested Loop</button><button class="opt">Hash Join</button><button class="opt">Merge Join (saralab)</button><div class="q-fb" data-ok="To‘g‘ri — O(N+M)." data-no="Hash Join odatda eng yaxshi."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">3.</span>Hash Join’da xesh-jadval qaysi tomondan quriladi?</div><button class="opt">Kattasidan</button><button class="opt">Kichigidan</button><div class="q-fb" data-ok="To‘g‘ri — xotira tejaladi." data-no="Kichik tomondan."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">4.</span><code>JOIN … ON t.sana BETWEEN a.boshi AND a.oxiri</code> — qaysi algoritm ishlay oladi?</div><button class="opt">Faqat Hash Join</button><button class="opt">Nested Loop (Hash tenglik talab qiladi)</button><button class="opt">Faqat Merge Join</button><div class="q-fb" data-ok="To‘g‘ri." data-no="Hash Join faqat = bilan."></div></div><div class="q" data-correct="1"><div class="q-txt"><span class="qn">5.</span>Nested Loop ichki tugun: <code>rows=7 loops=200000</code>, tashqi taxmin <code>rows=50</code>. Muammo?</div><button class="opt">Indeks yo‘q</button><button class="opt">Tashqi tomon taxmini 4000 baravar xato — noto‘g‘ri algoritm tanlangan</button><button class="opt">work_mem kichik</button><div class="q-fb" data-ok="To‘g‘ri — statistika muammosi." data-no="Taxmin xato → Nested Loop noto‘g‘ri tanlangan."></div></div></div>
+  </section>
+  <footer>
+    <div class="next">
+      <span class="eyebrow">Keyingi dars · PostgreSQL</span>
+      <h3>Statistika va planer</h3>
+      <p>Planer qatorlar sonini qayerdan biladi? pg_stats, histogramma, MCV, korrelyatsiya, CREATE STATISTICS — taxminlar qanday tuzatiladi.</p>
+      <div class="topics"><span class="topic-pill">115 · Tranzaksiya, MVCC</span><span class="topic-pill">116 · Indekslar</span><span class="topic-pill">117 · EXPLAIN</span><span class="topic-pill now">118 · Join algoritmlari</span><span class="topic-pill">119 · Planner</span><span class="topic-pill">120 · Sekin so‘rovlar</span><span class="topic-pill">121 · Partition, VACUUM</span><span class="topic-pill">122 · Praktikum</span></div>
+    </div>
+  </footer>
+
+</div>
+<nav class="cnav" aria-label="Darslar orasida o'tish" style="--tc:#2E6FA8"><div class="cnav-grid"><a class="cn pv" href="117-explain-analyze.html"><span class="cl">← Oldingi</span><span class="ct"><span class="n">117</span>EXPLAIN ANALYZE</span><span class="cs"><span class="ky-dot" style="background:#2E6FA8"></span>PostgreSQL</span></a><a class="cn nx" href="119-statistika-va-planer.html"><span class="cl">Keyingi dars →</span><span class="ct"><span class="n">119</span>Statistika va planer</span><span class="cs"><span class="ky-dot" style="background:#2E6FA8"></span>PostgreSQL</span></a></div><div class="cnav-foot"><a href="index.html">Barcha darslar</a><div class="cnav-bar" aria-hidden="true"><i style="width:100.0%"></i></div><span>118 / 118</span></div></nav>
+<script>try{var k='kodyoli:v',v=JSON.parse(localStorage.getItem(k)||'[]');if(v.indexOf(118)<0)v.push(118);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('kodyoli:last','118');var d=new Date(),t=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2),D=JSON.parse(localStorage.getItem('kodyoli:d')||'{}');D[t]=D[t]||[];if(D[t].indexOf(118)<0)D[t].push(118);localStorage.setItem('kodyoli:d',JSON.stringify(D));}catch(e){}</script><aside class="ky-side" id="kySide" style="--tc:#2E6FA8" aria-label="Yo'nalish mavzulari">
+<div class="ky-sh"><a class="ky-logo" href="index.html"><i>{}</i>kod yo'li</a><button type="button" class="ky-ib ky-x" onclick="kySide(0)" aria-label="Yopish"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="ky-tr"><div class="ky-lbl">Yo'nalish</div><div class="ky-tn"><span class="ky-dot"></span>PostgreSQL</div><div class="ky-pg"><i><b id="kyBar"></b></i><span id="kyCnt"></span></div></div>
+<nav class="ky-ls"><a href="108-ma-lumotlar-bazasi-nima.html" data-n="108"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">108</span>Ma’lumotlar bazasi nima</span></a><a href="109-select-where-order-by-null.html" data-n="109"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">109</span>SELECT, WHERE, ORDER BY, NULL</span></a><a href="110-group-by-having-agregatlar.html" data-n="110"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">110</span>GROUP BY, HAVING, agregatlar</span></a><a href="111-join-lar.html" data-n="111"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">111</span>JOIN’lar</span></a><a href="112-subquery-exists-cte-rekursiya.html" data-n="112"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">112</span>Subquery, EXISTS, CTE, rekursiya</span></a><a href="113-window-funksiyalar.html" data-n="113"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">113</span>Window funksiyalar</span></a><a href="114-bajarilish-tartibi-va-sql-tuzoqlari.html" data-n="114"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">114</span>Bajarilish tartibi va SQL tuzoqlari</span></a><a href="115-tranzaksiya-acid-mvcc-lock-lar.html" data-n="115"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">115</span>Tranzaksiya, ACID, MVCC, lock’lar</span></a><a href="116-indekslar.html" data-n="116"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">116</span>Indekslar</span></a><a href="117-explain-analyze.html" data-n="117"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">117</span>EXPLAIN ANALYZE</span></a><a href="118-join-algoritmlari.html" data-n="118" class="cur" aria-current="page"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">118</span>JOIN algoritmlari</span></a><a href="119-statistika-va-planer.html" data-n="119"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">119</span>Statistika va planer</span></a><a href="120-sekin-so-rovlarni-tuzatish.html" data-n="120"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">120</span>Sekin so‘rovlarni tuzatish</span></a><a href="121-partitsiya-vacuum-pool.html" data-n="121"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">121</span>Partitsiya, VACUUM, pool</span></a><a href="122-praktikum-va-suhbat.html" data-n="122"><span class="ky-st"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg></span><span><span class="n">122</span>Praktikum va suhbat</span></a><details class="ky-oth"><summary><span class="ky-lbl">Boshqa yo'nalishlar</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary><a href="01-java-qanday-ishlaydi.html" data-ns="1,2,3,4,5,6,7"><span class="ky-dot" style="background:#B5622A"></span><span>Java asoslari</span><span class="c">7</span></a><a href="08-klass-va-obyekt.html" data-ns="8,9,10,11,12,13"><span class="ky-dot" style="background:#9A5B2E"></span><span>OOP</span><span class="c">6</span></a><a href="14-kolleksiyalar.html" data-ns="14,15,16,17,18,19,20"><span class="ky-dot" style="background:#8A6A1E"></span><span>Java Core</span><span class="c">7</span></a><a href="21-zamonaviy-java-8-21.html" data-ns="21,22,23"><span class="ky-dot" style="background:#7A4B8C"></span><span>Advanced Java</span><span class="c">3</span></a><a href="89-algoritmik-fikrlash.html" data-ns="89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107"><span class="ky-dot" style="background:#0E7490"></span><span>DSA va algoritmlar</span><span class="c">19</span></a><a href="24-spring-boot-va-di.html" data-ns="24,25,26,27,28,29,30,31,32"><span class="ky-dot" style="background:#5A9E2F"></span><span>Spring Boot</span><span class="c">9</span></a><a href="37-big-o-va-tuzilmalar.html" data-ns="37,38,39"><span class="ky-dot" style="background:#6A4BB0"></span><span>Suhbatga tayyorgarlik</span><span class="c">3</span></a><a href="40-keycloak-va-iam.html" data-ns="40,41,42,43,44,45,46,47,48,49"><span class="ky-dot" style="background:#A3344A"></span><span>Keycloak</span><span class="c">10</span></a><a href="50-redis-nima-va-nega-tez.html" data-ns="50,51,52,53,54,55,56"><span class="ky-dot" style="background:#C8372D"></span><span>Redis</span><span class="c">7</span></a><a href="57-nega-kafka.html" data-ns="57,58,59,60,61,62,63,64"><span class="ky-dot" style="background:#334155"></span><span>Kafka</span><span class="c">8</span></a><a href="65-js-qanday-ishlaydi.html" data-ns="65,66,67,68,69,70,71,72,73,74"><span class="ky-dot" style="background:#B08900"></span><span>JavaScript</span><span class="c">10</span></a><a href="75-nega-typescript.html" data-ns="75,76,77,78,79,80"><span class="ky-dot" style="background:#3178C6"></span><span>TypeScript</span><span class="c">6</span></a><a href="81-vue-nima.html" data-ns="81,82,83,84,85,86,87,88"><span class="ky-dot" style="background:#2C8F68"></span><span>Vue.js</span><span class="c">8</span></a></details></nav>
+<div class="ky-sf"><a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>Barcha darslar</a></div></aside>
+<div class="ky-ov" id="kyOv" onclick="kySide(0)"></div>
+<script>function kySide(o){var s=document.getElementById('kySide');s.classList.toggle('on',!!o);document.getElementById('kyOv').classList.toggle('on',!!o);if(o){var c=s.querySelector('a.cur');if(c)c.scrollIntoView({block:'center'});}}
+function kyTheme(){var r=document.documentElement,t=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.setAttribute('data-theme',t==='dark'?'light':'dark');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')kySide(0);});
+(function(){var v=[];try{v=JSON.parse(localStorage.getItem('kodyoli:v')||'[]');}catch(e){}if(v.indexOf(118)<0)v.push(118);
+var as=document.querySelectorAll('.ky-ls > a[data-n]'),d=0;[].forEach.call(as,function(a){if(v.indexOf(+a.getAttribute('data-n'))>=0){d++;if(!a.classList.contains('cur'))a.classList.add('done');}});
+document.getElementById('kyCnt').textContent=d+'/'+as.length;document.getElementById('kyBar').style.width=(d/as.length*100)+'%';
+[].forEach.call(document.querySelectorAll('.ky-oth a[data-ns]'),function(a){var ns=a.getAttribute('data-ns').split(','),k=0;ns.forEach(function(n){if(v.indexOf(+n)>=0)k++;});a.querySelector('.c').textContent=k+'/'+ns.length;});
+if(innerWidth>=1200){var c=document.querySelector('.ky-ls a.cur');if(c)c.scrollIntoView({block:'center'});window.scrollTo(0,0);}
+var p=document.getElementById('kyProg'),q=0;function u(){q=0;var h=document.documentElement.scrollHeight-innerHeight;p.style.transform='scaleX('+(h>0?Math.min(1,scrollY/h):0)+')';}
+addEventListener('scroll',function(){if(!q){q=1;requestAnimationFrame(u);}},{passive:true});u();})();</script>
+<script>
+(function(){"use strict";
+var root=document.documentElement,tb=document.getElementById('themeBtn');
+function cur(){var t=root.getAttribute('data-theme');if(t)return t;return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+tb.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');});
+[].slice.call(document.querySelectorAll('.quiz .q')).forEach(function(q){
+  var correct=+q.getAttribute('data-correct'),opts=[].slice.call(q.querySelectorAll('.opt')),fb=q.querySelector('.q-fb');
+  opts.forEach(function(o,k){o.addEventListener('click',function(){
+    if(q.dataset.done)return;q.dataset.done="1";opts.forEach(function(x){x.disabled=true;});
+    var ok=k===correct;o.classList.add(ok?'correct':'wrong');if(!ok)opts[correct].classList.add('correct');
+    fb.textContent=ok?fb.getAttribute('data-ok'):fb.getAttribute('data-no');fb.className='q-fb show '+(ok?'ok':'no');});});
+});
+/* generic stepper: .stepper[data-n] with #id-prev #id-next #id-play, calls window.__steppers[id](i) */
+window.mkStepper=function(id,n,onStep,ms){
+  var i=0,timer=null,play=document.getElementById(id+'Play'),prev=document.getElementById(id+'Prev'),next=document.getElementById(id+'Next'),bar=document.getElementById(id+'Bar');
+  function go(k){i=(k+n)%n;onStep(i);if(bar)bar.style.width=((i+1)/n*100)+'%';}
+  function stop(){if(timer){clearInterval(timer);timer=null;}if(play)play.textContent='▶ Avto';}
+  function start(){stop();play.textContent='⏸ To\'xtat';timer=setInterval(function(){go(i+1);},ms||1800);}
+  if(prev)prev.addEventListener('click',function(){stop();go(i-1);});
+  if(next)next.addEventListener('click',function(){stop();go(i+1);});
+  if(play)play.addEventListener('click',function(){timer?stop():start();});
+  go(0);return {go:go,stop:stop};
+};
+})();
+
+(function(){
+var uid=0;
+function clone(o){return o===undefined?undefined:JSON.parse(JSON.stringify(o));}
+window.mkTrace=function(pid,o){
+  var el=function(s){return document.getElementById(pid+s);};
+  var code=el('Code'),lines=code?code.children:[],viz=el('Viz'),vb=el('Vars'),frames=[],i=0,timer=null,lastVars={};
+  function record(data){frames=[];var S={cnt:{},inc:function(k,n){S.cnt[k]=(S.cnt[k]||0)+(n||1);},
+      step:function(ln,msg,st,vars){frames.push({ln:ln,msg:msg,st:clone(st),vars:clone(vars||{}),cnt:clone(S.cnt)});},
+      arr:function(a){return a.map(function(v){return {v:v,id:'e'+(++uid)};});}};
+    (o.counters||[]).forEach(function(k){S.cnt[k]=0;});
+    try{o.run(data,S);}catch(e){frames.push({ln:0,msg:'<span style="color:var(--coral)">Xato: '+e.message+'</span>',st:frames.length?frames[frames.length-1].st:{},vars:{},cnt:clone(S.cnt)});}
+    el('Rng').max=Math.max(0,frames.length-1);}
+  function show(k){if(!frames.length)return;i=Math.max(0,Math.min(frames.length-1,k));var f=frames[i];
+    for(var j=0;j<lines.length;j++)lines[j].classList.toggle('on',j===f.ln-1);
+    var on=lines[f.ln-1];if(on&&code){var top=on.offsetTop-code.clientHeight/2;if(code.scrollHeight>code.clientHeight)code.scrollTop=top;}
+    o.draw(f.st,viz,f,i);
+    if(vb){var h='';Object.keys(f.vars).forEach(function(k){var v=f.vars[k],s=typeof v==='object'?JSON.stringify(v):String(v);h+='<span class="'+(lastVars[k]!==s&&i>0?'ch':'')+'">'+k+' = <b>'+s+'</b></span>';lastVars[k]=s;});vb.innerHTML=h;}
+    el('Cnt').innerHTML=Object.keys(f.cnt).map(function(k){return '<span>'+k+': <b>'+f.cnt[k]+'</b></span>';}).join('');
+    el('Ex').innerHTML='<b>'+(i+1)+'/'+frames.length+'</b> — '+f.msg;el('St').textContent='qadam '+(i+1)+'/'+frames.length;el('Rng').value=i;
+    if(o.onStep)o.onStep(i,f,frames);}
+  function stop(){if(timer){clearInterval(timer);timer=null;}el('Play').textContent='▶ Avto';}
+  function play(){if(i>=frames.length-1)show(0);stop();el('Play').textContent='⏸ To‘xtat';timer=setInterval(function(){if(i>=frames.length-1){stop();return;}show(i+1);},+el('Sp').value);}
+  el('Prev').addEventListener('click',function(){stop();show(i-1);});
+  el('Next').addEventListener('click',function(){stop();show(i+1);});
+  el('Play').addEventListener('click',function(){timer?stop():play();});
+  el('Rng').addEventListener('input',function(){stop();show(+this.value);});
+  el('Sp').addEventListener('change',function(){if(timer)play();});
+  function load(str){var d;try{d=o.parse?o.parse(str):str;}catch(e){el('Ex').innerHTML='<span style="color:var(--coral)">'+e.message+'</span>';return;}stop();lastVars={};if(viz&&o.reset)o.reset(viz);record(d);show(0);}
+  var inp=el('In');
+  if(inp){el('Go').addEventListener('click',function(){load(inp.value);});inp.addEventListener('keydown',function(e){if(e.key==='Enter')load(inp.value);});
+    [].forEach.call(document.querySelectorAll('#'+pid+' .chip2'),function(b){b.addEventListener('click',function(){inp.value=b.getAttribute('data-v');load(inp.value);});});}
+  load(inp?inp.value:o.input);
+  return {load:load,show:show,frames:function(){return frames;}};
+};
+window.parseNums=function(s,max){var a=String(s).split(/[\s,;]+/).filter(Boolean).map(Number);if(!a.length||a.some(isNaN))throw new Error('Faqat sonlarni vergul bilan yozing, masalan: 5, 3, 8, 1');if(a.length>(max||14))throw new Error('Ko‘pi bilan '+(max||14)+' ta son — animatsiya ko‘rinarli bo‘lsin');return a;};
+/* array viz: st.a=[{v,id}], opt: hl{index:cls}, ptr{name:index}, rg:[lo,hi], bars, ok:[indices] */
+window.arrViz=function(box,a,opt){opt=opt||{};var W=(box.clientWidth||324)-24,n=Math.max(a.length,opt.n||0),gap=6,cw=Math.min(56,Math.floor((W-gap*(n-1))/Math.max(n,1)));cw=Math.max(cw,22);
+  var tot=n*cw+(n-1)*gap,mx=1;a.forEach(function(x){if(x&&Math.abs(x.v)>mx)mx=Math.abs(x.v);});var bh=opt.bars?150:cw,H=bh+22+30;
+  var av=box.querySelector('.av');if(!av){av=document.createElement('div');av.className='av';box.appendChild(av);}
+  av.className='av'+(opt.bars?' bars':'');av.style.width=tot+'px';av.style.height=H+'px';
+  var seen={};
+  a.forEach(function(x,k){if(!x)return;var c=av.querySelector('[data-id="'+x.id+'"]');if(!c){c=document.createElement('div');c.className='c';c.setAttribute('data-id',x.id);c.style.left=(k*(cw+gap))+'px';av.appendChild(c);}
+    seen[x.id]=1;c.textContent=x.v;c.style.width=cw+'px';c.style.left=(k*(cw+gap))+'px';c.style.height=(opt.bars?Math.max(22,Math.round(18+Math.abs(x.v)/mx*(bh-18))):cw)+'px';
+    var cls='c';if(opt.ok&&opt.ok.indexOf(k)>=0)cls+=' ok';if(opt.dim&&opt.dim.indexOf(k)>=0)cls+=' dim';if(opt.hl&&opt.hl[k])cls+=' '+opt.hl[k];c.className=cls;});
+  [].forEach.call(av.querySelectorAll('.c'),function(c){if(!seen[c.getAttribute('data-id')])c.remove();});
+  [].forEach.call(av.querySelectorAll('.ix,.pt,.rg'),function(e){e.remove();});
+  if(opt.idx!==false)for(var k=0;k<n;k++){var ix=document.createElement('div');ix.className='ix';ix.style.left=(k*(cw+gap))+'px';ix.style.width=cw+'px';ix.textContent=k;av.appendChild(ix);}
+  if(opt.rg&&opt.rg[1]>=opt.rg[0]){var r=document.createElement('div');r.className='rg';r.style.left=(opt.rg[0]*(cw+gap)-4)+'px';r.style.width=((opt.rg[1]-opt.rg[0]+1)*(cw+gap)-gap+8)+'px';r.style.height=((opt.bars?bh:cw)+12)+'px';av.appendChild(r);}
+  var stack={};Object.keys(opt.ptr||{}).forEach(function(nm){var k=opt.ptr[nm];if(k==null||k<-1||k>n)return;var lv=stack[k]=(stack[k]||0)+1;var p=document.createElement('div');p.className='pt';p.style.left=(k*(cw+gap)-10)+'px';p.style.width=(cw+20)+'px';p.style.top=((lv-1)*13)+'px';p.innerHTML='<i>'+nm+(lv===1?' ↓':'')+'</i>';av.appendChild(p);});
+  if(!opt.bars)av.style.paddingTop='0';var top=(Object.keys(opt.ptr||{}).length?Math.max(1,Math.max.apply(null,Object.keys(stack).map(function(k){return stack[k];})))*13+4:4);
+  [].forEach.call(av.querySelectorAll('.c'),function(c){c.style.bottom='22px';});av.style.height=(top+(opt.bars?bh:cw)+26)+'px';};
+/* grid viz */
+window.gridViz=function(box,g,opt){opt=opt||{};var h='<div style="overflow-x:auto"><table class="gv">';if(opt.cols){h+='<tr><th></th>'+opt.cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr>';}
+  g.forEach(function(row,r){h+='<tr>'+(opt.rows?'<th>'+opt.rows[r]+'</th>':'');row.forEach(function(v,c){var k=r+','+c,cl=(opt.cls&&opt.cls[k])||'';h+='<td class="'+cl+(v===null||v===undefined?' e':'')+'">'+(v===null||v===undefined?'·':(v===Infinity?'∞':v))+'</td>';});h+='</tr>';});
+  box.innerHTML=h+'</table></div>'+(opt.note?'<div style="margin-top:8px;font-size:13px;text-align:center">'+opt.note+'</div>':'');};
+/* graph viz: nodes{id:[x,y]} in 0..100, edges [[a,b,w]], cls{node:cls}, ecls{'a-b':cls}, lab{node:text}, dir */
+window.graphViz=function(box,g,opt){opt=opt||{};var W=box.clientWidth||320,H=opt.h||240,nx=function(p){return 22+p[0]/100*(W-44);},ny=function(p){return 22+p[1]/100*(H-44);};
+  var s='<svg class="gr" viewBox="0 0 '+W+' '+H+'" height="'+H+'">';if(g.dir)s+='<defs><marker id="ah'+(opt.uid||'')+'" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" style="color:var(--ink-faint)"/></marker></defs>';
+  (g.edges||[]).forEach(function(e){var a=g.nodes[e[0]],b=g.nodes[e[1]],k=e[0]+'-'+e[1],k2=e[1]+'-'+e[0],cl=(opt.ecls&&(opt.ecls[k]||(!g.dir&&opt.ecls[k2])))||'';
+    s+='<line class="ed '+cl+'" x1="'+nx(a)+'" y1="'+ny(a)+'" x2="'+nx(b)+'" y2="'+ny(b)+'"'+(g.dir?' marker-end="url(#ah'+(opt.uid||'')+')"':'')+'/>';
+    if(e[2]!=null)s+='<text class="ew" x="'+((nx(a)+nx(b))/2+6)+'" y="'+((ny(a)+ny(b))/2-6)+'">'+e[2]+'</text>';});
+  Object.keys(g.nodes).forEach(function(id){var p=g.nodes[id],cl=(opt.cls&&opt.cls[id])||'';s+='<g class="nd '+cl+'"><circle cx="'+nx(p)+'" cy="'+ny(p)+'" r="16"/><text x="'+nx(p)+'" y="'+ny(p)+'">'+id+'</text>'+(opt.lab&&opt.lab[id]!=null?'<text class="lab" x="'+(nx(p)+(opt.ldx||0))+'" y="'+(ny(p)+(opt.ldy==null?28:opt.ldy))+'">'+opt.lab[id]+'</text>':'')+'</g>';});
+  box.innerHTML=s+'</svg>'+(opt.note?'<div style="margin-top:6px;font-size:13px;text-align:center">'+opt.note+'</div>':'');};
+/* binary tree layout: t={v,l,r} -> nodes with positions */
+window.treeLayout=function(t){var nodes={},edges=[],xs=0,depth=0;function walk(n,d){if(!n)return;walk(n.l,d+1);n._x=xs++;n._d=d;depth=Math.max(depth,d);walk(n.r,d+1);}walk(t,0);
+  function put(n){if(!n)return;nodes[n.v]=[xs<=1?50:n._x/(xs-1)*100,depth?n._d/depth*100:50];if(n.l){edges.push([n.v,n.l.v]);put(n.l);}if(n.r){edges.push([n.v,n.r.v]);put(n.r);}}put(t);return {nodes:nodes,edges:edges};};
+})();
+
+
+
+
+
+
+
+
+
+(function(){
+  var el=function(i){return document.getElementById(i);};
+  function parse(s){var p=s.split('|');if(p.length<2)throw new Error('Format: hisob id’lari | tranzaksiyalar hisob_id’lari');return {H:parseNums(p[0],7),T:parseNums(p[1],10)};}
+  function draw(pre,st,v){
+    var h='<div class="jz"><div><h5>'+(st.hn||'hisoblar H')+'</h5>'+st.H.map(function(x,k){return '<div class="jr '+(st.hc[k]||'')+'"><span>id '+x+'</span>'+(st.pi===k?'<span class="pt2">i</span>':'')+'</div>';}).join('')+
+      (st.map?'<h5 style="margin-top:10px">HashMap (id → hisob)</h5><div class="jmap">'+(st.map.length?st.map.map(function(e){return '<div class="'+(st.mk===e?'hl':'')+'"><b>'+e+'</b><span>hisob '+e+'</span></div>';}).join(''):'<span style="font:12px var(--font-mono);color:var(--ink-faint)">bo‘sh</span>')+'</div>':'')+
+      '</div><div><h5>'+(st.tn||'tranzaksiyalar T')+'</h5>'+st.T.map(function(x,k){return '<div class="jr '+(st.tc[k]||'')+'"><span>t'+(st.tid?st.tid[k]:k+1)+'</span><span>hisob_id '+x+'</span>'+(st.pj===k?'<span class="pt2">j</span>':'')+'</div>';}).join('')+
+      '</div></div><h5 style="margin-top:10px;font:700 11px var(--font-mono);color:var(--ink-faint)">NATIJA ('+st.res.length+')</h5><div class="jres">'+st.res.map(function(r){return '<span>h'+r[0]+'·t'+r[1]+'</span>';}).join('')+'</div>';
+    v.innerHTML=h;}
+  mkTrace('nl',{counters:['solishtirish'],parse:parse,
+    run:function(d,S){var st={H:d.H,T:d.T,hc:{},tc:{},res:[]};S.step(2,'Natija ro‘yxati bo‘sh. Tashqi: '+d.H.length+' ta hisob, ichki: '+d.T.length+' ta tranzaksiya.',st,{});
+      d.H.forEach(function(h,i){st.hc={};st.hc[i]='cur';st.tc={};S.step(3,'Tashqi qator: hisob <b>'+h+'</b>. Endi ichki ro‘yxat <b>boshidan</b> aylaniladi.',st,{'h.id':h});
+        d.T.forEach(function(t,j){st.tc={};for(var q=0;q<j;q++)st.tc[q]='no';st.tc[j]='cmp';S.inc('solishtirish');S.step(5,'t'+(j+1)+'.hisobId = '+t+' == '+h+' ? '+(t===h?'<b>ha</b>':'yo‘q'),st,{'h.id':h,'t.hisobId':t});
+          if(t===h){st.tc[j]='hit';st.res.push([h,j+1]);S.step(6,'Juft topildi → natijaga (h'+h+', t'+(j+1)+').',st,{'h.id':h,'t.hisobId':t});}});});
+      st.hc={};st.tc={};S.step(9,'Tamom: '+d.H.length+' × '+d.T.length+' = <b>'+(d.H.length*d.T.length)+'</b> solishtirish. 1 000 × 1 000 000 bo‘lsa — 1 mlrd! Shuning uchun ichki tomonda <b>indeks</b> bo‘lsa, ichki sikl O(log M) qidiruvga aylanadi (Index Nested Loop).',st,{});},
+    draw:function(st,v){draw('nl',st,v);}});
+  mkTrace('hj',{counters:['xesh amali'],parse:parse,
+    run:function(d,S){var st={H:d.H,T:d.T,hc:{},tc:{},res:[],map:[]};S.step(2,'<b>BUILD</b> bosqichi: kichik tomondan (hisoblar) HashMap quramiz.',st,{});
+      d.H.forEach(function(h,i){st.hc={};st.hc[i]='cur';st.map.push(h);st.mk=h;S.inc('xesh amali');S.step(4,'put('+h+') — hisob xaritaga.',st,{'h.id':h});});
+      st.hc={};st.mk=null;S.step(5,'BUILD tugadi: '+d.H.length+' ta amal. Endi <b>PROBE</b>: katta tomonni <b>bir marta</b> aylanamiz.',st,{});
+      d.T.forEach(function(t,j){st.tc={};for(var q=0;q<j;q++)st.tc[q]='no';st.tc[j]='cmp';st.mk=t;S.inc('xesh amali');var hit=d.H.indexOf(t)>=0;
+        S.step(7,'map.get('+t+') → '+(hit?'<b>topildi</b>':'null')+'. Ro‘yxatni aylanish yo‘q — bitta xesh amali.',st,{'t.hisobId':t});
+        if(hit){st.tc[j]='hit';st.hc={};st.hc[d.H.indexOf(t)]='hit';st.res.push([t,j+1]);S.step(9,'Natijaga (h'+t+', t'+(j+1)+').',st,{'t.hisobId':t});st.hc={};}});
+      st.tc={};st.mk=null;S.step(11,'Tamom: '+d.H.length+' + '+d.T.length+' = <b>'+(d.H.length+d.T.length)+'</b> amal (Nested Loop’da '+(d.H.length*d.T.length)+'). Narxi — xotira (HashMap) va faqat <b>tenglik</b> sharti.',st,{});},
+    draw:function(st,v){draw('hj',st,v);}});
+  mkTrace('mj',{counters:['solishtirish'],parse:parse,
+    run:function(d,S){var H=d.H.slice().sort(function(a,b){return a-b;}),idx=d.T.map(function(t,k){return [t,k+1];}).sort(function(a,b){return a[0]-b[0]||a[1]-b[1];}),T=idx.map(function(x){return x[0];}),tid=idx.map(function(x){return x[1];});
+      var st={H:H,T:T,tid:tid,hc:{},tc:{},res:[],hn:'H (tartiblangan)',tn:'T (hisob_id bo‘yicha tartiblangan)'};
+      S.step(1,'Avval ikkala ro‘yxat ham kalit bo‘yicha <b>tartiblanadi</b> (yoki indeksdan tartibda o‘qiladi).',st,{});
+      var i=0,j=0;st.pi=0;st.pj=0;S.step(4,'i = 0, j = 0 — ikkita ko‘rsatkich.',st,{i:0,j:0});
+      while(i<H.length&&j<T.length){var a=H[i],b=T[j];st.pi=i;st.pj=j;st.hc={};st.tc={};st.hc[i]='cmp';st.tc[j]='cmp';S.inc('solishtirish');
+        S.step(6,'a = '+a+', b = '+b,st,{i:i,j:j,a:a,b:b});
+        if(a<b){S.step(7,a+' &lt; '+b+' → chap orqada qoldi: <b>i++</b>. Bu hisobga boshqa juft kelmaydi (T tartiblangan).',st,{i:i,j:j,a:a,b:b});i++;}
+        else if(a>b){S.step(8,a+' &gt; '+b+' → o‘ng orqada: <b>j++</b>.',st,{i:i,j:j,a:a,b:b});j++;}
+        else{st.hc[i]='hit';st.tc[j]='hit';st.res.push([a,tid[j]]);S.step(9,'Teng → natijaga (h'+a+', t'+tid[j]+'), <b>j++</b>.',st,{i:i,j:j,a:a,b:b});j++;}}
+      st.hc={};st.tc={};st.pi=-1;st.pj=-1;S.step(11,'Tamom: har ro‘yxat <b>bir marta</b> yurildi — O(N + M). Agar avval saralash kerak bo‘lsa, unga O(N log N) qo‘shiladi; indeks tartibni “tekinga” beradi.',st,{});},
+    draw:function(st,v){draw('mj',st,v);}});
+})();
+
+</script>
+</body>
+</html>
